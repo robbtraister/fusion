@@ -50,7 +50,11 @@ function server () {
       if (err) {
         return res.sendStatus(500)
       }
-      res.send(`var ${(req.query.v || 'v').replace(/[^a-z_]*/gi, '')} = ${buf.toString()}`)
+      if (req.query.m) {
+        res.send(`${req.query.m.replace(/[^a-z_]*/gi, '')}(${buf.toString()})`)
+      } else {
+        res.send(`var ${(req.query.v || 'v').replace(/[^a-z_]*/gi, '')} = ${buf.toString()}`)
+      }
     })
   })
 

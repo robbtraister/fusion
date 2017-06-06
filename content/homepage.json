@@ -1,0 +1,13 @@
+[
+  {
+    "id": 1,
+    "component": "Header"
+  },
+  {
+    "id": 5,
+    "component": "Body",
+    "content": {
+      "html": "homepage"
+    }
+  }
+]

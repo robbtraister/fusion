@@ -1,0 +1,38 @@
+{
+  "name": "react-features",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm run sass && npm run pack",
+    "dev": "webpack-dev-server",
+    "pack": "webpack -p",
+    "sass": "node-sass --importer node_modules/node-sass-glob -o public components/style.scss",
+    "start": "node server/cluster",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-loader": "^7.0.0",
+    "css-loader": "^0.28.4",
+    "import-glob-loader": "^1.1.0",
+    "node-sass": "^4.5.3",
+    "node-sass-glob": "^1.0.4",
+    "sass-loader": "^6.0.5",
+    "style-loader": "^0.18.2",
+    "webpack": "^2.6.1",
+    "webpack-dev-server": "^2.4.5"
+  },
+  "dependencies": {
+    "babel-core": "^6.24.1",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "express": "^4.15.3",
+    "morgan": "^1.8.2",
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4"
+  }
+}

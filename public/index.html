@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>React Rendering Engine</title>
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <!--link rel="icon" type="image/ico" href="/favicon.ico" /-->
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+  </head>
+  <body>
+    <div id="App"></div>
+  </body>
+  <noscript>
+    <meta http-equiv="refresh" content="0; url=?rendered">
+  </noscript>
+  <script type="text/javascript">
+    <!--
+    //<![CDATA[
+      var page = document.location.pathname
+        // strip trailing / or .htm/.html
+        .replace(/(\/|\.html?)$/, '')
+        // if it's empty, use `/homepage`
+        .replace(/^$/, '/homepage')
+
+      document.write('<script src="' + '/content' + page + '.jsonp?v=layout' + '"></script>')
+    //]]>
+    -->
+  </script>
+  <script src="/render.js"></script>
+</html>

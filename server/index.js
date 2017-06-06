@@ -44,7 +44,7 @@ function server () {
     }
   })
 
-  app.use('/content', (req, res, next) => {
+  app.use(/^\/content\/.+\.jsonp$/, (req, res, next) => {
     let f = url.parse(req.originalUrl).pathname.replace(/^\//, '').replace(/\.jsonp$/, '.json')
     fs.readFile(path.join(root, f), (err, buf) => {
       if (err) {
@@ -58,6 +58,7 @@ function server () {
     })
   })
 
+  app.use('/content', express.static(path.join(root, 'content')))
   app.use(express.static(path.join(root, 'public')))
 
   var indexFilePath = path.join(__dirname, '..', 'public', 'index.html')

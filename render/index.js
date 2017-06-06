@@ -1,5 +1,7 @@
-const ReactDOM = require('react-dom')
-const App = require('./app')
+/* global XMLHttpRequest */
+
+import ReactDOM from 'react-dom'
+import App from './app'
 
 // use <link> tag in index.html since styles are published for SSR, anyway
 // require('./style.scss')
@@ -14,8 +16,11 @@ var page = document.location.pathname
   // if it's empty, use `/homepage`
   .replace(/^$/, '/homepage')
 
-var script = document.createElement('script')
-script.src = '/content' + page + '.jsonp?m=PbRender'
-document.head.appendChild(script)
-
-module.exports = PbRender
+var xhr = new XMLHttpRequest()
+xhr.onreadystatechange = function () {
+  if (this.readyState === 4 && this.status === 200) {
+    PbRender(JSON.parse(this.responseText))
+  }
+}
+xhr.open('GET', '/content' + page + '.json', true)
+xhr.send()

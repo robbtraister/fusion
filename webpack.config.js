@@ -26,10 +26,6 @@ module.exports = {
         loader: 'babel-loader'
       },
       {
-        test: require.resolve('./render/index.js'),
-        loader: 'expose-loader?PbRender'
-      },
-      {
         test: /\.s[ac]ss$/,
         exclude: /node_modules/,
         loader: ['style-loader', 'css-loader', 'sass-loader', 'import-glob-loader']

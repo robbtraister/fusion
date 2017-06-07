@@ -1,4 +1,6 @@
-/* global window, XMLHttpRequest */
+'use strict'
+
+/* global XMLHttpRequest */
 
 const ReactDOM = require('react-dom')
 const Engine = require('.')(require('../components'))

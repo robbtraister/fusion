@@ -27,6 +27,8 @@ function fetch (uri, cb) {
 function router () {
   let router = express.Router()
 
+  router.use(express.static(path.join(__dirname, '..', 'content')))
+
   router.use((req, res, next) => {
     fetch(req.path, (err, content) => {
       if (err) {

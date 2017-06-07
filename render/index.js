@@ -6,21 +6,21 @@ import App from './app'
 // use <link> tag in index.html since styles are published for SSR, anyway
 // require('./style.scss')
 
-function PbRender (layout) {
-  ReactDOM.render(App({layout: layout}), document.getElementById('App'))
-}
+function getContentSource () {
+  var page = document.location.pathname
+    // strip trailing / or .htm/.html
+    .replace(/(\/|\.html?)$/, '')
+    // strip leading slash
+    .replace(/^\/+/, '') || 'homepage'
 
-var page = document.location.pathname
-  // strip trailing / or .htm/.html
-  .replace(/(\/|\.html?)$/, '')
-  // if it's empty, use `/homepage`
-  .replace(/^$/, '/homepage')
+  return '/content/' + page + '.json'
+}
 
 var xhr = new XMLHttpRequest()
 xhr.onreadystatechange = function () {
   if (this.readyState === 4 && this.status === 200) {
-    PbRender(JSON.parse(this.responseText))
+    ReactDOM.render(App({layout: JSON.parse(this.responseText)}), document.getElementById('App'))
   }
 }
-xhr.open('GET', '/content' + page + '.json', true)
+xhr.open('GET', getContentSource(), true)
 xhr.send()

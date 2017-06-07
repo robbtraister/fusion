@@ -10,7 +10,7 @@ const express = require('express')
 const base = path.join(__dirname, '..', 'content')
 
 function source (uri) {
-  let f = url.parse(uri).pathname.replace(/^\//, '').replace(/\.jsonp?$/, '')
+  let f = url.parse(uri).pathname.replace(/^\//, '').replace(/\.json$/, '')
   return `${f || 'homepage'}.json`
 }
 
@@ -37,11 +37,7 @@ function router () {
           msg: err
         })
       }
-      if (/\.jsonp$/.test(req.path)) {
-        res.send(`var ${(req.query.v || 'v').replace(/[^a-z_]*/gi, '')} = ${content}`)
-      } else {
-        res.send(content)
-      }
+      res.send(content)
     })
   })
 

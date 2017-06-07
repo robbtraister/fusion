@@ -20,13 +20,9 @@ function master (workerCount) {
 }
 
 if (module === require.main) {
-  let workerCount = cluster.isMaster && process.env.hasOwnProperty('WORKERS')
-    ? Number(process.env.WORKERS) || require('os').cpus().length
-    : 1
-
-  if (workerCount === 1) {
-    worker()
+  if (cluster.isMaster) {
+    master(Number(process.env.WORKERS) || require('os').cpus().length)
   } else {
-    master(workerCount)
+    worker()
   }
 }

@@ -20,10 +20,10 @@ function server () {
 
   app.use(compression())
 
-  app.use(express.static(path.join(__dirname, '..', 'public')))
-
   app.use(render())
   app.use('/content', content())
+
+  app.use(express.static(path.join(__dirname, '..', 'public')))
 
   var indexFilePath = path.join(__dirname, '..', 'public', 'index.html')
   app.get('*', (req, res, next) => {

@@ -9,9 +9,13 @@ const express = require('express')
 
 const base = path.join(__dirname, '..', 'content')
 
-function fetch (uri, cb) {
+function source (uri) {
   let f = url.parse(uri).pathname.replace(/^\//, '').replace(/\.jsonp?$/, '')
-  fs.readFile(path.join(base, `${f}.json`), (err, buf) => {
+  return `${f || 'homepage'}.json`
+}
+
+function fetch (uri, cb) {
+  fs.readFile(path.join(base, source(uri)), (err, buf) => {
     if (err) {
       debug('fetch error:', err)
       return cb(err)
@@ -44,3 +48,4 @@ function router () {
 
 module.exports = router
 module.exports.fetch = fetch
+module.exports.source = source

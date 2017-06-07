@@ -9,7 +9,7 @@ function worker () {
 }
 
 function master (workerCount) {
-  console.log('Starting workers:', workerCount)
+  console.error('Starting workers:', workerCount)
 
   for (let w = 0; w < workerCount; w++) {
     cluster.fork()

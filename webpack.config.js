@@ -2,7 +2,8 @@ const path = require('path')
 
 module.exports = {
   entry: {
-    render: './render/index.js'
+    components: './components/index.js',
+    engine: './engine/mount.js'
   },
   output: {
     path: path.resolve('./public'),
@@ -24,6 +25,10 @@ module.exports = {
         test: /\.js$/,
         exclude: /node_modules/,
         loader: 'babel-loader'
+      },
+      {
+        test: require.resolve('./components/index.js'),
+        loader: 'expose-loader?Components'
       },
       {
         test: /\.s[ac]ss$/,

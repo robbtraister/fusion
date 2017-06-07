@@ -5,7 +5,7 @@ const express = require('express')
 
 const React = require('react')
 const ReactDOMServer = require('react-dom/server')
-const App = React.createFactory(require('../render/app'))
+const Engine = React.createFactory(require('../engine')(require('../components')))
 
 const fetch = require('./content').fetch
 const template = require('./template')
@@ -13,7 +13,7 @@ const template = require('./template')
 function renderLayout (layout) {
   return '<!DOCTYPE html>' +
     ReactDOMServer.renderToStaticMarkup(
-      template(ReactDOMServer.renderToStaticMarkup(App({layout})))
+      template(ReactDOMServer.renderToStaticMarkup(Engine({layout})))
     )
 }
 

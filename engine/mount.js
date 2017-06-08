@@ -1,13 +1,34 @@
 'use strict'
 
-/* global window */
+/* global window, XMLHttpRequest */
 
 const ReactDOM = require('react-dom')
 const Engine = require('.')
-const $ = require('jquery')
+// const $ = require('jquery')
 
 // use <link> tag in index.html since styles are published for SSR, anyway
 // require('./style.scss')
+
+function getJSON (uri) {
+  return new Promise(function (resolve, reject) {
+    var xhr = new XMLHttpRequest()
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4) {
+        var response = xhr.responseText
+        if (xhr.status === 200) {
+          try {
+            return resolve(JSON.parse(response))
+          } catch (e) {
+            response = e
+          }
+        }
+        reject(response)
+      }
+    }
+    xhr.open('GET', uri, true)
+    xhr.send()
+  })
+}
 
 function normalize (src) {
   return src
@@ -25,7 +46,7 @@ function fetchContent (src) {
     return contents[normalizedSource]
   }
 
-  var fetch = $.getJSON(normalizedSource)
+  var fetch = getJSON(normalizedSource)
     .then(function (content) {
       contents[normalizedSource] = content
       return content
@@ -50,7 +71,7 @@ function getContent (src) {
 
 function fetchLayout (src) {
   var normalizedSource = '/_layout/' + normalize(src) + '.json'
-  return $.getJSON(normalizedSource)
+  return getJSON(normalizedSource)
 }
 
 const page = document.location.pathname

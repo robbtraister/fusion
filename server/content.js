@@ -4,7 +4,7 @@ const fs = require('fs')
 const path = require('path')
 const url = require('url')
 
-const debug = require('debug')('pb:content')
+const debug = require('debug')(`pb:content:${process.pid}`)
 const express = require('express')
 
 const base = path.join(__dirname, '..', 'content')
@@ -33,7 +33,7 @@ function router () {
     fetch(req.path, (err, content) => {
       if (err) {
         return next({
-          status: 500,
+          status: err.code === 'ENOENT' ? 404 : 500,
           msg: err
         })
       }

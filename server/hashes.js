@@ -4,7 +4,7 @@ const crypto = require('crypto')
 const fs = require('fs')
 const path = require('path')
 
-const debug = require('debug')('pb:hashes')
+const debug = require('debug')(`pb:hashes:${process.pid}`)
 const glob = require('glob')
 
 const baseDir = path.normalize(`${__dirname}/../public`)

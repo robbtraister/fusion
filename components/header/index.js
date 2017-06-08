@@ -2,7 +2,7 @@ import React from 'react'
 
 const Header = (id) => {
   return <div className='header' key={id}>
-    The Washington Post
+    <a href='/'>The Washington Post</a>
   </div>
 }
 

@@ -6,7 +6,7 @@ require('babel-core/register')
 
 const path = require('path')
 
-const debug = require('debug')('pb:server')
+const debug = require('debug')(`pb:server:${process.pid}`)
 const express = require('express')
 const morgan = require('morgan')
 const compression = require('compression')
@@ -45,7 +45,6 @@ function server () {
   })
 
   app.use((err, req, res, next) => {
-    debug(err)
     return res.status(err.status || 500).send(/^prod/i.test(process.env.NODE_ENV) ? '' : err.msg)
   })
 

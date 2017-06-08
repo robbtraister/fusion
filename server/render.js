@@ -1,6 +1,6 @@
 'use strict'
 
-const debug = require('debug')('pb:render')
+const debug = require('debug')(`pb:render:${process.pid}`)
 const express = require('express')
 
 // Components bundle does not include react lib; expose it as the explicit lib name

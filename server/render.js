@@ -17,12 +17,22 @@ const layoutFetch = require('./layouts').fetch
 const template = require('./template')
 
 function renderHTML (body, omitScripts) {
-  return '<!DOCTYPE html>' +
-    ReactDOMServer.renderToStaticMarkup(template(body, omitScripts))
+  try {
+    return '<!DOCTYPE html>' +
+      ReactDOMServer.renderToStaticMarkup(template(body, omitScripts))
+  } catch (e) {
+    debug('error:', e)
+    throw e
+  }
 }
 
-function renderBody (content, layout, omitScripts) {
-  return renderHTML(ReactDOMServer.renderToStaticMarkup(engine({content, layout})), omitScripts)
+function renderBody (contents, layout, omitScripts) {
+  try {
+    return renderHTML(ReactDOMServer.renderToStaticMarkup(engine({contents, layout})), omitScripts)
+  } catch (e) {
+    debug('error:', e)
+    throw e
+  }
 }
 
 function renderURI (uri, omitScripts) {
@@ -51,21 +61,23 @@ function renderURI (uri, omitScripts) {
           }).map(function (contentSource) {
             return contentFetch(contentSource)
               .then(function (data) {
-                contents[contentSource] = data
+                contents[contentSource] = JSON.parse(data)
               })
           })
         )
           .then(function () { return layout })
       }),
     contentFetch(uri)
+      .then(data => {
+        contents._default = contents[uri] = JSON.parse(data)
+      })
   ])
     .then(data => {
-      let layout = data.shift()
-      let content = data.shift()
-      debug('layout:', JSON.parse(layout))
-      debug('content:', JSON.parse(content))
+      let layout = JSON.parse(data.shift())
+      debug('layout:', layout)
+      debug('content:', contents)
 
-      return renderBody(JSON.parse(content), JSON.parse(layout), omitScripts)
+      return renderBody(contents, layout, omitScripts)
     })
 }
 

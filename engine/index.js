@@ -24,6 +24,7 @@ const Engine = (Components) => {
             content = hydrate(content, element.template)
           }
         }
+        console.log(element, content)
         return Components[element.component](element.id, content)
       })
     return <div>{elements}</div>

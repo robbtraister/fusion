@@ -13,6 +13,7 @@ const compression = require('compression')
 
 const content = require('./content')
 const hashes = require('./hashes')
+const layouts = require('./layouts')
 const render = require('./render')
 
 function server () {
@@ -36,10 +37,11 @@ function server () {
   app.use(express.static(path.join(__dirname, '..', 'public')))
   app.use(express.static(path.join(__dirname, '..', 'dist')))
 
-  app.use('/content', content())
+  app.use('/_layouts', layouts())
+  app.use('/_content', content())
   app.use(render())
 
-  let index = render.renderContent(null)
+  let index = render.renderHTML(null)
   debug('index:', index)
   app.get('*', (req, res, next) => {
     res.send(index)

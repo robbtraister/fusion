@@ -10,29 +10,34 @@ const ReactDOMServer = require('react-dom/server')
 // Components bundle will load `Components` variable into global scope
 require('../dist/components')
 const Components = global.Components // require('../components')
-const Engine = React.createFactory(require('../engine')(Components))
+const engine = React.createFactory(require('../engine')(Components))
 
-const fetch = require('./content').fetch
+const contentFetch = require('./content').fetch
+const layoutFetch = require('./layouts').fetch
 const template = require('./template')
 
-function renderContent (content, omitScripts) {
+function renderHTML (body, omitScripts) {
   return '<!DOCTYPE html>' +
-    ReactDOMServer.renderToStaticMarkup(template(content, omitScripts))
+    ReactDOMServer.renderToStaticMarkup(template(body, omitScripts))
 }
 
-function renderLayout (layout, omitScripts) {
-  return renderContent(ReactDOMServer.renderToStaticMarkup(Engine(layout)), omitScripts)
+function renderBody (content, layout, omitScripts) {
+  return renderHTML(ReactDOMServer.renderToStaticMarkup(engine({content, layout})), omitScripts)
 }
 
-function renderURI (uri, omitScripts, cb) {
-  fetch(uri, (err, buf) => {
-    if (err) {
-      return cb(err)
-    }
-    let layout = JSON.parse(buf)
-    debug('layout:', layout)
-    cb(null, renderLayout(layout, omitScripts))
-  })
+function renderURI (uri, omitScripts) {
+  return Promise.all([
+    layoutFetch(uri),
+    contentFetch(uri)
+  ])
+    .then(data => {
+      let layout = data.shift()
+      let content = data.shift()
+      debug('layout:', JSON.parse(layout))
+      debug('content:', JSON.parse(content))
+
+      return renderBody(JSON.parse(content), JSON.parse(layout), omitScripts)
+    })
 }
 
 function router () {
@@ -44,15 +49,14 @@ function router () {
       'rendered'
     ].find(q => req.query.hasOwnProperty(q) && req.query[q] !== 'false')
     if (param) {
-      renderURI(req.path, param === 'noscript', (err, result) => {
-        if (err) {
-          return next({
+      renderURI(req.path, param === 'noscript')
+        .then(res.send.bind(res))
+        .catch(err => {
+          next({
             status: 500,
             msg: err
           })
-        }
-        res.send(result)
-      })
+        })
     } else {
       next()
     }
@@ -62,6 +66,6 @@ function router () {
 }
 
 module.exports = router
-module.exports.renderContent = renderContent
-module.exports.renderLayout = renderLayout
+module.exports.renderBody = renderBody
+module.exports.renderHTML = renderHTML
 module.exports.renderURI = renderURI

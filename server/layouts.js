@@ -4,18 +4,18 @@ const fs = require('fs')
 const path = require('path')
 const url = require('url')
 
-const debug = require('debug')(`pb:content:${process.pid}`)
+const debug = require('debug')(`pb:layouts:${process.pid}`)
 const express = require('express')
 
 const promisify = require('./promisify')
 
-const readFile = promisify(fs.readFile)
-const base = path.join(__dirname, '..', 'content')
+const readFile = promisify(fs.readFile.bind(fs))
+const base = path.join(__dirname, '..', 'layouts')
 
 function source (uri) {
   let p = url.parse(uri).pathname.replace(/^\//, '').replace(/\.json$/, '')
   debug('path:', p)
-  return `${p || 'homepage'}.json`
+  return `${['', 'homepage'].indexOf(p) >= 0 ? 'homepage' : 'article'}.json`
 }
 
 function fetch (uri) {
@@ -30,8 +30,6 @@ function fetch (uri) {
 
 function router () {
   let router = express.Router()
-
-  router.use(express.static(path.join(__dirname, '..', 'content')))
 
   router.use((req, res, next) => {
     fetch(req.path)

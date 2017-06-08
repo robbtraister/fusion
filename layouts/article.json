@@ -1,0 +1,18 @@
+[
+  {
+    "id": 5,
+    "component": "Body",
+    "children": [
+      {
+        "id": 7,
+        "component": "Blurb",
+        "template": "{{one}}"
+      },
+      {
+        "id": 9,
+        "component": "Blurb",
+        "template": "{{two}}"
+      }
+    ]
+  }
+]

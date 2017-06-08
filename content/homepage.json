@@ -1,7 +1,4 @@
-[
-  {
-    "id": 1,
-    "component": "Body",
-    "content": "homepage"
-  }
-]
+{
+  "id": 2,
+  "content": "homepage"
+}

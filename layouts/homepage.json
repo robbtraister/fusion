@@ -1,0 +1,7 @@
+[
+  {
+    "id": 1,
+    "component": "Body",
+    "template": "{{content}}"
+  }
+]

@@ -2,20 +2,24 @@
 
 const React = require('react')
 
-const Engine = (Components) => {
-  function render (layout) {
-    // We want to render layout as an Array of components,
-    // CSR React passes an expected Array, so don't do extra work
-    if (!(layout instanceof Array)) {
-      // SSR React forces the input param to an Object with '0', '1', etc keys
-      layout = Object.assign([], layout)
-    }
+function hydrate (content, template) {
+  return template.replace(/\{\{([^}]+)\}\}/g, function (match, prop) {
+    return content[prop] || match
+  })
+}
 
-    let elements = layout
+const Engine = (Components) => {
+  function render (props) {
+    let elements = props.layout
       .filter(f => Components[f.component])
       .map(f => {
-        let content = f.children ? render(f.children) : f.content
-        return Components[f.component](f.id, content)
+        var c = props.content
+        if (f.children) {
+          c = render({content: c, layout: f.children})
+        } else if (f.template) {
+          c = hydrate(c, f.template)
+        }
+        return Components[f.component](f.id, c)
       })
     return <div>{elements}</div>
   }

@@ -7,7 +7,7 @@ module.exports = {
     engine: './engine/mount.js'
   },
   output: {
-    path: path.resolve('./public'),
+    path: path.resolve('./dist'),
     filename: '[name].js'
   },
   devServer: {

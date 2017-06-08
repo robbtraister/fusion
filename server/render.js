@@ -8,7 +8,7 @@ const React = global.react = require('react')
 const ReactDOMServer = require('react-dom/server')
 
 // Components bundle will load `Components` variable into global scope
-require('../public/components')
+require('../dist/components')
 const Components = global.Components // require('../components')
 const Engine = React.createFactory(require('../engine')(Components))
 

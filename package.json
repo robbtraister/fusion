@@ -1,13 +1,13 @@
 {
-  "name": "react-features",
-  "version": "1.0.0",
+  "name": "reactor",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
     "build": "npm run sass && npm run pack",
     "dev": "webpack-dev-server",
     "pack": "webpack -p",
-    "sass": "node-sass --importer node_modules/node-sass-glob -o public components/style.scss",
+    "sass": "node-sass --importer node_modules/node-sass-glob -o dist components/style.scss",
     "start": "node server/cluster",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

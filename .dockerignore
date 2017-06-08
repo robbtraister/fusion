@@ -3,7 +3,5 @@
 docker-compose.yml
 docker-compose.override.yml
 
+dist
 node_modules
-
-public/*
-!public/index.html

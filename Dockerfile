@@ -13,7 +13,7 @@ RUN \
 
 WORKDIR /pb
 
-COPY package.json ./
+COPY package-lock.json ./
 
 RUN \
     npm install

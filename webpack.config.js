@@ -1,4 +1,5 @@
 const path = require('path')
+const componentDir = path.join(__dirname, 'components')
 
 module.exports = {
   entry: {
@@ -14,6 +15,14 @@ module.exports = {
     contentBase: './public',
     port: 8100
   },
+  externals: function (context, request, callback) {
+    if (request === 'react') {
+      if (context.startsWith(componentDir)) {
+        return callback(null, request)
+      }
+    }
+    callback()
+  },
   module: {
     loaders: [
       {
@@ -25,6 +34,10 @@ module.exports = {
         test: /\.js$/,
         exclude: /node_modules/,
         loader: 'babel-loader'
+      },
+      {
+        test: require.resolve('./engine/mount.js'),
+        loader: 'expose-loader?react'
       },
       {
         test: require.resolve('./components/index.js'),

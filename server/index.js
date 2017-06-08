@@ -6,6 +6,7 @@ require('babel-core/register')
 
 const path = require('path')
 
+const debug = require('debug')('pb:server')
 const express = require('express')
 const morgan = require('morgan')
 const compression = require('compression')
@@ -16,7 +17,7 @@ const render = require('./render')
 function server () {
   let app = express()
 
-  app.use(morgan('common'))
+  app.use(morgan('dev'))
 
   app.use(compression())
 
@@ -25,12 +26,14 @@ function server () {
 
   app.use(express.static(path.join(__dirname, '..', 'public')))
 
-  var indexFilePath = path.join(__dirname, '..', 'public', 'index.html')
+  let index = render.renderContent(null)
+  debug(index)
   app.get('*', (req, res, next) => {
-    res.sendFile(indexFilePath)
+    res.send(index)
   })
 
   app.use((err, req, res, next) => {
+    debug(err)
     return res.status(err.status || 500).send(/^prod/i.test(process.env.NODE_ENV) ? '' : err.msg)
   })
 

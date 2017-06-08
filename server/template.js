@@ -2,10 +2,23 @@
 
 const React = require('react')
 
-const Template = (content) => {
+const Template = (content, omitScripts) => {
   return <html>
     <head>
+      {omitScripts ||
+        <noscript>
+          <meta http-equiv='refresh' content='0; url=?noscript' />
+        </noscript>
+      }
+      {omitScripts ||
+        <script src='/engine.js' />
+      }
+      {omitScripts ||
+        <script src='/components.js' />
+      }
+
       <title>React Rendering Engine</title>
+
       <link rel='icon' type='image/png' sizes='96x96' href='/favicon-96x96.png' />
       <link rel='icon' type='image/png' sizes='32x32' href='/favicon-32x32.png' />
       <link rel='icon' type='image/png' sizes='16x16' href='/favicon-16x16.png' />

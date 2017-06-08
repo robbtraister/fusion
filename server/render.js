@@ -10,21 +10,23 @@ const Engine = React.createFactory(require('../engine')(require('../components')
 const fetch = require('./content').fetch
 const template = require('./template')
 
-function renderLayout (layout) {
+function renderContent (content, omitScripts) {
   return '<!DOCTYPE html>' +
-    ReactDOMServer.renderToStaticMarkup(
-      template(ReactDOMServer.renderToStaticMarkup(Engine({layout})))
-    )
+    ReactDOMServer.renderToStaticMarkup(template(content, omitScripts))
 }
 
-function renderURI (uri, cb) {
+function renderLayout (layout, omitScripts) {
+  return renderContent(ReactDOMServer.renderToStaticMarkup(Engine({layout})), omitScripts)
+}
+
+function renderURI (uri, omitScripts, cb) {
   fetch(uri, (err, buf) => {
     if (err) {
       return cb(err)
     }
     let layout = JSON.parse(buf)
     debug('layout:', layout)
-    cb(null, renderLayout(layout))
+    cb(null, renderLayout(layout, omitScripts))
   })
 }
 
@@ -32,8 +34,12 @@ function router () {
   let router = express.Router()
 
   router.use((req, res, next) => {
-    if (req.query.hasOwnProperty('rendered') && req.query.rendered !== 'false') {
-      renderURI(req.path, (err, result) => {
+    let param = [
+      'noscript',
+      'rendered'
+    ].find(q => req.query.hasOwnProperty(q) && req.query[q] !== 'false')
+    if (param) {
+      renderURI(req.path, param === 'noscript', (err, result) => {
         if (err) {
           return next({
             status: 500,
@@ -51,5 +57,6 @@ function router () {
 }
 
 module.exports = router
+module.exports.renderContent = renderContent
 module.exports.renderLayout = renderLayout
 module.exports.renderURI = renderURI

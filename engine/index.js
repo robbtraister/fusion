@@ -11,15 +11,20 @@ function hydrate (content, template) {
 const Engine = (Components) => {
   function render (props) {
     let elements = props.layout
-      .filter(f => Components[f.component])
-      .map(f => {
-        var c = props.content
-        if (f.children) {
-          c = render({content: c, layout: f.children})
-        } else if (f.template) {
-          c = hydrate(c, f.template)
+      .filter(element => Components[element.component])
+      .map(element => {
+        var content = props.contents._default
+        if (element.children) {
+          content = render({contents: props.contents, layout: element.children})
+        } else {
+          if (element.content) {
+            content = props.contents[element.content]
+          }
+          if (element.template) {
+            content = hydrate(content, element.template)
+          }
         }
-        return Components[f.component](f.id, c)
+        return Components[element.component](element.id, content)
       })
     return <div>{elements}</div>
   }

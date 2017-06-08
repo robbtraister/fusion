@@ -14,5 +14,11 @@
         "template": "{{two}}"
       }
     ]
+  },
+  {
+    "id": 11,
+    "component": "Footer",
+    "content": "/footer",
+    "template": "{{content}}"
   }
 ]

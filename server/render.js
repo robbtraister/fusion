@@ -26,8 +26,37 @@ function renderBody (content, layout, omitScripts) {
 }
 
 function renderURI (uri, omitScripts) {
+  let contents = {}
+  contents[uri] = true
   return Promise.all([
-    layoutFetch(uri),
+    layoutFetch(uri)
+      .then(layout => {
+        function collect (elements) {
+          elements.forEach(function (element) {
+            if (element.children) {
+              collect(element.children)
+            } else if (element.content) {
+              if (!contents.hasOwnProperty(element.content)) {
+                contents[element.content] = false
+              }
+            }
+          })
+        }
+
+        collect(layout)
+
+        return Promise.all(
+          Object.keys(contents).filter(function (contentSource) {
+            return contents[contentSource] === false
+          }).map(function (contentSource) {
+            return contentFetch(contentSource)
+              .then(function (data) {
+                contents[contentSource] = data
+              })
+          })
+        )
+          .then(function () { return layout })
+      }),
     contentFetch(uri)
   ])
     .then(data => {

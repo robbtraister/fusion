@@ -1,8 +1,8 @@
 import React from 'react'
 
-const Header = (id, content) => {
+const Header = (id) => {
   return <div className='header' key={id}>
-    Header
+    The Washington Post
   </div>
 }
 

@@ -2,8 +2,17 @@
   {
     "id": 5,
     "component": "Body",
-    "content": {
-      "html": "blah blah"
-    }
+    "children": [
+      {
+        "id": 7,
+        "component": "Blurb",
+        "content": "blurb 1"
+      },
+      {
+        "id": 9,
+        "component": "Blurb",
+        "content": "blurb 2"
+      }
+    ]
   }
 ]

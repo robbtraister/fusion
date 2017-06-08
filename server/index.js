@@ -12,6 +12,7 @@ const morgan = require('morgan')
 const compression = require('compression')
 
 const content = require('./content')
+const hashes = require('./hashes')
 const render = require('./render')
 
 function server () {
@@ -21,10 +22,21 @@ function server () {
 
   app.use(compression())
 
-  app.use(render())
-  app.use('/content', content())
+  if (process.env.CACHE_MAX_AGE !== '0') {
+    app.use((req, res, next) => {
+      if (req.query.h) {
+        if (req.query.h === hashes[req.path]) {
+          res.set('Cache-Control', `max-age=${process.env.CACHE_MAX_AGE || 31536000}`)
+        }
+      }
+      next()
+    })
+  }
 
   app.use(express.static(path.join(__dirname, '..', 'public')))
+
+  app.use('/content', content())
+  app.use(render())
 
   let index = render.renderContent(null)
   debug(index)

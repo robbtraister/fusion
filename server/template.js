@@ -2,6 +2,12 @@
 
 const React = require('react')
 
+const hashes = require('./hashes')
+
+function appendHash (h) {
+  return h ? `?h=${h}` : ''
+}
+
 const Template = (content, omitScripts) => {
   return <html>
     <head>
@@ -11,10 +17,10 @@ const Template = (content, omitScripts) => {
         </noscript>
       }
       {omitScripts ||
-        <script src='/engine.js' />
+        <script src={`/engine.js${appendHash(hashes['/engine.js'])}`} />
       }
       {omitScripts ||
-        <script src='/components.js' />
+        <script src={`/components.js${appendHash(hashes['/components.js'])}`} />
       }
 
       <title>React Rendering Engine</title>
@@ -22,7 +28,7 @@ const Template = (content, omitScripts) => {
       <link rel='icon' type='image/png' sizes='96x96' href='/favicon-96x96.png' />
       <link rel='icon' type='image/png' sizes='32x32' href='/favicon-32x32.png' />
       <link rel='icon' type='image/png' sizes='16x16' href='/favicon-16x16.png' />
-      <link rel='stylesheet' type='text/css' href='/style.css' />
+      <link rel='stylesheet' type='text/css' href={`/style.css${appendHash(hashes['/style.css'])}`} />
     </head>
     <body>
       <div id='App' dangerouslySetInnerHTML={{ __html: content }} />

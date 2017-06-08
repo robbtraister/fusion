@@ -3,14 +3,18 @@
 const React = require('react')
 
 const Engine = (Components) => {
-  return (props) => {
-    let elements = props.layout
+  function render (layout) {
+    // We want to render layout as an Array of components,
+    // but React forces the input param to an Object
+    let elements = Object.assign([], layout)
       .filter(f => Components[f.component])
       .map(f => {
-        return Components[f.component](f.id, f.content)
+        let content = f.children ? render(f.children) : f.content
+        return Components[f.component](f.id, content)
       })
     return <div>{elements}</div>
   }
+  return render
 }
 
 module.exports = Engine

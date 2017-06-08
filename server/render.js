@@ -3,9 +3,14 @@
 const debug = require('debug')('pb:render')
 const express = require('express')
 
-const React = require('react')
+// Components bundle does not include react lib; expose it as the explicit lib name
+const React = global.react = require('react')
 const ReactDOMServer = require('react-dom/server')
-const Engine = React.createFactory(require('../engine')(require('../components')))
+
+// Components bundle will load `Components` variable into global scope
+require('../public/components')
+const Components = global.Components // require('../components')
+const Engine = React.createFactory(require('../engine')(Components))
 
 const fetch = require('./content').fetch
 const template = require('./template')
@@ -16,7 +21,7 @@ function renderContent (content, omitScripts) {
 }
 
 function renderLayout (layout, omitScripts) {
-  return renderContent(ReactDOMServer.renderToStaticMarkup(Engine({layout})), omitScripts)
+  return renderContent(ReactDOMServer.renderToStaticMarkup(Engine(layout)), omitScripts)
 }
 
 function renderURI (uri, omitScripts, cb) {

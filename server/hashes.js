@@ -4,6 +4,7 @@ const crypto = require('crypto')
 const fs = require('fs')
 const path = require('path')
 
+const debug = require('debug')('pb:hashes')
 const glob = require('glob')
 
 const baseDir = path.normalize(`${__dirname}/../public`)
@@ -23,5 +24,7 @@ glob.sync(`${baseDir}/**/*`)
   .forEach(fp => {
     hashes[generateKey(fp)] = generateHash(fp)
   })
+
+debug(hashes)
 
 module.exports = hashes

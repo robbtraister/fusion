@@ -39,7 +39,7 @@ function server () {
   app.use(render())
 
   let index = render.renderContent(null)
-  debug(index)
+  debug('index:', index)
   app.get('*', (req, res, next) => {
     res.send(index)
   })

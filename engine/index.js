@@ -17,8 +17,10 @@ const Engine = (Components) => {
         if (element.children) {
           content = render({contents: props.contents, layout: element.children})
         } else {
-          if (element.content) {
-            content = props.contents[element.content]
+          if (element.source) {
+            content = props.contents[element.source]
+          } else if (element.content) {
+            content = element.content
           }
           if (element.template) {
             content = hydrate(content, element.template)

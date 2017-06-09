@@ -23,8 +23,8 @@ function Fetcher (fetchContent, fetchLayout) {
       return [].concat.apply([], elements.map(function (element) {
         if (element.children) {
           return getLayoutContent(element.children)
-        } else if (element.content) {
-          return getContent(element.content)
+        } else if (element.source) {
+          return getContent(element.source)
         }
       }))
     }

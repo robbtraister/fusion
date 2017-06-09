@@ -1,7 +1,7 @@
 'use strict'
 
 function Fetcher (fetchContent, fetchLayout) {
-  return function (src) {
+  return function fetchAll (src) {
     let contents = {}
 
     function getContent (src) {
@@ -11,7 +11,7 @@ function Fetcher (fetchContent, fetchLayout) {
 
       contents[src] = true
       var fetch = fetchContent(src)
-        .then(function (content) {
+        .then(content => {
           contents[src] = content
           return content
         })
@@ -20,7 +20,7 @@ function Fetcher (fetchContent, fetchLayout) {
     }
 
     function getLayoutContent (elements) {
-      return [].concat.apply([], elements.map(function (element) {
+      return [].concat.apply([], elements.map(element => {
         if (element.children) {
           return getLayoutContent(element.children)
         } else if (element.source) {
@@ -31,21 +31,17 @@ function Fetcher (fetchContent, fetchLayout) {
 
     return Promise.all([
       fetchLayout(src)
-        .then(function (layout) {
+        .then(layout => {
           return Promise.all(getLayoutContent(layout))
-            .then(function () { return layout })
+            .then(() => layout)
         }),
       getContent(src)
-        .then(function (data) {
-          contents._default = data
-        })
+        .then(data => { contents._default = data })
     ])
-      .then(function (data) {
-        return {
-          layout: data.shift(),
-          contents
-        }
-      })
+      .then(data => ({
+        layout: data.shift(),
+        contents
+      }))
   }
 }
 

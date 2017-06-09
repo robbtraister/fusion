@@ -3,7 +3,7 @@
 const React = require('react')
 
 function hydrate (content, template) {
-  return template.replace(/\{\{([^}]+)\}\}/g, function (match, prop) {
+  return template.replace(/\{\{([^}]+)\}\}/g, (match, prop) => {
     return content[prop] || match
   })
 }

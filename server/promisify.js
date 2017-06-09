@@ -1,9 +1,9 @@
 'use strict'
 
-module.exports = function (cb) {
-  return function () {
+module.exports = function promisify (cb) {
+  return function promisified () {
     return new Promise((resolve, reject) => {
-      cb(...arguments, function (err, data) {
+      cb(...arguments, (err, data) => {
         if (err) {
           return reject(err)
         }

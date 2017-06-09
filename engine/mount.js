@@ -9,7 +9,7 @@ const Engine = require('.')
 // require('./style.scss')
 
 function fetchJSON (uri) {
-  return fetch(uri).then(function (res) { return res.json() })
+  return fetch(uri).then(function getJSON (res) { return res.json() })
 }
 
 function normalize (src) {
@@ -30,7 +30,7 @@ function fetchLayout (src) {
 
 var fetcher = Engine.Fetcher(fetchContent, fetchLayout)
 fetcher(document.location.pathname)
-  .then(function (props) {
+  .then(function render (props) {
     var engine = Engine(Components)
     ReactDOM.render(engine(props), document.getElementById('App'))
   })

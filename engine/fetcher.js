@@ -5,7 +5,7 @@ function Fetcher (fetchContent, fetchLayout) {
 
     function getContent (src) {
       if (contents[src]) {
-        return contents[src]
+        return
       }
 
       contents[src] = true
@@ -18,20 +18,20 @@ function Fetcher (fetchContent, fetchLayout) {
       return fetch
     }
 
+    function getLayoutContent (elements) {
+      return [].concat.apply([], elements.map(function (element) {
+        if (element.children) {
+          return getLayoutContent(element.children)
+        } else if (element.content) {
+          return getContent(element.content)
+        }
+      }))
+    }
+
     return Promise.all([
       fetchLayout(src)
         .then(function (layout) {
-          function contentSources (elements) {
-            return [].concat.apply([], elements.map(function (element) {
-              if (element.children) {
-                return contentSources(element.children)
-              } else if (element.content) {
-                return getContent(element.content)
-              }
-            }))
-          }
-
-          return Promise.all(contentSources(layout))
+          return Promise.all(getLayoutContent(layout))
             .then(function () { return layout })
         }),
       getContent(src)

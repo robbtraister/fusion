@@ -1,3 +1,4 @@
+'use strict'
 
 function Fetcher (fetchContent, fetchLayout) {
   return function (src) {

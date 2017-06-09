@@ -36,4 +36,5 @@ fetcher(document.location.pathname)
   })
   .catch(console.error)
 
+// expose react lib for Components
 module.exports = require('react')

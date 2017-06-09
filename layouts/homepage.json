@@ -3,5 +3,13 @@
     "id": 1,
     "component": "Body",
     "template": "{{content}}"
+  },
+  {
+    "id": 2,
+    "component": "Link",
+    "content": {
+      "href": "/blurbs",
+      "text": "Blurbs"
+    }
   }
 ]

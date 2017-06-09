@@ -13,7 +13,7 @@ const Engine = (Components) => {
     let elements = props.layout
       .filter(element => Components[element.component])
       .map(element => {
-        var content = props.contents._default
+        let content = props.contents._default
         if (element.children) {
           content = render({contents: props.contents, layout: element.children})
         } else {
@@ -26,7 +26,12 @@ const Engine = (Components) => {
             content = hydrate(content, element.template)
           }
         }
-        return Components[element.component](element.id, content)
+
+        let Component = Components[element.component]
+        if (Component.prototype instanceof React.Component) {
+          Component = (new Component()).render
+        }
+        return Component(element.id, content)
       })
     return <div>{elements}</div>
   }

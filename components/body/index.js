@@ -2,10 +2,10 @@ import React from 'react'
 
 import Header from '../header'
 
-const Body = (id, content) => {
-  return <div className='body' key={id}>
+const Body = (props) => {
+  return <div className='body' key={props.id}>
     <Header />
-    {content}
+    {props.content}
   </div>
 }
 

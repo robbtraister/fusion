@@ -6,12 +6,12 @@
       {
         "id": 7,
         "component": "Blurb",
-        "template": "{{one}}"
+        "property": "one"
       },
       {
         "id": 9,
         "component": "Blurb",
-        "template": "{{two}}"
+        "property": "two"
       }
     ]
   },

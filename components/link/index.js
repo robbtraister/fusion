@@ -1,8 +1,8 @@
 import React from 'react'
 
 class Link extends React.Component {
-  render (id, content) {
-    return <a href={content.href}>{content.text}</a>
+  render () {
+    return <a className='link' key={this.props.id} href={this.props.href}>{this.props.text}</a>
   }
 }
 

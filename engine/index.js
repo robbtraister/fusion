@@ -2,36 +2,24 @@
 
 const React = require('react')
 
-function hydrate (content, template) {
-  return template.replace(/\{\{([^}]+)\}\}/g, (match, prop) => {
-    return content[prop] || match
-  })
-}
-
 const Engine = (Components) => {
-  function render (props) {
-    let elements = props.layout
+  function render (config) {
+    let elements = config.layout
       .filter(element => Components[element.component])
       .map(element => {
-        let content = props.contents._default
+        let content = config.contents._default
         if (element.children) {
-          content = render({contents: props.contents, layout: element.children})
-        } else {
-          if (element.source) {
-            content = props.contents[element.source]
-          } else if (element.content) {
-            content = element.content
-          }
-          if (element.template) {
-            content = hydrate(content, element.template)
-          }
+          content = {content: render({contents: config.contents, layout: element.children})}
+        } else if (element.source) {
+          content = config.contents[element.source]
         }
 
+        let props = Object.assign({}, content, element)
         let Component = Components[element.component]
         if (Component.prototype instanceof React.Component) {
-          Component = (new Component()).render
+          return (new Component(props)).render()
         }
-        return Component(element.id, content)
+        return Component(props)
       })
     return <div>{elements}</div>
   }

@@ -1,7 +1,7 @@
 import React from 'react'
 
-const Blurb = (id, content) => {
-  return <div className='blurb' key={id}>{content}</div>
+const Blurb = (props) => {
+  return <div className='blurb' key={props.id}>{props[props.property]}</div>
 }
 
 export default Blurb

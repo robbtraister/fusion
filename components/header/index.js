@@ -1,7 +1,7 @@
 import React from 'react'
 
-const Header = (id) => {
-  return <div className='header' key={id}>
+const Header = (props) => {
+  return <div className='header' key={props.id}>
     <a href='/'>The Washington Post</a>
   </div>
 }

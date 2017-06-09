@@ -41,7 +41,7 @@ function server () {
   app.use('/_content', content())
   app.use(render())
 
-  let index = render.renderHTML(null)
+  let index = render.renderHTML(null, true, true)
   debug('index:', index)
   app.get('*', (req, res, next) => {
     res.send(index)

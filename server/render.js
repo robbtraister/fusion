@@ -17,19 +17,19 @@ const Content = require('./content')
 const Layouts = require('./layouts')
 const Template = require('./template')
 
-function renderHTML (body, omitScripts) {
+function renderHTML (body, includeScripts, includeNoscript) {
   try {
     return '<!DOCTYPE html>' +
-      ReactDOMServer.renderToStaticMarkup(Template(body, omitScripts))
+      ReactDOMServer.renderToStaticMarkup(Template(body, includeScripts, includeNoscript))
   } catch (e) {
     debug('error:', e)
     throw e
   }
 }
 
-function renderBody (props, omitScripts) {
+function renderBody (props, includeScripts, includeNoscript) {
   try {
-    return renderHTML(ReactDOMServer.renderToStaticMarkup(engine(props)), omitScripts)
+    return renderHTML(ReactDOMServer.renderToStaticMarkup(engine(props)), includeScripts, includeNoscript)
   } catch (e) {
     debug('error:', e)
     throw e
@@ -45,9 +45,9 @@ function fetchLayout (src) {
 }
 
 const fetcher = Engine.Fetcher(fetchContent, fetchLayout)
-function renderURI (uri, omitScripts) {
+function renderURI (uri, includeScripts, includeNoscript) {
   return fetcher(uri)
-    .then(props => renderBody(props, omitScripts))
+    .then(props => renderBody(props, includeScripts, includeNoscript))
 }
 
 function router () {
@@ -59,7 +59,7 @@ function router () {
       'rendered'
     ].find(q => req.query.hasOwnProperty(q) && req.query[q] !== 'false')
     if (param) {
-      renderURI(req.path, param === 'noscript')
+      renderURI(req.path, param !== 'noscript')
         .then(res.send.bind(res))
         .catch(err => {
           next({

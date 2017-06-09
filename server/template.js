@@ -8,18 +8,18 @@ function appendHash (h) {
   return h ? `?h=${h}` : ''
 }
 
-const Template = (content, omitScripts) => {
+const Template = (content, includeScripts, includeNoscript) => {
   return <html>
     <head>
-      {omitScripts ||
+      {includeNoscript &&
         <noscript>
-          <meta http-equiv='refresh' content='0; url=?noscript' />
+          <meta httpEquiv='refresh' content='0; url=?noscript' />
         </noscript>
       }
-      {omitScripts ||
+      {includeScripts &&
         <script src={`/engine.js${appendHash(hashes['/engine.js'])}`} />
       }
-      {omitScripts ||
+      {includeScripts &&
         <script src={`/components.js${appendHash(hashes['/components.js'])}`} />
       }
 

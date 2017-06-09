@@ -33,3 +33,4 @@ const Engine = (Components) => {
 
 module.exports = Engine
 module.exports.Engine = Engine
+module.exports.Fetcher = require('./fetcher')

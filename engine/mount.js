@@ -38,73 +38,19 @@ function normalize (src) {
     .replace(/^\/+/, '') || 'homepage'
 }
 
-var contents = {}
-
 function fetchContent (src) {
-  var normalizedSource = '/_content/' + normalize(src) + '.json'
-  if (contents[normalizedSource]) {
-    return contents[normalizedSource]
-  }
-
-  var fetch = getJSON(normalizedSource)
-    .then(function (content) {
-      contents[normalizedSource] = content
-      return content
-    })
-  contents[normalizedSource] = contents[normalizedSource] || fetch
-  return fetch
-}
-
-function getContent (src) {
-  if (contents[src]) {
-    return contents[src]
-  }
-
-  var fetch = fetchContent(src)
-    .then(function (content) {
-      contents[src] = content
-      return content
-    })
-  contents[src] = contents[src] || fetch
-  return fetch
+  return getJSON('/_content/' + normalize(src) + '.json')
 }
 
 function fetchLayout (src) {
-  var normalizedSource = '/_layout/' + normalize(src) + '.json'
-  return getJSON(normalizedSource)
+  return getJSON('/_layouts/' + normalize(src) + '.json')
 }
 
-const page = document.location.pathname
-
-Promise.all([
-  fetchLayout(page)
-    .then(function (layout) {
-      function collect (elements) {
-        elements.forEach(function (element) {
-          if (element.children) {
-            collect(element.children)
-          } else if (element.content) {
-            if (!contents.hasOwnProperty(element.content)) {
-              contents[element.content] = false
-            }
-          }
-        })
-      }
-
-      collect(layout)
-
-      return Promise.all(Object.keys(contents).map(getContent))
-        .then(function () { return layout })
-    }),
-  getContent(page)
-    .then(function (data) {
-      contents._default = data
-    })
-])
-  .then(function (data) {
-    var layout = data.shift()
+var fetcher = Engine.Fetcher(fetchContent, fetchLayout)
+fetcher(document.location.pathname)
+  .then(function (props) {
     var engine = Engine(window.Components)
-    ReactDOM.render(engine({contents: contents, layout: layout}), document.getElementById('App'))
+    ReactDOM.render(engine(props), document.getElementById('App'))
   })
   .catch(console.error)
 

@@ -10,75 +10,44 @@ const ReactDOMServer = require('react-dom/server')
 // Components bundle will load `Components` variable into global scope
 require('../dist/components')
 const Components = global.Components // require('../components')
-const engine = React.createFactory(require('../engine')(Components))
+const Engine = require('../engine')
+const engine = React.createFactory(Engine(Components))
 
-const contentFetch = require('./content').fetch
-const layoutFetch = require('./layouts').fetch
-const template = require('./template')
+const Content = require('./content')
+const Layouts = require('./layouts')
+const Template = require('./template')
 
 function renderHTML (body, omitScripts) {
   try {
     return '<!DOCTYPE html>' +
-      ReactDOMServer.renderToStaticMarkup(template(body, omitScripts))
+      ReactDOMServer.renderToStaticMarkup(Template(body, omitScripts))
   } catch (e) {
     debug('error:', e)
     throw e
   }
 }
 
-function renderBody (contents, layout, omitScripts) {
+function renderBody (props, omitScripts) {
   try {
-    return renderHTML(ReactDOMServer.renderToStaticMarkup(engine({contents, layout})), omitScripts)
+    return renderHTML(ReactDOMServer.renderToStaticMarkup(engine(props)), omitScripts)
   } catch (e) {
     debug('error:', e)
     throw e
   }
 }
 
+function fetchContent (src) {
+  return Content.fetch(src).then(JSON.parse.bind(JSON))
+}
+
+function fetchLayout (src) {
+  return Layouts.fetch(src).then(JSON.parse.bind(JSON))
+}
+
+const fetcher = Engine.Fetcher(fetchContent, fetchLayout)
 function renderURI (uri, omitScripts) {
-  let contents = {}
-  contents[uri] = true
-  return Promise.all([
-    layoutFetch(uri)
-      .then(layout => {
-        function collect (elements) {
-          elements.forEach(function (element) {
-            if (element.children) {
-              collect(element.children)
-            } else if (element.content) {
-              if (!contents.hasOwnProperty(element.content)) {
-                contents[element.content] = false
-              }
-            }
-          })
-        }
-
-        collect(layout)
-
-        return Promise.all(
-          Object.keys(contents).filter(function (contentSource) {
-            return contents[contentSource] === false
-          }).map(function (contentSource) {
-            return contentFetch(contentSource)
-              .then(function (data) {
-                contents[contentSource] = JSON.parse(data)
-              })
-          })
-        )
-          .then(function () { return layout })
-      }),
-    contentFetch(uri)
-      .then(data => {
-        contents._default = contents[uri] = JSON.parse(data)
-      })
-  ])
-    .then(data => {
-      let layout = JSON.parse(data.shift())
-      debug('layout:', layout)
-      debug('content:', contents)
-
-      return renderBody(contents, layout, omitScripts)
-    })
+  return fetcher(uri)
+    .then(props => renderBody(props, omitScripts))
 }
 
 function router () {

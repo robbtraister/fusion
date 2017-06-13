@@ -17,19 +17,19 @@ const Content = require('./content')
 const Layouts = require('./layouts')
 const Template = require('./template')
 
-function renderHTML (body, includeScripts, includeNoscript) {
+function renderHTML (body) {
   try {
     return '<!DOCTYPE html>' +
-      ReactDOMServer.renderToStaticMarkup(Template(body, includeScripts, includeNoscript))
+      ReactDOMServer.renderToStaticMarkup(Template(body))
   } catch (e) {
     debug('error:', e)
     throw e
   }
 }
 
-function renderBody (props, includeScripts, includeNoscript) {
+function renderBody (props) {
   try {
-    return renderHTML(ReactDOMServer.renderToStaticMarkup(engine(props)), includeScripts, includeNoscript)
+    return renderHTML(ReactDOMServer.renderToStaticMarkup(engine(props)))
   } catch (e) {
     debug('error:', e)
     throw e
@@ -54,22 +54,14 @@ function router () {
   let router = express.Router()
 
   router.use((req, res, next) => {
-    let param = [
-      'noscript',
-      'rendered'
-    ].find(q => req.query.hasOwnProperty(q) && req.query[q] !== 'false')
-    if (param) {
-      renderURI(req.path, param !== 'noscript')
-        .then(res.send.bind(res))
-        .catch(err => {
-          next({
-            status: 500,
-            msg: err
-          })
+    renderURI(req.path)
+      .then(res.send.bind(res))
+      .catch(err => {
+        next({
+          status: 500,
+          msg: err
         })
-    } else {
-      next()
-    }
+      })
   })
 
   return router

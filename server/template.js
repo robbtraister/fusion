@@ -8,20 +8,11 @@ function appendHash (h) {
   return h ? `?h=${h}` : ''
 }
 
-const Template = (content, includeScripts, includeNoscript) => {
+const Template = (content) => {
   return <html>
     <head>
-      {includeNoscript &&
-        <noscript>
-          <meta httpEquiv='refresh' content='0; url=?noscript' />
-        </noscript>
-      }
-      {includeScripts &&
-        <script src={`/engine.js${appendHash(hashes['/engine.js'])}`} />
-      }
-      {includeScripts &&
-        <script src={`/components.js${appendHash(hashes['/components.js'])}`} />
-      }
+      <script src={`/engine.js${appendHash(hashes['/engine.js'])}`} />
+      <script src={`/components.js${appendHash(hashes['/components.js'])}`} />
 
       <title>React Rendering Engine</title>
 

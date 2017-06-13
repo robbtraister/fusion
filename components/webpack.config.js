@@ -5,7 +5,7 @@ module.exports = {
     components: './src/index.js'
   },
   output: {
-    path: path.resolve('../dist'),
+    path: path.resolve('./dist'),
     filename: '[name].js'
   },
   externals: function (context, request, callback) {

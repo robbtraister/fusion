@@ -1,0 +1,27 @@
+{
+  "name": "fusion-components",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm run sass && npm run pack",
+    "pack": "webpack -p",
+    "sass": "mkdir -p dist && node-sass --importer node_modules/node-sass-glob src/style.scss | cleancss -o dist/style.css",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "clean-css-cli": "^4.1.3",
+    "css-loader": "^0.28.4",
+    "expose-loader": "^0.7.3",
+    "import-glob-loader": "^1.1.0",
+    "node-sass": "^4.5.3",
+    "node-sass-glob": "^1.0.4",
+    "react": "^15.5.4",
+    "sass-loader": "^6.0.5",
+    "style-loader": "^0.18.2",
+    "webpack": "^2.6.1"
+  }
+}

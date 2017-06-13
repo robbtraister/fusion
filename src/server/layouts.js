@@ -10,7 +10,7 @@ const express = require('express')
 const promisify = require('./promisify')
 
 const readFile = promisify(fs.readFile.bind(fs))
-const base = path.join(__dirname, '..', 'layouts')
+const base = path.join(__dirname, '..', '..', 'layouts')
 
 function source (uri) {
   let p = url.parse(uri).pathname.replace(/^\//, '').replace(/\.json$/, '')

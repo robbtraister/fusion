@@ -34,8 +34,8 @@ function server () {
     })
   }
 
-  app.use(express.static(path.join(__dirname, '..', 'public')))
-  app.use(express.static(path.join(__dirname, '..', 'dist')))
+  app.use(express.static(path.join(__dirname, '..', '..', 'public')))
+  app.use(express.static(path.join(__dirname, '..', '..', 'dist')))
 
   app.use('/_layouts', layouts())
   app.use('/_content', content())

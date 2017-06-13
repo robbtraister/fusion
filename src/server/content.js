@@ -10,7 +10,7 @@ const express = require('express')
 const promisify = require('./promisify')
 
 const readFile = promisify(fs.readFile)
-const base = path.join(__dirname, '..', 'content')
+const base = path.join(__dirname, '..', '..', 'content')
 
 function source (uri) {
   let p = url.parse(uri).pathname.replace(/^\//, '').replace(/\.json$/, '')
@@ -31,7 +31,7 @@ function fetch (uri) {
 function router () {
   let router = express.Router()
 
-  router.use(express.static(path.join(__dirname, '..', 'content')))
+  router.use(express.static(base))
 
   router.use((req, res, next) => {
     fetch(req.path)

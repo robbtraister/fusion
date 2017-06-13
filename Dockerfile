@@ -21,6 +21,7 @@ RUN \
 COPY . ./
 
 RUN \
+    mkdir -p dist && \
     npm run build
 
 ENV USER="pb"

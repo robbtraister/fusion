@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "npm run pack && cd components && npm run build && cp -R ./dist/* ../dist/",
+    "prebuild": "npm install",
+    "build": "npm run pack && cd components && npm run build",
+    "postbuild": "cp -R ./components/dist/* ./dist/",
     "dev": "webpack-dev-server",
     "pack": "webpack -p",
     "start": "node src/server/cluster",

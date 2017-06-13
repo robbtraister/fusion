@@ -4,9 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "prebuild": "npm install",
     "build": "npm run sass && npm run pack",
     "pack": "webpack -p",
-    "sass": "mkdir -p dist && node-sass --importer node_modules/node-sass-glob src/style.scss | cleancss -o dist/style.css",
+    "presass": "mkdir -p dist",
+    "sass": "node-sass --importer node_modules/node-sass-glob src/style.scss | cleancss -o dist/style.css",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

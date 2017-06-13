@@ -7,7 +7,7 @@ const path = require('path')
 const debug = require('debug')(`pb:hashes:${process.pid}`)
 const glob = require('glob')
 
-const distDir = path.normalize(`${__dirname}/../../dist`)
+const distDir = path.join(__dirname, '..', '..', 'dist')
 
 function generateHash (fp) {
   let hash = crypto.createHash(process.env.HASH_ALGORITHM || 'md5')

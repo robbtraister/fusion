@@ -3,7 +3,7 @@
 const debug = require('debug')(`pb:render:${process.pid}`)
 const express = require('express')
 
-// Components bundle does not include react lib; expose it as the explicit lib name
+// Components bundle does not include react lib; must expose it as the explicit lib name
 const React = global.react = require('react')
 const ReactDOMServer = require('react-dom/server')
 

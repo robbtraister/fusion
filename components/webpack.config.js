@@ -2,7 +2,7 @@ const path = require('path')
 
 module.exports = {
   entry: {
-    components: './index.js'
+    components: './src/index.js'
   },
   output: {
     path: path.resolve('../dist'),
@@ -27,7 +27,7 @@ module.exports = {
         loader: 'babel-loader'
       },
       {
-        test: require.resolve('./index.js'),
+        test: require.resolve('./src/index.js'),
         loader: 'expose-loader?Components'
       },
       {

@@ -7,8 +7,8 @@
     "build": "npm run sass && npm run pack",
     "dev": "webpack-dev-server",
     "pack": "webpack -p && cd components && webpack -p",
-    "sass": "node-sass --importer node_modules/node-sass-glob components/style.scss | cleancss -o dist/style.css",
-    "start": "node server/cluster",
+    "sass": "mkdir -p dist && node-sass --importer node_modules/node-sass-glob components/src/style.scss | cleancss -o dist/style.css",
+    "start": "node src/server/cluster",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

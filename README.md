@@ -22,4 +22,6 @@ Fusion also supports SSR options using the `ReactDOMServer`.  If a `rendered` qu
 
 Similarly, if a `noscript` query parameter is appended to the URL, the resulting payload will be a fully rendered version of the page, but will NOT include or load any scripts.  This will be a static page.
 
+In either of the above cases, a cookie is also set to remember the user's preference.  To clear the cookie, you may append a `norender` query param.
+
 _Note: the standard version will include a noscript meta tag to redirect to `?noscript` when necessary._

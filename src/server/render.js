@@ -1,6 +1,6 @@
 'use strict'
 
-const debug = require('debug')(`pb:render:${process.pid}`)
+const debug = require('debug')(`fusion:render:${process.pid}`)
 const express = require('express')
 
 // Components bundle does not include react lib; must expose it as the explicit lib name
@@ -17,19 +17,19 @@ const Content = require('./content')
 const Layouts = require('./layouts')
 const Template = require('./template')
 
-function renderHTML (body) {
+function renderHTML (body, options) {
   try {
     return '<!DOCTYPE html>' +
-      ReactDOMServer.renderToStaticMarkup(Template(body))
+      ReactDOMServer.renderToStaticMarkup(Template(body, options))
   } catch (e) {
     debug('error:', e)
     throw e
   }
 }
 
-function renderBody (props) {
+function renderBody (props, options) {
   try {
-    return renderHTML(ReactDOMServer.renderToStaticMarkup(engine(props)))
+    return renderHTML(ReactDOMServer.renderToStaticMarkup(engine(props)), options)
   } catch (e) {
     debug('error:', e)
     throw e
@@ -45,23 +45,34 @@ function fetchLayout (src) {
 }
 
 const fetcher = Engine.Fetcher(fetchContent, fetchLayout)
-function renderURI (uri, includeScripts, includeNoscript) {
+function renderURI (uri, options) {
   return fetcher(uri)
-    .then(props => renderBody(props, includeScripts, includeNoscript))
+    .then(props => renderBody(props, options))
 }
 
 function router () {
   let router = express.Router()
 
   router.use((req, res, next) => {
-    renderURI(req.path)
-      .then(res.send.bind(res))
-      .catch(err => {
-        next({
-          status: 500,
-          msg: err
-        })
+    let param = [
+      'noscript',
+      'rendered'
+    ].find(q => req.query.hasOwnProperty(q) && req.query[q] !== 'false')
+
+    if (param) {
+      renderURI(req.path, {
+        includeScripts: param !== 'noscript'
       })
+        .then(res.send.bind(res))
+        .catch(err => {
+          next({
+            status: 500,
+            msg: err
+          })
+        })
+    } else {
+      next()
+    }
   })
 
   return router

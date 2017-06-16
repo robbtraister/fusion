@@ -6,7 +6,7 @@ require('babel-core/register')
 
 const path = require('path')
 
-// const debug = require('debug')(`pb:server:${process.pid}`)
+const debug = require('debug')(`fusion:server:${process.pid}`)
 const express = require('express')
 const morgan = require('morgan')
 const compression = require('compression')
@@ -41,8 +41,13 @@ function server () {
   app.use('/_content', content())
   app.use(render())
 
+  let index = render.renderHTML(null, {
+    includeScripts: true,
+    includeNoscript: true
+  })
+  debug('index:', index)
   app.get('*', (req, res, next) => {
-    res.sendStatus(404)
+    res.send(index)
   })
 
   app.use((err, req, res, next) => {

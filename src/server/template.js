@@ -8,11 +8,21 @@ function appendHash (h) {
   return h ? `?h=${h}` : ''
 }
 
-const Template = (content) => {
+const Template = (content, options) => {
+  options = options || {}
   return <html>
     <head>
-      <script src={`/engine.js${appendHash(hashes['/engine.js'])}`} />
-      <script src={`/components.js${appendHash(hashes['/components.js'])}`} />
+      {options.includeNoscript &&
+        <noscript>
+          <meta httpEquiv='refresh' content='0; url=?noscript' />
+        </noscript>
+      }
+      {options.includeScripts &&
+        <script src={`/engine.js${appendHash(hashes['/engine.js'])}`} />
+      }
+      {options.includeScripts &&
+        <script src={`/components.js${appendHash(hashes['/components.js'])}`} />
+      }
 
       <title>React Rendering Engine</title>
 

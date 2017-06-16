@@ -4,7 +4,7 @@ const fs = require('fs')
 const path = require('path')
 const url = require('url')
 
-const debug = require('debug')(`pb:layouts:${process.pid}`)
+const debug = require('debug')(`fusion:layouts:${process.pid}`)
 const express = require('express')
 
 const promisify = require('./promisify')

@@ -4,7 +4,7 @@ const crypto = require('crypto')
 const fs = require('fs')
 const path = require('path')
 
-const debug = require('debug')(`pb:hashes:${process.pid}`)
+const debug = require('debug')(`fusion:hashes:${process.pid}`)
 const glob = require('glob')
 
 const distDir = path.join(__dirname, '..', '..', 'dist')

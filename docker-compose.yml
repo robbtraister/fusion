@@ -1,9 +1,22 @@
 version: "2"
 services:
-  render:
+  components:
+    build: ./components
+    volumes:
+      - "fusion-dist-volume:/fusion-components/export"
+  server:
     build: .
+    command: start
     ports:
-      - "8080:8080"
+      - "80:8000"
+      - "9229:9229"
+      - "5859:5859"
     environment:
-      PORT: 8080
-      WORKERS: 0
+      NGINX_PORT: 8000
+      NODEJS_PORT: 8080
+      WORKERS: 1
+      DEBUG: fusion:*
+    volumes:
+      - "fusion-dist-volume:/fusion/dist"
+volumes:
+  fusion-dist-volume: {}

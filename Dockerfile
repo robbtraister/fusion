@@ -4,6 +4,7 @@ RUN \
     apk update && \
     apk upgrade && \
     apk add --update --no-cache \
+            nginx \
             nodejs-npm \
             && \
     rm -rf /var/cache/apk/* && \
@@ -11,22 +12,38 @@ RUN \
     node -v && \
     npm -v
 
-WORKDIR /pb
+WORKDIR /fusion
 
-COPY package-lock.json ./
+COPY package.json ./
 
 RUN \
     npm install
 
-COPY . ./
+COPY src ./src
+COPY .babelrc webpack.config.js ./
 
 RUN \
     npm run build
 
-ENV USER="pb"
+COPY . ./
+
+ENV USER="fusion"
 RUN \
     addgroup -S ${USER} && \
-    adduser -S ${USER} -G ${USER} -s "/bin/sh"
+    adduser -S ${USER} -G ${USER} -s "/bin/sh" && \
+    mkdir -p \
+          ./proxy/logs \
+          ./proxy/tmp/cache \
+          ./proxy/tmp/client_body \
+          ./proxy/tmp/fastcgi \
+          ./proxy/tmp/proxy \
+          ./proxy/tmp/scgi \
+          ./proxy/tmp/uwsgi \
+          && \
+    ln -sf /dev/stdout ./proxy/logs/access.log && \
+    ln -sf /dev/stdout ./proxy/logs/error.log && \
+    chown -R ${USER}:${USER} \
+          ./proxy
 
 USER ${USER}
 

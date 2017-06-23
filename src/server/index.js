@@ -34,8 +34,10 @@ function server () {
     })
   }
 
-  app.use(express.static(path.join(__dirname, '..', '..', 'public')))
-  app.use(express.static(path.join(__dirname, '..', '..', 'dist')))
+  if (!process.env.NGINX_PORT) {
+    app.use(express.static(path.join(__dirname, '..', '..', 'public')))
+    app.use(express.static(path.join(__dirname, '..', '..', 'dist')))
+  }
 
   app.use('/_layouts', layouts())
   app.use('/_content', content())
@@ -54,9 +56,13 @@ function server () {
     return res.status(err.status || 500).send(/^prod/i.test(process.env.NODE_ENV) ? '' : err.msg)
   })
 
-  const port = process.env.PORT || 8080
-  return app.listen(port, () => {
-    console.error(`Listening on port: ${port}`)
+  const port = process.env.NODEJS_PORT || process.env.PORT || 8080
+  return app.listen(port, (err) => {
+    if (err) {
+      console.error(err)
+    } else {
+      console.log(`Listening on port: ${port}`)
+    }
   })
 }
 

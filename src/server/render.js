@@ -3,6 +3,7 @@
 const debug = require('debug')(`fusion:render:${process.pid}`)
 const express = require('express')
 const cookieParser = require('cookie-parser')
+// const request = require('request-promise-native')
 
 // Components bundle does not include react lib; must expose it as the explicit lib name
 const React = global.react = require('react')
@@ -37,11 +38,14 @@ function renderBody (props, options) {
   }
 }
 
+// const port = process.env.NODEJS_PORT || process.env.PORT || 8080
 function fetchContent (src) {
+  // return request(`http://localhost:${port}/_content/${Content.source(src)}`).then(JSON.parse.bind(JSON))
   return Content.fetch(src).then(JSON.parse.bind(JSON))
 }
 
 function fetchLayout (src) {
+  // return request(`http://localhost:${port}/_layouts/${Layouts.source(src)}`).then(JSON.parse.bind(JSON))
   return Layouts.fetch(src).then(JSON.parse.bind(JSON))
 }
 
@@ -53,31 +57,36 @@ function renderURI (uri, options) {
 
 function getRenderingOptions () {
   return function (req, res, next) {
+    debug('query', req.query)
+    debug('cookies', req.cookies)
+
     function hasQueryParam (q) {
-      return req.query.hasOwnProperty(q) && req.query[q] !== 'false'
+      return req.query.hasOwnProperty(q) && ['false', '0'].indexOf(req.query[q]) < 0
     }
 
     let noscript = false
     let rendered = false
 
     if (hasQueryParam('norender')) {
-      res.cookie('FUSION_NORENDER', true)
+      res.cookie('FUSION_NORENDER', 1)
       noscript = false
       rendered = false
     } else if (hasQueryParam('noscript')) {
-      res.cookie('FUSION_NOSCRIPT', true)
+      res.cookie('FUSION_NOSCRIPT', 1)
       noscript = true
       rendered = false
     } else if (hasQueryParam('rendered')) {
-      res.cookie('FUSION_RENDERED', true)
+      res.cookie('FUSION_RENDERED', 1)
       noscript = false
       rendered = true
-    } else if (req.cookies.hasOwnProperty('FUSION_NORENDER')) {
-      // do nothing
-    } else if (req.cookies.hasOwnProperty('FUSION_NOSCRIPT')) {
-      noscript = true
-    } else if (req.cookies.hasOwnProperty('FUSION_RENDERED')) {
-      rendered = true
+    } else if (req.cookies.hasOwnProperty) { // if no cookies, will be `null` object
+      if (req.cookies.hasOwnProperty('FUSION_NORENDER')) {
+        // do nothing
+      } else if (req.cookies.hasOwnProperty('FUSION_NOSCRIPT')) {
+        noscript = true
+      } else if (req.cookies.hasOwnProperty('FUSION_RENDERED')) {
+        rendered = true
+      }
     }
 
     if (noscript) {

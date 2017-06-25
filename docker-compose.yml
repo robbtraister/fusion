@@ -3,7 +3,7 @@ services:
   components:
     build: ./components
     volumes:
-      - "fusion-dist-volume:/fusion-components/export"
+      - "fusion-components-volume:/fusion-components/export"
   server:
     build: .
     command: start
@@ -17,6 +17,6 @@ services:
       WORKERS: 1
       DEBUG: fusion:*
     volumes:
-      - "fusion-dist-volume:/fusion/dist"
+      - "fusion-components-volume:/fusion/components"
 volumes:
-  fusion-dist-volume: {}
+  fusion-components-volume: {}

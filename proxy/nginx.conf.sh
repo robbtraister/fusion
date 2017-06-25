@@ -90,7 +90,7 @@ http {
     }
 
     location / {
-      try_files \$uri /public\$uri /dist\$uri @engine;
+      try_files \$uri /public\$uri /dist\$uri /components\$uri @engine;
     }
   }
 }

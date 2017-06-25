@@ -3,15 +3,14 @@
 const debug = require('debug')(`fusion:render:${process.pid}`)
 const express = require('express')
 const cookieParser = require('cookie-parser')
-// const request = require('request-promise-native')
 
 // Components bundle does not include react lib; must expose it as the explicit lib name
 const React = global.react = require('react')
 const ReactDOMServer = require('react-dom/server')
 
-// Components bundle will load `Components` variable into global scope
-require('../../dist/components')
-const Components = global.Components // require('../components')
+// Components bundle will load `Components` variable into global scope for client use
+require('../../components/components')
+const Components = global.Components // require('../../components/components')
 const Engine = require('../engine')
 const engine = React.createFactory(Engine(Components))
 
@@ -38,14 +37,11 @@ function renderBody (props, options) {
   }
 }
 
-// const port = process.env.NODEJS_PORT || process.env.PORT || 8080
 function fetchContent (src) {
-  // return request(`http://localhost:${port}/_content/${Content.source(src)}`).then(JSON.parse.bind(JSON))
   return Content.fetch(src).then(JSON.parse.bind(JSON))
 }
 
 function fetchLayout (src) {
-  // return request(`http://localhost:${port}/_layouts/${Layouts.source(src)}`).then(JSON.parse.bind(JSON))
   return Layouts.fetch(src).then(JSON.parse.bind(JSON))
 }
 

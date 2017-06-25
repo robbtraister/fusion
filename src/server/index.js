@@ -37,6 +37,7 @@ function server () {
   if (!process.env.NGINX_PORT) {
     app.use(express.static(path.join(__dirname, '..', '..', 'public')))
     app.use(express.static(path.join(__dirname, '..', '..', 'dist')))
+    app.use(express.static(path.join(__dirname, '..', '..', 'components')))
   }
 
   app.use('/_layouts', layouts())

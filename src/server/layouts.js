@@ -14,22 +14,24 @@ const base = path.join(__dirname, '..', '..', 'layouts')
 
 function source (uri) {
   let p = url.parse(uri).pathname.replace(/^\//, '').replace(/\.json$/, '')
-  debug('path:', p)
+  debug('layout path:', p)
   return `${['', 'homepage'].indexOf(p) >= 0 ? 'homepage' : 'article'}.json`
 }
 
 function fetch (uri) {
   let s = source(uri)
-  debug('source:', s)
+  debug('layout source:', s)
   return readFile(path.join(base, s))
     .catch(err => {
-      debug('fetch error:', err)
+      debug('layout fetch error:', err)
       throw err
     })
 }
 
 function router () {
   let router = express.Router()
+
+  router.use(express.static(base))
 
   router.use((req, res, next) => {
     fetch(req.path)

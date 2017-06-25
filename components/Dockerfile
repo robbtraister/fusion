@@ -25,4 +25,4 @@ RUN \
 
 VOLUME ./export
 
-CMD cp -R ./dist/* ./export
+CMD rm -rf ./export/* && cp -R ./dist/* ./export

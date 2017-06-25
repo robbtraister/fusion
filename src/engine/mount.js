@@ -14,8 +14,8 @@ function fetchJSON (uri) {
 
 function normalize (src) {
   return src
-    // strip trailing / or .htm/.html
-    .replace(/(\/|\.html?)$/, '')
+    // strip trailing / or .htm/.html/.json
+    .replace(/(\/|\.html?|\.json)$/, '')
     // strip leading slash
     .replace(/^\/+/, '') || 'homepage'
 }

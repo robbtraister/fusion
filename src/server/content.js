@@ -14,16 +14,16 @@ const base = path.join(__dirname, '..', '..', 'content')
 
 function source (uri) {
   let p = url.parse(uri).pathname.replace(/^\//, '').replace(/\.json$/, '')
-  debug('path:', p)
+  debug('content path:', p)
   return `${p || 'homepage'}.json`
 }
 
 function fetch (uri) {
   let s = source(uri)
-  debug('source:', s)
+  debug('content source:', s)
   return readFile(path.join(base, s))
     .catch(err => {
-      debug('fetch error:', err)
+      debug('content fetch error:', err)
       throw err
     })
 }

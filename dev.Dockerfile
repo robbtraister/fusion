@@ -14,15 +14,26 @@ RUN \
 
 WORKDIR /fusion
 
-COPY . ./
+COPY test/package.json ./test/
 
 RUN \
-    npm install && \
-    (cd test && npm install) && \
+    cd test && \
+    npm install
+
+COPY package.json ./
+
+RUN \
+    npm install
+
+COPY .babelrc webpack.config.js ./
+COPY test ./test
+COPY src ./src
+
+RUN \
     npm run test && \
-    rm -rf ./test && \
-    npm run build && \
-    npm cache clean --force
+    npm run build
+
+COPY . ./
 
 ENV USER="fusion"
 RUN \

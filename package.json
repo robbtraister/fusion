@@ -8,7 +8,7 @@
     "dev_old": "webpack-dev-server",
     "dev": "./proxy/run.sh && node --inspect=9229 src/server/cluster",
     "start": "./proxy/run.sh && node src/server/cluster",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "cd test && npm run test"
   },
   "keywords": [],
   "author": "",

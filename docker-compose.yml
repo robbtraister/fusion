@@ -5,17 +5,16 @@ services:
     volumes:
       - "fusion-components-volume:/fusion-components/export"
   server:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     command: start
     ports:
       - "80:8000"
-      - "9229:9229"
-      - "5859:5859"
     environment:
       NGINX_PORT: 8000
       NODEJS_PORT: 8080
-      WORKERS: 1
-      DEBUG: fusion:*
+      WORKERS: 0
     volumes:
       - "fusion-components-volume:/fusion/components"
 volumes:

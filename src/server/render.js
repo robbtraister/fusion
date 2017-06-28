@@ -16,30 +16,16 @@ Templates.Index = require('./template')
 const fetch = require('./content').fetch
 const getTemplate = require('./templates').get
 
-function renderHTML (body, options) {
-  try {
-    return '<!DOCTYPE html>' +
-      ReactDOMServer.renderToStaticMarkup(Templates.Index(body, options))
-  } catch (e) {
-    debug('error:', e)
-    throw e
-  }
+function renderHTML (template, body, options) {
+  return '<!DOCTYPE html>' +
+    ReactDOMServer.renderToStaticMarkup(Templates.Index(template, body, options))
 }
 
-function renderBody (template, state, options) {
-  debug('state:', state)
-  try {
-    return renderHTML(ReactDOMServer.renderToStaticMarkup(Templates[template](state)), options)
-  } catch (e) {
-    debug('error:', e)
-    throw e
-  }
-}
-
-function renderURI (uri, options) {
+function renderURI (template, uri, options) {
   return fetch(uri)
     .then(JSON.parse.bind(JSON))
-    .then(state => renderBody(getTemplate(uri), state, options))
+    .then(state => ReactDOMServer.renderToStaticMarkup(Templates[template](state)))
+    .then(body => renderHTML(template, body, options))
 }
 
 function getRenderingOptions () {
@@ -101,17 +87,28 @@ function router () {
   router.use(getRenderingOptions())
 
   router.use((req, res, next) => {
+    function errHandler (err) {
+      next({
+        status: 500,
+        msg: err
+      })
+    }
+    let template = getTemplate(req.path)
     if (req.renderingOptions) {
-      renderURI(req.path, req.renderingOptions)
+      renderURI(template, req.path, req.renderingOptions)
         .then(res.send.bind(res))
-        .catch(err => {
-          next({
-            status: 500,
-            msg: err
-          })
-        })
+        .catch(errHandler)
     } else {
-      next()
+      try {
+        res.send(
+          renderHTML(template, null, {
+            includeScripts: true,
+            includeNoscript: true
+          })
+        )
+      } catch (err) {
+        errHandler(err)
+      }
     }
   })
 
@@ -119,6 +116,5 @@ function router () {
 }
 
 module.exports = router
-module.exports.renderBody = renderBody
 module.exports.renderHTML = renderHTML
 module.exports.renderURI = renderURI

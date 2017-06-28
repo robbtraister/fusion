@@ -3,10 +3,7 @@ const path = require('path')
 
 const glob = require('glob')
 
-const entry = {
-  engine: require.resolve('./src/engine')
-}
-
+const collections = {}
 ;['components', 'templates'].forEach(k => {
   let list = glob.sync('*/', {
     cwd: `${__dirname}/${k}`
@@ -15,56 +12,125 @@ const entry = {
 
   fs.writeFileSync(`./${k}/index.js`, list.map(item => `export * from './${item}'`).join('\n'))
 
-  entry[k] = require.resolve(`./${k}`)
+  collections[k] = {}
   list.forEach(item => {
-    entry[item] = require.resolve(`./${k}/${item}`)
+    collections[k][item] = require.resolve(`./${k}/${item}`)
   })
 })
 
-module.exports = {
-  entry,
-  output: {
-    path: path.resolve('./dist'),
-    filename: '[name].js'
-  },
-  externals: function (context, request, callback) {
-    if (request === 'react') {
-      if (context.startsWith(path.resolve('./components')) || context.startsWith(path.resolve('./template'))) {
-        return callback(null, request)
-      }
+function excludeReact (context, request, callback) {
+  if (request === 'react') {
+    return callback(null, request)
+  }
+  callback()
+}
+
+module.exports = [
+  {
+    entry: {
+      engine: require.resolve('./src/engine')
+    },
+    output: {
+      path: path.resolve('./dist'),
+      filename: '[name].js'
+    },
+    devServer: {
+      inline: true,
+      contentBase: './public',
+      port: 8100
+    },
+    module: {
+      loaders: [
+        {
+          test: require.resolve('./src/engine'),
+          loader: ['expose-loader?react']
+        },
+        {
+          test: /\.js$/,
+          exclude: /node_modules/,
+          loader: ['babel-loader']
+        }
+      ]
     }
-    callback()
   },
-  devServer: {
-    inline: true,
-    contentBase: './public',
-    port: 8100
+
+  {
+    entry: {
+      components: require.resolve('./components'),
+      templates: require.resolve('./templates')
+    },
+    externals: excludeReact,
+    output: {
+      path: path.resolve('./dist'),
+      filename: '[name].js'
+    },
+    module: {
+      loaders: [
+        {
+          test: require.resolve('./components'),
+          loader: ['expose-loader?Components']
+        },
+        {
+          test: require.resolve('./templates'),
+          loader: ['expose-loader?Templates']
+        },
+        {
+          test: /\.js$/,
+          exclude: /node_modules/,
+          loader: ['babel-loader']
+        }
+      ]
+    }
   },
-  module: {
-    loaders: [
+
+  {
+    entry: collections.components,
+    externals: excludeReact,
+    output: {
+      path: path.resolve('./dist/components'),
+      filename: '[name].js'
+    },
+    module: {
+      loaders: [
+        {
+          loader: ['expose-loader?Components']
+        },
+        {
+          test: /\.js$/,
+          exclude: /node_modules/,
+          loader: ['babel-loader']
+        }
+      ]
+    }
+  },
+
+  {
+    entry: collections.templates,
+    externals: excludeReact,
+    output: {
+      path: path.resolve('./dist/templates'),
+      filename: '[name].js'
+    },
+    module: {
+      loaders: [
+        {
+          loader: ['expose-loader?Templates']
+        },
+        {
+          test: /\.js$/,
+          exclude: /node_modules/,
+          loader: ['babel-loader']
+        }
+      ]
+    }
+  }
+]
+
+/*
       {
         test: /\.css$/,
         exclude: /node_modules/,
         loader: ['style-loader', 'css-loader']
-      },
-      {
-        test: /\/components\/.*\.js$/,
-        exclude: /node_modules/,
-        loader: ['expose-loader?Components']
-      },
-      {
-        test: /\/templates\/.*\.js$/,
-        exclude: /node_modules/,
-        loader: ['expose-loader?Templates']
-      },
-      {
-        test: require.resolve('./src/engine'),
-        loader: ['expose-loader?react']
-      },
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        loader: ['babel-loader']
       },
       {
         test: /\.s[ac]ss$/,
@@ -74,3 +140,4 @@ module.exports = {
     ]
   }
 }
+*/

@@ -6,7 +6,7 @@ require('babel-core/register')
 
 const path = require('path')
 
-const debug = require('debug')(`fusion:server:${process.pid}`)
+// const debug = require('debug')(`fusion:server:${process.pid}`)
 const express = require('express')
 const morgan = require('morgan')
 const compression = require('compression')
@@ -14,7 +14,6 @@ const compression = require('compression')
 const content = require('./content')
 const hashes = require('./hashes')
 const render = require('./render')
-const templates = require('./templates')
 
 function server () {
   let app = express()
@@ -42,17 +41,7 @@ function server () {
   }
 
   app.use('/_content', content())
-  app.use('/_templates', templates())
   app.use(render())
-
-  let index = render.renderHTML(null, {
-    includeScripts: true,
-    includeNoscript: true
-  })
-  debug('index:', index)
-  app.get('*', (req, res, next) => {
-    res.send(index)
-  })
 
   app.use((err, req, res, next) => {
     return res.status(err.status || 500).send(/^prod/i.test(process.env.NODE_ENV) ? '' : err.msg)

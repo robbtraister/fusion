@@ -9,7 +9,7 @@ function hashedSource (s) {
   return h ? `${s}?h=${h}` : s
 }
 
-const Template = (content, options) => {
+const Template = (template, content, options) => {
   options = options || {}
   return <html>
     <head>
@@ -20,6 +20,9 @@ const Template = (content, options) => {
       }
       {options.includeScripts &&
         <script src={hashedSource('/engine.js')} />
+      }
+      {options.includeScripts && template &&
+        <script src={hashedSource(`/templates/${template.toLowerCase()}.js`)} />
       }
 
       <title>React Rendering Engine</title>

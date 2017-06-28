@@ -20,7 +20,7 @@ function generateKey (fp) {
 }
 
 const hashes = {}
-glob.sync(`${distDir}/**/*`)
+glob.sync(`${distDir}/**/*`, {nodir: true})
   .forEach(fp => {
     hashes[generateKey(fp)] = generateHash(fp)
   })

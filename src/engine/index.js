@@ -15,26 +15,9 @@ function normalize (src) {
     .replace(/^\/+/, '') || 'homepage'
 }
 
-var page = normalize(document.location.pathname)
-var content = null
-var loaded = 0
-
-function render (json) {
-  content = content || json
-  loaded++
-  if (loaded === 2) {
-    ReactDOM.render(Templates.default(content), document.getElementById('App'))
-  }
-}
-
-var s = document.createElement('script')
-s.src = '/_templates/' + page
-s.onload = function () { render() }
-document.documentElement.getElementsByTagName('head')[0].appendChild(s)
-
-fetch('/_content/' + page)
+fetch('/_content/' + normalize(document.location.pathname))
   .then(res => res.json())
-  .then(render)
+  .then(content => ReactDOM.render(Templates.default(content), document.getElementById('App')))
   .catch(console.error)
 
 // expose react lib for Components

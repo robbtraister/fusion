@@ -4,11 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build_dev": "npm run sass_dev && webpack",
     "build": "npm run sass && webpack -p",
     "dev_old": "webpack-dev-server",
     "dev": "./proxy/run.sh && node --inspect=9229 src/server/cluster",
-    "presass": "mkdir -p dist",
-    "sass": "node-sass --importer node_modules/node-sass-glob style.scss | cleancss -o dist/style.css",
+    "sass_dev": "mkdir -p dist && node-sass --importer node_modules/node-sass-glob style.scss > dist/style.css",
+    "sass": "mkdir -p dist && node-sass --importer node_modules/node-sass-glob style.scss | cleancss -o dist/style.css",
     "start": "./proxy/run.sh && node src/server/cluster",
     "test": "cd test && npm run test"
   },

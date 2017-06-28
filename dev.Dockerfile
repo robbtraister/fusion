@@ -33,7 +33,7 @@ COPY src ./src
 
 RUN \
     npm run test && \
-    npm run build
+    npm run build_dev
 
 COPY . ./
 

@@ -11,7 +11,7 @@ const Article = (props) => {
   return <div className='article'>
     <Header />
     <Body>
-      {props.content.map(c => <Blurb content={c} />)}
+      {props.content.map((c, i) => <Blurb key={i} content={c} />)}
     </Body>
     <Footer source='blurb-footer' />
   </div>

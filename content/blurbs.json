@@ -1,5 +1,7 @@
 {
-  "id": 6,
-  "one": "blurb 1",
-  "two": "blurb 2"
+  "content": [
+    "blurb 1",
+    "blurb 2",
+    "blurb 3"
+  ]
 }

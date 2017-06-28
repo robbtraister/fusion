@@ -4,8 +4,9 @@ const React = require('react')
 
 const hashes = require('./hashes')
 
-function appendHash (h) {
-  return h ? `?h=${h}` : ''
+function hashedSource (s) {
+  let h = hashes[s]
+  return h ? `${s}?h=${h}` : s
 }
 
 const Template = (content, options) => {
@@ -18,10 +19,7 @@ const Template = (content, options) => {
         </noscript>
       }
       {options.includeScripts &&
-        <script src={`/engine.js${appendHash(hashes['/engine.js'])}`} />
-      }
-      {options.includeScripts &&
-        <script src={`/components.js${appendHash(hashes['/components.js'])}`} />
+        <script src={hashedSource('/engine.js')} />
       }
 
       <title>React Rendering Engine</title>
@@ -29,7 +27,7 @@ const Template = (content, options) => {
       <link rel='icon' type='image/png' sizes='96x96' href='/favicon-96x96.png' />
       <link rel='icon' type='image/png' sizes='32x32' href='/favicon-32x32.png' />
       <link rel='icon' type='image/png' sizes='16x16' href='/favicon-16x16.png' />
-      <link rel='stylesheet' type='text/css' href={`/style.css${appendHash(hashes['/style.css'])}`} />
+      <link rel='stylesheet' type='text/css' href={hashedSource('/style.css')} />
     </head>
     <body>
       <div id='App' dangerouslySetInnerHTML={{ __html: content }} />

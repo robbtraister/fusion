@@ -25,8 +25,10 @@ COPY package.json ./
 RUN \
     npm install
 
-COPY .babelrc webpack.config.js ./
+COPY .babelrc webpack.config.js style.scss ./
 COPY test ./test
+COPY components ./components
+COPY templates ./templates
 COPY src ./src
 
 RUN \

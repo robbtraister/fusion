@@ -1,7 +1,9 @@
+'use strict'
+
 import React from 'react'
 
 const Header = (props) => {
-  return <div className='header' key={props.id}>
+  return <div className='header'>
     <a href='/'>The Washington Post</a>
   </div>
 }

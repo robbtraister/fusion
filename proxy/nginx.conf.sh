@@ -58,7 +58,7 @@ http {
   gzip_comp_level  2;
   gzip_min_length  1400;
   gzip_proxied     expired no-cache no-store private auth;
-  gzip_types       text/plain application/x-javascript application/json text/css;
+  gzip_types       text/plain application/javascript application/x-javascript application/json text/css;
 
   server_names_hash_bucket_size 128;
 
@@ -90,7 +90,7 @@ http {
     }
 
     location / {
-      try_files \$uri /public\$uri /dist\$uri /components\$uri @engine;
+      try_files \$uri /dist\$uri /resources\$uri @engine;
     }
   }
 }

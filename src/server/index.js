@@ -13,15 +13,17 @@ const compression = require('compression')
 
 const content = require('./content')
 const hashes = require('./hashes')
-const layouts = require('./layouts')
 const render = require('./render')
+const templates = require('./templates')
 
 function server () {
   let app = express()
 
   app.use(morgan('dev'))
 
-  app.use(compression())
+  if (!process.env.NGINX_PORT) {
+    app.use(compression())
+  }
 
   if (process.env.CACHE_MAX_AGE !== '0') {
     app.use((req, res, next) => {
@@ -35,13 +37,12 @@ function server () {
   }
 
   if (!process.env.NGINX_PORT) {
-    app.use(express.static(path.join(__dirname, '..', '..', 'public')))
     app.use(express.static(path.join(__dirname, '..', '..', 'dist')))
-    app.use(express.static(path.join(__dirname, '..', '..', 'components')))
+    app.use(express.static(path.join(__dirname, '..', '..', 'resources')))
   }
 
-  app.use('/_layouts', layouts())
   app.use('/_content', content())
+  app.use('/_templates', templates())
   app.use(render())
 
   let index = render.renderHTML(null, {

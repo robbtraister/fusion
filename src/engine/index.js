@@ -1,31 +1,41 @@
 'use strict'
 
-const React = require('react')
+/* global fetch, Templates */
 
-const Engine = (Components) => {
-  function render (config) {
-    let elements = config.layout
-      .filter(element => Components[element.component])
-      .map(element => {
-        let content = config.contents._default
-        if (element.children) {
-          content = {content: render({contents: config.contents, layout: element.children})}
-        } else if (element.source) {
-          content = config.contents[element.source]
-        }
+const ReactDOM = require('react-dom')
 
-        let props = Object.assign({}, content, element)
-        let Component = Components[element.component]
-        if (Component.prototype instanceof React.Component) {
-          return (new Component(props)).render()
-        }
-        return Component(props)
-      })
-    return <div>{elements}</div>
-  }
-  return render
+// use <link> tag in index.html since styles are published for SSR, anyway
+// require('./style.scss')
+
+function normalize (src) {
+  return src
+    // strip trailing / or .htm/.html
+    .replace(/(\/|\.html?)$/, '')
+    // strip leading slash
+    .replace(/^\/+/, '') || 'homepage'
 }
 
-module.exports = Engine
-module.exports.Engine = Engine
-module.exports.Fetcher = require('./fetcher')
+var page = normalize(document.location.pathname)
+var content = null
+var loaded = 0
+
+function render (json) {
+  content = content || json
+  loaded++
+  if (loaded === 2) {
+    ReactDOM.render(Templates.default(content), document.getElementById('App'))
+  }
+}
+
+var s = document.createElement('script')
+s.src = '/_templates/' + page
+s.onload = function () { render() }
+document.documentElement.getElementsByTagName('head')[0].appendChild(s)
+
+fetch('/_content/' + page)
+  .then(res => res.json())
+  .then(render)
+  .catch(console.error)
+
+// expose react lib for Components
+module.exports = require('react')

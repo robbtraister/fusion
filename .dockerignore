@@ -3,6 +3,5 @@
 docker-compose.yml
 docker-compose.override.yml
 
-components
 **/dist
 **/node_modules

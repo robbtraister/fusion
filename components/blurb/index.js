@@ -1,7 +1,9 @@
+'use strict'
+
 import React from 'react'
 
 const Blurb = (props) => {
-  return <div className='blurb' key={props.id}>{props[props.property]}</div>
+  return <div className='blurb'>{props.content}</div>
 }
 
 export default Blurb

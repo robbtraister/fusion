@@ -5,50 +5,41 @@ const express = require('express')
 const cookieParser = require('cookie-parser')
 
 // Components bundle does not include react lib; must expose it as the explicit lib name
-const React = global.react = require('react')
+global.react = require('react')
 const ReactDOMServer = require('react-dom/server')
 
 // Components bundle will load `Components` variable into global scope for client use
-require('../../components/components')
-const Components = global.Components // require('../../components/components')
-const Engine = require('../engine')
-const engine = React.createFactory(Engine(Components))
+require('../../dist/templates')
+const Templates = global.Templates // require('../../components/components')
+Templates.Index = require('./template')
 
-const Content = require('./content')
-const Layouts = require('./layouts')
-const Template = require('./template')
+const fetch = require('./content').fetch
+const getTemplate = require('./templates').get
 
 function renderHTML (body, options) {
   try {
     return '<!DOCTYPE html>' +
-      ReactDOMServer.renderToStaticMarkup(Template(body, options))
+      ReactDOMServer.renderToStaticMarkup(Templates.Index(body, options))
   } catch (e) {
     debug('error:', e)
     throw e
   }
 }
 
-function renderBody (props, options) {
+function renderBody (template, state, options) {
+  debug('state:', state)
   try {
-    return renderHTML(ReactDOMServer.renderToStaticMarkup(engine(props)), options)
+    return renderHTML(ReactDOMServer.renderToStaticMarkup(Templates[template](state)), options)
   } catch (e) {
     debug('error:', e)
     throw e
   }
 }
 
-function fetchContent (src) {
-  return Content.fetch(src).then(JSON.parse.bind(JSON))
-}
-
-function fetchLayout (src) {
-  return Layouts.fetch(src).then(JSON.parse.bind(JSON))
-}
-
-const fetcher = Engine.Fetcher(fetchContent, fetchLayout)
 function renderURI (uri, options) {
-  return fetcher(uri)
-    .then(props => renderBody(props, options))
+  return fetch(uri)
+    .then(JSON.parse.bind(JSON))
+    .then(state => renderBody(getTemplate(uri), state, options))
 }
 
 function getRenderingOptions () {

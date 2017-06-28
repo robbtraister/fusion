@@ -2,5 +2,8 @@
 
 docker-compose.override.yml
 
+components/src/all.js
+components/src/index.js
+
 **/dist
 **/node_modules

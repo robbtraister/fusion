@@ -1,9 +1,5 @@
 version: "2"
 services:
-  components:
-    build: ./components
-    volumes:
-      - "fusion-components-volume:/fusion-components/export"
   server:
     build:
       context: .
@@ -15,7 +11,3 @@ services:
       NGINX_PORT: 8000
       NODEJS_PORT: 8080
       WORKERS: 0
-    volumes:
-      - "fusion-components-volume:/fusion/components"
-volumes:
-  fusion-components-volume: {}

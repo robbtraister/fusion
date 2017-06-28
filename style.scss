@@ -1,0 +1,8 @@
+body {
+  margin: 0;
+}
+
+#App {
+  @import "./components/**/*.s{a,c}ss";
+  @import "./templates/**/*.s{a,c}ss";
+}

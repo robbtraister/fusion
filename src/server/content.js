@@ -34,7 +34,7 @@ function router () {
   router.use((req, res, next) => {
     fetch(req.path)
       .then(content => (/\.jsonp$/.test(req.path))
-        ? `var ${req.query.v || 'content'} =${content}`
+        ? `var content = ${content}`
         : content
       )
       .then(res.send.bind(res))

@@ -13,19 +13,19 @@ require('../../dist/templates')
 const Templates = global.Templates // require('../../components/components')
 Templates.Index = require('./template')
 
-const fetch = require('./content').fetch
+const Content = require('./content')
 const getTemplate = require('./templates').get
 
-function renderHTML (template, body, options) {
+function renderHTML (source, template, body, options) {
   return '<!DOCTYPE html>' +
-    ReactDOMServer.renderToStaticMarkup(Templates.Index(template, body, options))
+    ReactDOMServer.renderToStaticMarkup(Templates.Index(source, template, body, options))
 }
 
-function renderURI (template, uri, options) {
-  return fetch(uri)
+function renderSource (source, template, options) {
+  return Content.fetch(source)
     .then(JSON.parse.bind(JSON))
     .then(state => ReactDOMServer.renderToStaticMarkup(Templates[template](state)))
-    .then(body => renderHTML(template, body, options))
+    .then(body => renderHTML(source, template, body, options))
 }
 
 function getRenderingOptions () {
@@ -93,15 +93,18 @@ function router () {
         msg: err
       })
     }
+
     let template = getTemplate(req.path)
+    let source = Content.source(req.path)
+
     if (req.renderingOptions) {
-      renderURI(template, req.path, req.renderingOptions)
+      renderSource(source, template, req.renderingOptions)
         .then(res.send.bind(res))
         .catch(errHandler)
     } else {
       try {
         res.send(
-          renderHTML(template, null, {
+          renderHTML(source, template, null, {
             includeScripts: true,
             includeNoscript: true
           })
@@ -117,4 +120,4 @@ function router () {
 
 module.exports = router
 module.exports.renderHTML = renderHTML
-module.exports.renderURI = renderURI
+module.exports.renderSource = renderSource

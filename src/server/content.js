@@ -13,7 +13,7 @@ const readFile = promisify(fs.readFile)
 const base = path.join(__dirname, '..', '..', 'content')
 
 function source (uri) {
-  let p = url.parse(uri).pathname.replace(/^\//, '').replace(/\.js(on)?$/, '')
+  let p = url.parse(uri).pathname.replace(/^\//, '').replace(/\.js(onp?)?$/, '')
   debug('content path:', p)
   return `${p || 'homepage'}.json`
 }
@@ -33,6 +33,10 @@ function router () {
 
   router.use((req, res, next) => {
     fetch(req.path)
+      .then(content => (/\.jsonp$/.test(req.path))
+        ? `var ${req.query.v || 'content'} =${content}`
+        : content
+      )
       .then(res.send.bind(res))
       .catch(err => {
         next({

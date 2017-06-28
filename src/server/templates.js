@@ -4,7 +4,7 @@ const debug = require('debug')(`fusion:templates:${process.pid}`)
 
 function get (uri) {
   let template = 'Article'
-  if (/^\/(homepage\/?)?$/i.test(uri)) {
+  if (/^\/(homepage\/?)?$/i.test(uri.replace(/\.html?$/, ''))) {
     template = 'Homepage'
   }
   debug('template:', template)

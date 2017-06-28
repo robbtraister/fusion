@@ -87,10 +87,10 @@ http {
       proxy_pass http://localhost:8080;
     }
 
-    # location ~ ^/_assets/(.*) {
-    #   root ..;
-    #   try_files /dist/\$1 /resources/\$1 =404;
-    # }
+    location ~ ^/_assets/(.*) {
+      root ..;
+      try_files /dist/\$1 /resources/\$1 =404;
+    }
   }
 }
 EOF

@@ -35,16 +35,20 @@ function server () {
     })
   }
 
-  if (!process.env.NGINX_PORT) {
-    app.use(express.static(path.join(__dirname, '..', '..', 'dist')))
-    app.use(express.static(path.join(__dirname, '..', '..', 'resources')))
-  }
+  app.use('/_assets',
+    express.static(path.join(__dirname, '..', '..', 'dist')),
+    express.static(path.join(__dirname, '..', '..', 'resources'))
+  )
 
   app.use('/_content', content())
+
   app.use(render())
 
   app.use((err, req, res, next) => {
     return res.status(err.status || 500).send(/^prod/i.test(process.env.NODE_ENV) ? '' : err.msg)
+  })
+  app.use((req, res, next) => {
+    return res.sendStatus(404)
   })
 
   const port = process.env.NODEJS_PORT || process.env.PORT || 8080

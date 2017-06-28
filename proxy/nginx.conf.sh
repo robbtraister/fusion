@@ -75,8 +75,6 @@ http {
     listen ${NGINX_PORT} default_server;
     server_name _;
 
-    root ..;
-
     proxy_cache cache;
     proxy_cache_lock on;
     proxy_cache_valid 0s;
@@ -85,13 +83,14 @@ http {
     sendfile           on;
     sendfile_max_chunk 1m;
 
-    location @engine {
+    location / {
       proxy_pass http://localhost:8080;
     }
 
-    location / {
-      try_files \$uri /dist\$uri /resources\$uri @engine;
-    }
+    # location ~ ^/_assets/(.*) {
+    #   root ..;
+    #   try_files /dist/\$1 /resources/\$1 =404;
+    # }
   }
 }
 EOF

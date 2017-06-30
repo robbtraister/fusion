@@ -4,19 +4,20 @@
 
 require('babel-core/register')
 
-const path = require('path')
-
 // const debug = require('debug')(`fusion:server:${process.pid}`)
 const express = require('express')
 const morgan = require('morgan')
 const compression = require('compression')
 
+const assets = require('./assets')
 const content = require('./content')
-const hashes = require('./hashes')
 const render = require('./render')
 
 function server () {
   let app = express()
+
+  app.set('x-powered-by', false)
+  app.set('etag', true)
 
   app.use(morgan('dev'))
 
@@ -24,24 +25,8 @@ function server () {
     app.use(compression())
   }
 
-  if (process.env.CACHE_MAX_AGE !== '0') {
-    app.use((req, res, next) => {
-      if (req.query.h) {
-        if (req.query.h === hashes[req.path]) {
-          res.set('Cache-Control', `max-age=${process.env.CACHE_MAX_AGE || 31536000}`)
-        }
-      }
-      next()
-    })
-  }
-
-  app.use('/_assets',
-    express.static(path.join(__dirname, '..', '..', 'dist')),
-    express.static(path.join(__dirname, '..', '..', 'resources'))
-  )
-
+  app.use('/_assets', assets())
   app.use('/_content', content())
-
   app.use(render())
 
   app.use((err, req, res, next) => {

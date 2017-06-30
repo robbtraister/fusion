@@ -84,11 +84,20 @@ http {
     sendfile_max_chunk 1m;
 
     location / {
+      access_log off;
+      etag off;
       proxy_pass http://localhost:8080;
+    }
+
+    location /favicon.ico {
+      root ../resources;
+      etag on;
     }
 
     location ~ ^/_assets/(.*) {
       root ..;
+      etag on;
+      expires ${CACHE_MAX_AGE:-0};
       try_files /dist/\$1 /resources/\$1 =404;
     }
   }

@@ -12,7 +12,7 @@ const promisify = require('./promisify')
 const readFile = promisify(fs.readFile)
 const base = path.join(__dirname, '..', '..', 'content')
 
-const jsMask = /^[_a-z][_a-z0-9]*/i
+const jsMask = /^[_$a-z][_$a-z0-9]*/i
 
 function source (uri) {
   let p = url.parse(uri).pathname.replace(/^\//, '').replace(/\.js(onp?)?$/, '')

@@ -10,25 +10,27 @@ global.react = require('react')
 const Templates = {}
 const templateWatchers = {}
 
-function loadTemplate (p) {
+function loadTemplate (p, name) {
   debug('(re)loading', p)
   delete require.cache[p]
   require(p)
-  Object.keys(global.Templates)
-    .filter(k => k !== 'default')
-    .forEach(t => { Templates[t] = global.Templates[t] })
+  Templates[name] = global.Templates[name]
 }
 
 function load (name) {
-  return new Promise((resolve, reject) => {
-    let p = require.resolve(`../../dist/templates/${name.toLowerCase()}`)
+  let p = require.resolve(`../../dist/templates/${name.toLowerCase()}`)
 
-    if (!templateWatchers.hasOwnProperty(p)) {
-      loadTemplate(p)
-      templateWatchers[p] = fs.watch(p, () => loadTemplate(p))
-    }
-    resolve(Templates[name])
-  })
+  if (!templateWatchers.hasOwnProperty(p)) {
+    loadTemplate(p, name)
+    templateWatchers[p] = fs.watch(p, () => loadTemplate(p, name))
+  }
+
+  return Templates[name]
+}
+
+function render (name, state) {
+  let template = load(name)
+  return template(state)
 }
 
 function resolve (uri) {
@@ -42,4 +44,5 @@ function resolve (uri) {
 
 module.exports = resolve
 module.exports.load = load
+module.exports.render = render
 module.exports.resolve = resolve

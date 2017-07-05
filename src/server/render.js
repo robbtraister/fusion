@@ -17,16 +17,9 @@ function renderHTML (sourceURI, templateName, body, options) {
 }
 
 function renderSource (sourceURI, templateName, options) {
-  return Promise.all([
-    Templates.load(templateName),
-    Content.fetch(sourceURI)
-      .then(JSON.parse.bind(JSON))
-  ])
-    .then(data => {
-      let template = data[0]
-      let state = data[1]
-      return ReactDOMServer.renderToStaticMarkup(template(state))
-    })
+  return Content.fetch(sourceURI)
+    .then(JSON.parse.bind(JSON))
+    .then(state => ReactDOMServer.renderToStaticMarkup(Templates.render(templateName, state)))
     .then(body => renderHTML(sourceURI, templateName, body, options))
 }
 

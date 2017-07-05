@@ -2,7 +2,7 @@
 
 const React = require('react')
 
-const Template = (source, template, content, options) => {
+const Wrapper = (sourceURI, templateName, content, options) => {
   options = options || {}
   return <html>
     <head>
@@ -14,8 +14,8 @@ const Template = (source, template, content, options) => {
       {options.includeScripts &&
         <script src={`/_assets/engine.js`} defer='defer' />
       }
-      {options.includeScripts && template &&
-        <script src={`/_assets/templates/${template.toLowerCase()}.js`} defer='defer' />
+      {options.includeScripts && templateName &&
+        <script src={`/_assets/templates/${templateName.toLowerCase()}.js`} defer='defer' />
       }
 
       <title>React Rendering Engine</title>
@@ -27,12 +27,11 @@ const Template = (source, template, content, options) => {
     </head>
     <body>
       <div id='App' dangerouslySetInnerHTML={{ __html: content }} />
-      {options.includeScripts && source &&
-        <script src={`/_content/${source}.js?f=render`} defer='defer' />
+      {options.includeScripts && sourceURI &&
+        <script src={`/_content/${sourceURI}.js?f=render`} defer='defer' />
       }
     </body>
   </html>
 }
 
-module.exports = Template
-module.exports.Body = Template
+module.exports = Wrapper

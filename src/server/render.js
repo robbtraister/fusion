@@ -4,34 +4,36 @@ const debug = require('debug')(`fusion:render:${process.pid}`)
 const express = require('express')
 const cookieParser = require('cookie-parser')
 
-// Components bundle does not include react lib; must expose it as the explicit lib name
-global.react = require('react')
 const ReactDOMServer = require('react-dom/server')
 
-// Components bundle will load `Components` variable into global scope for client use
-require('../../dist/templates')
-const Templates = global.Templates // require('../../components/components')
-Templates.Index = require('./template')
+const wrapper = require('./wrapper')
 
 const Content = require('./content')
-const getTemplate = require('./templates').get
+const Templates = require('./templates')
 
-function renderHTML (source, template, body, options) {
+function renderHTML (sourceURI, templateName, body, options) {
   return '<!DOCTYPE html>' +
-    ReactDOMServer.renderToStaticMarkup(Templates.Index(source, template, body, options))
+    ReactDOMServer.renderToStaticMarkup(wrapper(sourceURI, templateName, body, options))
 }
 
-function renderSource (source, template, options) {
-  return Content.fetch(source)
-    .then(JSON.parse.bind(JSON))
-    .then(state => ReactDOMServer.renderToStaticMarkup(Templates[template](state)))
-    .then(body => renderHTML(source, template, body, options))
+function renderSource (sourceURI, templateName, options) {
+  return Promise.all([
+    Templates.load(templateName),
+    Content.fetch(sourceURI)
+      .then(JSON.parse.bind(JSON))
+  ])
+    .then(data => {
+      let template = data[0]
+      let state = data[1]
+      return ReactDOMServer.renderToStaticMarkup(template(state))
+    })
+    .then(body => renderHTML(sourceURI, templateName, body, options))
 }
 
 function getRenderingOptions () {
   return function (req, res, next) {
-    debug('query', req.query)
-    debug('cookies', req.cookies)
+    debug('query:', req.query)
+    debug('cookies:', req.cookies)
 
     function hasQueryParam (q) {
       return req.query.hasOwnProperty(q) && ['false', '0'].indexOf(req.query[q]) < 0
@@ -94,17 +96,17 @@ function router () {
       })
     }
 
-    let template = getTemplate(req.path)
-    let source = Content.source(req.path)
+    let templateName = Templates.resolve(req.path)
+    let sourceURI = Content.source(req.path)
 
     if (req.renderingOptions) {
-      renderSource(source, template, req.renderingOptions)
+      renderSource(sourceURI, templateName, req.renderingOptions)
         .then(res.send.bind(res))
         .catch(errHandler)
     } else {
       try {
         res.send(
-          renderHTML(source, template, null, {
+          renderHTML(sourceURI, templateName, null, {
             includeScripts: true,
             includeNoscript: true
           })

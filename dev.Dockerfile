@@ -55,7 +55,7 @@ RUN \
     chown -R ${USER}:${USER} \
           ./proxy
 
-USER ${USER}
+# USER ${USER}
 
 ENTRYPOINT ["npm", "run"]
 CMD ["start"]

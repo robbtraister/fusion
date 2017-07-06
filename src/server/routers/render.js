@@ -84,7 +84,7 @@ function router () {
     } else {
       try {
         res.send(
-          controller.renderEmpty(templateName, contentURI, {
+          controller.renderToMarkup(templateName, contentURI, {
             includeScripts: true,
             includeNoscript: true
           })

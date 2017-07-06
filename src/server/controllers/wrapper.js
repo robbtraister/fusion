@@ -2,9 +2,9 @@
 
 const React = require('react')
 
-const Provider = require('../engine/provider')
+const Provider = require('../../engine/provider')
 
-const Template = (templateName, contentURI, NodeElement, props, fetch, options) => {
+const Wrapper = (templateName, contentURI, options, Component, props, fetch) => {
   options = options || {}
   return <html>
     <head>
@@ -29,10 +29,11 @@ const Template = (templateName, contentURI, NodeElement, props, fetch, options) 
     </head>
     <body>
       <div id='App'>
-        {NodeElement &&
+        {Component &&
           <Provider fetch={fetch}>
-            <NodeElement {...props} />
-          </Provider>}
+            <Component {...props} />
+          </Provider>
+        }
       </div>
       {options.includeScripts && contentURI &&
         <script src={`/_content/${contentURI}.js?f=render`} defer='defer' />
@@ -41,4 +42,5 @@ const Template = (templateName, contentURI, NodeElement, props, fetch, options) 
   </html>
 }
 
-module.exports = Template
+module.exports = Wrapper
+module.exports.Wrapper = Wrapper

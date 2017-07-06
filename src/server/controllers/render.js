@@ -7,14 +7,23 @@ const debug = require('debug')(`fusion:controllers:render:${process.pid}`)
 const ReactDOMServer = require('react-dom/server')
 const request = require('request-promise-native')
 
-const template = require('../template')
+const wrapper = require('./wrapper')
 
 const content = require('./content')
 const templates = require('./templates')
 
-function renderEmpty (templateName, contentURI, options) {
+function renderToMarkup (templateName, contentURI, options, component, props, fetch) {
   return '<!DOCTYPE html>' +
-    ReactDOMServer.renderToStaticMarkup(template(templateName, contentURI, null, null, null, options))
+    ReactDOMServer.renderToStaticMarkup(
+      wrapper(
+        templateName,
+        contentURI,
+        options,
+        component,
+        props,
+        fetch
+      )
+    )
 }
 
 function render (templateName, contentURI, options) {
@@ -38,20 +47,19 @@ function render (templateName, contentURI, options) {
         }
       }
 
-      function renderToMarkup () {
-        return ReactDOMServer.renderToStaticMarkup(
-          template(templateName, contentURI, templates.load(templateName), props, cachedFetch, options)
-        )
+      let template = templates.load(templateName)
+      function renderHydrated () {
+        return renderToMarkup(templateName, contentURI, options, template, props, cachedFetch)
       }
 
-      let markup = renderToMarkup()
+      let htmlPromise = Promise.resolve(renderHydrated())
       let keys = Object.keys(cache)
       if (keys.length) {
-        return Promise.all(keys.map(k => cache[k]))
-          .then(renderToMarkup)
-      } else {
-        return markup
+        htmlPromise = Promise.all(keys.map(k => cache[k]))
+          .then(renderHydrated)
       }
+
+      return htmlPromise
     })
     .then(html => '<!DOCTYPE html>' + html)
     .catch(console.error)
@@ -59,4 +67,4 @@ function render (templateName, contentURI, options) {
 
 module.exports = render
 module.exports.render = render
-module.exports.renderEmpty = renderEmpty
+module.exports.renderToMarkup = renderToMarkup

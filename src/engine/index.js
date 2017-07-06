@@ -2,6 +2,9 @@
 
 /* global fetch, Templates */
 
+// use <link> tag in index.html since styles are published for SSR, anyway
+// require('./style.scss')
+
 const React = require('react')
 const ReactDOM = require('react-dom')
 
@@ -20,9 +23,6 @@ function cachedFetch (uri, component) {
     return cache[uri]
   }
 }
-
-// use <link> tag in index.html since styles are published for SSR, anyway
-// require('./style.scss')
 
 window.render = function (props) {
   ReactDOM.render(

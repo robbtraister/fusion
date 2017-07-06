@@ -2,7 +2,7 @@
 
 const React = require('react')
 
-const Wrapper = (sourceURI, templateName, content, options) => {
+const Template = (templateName, contentURI, content, options) => {
   options = options || {}
   return <html>
     <head>
@@ -27,11 +27,11 @@ const Wrapper = (sourceURI, templateName, content, options) => {
     </head>
     <body>
       <div id='App' dangerouslySetInnerHTML={{ __html: content }} />
-      {options.includeScripts && sourceURI &&
-        <script src={`/_content/${sourceURI}.js?f=render`} defer='defer' />
+      {options.includeScripts && contentURI &&
+        <script src={`/_content/${contentURI}.js?f=render`} defer='defer' />
       }
     </body>
   </html>
 }
 
-module.exports = Wrapper
+module.exports = Template

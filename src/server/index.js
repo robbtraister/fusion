@@ -2,16 +2,14 @@
 
 'use strict'
 
-require('babel-core/register')
-
 // const debug = require('debug')(`fusion:server:${process.pid}`)
 const express = require('express')
 const morgan = require('morgan')
 const compression = require('compression')
 
-const assets = require('./assets')
-const content = require('./content')
-const render = require('./render')
+const assets = require('./routers/assets')
+const content = require('./routers/content')
+const render = require('./routers/render')
 
 function server () {
   let app = express()

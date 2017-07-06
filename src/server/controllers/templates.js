@@ -2,7 +2,7 @@
 
 const fs = require('fs')
 
-const debug = require('debug')(`fusion:templates:${process.pid}`)
+const debug = require('debug')(`fusion:controllers:templates:${process.pid}`)
 
 // Components/Templates bundles do not include react lib; must expose it globally
 global.react = require('react')
@@ -13,12 +13,12 @@ const templateWatchers = {}
 function loadTemplate (p, name) {
   debug('(re)loading', p)
   delete require.cache[p]
-  require(p)
+  global.Templates = require(p)
   Templates[name] = global.Templates[name]
 }
 
 function load (name) {
-  let p = require.resolve(`../../dist/templates/${name.toLowerCase()}`)
+  let p = require.resolve(`../../../templates/${name.toLowerCase()}`)
 
   if (!templateWatchers.hasOwnProperty(p)) {
     loadTemplate(p, name)
@@ -28,9 +28,9 @@ function load (name) {
   return Templates[name]
 }
 
-function render (name, state) {
+function render (name, props) {
   let template = load(name)
-  return template(state)
+  return template(props)
 }
 
 function resolve (uri) {

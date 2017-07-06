@@ -4,24 +4,9 @@ const debug = require('debug')(`fusion:render:${process.pid}`)
 const express = require('express')
 const cookieParser = require('cookie-parser')
 
-const ReactDOMServer = require('react-dom/server')
-
-const wrapper = require('./wrapper')
-
-const Content = require('./content')
-const Templates = require('./templates')
-
-function renderHTML (sourceURI, templateName, body, options) {
-  return '<!DOCTYPE html>' +
-    ReactDOMServer.renderToStaticMarkup(wrapper(sourceURI, templateName, body, options))
-}
-
-function renderSource (sourceURI, templateName, options) {
-  return Content.fetch(sourceURI)
-    .then(JSON.parse.bind(JSON))
-    .then(state => ReactDOMServer.renderToStaticMarkup(Templates.render(templateName, state)))
-    .then(body => renderHTML(sourceURI, templateName, body, options))
-}
+const controller = require('../controllers/render')
+const content = require('../controllers/content')
+const templates = require('../controllers/templates')
 
 function getRenderingOptions () {
   return function (req, res, next) {
@@ -89,17 +74,17 @@ function router () {
       })
     }
 
-    let templateName = Templates.resolve(req.path)
-    let sourceURI = Content.source(req.path)
+    let contentURI = content.resolve(req.path)
+    let templateName = templates.resolve(req.path)
 
     if (req.renderingOptions) {
-      renderSource(sourceURI, templateName, req.renderingOptions)
+      controller.render(templateName, contentURI, req.renderingOptions)
         .then(res.send.bind(res))
         .catch(errHandler)
     } else {
       try {
         res.send(
-          renderHTML(sourceURI, templateName, null, {
+          controller.renderWithContent(templateName, contentURI, null, {
             includeScripts: true,
             includeNoscript: true
           })
@@ -114,5 +99,4 @@ function router () {
 }
 
 module.exports = router
-module.exports.renderHTML = renderHTML
-module.exports.renderSource = renderSource
+module.exports.router = router

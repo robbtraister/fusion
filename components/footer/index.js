@@ -1,35 +1,19 @@
 'use strict'
 
-/* global fetch */
-
 import React from 'react'
 
 class Footer extends React.Component {
   constructor (props, context) {
     super(props)
-    this.state = {content: ''}
 
     let uri = `/_content/${this.props.source || 'footer'}.json`
 
     // Synchronous Content Fetching
-    if (typeof window === 'undefined') {
-      if (context.data.hasOwnProperty(uri)) {
-        if (!(context.data[uri] instanceof Promise)) {
-          this.state = context.data[uri]
-        }
-      } else {
-        context.data[uri] = fetch(uri)
-          .then(res => res.json())
-          .then(json => { context.data[uri] = json })
-      }
-    }
+    this.state = context.fetch(uri, this) || {content: ''}
 
     // Asynchronous Content Fetching
-    if (typeof window !== 'undefined' && typeof fetch !== 'undefined') {
-      fetch(uri)
-        .then(res => res.json())
-        .then(this.setState.bind(this))
-    }
+    // context.async && context.async(uri).then(this.setState.bind(this))
+    // context.async && context.async(uri, this)
   }
 
   render () {
@@ -38,7 +22,7 @@ class Footer extends React.Component {
 }
 
 Footer.contextTypes = {
-  data: React.PropTypes.object
+  fetch: React.PropTypes.func
 }
 
 export default Footer

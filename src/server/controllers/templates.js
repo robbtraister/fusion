@@ -4,23 +4,8 @@ const fs = require('fs')
 
 const debug = require('debug')(`fusion:controllers:templates:${process.pid}`)
 
-const request = require('request-promise-native')
-
 // Components/Templates bundles do not include react lib; must expose it globally
 global.react = require('react')
-global.fetch = (uri) => {
-  return request({
-    uri: `http://localhost:8080${uri}`,
-    json: true
-  })
-    .then(data => {
-      return {
-        json () {
-          return data
-        }
-      }
-    })
-}
 
 const Templates = {}
 const templateWatchers = {}

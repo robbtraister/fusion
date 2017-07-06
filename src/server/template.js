@@ -2,23 +2,9 @@
 
 const React = require('react')
 
-class Provider extends React.Component {
-  getChildContext () {
-    return {
-      data: this.props.data
-    }
-  }
+const Provider = require('../engine/provider')
 
-  render () {
-    return this.props.children
-  }
-}
-
-Provider.childContextTypes = {
-  data: React.PropTypes.object
-}
-
-const Template = (templateName, contentURI, NodeElement, props, data, options) => {
+const Template = (templateName, contentURI, NodeElement, props, fetch, options) => {
   options = options || {}
   return <html>
     <head>
@@ -44,7 +30,7 @@ const Template = (templateName, contentURI, NodeElement, props, data, options) =
     <body>
       <div id='App'>
         {NodeElement &&
-          <Provider data={data}>
+          <Provider fetch={fetch}>
             <NodeElement {...props} />
           </Provider>}
       </div>

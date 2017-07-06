@@ -5,23 +5,27 @@
 import React from 'react'
 
 class Footer extends React.Component {
-  constructor (props) {
+  constructor (props, context) {
     super(props)
     this.state = {content: ''}
-/*
-    let store = this.context.store
 
-    if (!store.hasOwnProperty(uri)) {
-      store[uri] = Promise.resolve(uri)
-        .then(data => { store[uri] = data })
-    } else if (store[uri] instanceof Promise) {
-      this.state = {content: ''}
-    } else {
-      this.state = store[uri]
-    }
-*/
     let uri = `/_content/${this.props.source || 'footer'}.json`
-    if (typeof fetch !== 'undefined') {
+
+    // Synchronous Content Fetching
+    if (typeof window === 'undefined') {
+      if (context.data.hasOwnProperty(uri)) {
+        if (!(context.data[uri] instanceof Promise)) {
+          this.state = context.data[uri]
+        }
+      } else {
+        context.data[uri] = fetch(uri)
+          .then(res => res.json())
+          .then(json => { context.data[uri] = json })
+      }
+    }
+
+    // Asynchronous Content Fetching
+    if (typeof window !== 'undefined' && typeof fetch !== 'undefined') {
       fetch(uri)
         .then(res => res.json())
         .then(this.setState.bind(this))
@@ -31,6 +35,10 @@ class Footer extends React.Component {
   render () {
     return <div className='footer'>{this.state.content}</div>
   }
+}
+
+Footer.contextTypes = {
+  data: React.PropTypes.object
 }
 
 export default Footer

@@ -84,7 +84,7 @@ function router () {
     } else {
       try {
         res.send(
-          controller.renderWithContent(templateName, contentURI, null, {
+          controller.renderEmpty(templateName, contentURI, {
             includeScripts: true,
             includeNoscript: true
           })

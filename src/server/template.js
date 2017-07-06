@@ -2,7 +2,23 @@
 
 const React = require('react')
 
-const Template = (templateName, contentURI, content, options) => {
+class Provider extends React.Component {
+  getChildContext () {
+    return {
+      data: this.props.data
+    }
+  }
+
+  render () {
+    return this.props.children
+  }
+}
+
+Provider.childContextTypes = {
+  data: React.PropTypes.object
+}
+
+const Template = (templateName, contentURI, NodeElement, props, data, options) => {
   options = options || {}
   return <html>
     <head>
@@ -26,7 +42,12 @@ const Template = (templateName, contentURI, content, options) => {
       <link rel='stylesheet' type='text/css' href={`/_assets/style.css`} />
     </head>
     <body>
-      <div id='App' dangerouslySetInnerHTML={{ __html: content }} />
+      <div id='App'>
+        {NodeElement &&
+          <Provider data={data}>
+            <NodeElement {...props} />
+          </Provider>}
+      </div>
       {options.includeScripts && contentURI &&
         <script src={`/_content/${contentURI}.js?f=render`} defer='defer' />
       }

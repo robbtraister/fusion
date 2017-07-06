@@ -11,18 +11,36 @@ const template = require('../template')
 const content = require('./content')
 const templates = require('./templates')
 
-function renderWithContent (templateName, contentURI, body, options) {
+function renderEmpty (templateName, contentURI, options) {
   return '<!DOCTYPE html>' +
-    ReactDOMServer.renderToStaticMarkup(template(templateName, contentURI, body, options))
+    ReactDOMServer.renderToStaticMarkup(template(templateName, contentURI, null, null, null, options))
 }
 
 function render (templateName, contentURI, options) {
   return content.fetch(contentURI)
     .then(JSON.parse.bind(JSON))
-    .then(props => ReactDOMServer.renderToStaticMarkup(templates.render(templateName, props)))
-    .then(body => renderWithContent(templateName, contentURI, body, options))
+    .then(props => {
+      let data = {}
+
+      function renderToMarkup () {
+        return ReactDOMServer.renderToStaticMarkup(
+          template(templateName, contentURI, templates.load(templateName), props, data, options)
+        )
+      }
+
+      let m = renderToMarkup()
+      let keys = Object.keys(data)
+      if (keys.length) {
+        return Promise.all(keys.map(k => data[k]))
+          .then(renderToMarkup)
+      } else {
+        return m
+      }
+    })
+    .then(html => '<!DOCTYPE html>' + html)
+    .catch(console.error)
 }
 
 module.exports = render
 module.exports.render = render
-module.exports.renderWithContent = renderWithContent
+module.exports.renderEmpty = renderEmpty

@@ -1,6 +1,7 @@
 'use strict'
 
 import React from 'react'
+import PropTypes from 'prop-types'
 
 class Footer extends React.Component {
   constructor (props, context) {
@@ -8,12 +9,8 @@ class Footer extends React.Component {
 
     let uri = `/_content/${this.props.source || 'footer'}.json`
 
-    // Synchronous Content Fetching
+    // Shared Content Fetching
     this.state = context.fetch(uri, this) || {content: ''}
-
-    // Asynchronous Content Fetching
-    // context.async && context.async(uri).then(this.setState.bind(this))
-    // context.async && context.async(uri, this)
   }
 
   render () {
@@ -22,7 +19,7 @@ class Footer extends React.Component {
 }
 
 Footer.contextTypes = {
-  fetch: React.PropTypes.func
+  fetch: PropTypes.func
 }
 
 export default Footer

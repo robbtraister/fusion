@@ -1,6 +1,7 @@
 'use strict'
 
 const React = require('react')
+const PropTypes = require('prop-types')
 
 class Provider extends React.Component {
   getChildContext () {
@@ -15,7 +16,7 @@ class Provider extends React.Component {
 }
 
 Provider.childContextTypes = {
-  fetch: React.PropTypes.func
+  fetch: PropTypes.func
 }
 
 module.exports = Provider

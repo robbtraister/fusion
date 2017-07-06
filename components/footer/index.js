@@ -8,15 +8,23 @@ class Footer extends React.Component {
   constructor (props) {
     super(props)
     this.state = {content: ''}
-  }
+/*
+    let store = this.context.store
 
-  componentWillMount () {
+    if (!store.hasOwnProperty(uri)) {
+      store[uri] = Promise.resolve(uri)
+        .then(data => { store[uri] = data })
+    } else if (store[uri] instanceof Promise) {
+      this.state = {content: ''}
+    } else {
+      this.state = store[uri]
+    }
+*/
+    let uri = `/_content/${this.props.source || 'footer'}.json`
     if (typeof fetch !== 'undefined') {
-      fetch(`/_content/${this.props.source || 'footer'}.json`)
+      fetch(uri)
         .then(res => res.json())
-        .then(json => {
-          this.setState(json)
-        })
+        .then(this.setState.bind(this))
     }
   }
 

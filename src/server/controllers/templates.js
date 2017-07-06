@@ -5,7 +5,7 @@ const fs = require('fs')
 const debug = require('debug')(`fusion:controllers:templates:${process.pid}`)
 
 // Components/Templates bundles do not include react lib; must expose it globally
-global.react = require('react')
+const React = global.react = require('react')
 
 const Templates = {}
 const templateWatchers = {}
@@ -29,8 +29,8 @@ function load (name) {
 }
 
 function render (name, props) {
-  let template = load(name)
-  return template(props)
+  let Template = load(name)
+  return <Template {...props} />
 }
 
 function resolve (uri) {

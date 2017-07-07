@@ -1,6 +1,6 @@
 'use strict'
 
-/* global fetch, Templates */
+/* global contentCache, fetch, Templates */
 
 // use <link> tag in index.html since styles are published for SSR, anyway
 // require('./style.scss')
@@ -19,6 +19,7 @@ function cachedFetch (uri, component) {
 
   if (component) {
     cache[uri] = cache[uri].then(json => component.setState(json))
+    return ((typeof contentCache !== 'undefined') && contentCache[uri]) || null
   } else {
     return cache[uri]
   }

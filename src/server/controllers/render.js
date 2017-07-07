@@ -12,7 +12,7 @@ const wrapper = require('./wrapper')
 const content = require('./content')
 const templates = require('./templates')
 
-function renderToMarkup (templateName, contentURI, options, component, props, fetch) {
+function renderToMarkup (templateName, contentURI, options, component, props, fetch, cache) {
   return '<!DOCTYPE html>' +
     ReactDOMServer.renderToStaticMarkup(
       wrapper(
@@ -21,7 +21,8 @@ function renderToMarkup (templateName, contentURI, options, component, props, fe
         options,
         component,
         props,
-        fetch
+        fetch,
+        cache
       )
     )
 }
@@ -48,15 +49,15 @@ function render (templateName, contentURI, options) {
       }
 
       let template = templates.load(templateName)
-      function renderHydrated () {
-        return renderToMarkup(templateName, contentURI, options, template, props, cachedFetch)
+      function renderHydrated (hydrated) {
+        return renderToMarkup(templateName, contentURI, options, template, props, cachedFetch, hydrated ? cache : null)
       }
 
-      let htmlPromise = Promise.resolve(renderHydrated())
+      let htmlPromise = Promise.resolve(renderHydrated(false))
       let keys = Object.keys(cache)
       if (keys.length) {
         htmlPromise = Promise.all(keys.map(k => cache[k]))
-          .then(renderHydrated)
+          .then(() => renderHydrated(true))
       }
 
       return htmlPromise

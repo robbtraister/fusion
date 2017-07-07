@@ -2,9 +2,20 @@
 
 const React = require('react')
 
-const Provider = require('../../engine/provider')
+class Provider extends require('../../engine/provider') {
+  render () {
+    if (this.props.cache) {
+      return <div>
+        <script dangerouslySetInnerHTML={{ __html: `var contentCache=${JSON.stringify(this.props.cache)}` }} />
+        {super.render()}
+      </div>
+    } else {
+      return super.render()
+    }
+  }
+}
 
-const Wrapper = (templateName, contentURI, options, Component, props, fetch) => {
+const Wrapper = (templateName, contentURI, options, Component, props, fetch, cache) => {
   options = options || {}
   return <html>
     <head>
@@ -30,7 +41,7 @@ const Wrapper = (templateName, contentURI, options, Component, props, fetch) => 
     <body>
       <div id='App'>
         {Component &&
-          <Provider fetch={fetch}>
+          <Provider fetch={fetch} cache={options.includeScripts && cache}>
             <Component {...props} />
           </Provider>
         }

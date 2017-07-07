@@ -5,16 +5,16 @@ import PropTypes from 'prop-types'
 
 class Footer extends React.Component {
   constructor (props, context) {
-    super(props)
+    super(props, context)
 
     let uri = `/_content/${this.props.source || 'footer'}.json`
 
     // Shared Content Fetching
-    this.state = context.fetch(uri, this) || {content: ''}
+    this.state = context.fetch && context.fetch(uri, this)
   }
 
   render () {
-    return <div className='footer'>{this.state.content}</div>
+    return <div className='footer'>{this.state && this.state.content}</div>
   }
 }
 

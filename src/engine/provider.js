@@ -6,6 +6,7 @@ const PropTypes = require('prop-types')
 class Provider extends React.Component {
   getChildContext () {
     return {
+      async: (uri, comp) => this.props.fetch(uri, comp, true),
       fetch: this.props.fetch
     }
   }
@@ -16,6 +17,7 @@ class Provider extends React.Component {
 }
 
 Provider.childContextTypes = {
+  async: PropTypes.func,
   fetch: PropTypes.func
 }
 

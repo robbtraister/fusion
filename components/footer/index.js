@@ -9,8 +9,11 @@ class Footer extends React.Component {
 
     let uri = `/_content/${props.source || 'footer'}.json`
 
-    // Shared Content Fetching
-    this.state = context.fetch(uri, this, props.async)
+    if (props.async) {
+      context.async(uri, this)
+    } else {
+      this.state = context.fetch(uri, this, props.async)
+    }
   }
 
   render () {
@@ -19,6 +22,7 @@ class Footer extends React.Component {
 }
 
 Footer.contextTypes = {
+  async: PropTypes.func,
   fetch: PropTypes.func
 }
 

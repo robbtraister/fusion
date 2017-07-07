@@ -7,10 +7,10 @@ class Footer extends React.Component {
   constructor (props, context) {
     super(props, context)
 
-    let uri = `/_content/${this.props.source || 'footer'}.json`
+    let uri = `/_content/${props.source || 'footer'}.json`
 
     // Shared Content Fetching
-    this.state = context.fetch && context.fetch(uri, this)
+    this.state = context.fetch(uri, this, props.async)
   }
 
   render () {

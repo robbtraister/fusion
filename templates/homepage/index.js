@@ -14,7 +14,7 @@ const Homepage = (props) => {
       <p />
       <a href='/blurbs'>Blurbs</a>
     </Body>
-    <Footer />
+    <Footer async='true' />
   </div>
 }
 

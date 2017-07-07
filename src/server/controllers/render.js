@@ -32,20 +32,23 @@ function render (templateName, contentURI, options) {
     .then(JSON.parse.bind(JSON))
     .then(props => {
       let cache = {}
-      function cachedFetch (uri) {
-        debug('sync fetching', uri)
+      function cachedFetch (uri, component, asyncOnly) {
+        if (!asyncOnly) {
+          debug('sync fetching', uri)
 
-        if (cache.hasOwnProperty(uri)) {
-          if (!(cache[uri] instanceof Promise)) {
-            return cache[uri]
+          if (cache.hasOwnProperty(uri)) {
+            if (!(cache[uri] instanceof Promise)) {
+              return cache[uri]
+            }
+          } else {
+            cache[uri] = request({
+              uri: `http://localhost:8080${uri}`,
+              json: true
+            })
+              .then(json => { cache[uri] = json })
           }
-        } else {
-          cache[uri] = request({
-            uri: `http://localhost:8080${uri}`,
-            json: true
-          })
-            .then(json => { cache[uri] = json })
         }
+        return null
       }
 
       let template = templates.load(templateName)

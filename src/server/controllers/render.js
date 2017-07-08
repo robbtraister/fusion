@@ -71,10 +71,11 @@ function hydrate (templateName, contentURI, options) {
       return render(templateName, contentURI, options, template, content, fetch, cache)
     }
 
+    // render with no cache; fetch will populate it as necessary
     let dehydratedHTML = renderHydrated()
-    let keys = Object.keys(cache)
+    let cacheKeys = Object.keys(cache)
 
-    let cachePromise = Promise.all(keys.map(k => cache[k])).then(() => cache)
+    let cachePromise = Promise.all(cacheKeys.map(k => cache[k]))
 
     return {
       // if getting content, we want it populated with the global content
@@ -83,7 +84,7 @@ function hydrate (templateName, contentURI, options) {
       // if a component requested global content uri, it will already be added
       content: () => cachePromise.then(() => { cache[contentURI] = content }).then(() => cache),
       // if no component content, don't re-render
-      render: () => keys.length ? cachePromise.then(renderHydrated) : dehydratedHTML
+      render: () => cacheKeys.length ? cachePromise.then(() => renderHydrated(cache)) : dehydratedHTML
     }
   })
 }

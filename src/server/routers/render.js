@@ -4,8 +4,8 @@ const debug = require('debug')(`fusion:render:${process.pid}`)
 const express = require('express')
 const cookieParser = require('cookie-parser')
 
-const Render = require('../controllers/render')
 const Content = require('../controllers/content')
+const Render = require('../controllers/render')
 const Templates = require('../controllers/templates')
 
 function getRenderingOptions () {

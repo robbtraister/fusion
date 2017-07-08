@@ -28,7 +28,8 @@ function server () {
   app.use(render())
 
   app.use((err, req, res, next) => {
-    return res.status(err.status || 500).send(/^prod/i.test(process.env.NODE_ENV) ? '' : err.msg)
+    console.error(err.stack)
+    return res.status(err.status || 500).send(/^prod/i.test(process.env.NODE_ENV) ? '' : err.message)
   })
   app.use((req, res, next) => {
     return res.sendStatus(404)

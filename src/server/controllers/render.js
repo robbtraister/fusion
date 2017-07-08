@@ -9,10 +9,10 @@ const request = require('request-promise-native')
 
 const wrapper = require('./wrapper')
 
-const content = require('./content')
-const templates = require('./templates')
+const Content = require('./content')
+const Templates = require('./templates')
 
-function renderToMarkup (templateName, contentURI, options, component, props, fetch, cache) {
+function render (templateName, contentURI, options, component, props, fetch, cache) {
   return '<!DOCTYPE html>' +
     ReactDOMServer.renderToStaticMarkup(
       wrapper(
@@ -27,72 +27,78 @@ function renderToMarkup (templateName, contentURI, options, component, props, fe
     )
 }
 
-function _render (templateName, contentURI, options, contentOnly) {
-  return content.fetch(contentURI)
+function contentCache (contentURI) {
+  let content = Content.fetch(contentURI)
     .then(JSON.parse.bind(JSON))
-    .then(props => {
-      let cache = {}
-      function cachedFetch (uri, component, asyncOnly) {
-        if (!asyncOnly) {
-          debug('sync fetching', uri)
 
-          if (uri === contentURI) {
-            cache[uri] = props
-            return props
-          }
+  let cache = {}
+  function fetch (uri, component, asyncOnly) {
+    if (!asyncOnly) {
+      debug('sync fetching', uri)
 
-          if (cache.hasOwnProperty(uri)) {
-            if (!(cache[uri] instanceof Promise)) {
-              return cache[uri]
-            }
-          } else {
-            cache[uri] = request({
-              uri: `http://localhost:8080${uri}`,
-              json: true
-            })
-              .then(json => { cache[uri] = json })
-          }
+      if (cache.hasOwnProperty(uri)) {
+        if (!(cache[uri] instanceof Promise)) {
+          return cache[uri]
         }
-        return null
-      }
-
-      let template = templates.load(templateName)
-      function renderHydrated (hydrated) {
-        return renderToMarkup(templateName, contentURI, options, template, props, cachedFetch, hydrated ? cache : null)
-      }
-
-      let htmlPromise = Promise.resolve(renderHydrated(false))
-      let keys = Object.keys(cache)
-
-      if (contentOnly) {
-        return Promise.all(keys.map(k => cache[k]))
-          .then(() => {
-            cache[contentURI] = props
-            return cache
+      } else {
+        // don't add global content to the cache unless a component requests it
+        cache[uri] = (
+          (uri === contentURI)
+          ? content
+          : request({
+            uri: `http://localhost:8080${uri}`,
+            json: true
           })
-      } else if (keys.length) {
-        htmlPromise = Promise.all(keys.map(k => cache[k]))
-          .then(() => renderHydrated(true))
+        ).then(json => { cache[uri] = json })
       }
+    }
+    return null
+  }
 
-      return htmlPromise
-    })
-    .catch(err => {
-      console.error(err)
-      throw err
-    })
+  return {
+    cache,
+    content,
+    fetch
+  }
 }
 
-function dependencies (templateName, contentURI, options) {
-  return _render(templateName, contentURI, options, true)
+function hydrate (templateName, contentURI, options) {
+  let { cache, content, fetch } = contentCache(contentURI)
+  let template = Templates.load(templateName)
+
+  return content.then(content => {
+    function renderHydrated (cache) {
+      return render(templateName, contentURI, options, template, content, fetch, cache)
+    }
+
+    let dehydratedHTML = renderHydrated()
+    let keys = Object.keys(cache)
+
+    let cachePromise = Promise.all(keys.map(k => cache[k])).then(() => cache)
+
+    return {
+      // if getting content, we want it populated with the global content
+      // if rendering, we don't want to add global content to the html
+      // so don't add to the cache until we know which we are doing
+      // if a component requested global content uri, it will already be added
+      content: () => cachePromise.then(() => { cache[contentURI] = content }).then(() => cache),
+      // if no component content, don't re-render
+      render: () => keys.length ? cachePromise.then(renderHydrated) : dehydratedHTML
+    }
+  })
 }
 
-function render (templateName, contentURI, options) {
-  return _render(templateName, contentURI, options)
-    .then(html => '<!DOCTYPE html>' + html)
+function content (templateName, contentURI, options) {
+  return hydrate(templateName, contentURI, options)
+    .then(data => data.content())
 }
 
-module.exports = render
-module.exports.dependencies = dependencies
+function renderHydrated (templateName, contentURI, options) {
+  return hydrate(templateName, contentURI, options)
+    .then(data => data.render())
+}
+
+module.exports = renderHydrated
+module.exports.content = content
 module.exports.render = render
-module.exports.renderToMarkup = renderToMarkup
+module.exports.renderHydrated = renderHydrated

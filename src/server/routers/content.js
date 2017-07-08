@@ -3,9 +3,9 @@
 // const debug = require('debug')(`fusion:routers:content:${process.pid}`)
 const express = require('express')
 
-const controller = require('../controllers/content')
-const render = require('../controllers/render')
-const templates = require('../controllers/templates')
+const Content = require('../controllers/content')
+const Render = require('../controllers/render')
+const Templates = require('../controllers/templates')
 
 const jsMask = /^[_$a-z][_$a-z0-9]*/i
 
@@ -14,13 +14,13 @@ function router () {
 
   router.use((req, res, next) => {
     if (req.query.all === 'true') {
-      let contentURI = controller.resolve(req.path)
-      let templateName = templates.resolve(req.path)
+      let contentURI = Content.resolve(req.path)
+      let templateName = Templates.resolve(req.path)
 
-      render.dependencies(templateName, contentURI, { includeScripts: true })
+      Render.content(templateName, contentURI, { includeScripts: true })
         .then(res.send.bind(res))
     } else {
-      controller.fetch(req.path)
+      Content.fetch(req.path)
         .then(content => {
           if (/\.jsonp$/.test(req.path)) {
             let varName = jsMask.exec(req.query.v || '') || 'v'
@@ -35,7 +35,8 @@ function router () {
         .catch(err => {
           next({
             status: err.code === 'ENOENT' ? 404 : 500,
-            msg: err
+            message: err.message,
+            stack: err.stack
           })
         })
     }

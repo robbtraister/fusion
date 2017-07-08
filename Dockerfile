@@ -14,10 +14,14 @@ RUN \
 
 WORKDIR /fusion
 
+COPY package.json ./
+
+RUN \
+    npm install
+
 COPY . ./
 
 RUN \
-    npm install && \
     (cd test && npm install) && \
     npm run test && \
     rm -rf ./test && \

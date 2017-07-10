@@ -17,12 +17,8 @@ function cachedFetch (uri, component) {
       .then(res => res.json())
   }
 
-  if (component) {
-    cache[uri] = cache[uri].then(json => component.setState(json))
-    return ((typeof contentCache !== 'undefined') && contentCache[uri]) || null
-  } else {
-    return cache[uri]
-  }
+  cache[uri] = cache[uri].then(json => component.setState(json))
+  return ((typeof contentCache !== 'undefined') && contentCache[uri]) || null
 }
 
 window.render = function (props) {

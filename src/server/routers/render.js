@@ -4,9 +4,7 @@ const debug = require('debug')(`fusion:render:${process.pid}`)
 const express = require('express')
 const cookieParser = require('cookie-parser')
 
-const Content = require('../controllers/content')
 const Render = require('../controllers/render')
-const Templates = require('../controllers/templates')
 
 function getRenderingOptions () {
   return function (req, res, next) {
@@ -75,25 +73,13 @@ function router () {
       })
     }
 
-    let contentURI = Content.resolve(req.path)
-    let templateName = Templates.resolve(req.path)
+    let renderPromise = req.renderingOptions
+      ? Render.renderHydrated(req.path, req.renderingOptions)
+      : Render.renderDehydrated(req.path)
 
-    if (req.renderingOptions) {
-      Render.renderHydrated(templateName, contentURI, req.renderingOptions)
-        .then(res.send.bind(res))
-        .catch(errHandler)
-    } else {
-      try {
-        res.send(
-          Render.render(templateName, contentURI, {
-            includeScripts: true,
-            includeNoscript: true
-          })
-        )
-      } catch (err) {
-        errHandler(err)
-      }
-    }
+    renderPromise
+      .then(res.send.bind(res))
+      .catch(errHandler)
   })
 
   return router

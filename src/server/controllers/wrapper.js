@@ -15,20 +15,19 @@ class Provider extends require('../../engine/provider') {
   }
 }
 
-const Wrapper = (templateName, contentURI, options, Component, props, fetch, cache) => {
-  options = options || {}
+const Wrapper = (rendering) => {
   return <html>
     <head>
-      {options.includeNoscript &&
+      {!rendering.options.hydrated &&
         <noscript>
           <meta httpEquiv='refresh' content='0; url=?noscript' />
         </noscript>
       }
-      {options.includeScripts &&
+      {rendering.options.includeScripts &&
         <script src={`/_assets/engine.js`} defer='defer' />
       }
-      {options.includeScripts && templateName &&
-        <script src={`/_assets/templates/${templateName.toLowerCase()}.js`} defer='defer' />
+      {rendering.options.includeScripts && rendering.templateName &&
+        <script src={`/_assets/templates/${rendering.templateName.toLowerCase()}.js`} defer='defer' />
       }
 
       <title>React Rendering Engine</title>
@@ -40,14 +39,14 @@ const Wrapper = (templateName, contentURI, options, Component, props, fetch, cac
     </head>
     <body>
       <div id='App'>
-        {Component &&
-          <Provider fetch={fetch} cache={options.includeScripts && cache}>
-            <Component {...props} />
+        {rendering.options.hydrated &&
+          <Provider fetch={rendering.fetch} cache={rendering.options.includeScripts && rendering.cache}>
+            <rendering.component {...rendering.content} />
           </Provider>
         }
       </div>
-      {options.includeScripts && contentURI &&
-        <script src={`/_content/${contentURI}.js?f=render`} defer='defer' />
+      {rendering.options.includeScripts && rendering.contentURI &&
+        <script src={`/_content/${rendering.contentURI}.js?f=render`} defer='defer' />
       }
     </body>
   </html>

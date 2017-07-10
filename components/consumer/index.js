@@ -3,18 +3,15 @@
 import PropTypes from 'prop-types'
 
 function Consumer (Component) {
-  const ContextWrapper = (props, context) => {
-    class ConsumerComponent extends Component {
-      async (uri) {
-        this.fetch(uri, true)
-      }
+  class ContextWrapper extends Component {
+    constructor (props, context) {
+      super(props, context)
 
-      fetch (uri, asyncOnly) {
+      this.fetch = (uri, asyncOnly) => {
         this.state = context.fetch(uri, this, asyncOnly) || {}
       }
+      this.async = (uri) => this.fetch(uri, true)
     }
-
-    return new ConsumerComponent(props)
   }
 
   ContextWrapper.contextTypes = {

@@ -25,13 +25,13 @@ function excludeReact (context, request, callback) {
   callback()
 }
 
-const resolvePreact = {
-  extensions: ['.js', '.jsx'],
-  alias: {
-    react: 'preact-compat',
-    'react-dom': 'preact-compat'
-  }
-}
+// const resolvePreact = {
+//   extensions: ['.js', '.jsx'],
+//   alias: {
+//     react: 'preact-compat',
+//     'react-dom': 'preact-compat'
+//   }
+// }
 
 module.exports = [
   {
@@ -47,7 +47,7 @@ module.exports = [
       contentBase: './public',
       port: 8100
     },
-    resolve: resolvePreact,
+    // resolve: resolvePreact,
     module: {
       loaders: [
         {
@@ -73,7 +73,6 @@ module.exports = [
       path: path.resolve('./dist'),
       filename: '[name].js'
     },
-    resolve: resolvePreact,
     module: {
       loaders: [
         {
@@ -100,7 +99,6 @@ module.exports = [
       path: path.resolve('./dist/components'),
       filename: '[name].js'
     },
-    resolve: resolvePreact,
     module: {
       loaders: [
         {
@@ -122,7 +120,6 @@ module.exports = [
       path: path.resolve('./dist/templates'),
       filename: '[name].js'
     },
-    resolve: resolvePreact,
     module: {
       loaders: [
         {

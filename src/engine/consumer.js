@@ -24,8 +24,8 @@ function Consumer (Component) {
     }
 
     setState (updater, callback) {
-      this.component.setState(updater, callback)
-      super.setState && super.setState(updater, callback)
+      this.component.setState && this.component.setState(updater, callback)
+      super.setState(updater, callback)
     }
 
     componentWillMount () {

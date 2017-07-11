@@ -37,4 +37,4 @@ window.onload = function () {
 */
 
 // expose react lib for Components
-module.exports = require('react')
+module.exports = React

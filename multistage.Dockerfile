@@ -30,10 +30,10 @@ COPY components ./components
 COPY templates ./templates
 COPY src ./src
 
-COPY Consumer.js ./node_modules/
+COPY Consumer ./node_modules/Consumer
 
 RUN \
-    npm run test && \
+    # npm run test && \
     npm run build
 
 FROM alpine
@@ -59,7 +59,7 @@ RUN \
 
 COPY . ./
 
-COPY Consumer.js ./node_modules/
+COPY Consumer ./node_modules/Consumer
 
 COPY --from=dist /fusion/dist/ ./dist/
 

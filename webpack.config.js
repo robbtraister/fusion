@@ -47,7 +47,7 @@ module.exports = [
       contentBase: './public',
       port: 8100
     },
-    resolve: resolvePreact,
+    resolve: /^prod/i.test(process.env.NODE_ENV) ? resolvePreact : {},
     module: {
       loaders: [
         {

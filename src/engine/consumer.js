@@ -8,7 +8,7 @@ function Consumer (Component) {
     constructor (props, context) {
       super(props, context)
 
-      let _this = this
+      let wrapper = this
 
       class ConsumerComponent extends Component {
         async (uri) {
@@ -16,9 +16,15 @@ function Consumer (Component) {
         }
 
         fetch (uri, asyncOnly) {
-          this.state = context.fetch(uri, _this, asyncOnly) || {}
+          this.state = context.fetch(uri, wrapper, asyncOnly) || {}
+        }
+
+        forceUpdate () {
+          wrapper.forceUpdate()
         }
       }
+
+      ConsumerComponent.defaultProps = ContextWrapper.defaultProps
 
       this.component = new ConsumerComponent(props)
     }
@@ -28,39 +34,52 @@ function Consumer (Component) {
       super.setState(updater, callback)
     }
 
-    componentWillMount () {
-      this.component.componentWillMount && this.component.componentWillMount()
-    }
-
-    componentDidMount () {
-      this.component.componentDidMount && this.component.componentDidMount()
-    }
-
-    componentWillReceiveProps (nextProps) {
-      this.component.componentWillReceiveProps && this.component.componentWillReceiveProps(nextProps)
-    }
-
     shouldComponentUpdate (nextProps, nextState) {
       return this.component.shouldComponentUpdate
         ? this.component.shouldComponentUpdate(nextProps, nextState)
         : true
     }
 
-    componentWillUpdate (nextProps, nextState) {
-      this.component.componentWillUpdate && this.component.componentWillUpdate(nextProps, nextState)
-    }
-
-    componentDidUpdate (prevProps, prevState) {
-      this.component.componentDidUpdate && this.component.componentDidUpdate(prevProps, prevState)
-    }
-
-    componentWillUnmount () {
-      this.component.componentWillUnmount && this.component.componentWillUnmount()
-    }
-
     render () {
       return this.component.render()
     }
+  }
+
+  ;[
+    'componentWillMount',
+    'componentDidMount',
+    'componentWillReceiveProps',
+    'componentWillUpdate',
+    'componentDidUpdate',
+    'componentWillUnmount'
+  ].forEach(m => {
+    ContextWrapper.prototype[m] = function () {
+      return this.component[m] && this.component[m].apply(this.component, arguments)
+    }
+  })
+
+  ContextWrapper.contextTypes = {
+    fetch: PropTypes.func
+  }
+
+  return ContextWrapper
+}
+
+/*
+// this impl is not unwrapped properly by Preact
+function Consumer (Component) {
+  const ContextWrapper = (props, context) => {
+    class ConsumerComponent extends Component {
+      async (uri) {
+        this.fetch(uri, true)
+      }
+
+      fetch (uri, asyncOnly) {
+        this.state = context.fetch(uri, this, asyncOnly) || {}
+      }
+    }
+
+    return new ConsumerComponent(props)
   }
 
   ContextWrapper.contextTypes = {
@@ -69,6 +88,7 @@ function Consumer (Component) {
 
   return ContextWrapper
 }
+*/
 
 /*
 // this impl prevents fetch/async from being called in Component's constructor

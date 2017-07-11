@@ -8,6 +8,7 @@
 const React = require('react')
 const ReactDOM = require('react-dom')
 
+require('./consumer')
 const Provider = require('./provider')
 
 const cache = {}

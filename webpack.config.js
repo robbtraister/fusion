@@ -19,7 +19,7 @@ const collections = {}
 })
 
 function excludeReact (context, request, callback) {
-  if (request === 'react') {
+  if (request === 'react' || request === 'Consumer') {
     return callback(null, request)
   }
   callback()
@@ -53,6 +53,10 @@ module.exports = [
         {
           test: require.resolve('./src/engine'),
           loader: ['expose-loader?react']
+        },
+        {
+          test: require.resolve('./src/engine/consumer'),
+          loader: ['expose-loader?Consumer']
         },
         {
           test: /\.js$/,

@@ -7,17 +7,11 @@ RUN \
             nodejs-npm \
             && \
     rm -rf /var/cache/apk/* && \
-    npm update -g npm && \
+    npm install -g npm@~5.1 && \
     node -v && \
     npm -v
 
 WORKDIR /fusion
-
-COPY test/package.json ./test/
-
-RUN \
-    cd test && \
-    npm install
 
 COPY package.json ./
 
@@ -33,20 +27,19 @@ COPY src ./src
 COPY Consumer ./node_modules/Consumer
 
 RUN \
-    # npm run test && \
+    npm run test && \
     npm run build
 
-FROM alpine
+FROM alpine AS modules
 
 RUN \
     apk update && \
     apk upgrade && \
     apk add --update --no-cache \
-            nginx \
             nodejs-npm \
             && \
     rm -rf /var/cache/apk/* && \
-    npm update -g npm && \
+    npm install -g npm@~5.1 && \
     node -v && \
     npm -v
 
@@ -57,8 +50,24 @@ COPY package.json ./
 RUN \
     npm install --production
 
+FROM alpine
+
+RUN \
+    apk update && \
+    apk upgrade && \
+    apk add --update --no-cache \
+            nginx \
+            nodejs \
+            && \
+    rm -rf /var/cache/apk/* && \
+    nginx -v && \
+    node -v
+
+WORKDIR /fusion
+
 COPY . ./
 
+COPY --from=modules /fusion/node_modules ./node_modules/
 COPY Consumer ./node_modules/Consumer
 
 COPY --from=dist /fusion/dist/ ./dist/
@@ -83,5 +92,4 @@ RUN \
 
 USER ${USER}
 
-ENTRYPOINT ["npm", "run"]
-CMD ["start"]
+CMD ./proxy/run.sh && node src/server/cluster

@@ -8,17 +8,12 @@ RUN \
             nodejs-npm \
             && \
     rm -rf /var/cache/apk/* && \
-    npm update -g npm && \
+    npm install -g npm@~5.1 && \
+    nginx -v && \
     node -v && \
     npm -v
 
 WORKDIR /fusion
-
-COPY test/package.json ./test/
-
-RUN \
-    cd test && \
-    npm install
 
 COPY package.json ./
 
@@ -34,7 +29,7 @@ COPY src ./src
 COPY Consumer ./node_modules/Consumer
 
 RUN \
-    # npm run test && \
+    npm run test && \
     npm run build_dev
 
 COPY . ./

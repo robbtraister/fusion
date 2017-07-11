@@ -8,7 +8,7 @@ RUN \
             nodejs-npm \
             && \
     rm -rf /var/cache/apk/* && \
-    npm update -g npm && \
+    npm install -g npm@~5.1 && \
     node -v && \
     npm -v
 
@@ -22,7 +22,6 @@ RUN \
 COPY . ./
 
 RUN \
-    (cd test && npm install) && \
     npm run test && \
     rm -rf ./test && \
     npm run build && \

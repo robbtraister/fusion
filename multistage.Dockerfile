@@ -50,6 +50,8 @@ COPY package.json ./
 RUN \
     npm install --production
 
+COPY Consumer ./node_modules/Consumer
+
 FROM alpine
 
 RUN \
@@ -66,11 +68,8 @@ RUN \
 WORKDIR /fusion
 
 COPY . ./
-
-COPY --from=modules /fusion/node_modules ./node_modules/
-COPY Consumer ./node_modules/Consumer
-
 COPY --from=dist /fusion/dist/ ./dist/
+COPY --from=modules /fusion/node_modules ./node_modules/
 
 ENV USER="fusion"
 RUN \

@@ -8,7 +8,7 @@ RUN \
             nodejs-npm \
             && \
     rm -rf /var/cache/apk/* && \
-    npm install -g npm@~5.1 && \
+    npm install -g npm && \
     nginx -v && \
     node -v && \
     npm -v

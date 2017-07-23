@@ -1,7 +1,7 @@
 'use strict'
 
 import React from 'react'
-import Consumer from 'Consumer'
+import Consumer from 'consumer'
 
 // @Consumer
 const Footer = Consumer(

@@ -8,8 +8,8 @@
 const React = require('react')
 const ReactDOM = require('react-dom')
 
-require('./consumer')
-const Provider = require('./provider')
+require('../context/consumer')
+const Provider = require('../context/provider')
 
 const cache = {}
 function cachedFetch (uri, component) {

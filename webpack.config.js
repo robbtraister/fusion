@@ -55,7 +55,7 @@ module.exports = [
           loader: ['expose-loader?react']
         },
         {
-          test: require.resolve('./src/engine/consumer'),
+          test: require.resolve('./src/context/consumer'),
           loader: ['expose-loader?Consumer']
         },
         {

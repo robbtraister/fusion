@@ -2,7 +2,7 @@
 
 const React = require('react')
 
-class Provider extends require('../../engine/provider') {
+class Provider extends require('../../context/provider') {
   render () {
     if (this.props.cache) {
       return <div>

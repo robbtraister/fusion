@@ -19,6 +19,7 @@ function Rendering (uri, options) {
   this.options = options || {}
   this.options.hydrated = false
 
+  this.uri = uri
   this.contentURI = Content.resolve(uri)
   this.templateName = Templates.resolve(uri)
   this.component = Templates.load(this.templateName)

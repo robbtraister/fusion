@@ -10,6 +10,7 @@ const compression = require('compression')
 const assets = require('./routers/assets')
 const content = require('./routers/content')
 const render = require('./routers/render')
+const template = require('./routers/template')
 
 function server () {
   let app = express()
@@ -25,6 +26,7 @@ function server () {
 
   app.use('/_assets', assets())
   app.use('/_content', content())
+  app.use('/_template', template())
   app.use(render())
 
   app.use((err, req, res, next) => {

@@ -7,7 +7,7 @@ const cookieParser = require('cookie-parser')
 const Render = require('../controllers/render')
 
 function getRenderingOptions () {
-  return function (req, res, next) {
+  return function getRenderingOptions (req, res, next) {
     debug('query:', req.query)
     debug('cookies:', req.cookies)
 

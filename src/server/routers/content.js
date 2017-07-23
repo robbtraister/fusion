@@ -1,33 +1,31 @@
 'use strict'
 
-// const debug = require('debug')(`fusion:routers:content:${process.pid}`)
-const express = require('express')
+const url = require('url')
+
+const debug = require('debug')(`fusion:routers:content:${process.pid}`)
 
 const Content = require('../controllers/content')
 const Render = require('../controllers/render')
-const Templates = require('../controllers/templates')
 
 const jsMask = /^[_$a-z][_$a-z0-9]*/i
 
 function router () {
-  let router = express.Router()
+  return function contentMiddleware (req, res, next) {
+    let uri = url.parse(req.query.uri || req.path).pathname
+    debug('Content URI:', uri)
 
-  router.use((req, res, next) => {
     if (req.query.all === 'true') {
-      let contentURI = Content.resolve(req.path)
-      let templateName = Templates.resolve(req.path)
-
-      Render.content(templateName, contentURI, { includeScripts: true })
+      Render.content(uri, { includeScripts: true })
         .then(res.send.bind(res))
     } else {
-      Content.fetch(req.path)
+      Content.fetch(uri)
         .then(content => {
-          if (/\.jsonp$/.test(req.path)) {
-            let varName = jsMask.exec(req.query.v || '') || 'v'
-            content = `/**/;var ${varName}=${content};`
-          } else if (/\.js$/.test(req.path)) {
+          if (/\.js$/.test(uri) || req.query.f) {
             let fcnName = jsMask.exec(req.query.f || '') || 'f'
             content = `/**/;${fcnName}(${content});`
+          } else if (/\.jsonp$/.test(uri) || req.query.v) {
+            let varName = jsMask.exec(req.query.v || '') || 'v'
+            content = `/**/;var ${varName}=${content};`
           }
           return content
         })
@@ -40,9 +38,7 @@ function router () {
           })
         })
     }
-  })
-
-  return router
+  }
 }
 
 module.exports = router

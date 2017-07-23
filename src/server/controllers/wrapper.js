@@ -26,8 +26,8 @@ const Wrapper = (rendering) => {
       {rendering.options.includeScripts &&
         <script src={`/_assets/engine.js`} defer='defer' />
       }
-      {rendering.options.includeScripts && rendering.templateName &&
-        <script src={`/_assets/templates/${rendering.templateName.toLowerCase()}.js`} defer='defer' />
+      {rendering.options.includeScripts &&
+        <script src={`/_template?uri=${rendering.uri}`} defer='defer' />
       }
 
       <title>React Rendering Engine</title>
@@ -45,8 +45,8 @@ const Wrapper = (rendering) => {
           </Provider>
         }
       </div>
-      {rendering.options.includeScripts && rendering.contentURI &&
-        <script src={`/_content/${rendering.contentURI}.js?f=render`} defer='defer' />
+      {rendering.options.includeScripts &&
+        <script src={`/_content?uri=${rendering.uri}&f=render`} defer='defer' />
       }
     </body>
   </html>

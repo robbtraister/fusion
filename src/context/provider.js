@@ -11,7 +11,9 @@ class Provider extends React.Component {
   }
 
   render () {
-    return this.props.children
+    return (this.props.children && this.props.children.length === 1)
+      ? this.props.children
+      : <div>{this.props.children}</div>
   }
 }
 

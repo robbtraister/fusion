@@ -12,7 +12,7 @@ const Wrapper = (rendering, html) => {
         </noscript>
       }
       {rendering.options.includeScripts &&
-        <script src={`/_/engine?uri=${rendering.uri}`} defer='defer' />
+        <script src={`/_/assets/engine.js`} defer='defer' />
       }
       {rendering.options.includeScripts &&
         <script src={`/_/template?uri=${rendering.uri}`} defer='defer' />

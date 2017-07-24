@@ -3,7 +3,7 @@
 const React = require('react')
 const ReactDOMServer = require('react-dom/server')
 
-const Provider = require('../../content/provider/server')
+const Provider = require('../content/provider/server')
 
 function render (rendering) {
   return Promise.resolve(ReactDOMServer.renderToStaticMarkup(

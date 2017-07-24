@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 'use strict'
 
 const url = require('url')
@@ -7,7 +9,6 @@ const debug = require('debug')(`fusion:controllers:resolver:${process.pid}`)
 function resolve (uri) {
   return {
     contentURI: contentURI(uri),
-    engine: engine(uri),
     templateName: templateName(uri)
   }
 }
@@ -16,11 +17,6 @@ function contentURI (uri) {
   let p = url.parse(uri).pathname.replace(/^\//, '').replace(/\.js(onp?)?$/, '')
   debug('content path:', p)
   return `${p || 'homepage'}`
-}
-
-function engine (uri) {
-  // let t = Templates.load(templateName(uri))
-  return /^\/section(\/|$)/.test(uri) ? 'vue' : 'react'
 }
 
 function templateName (uri) {
@@ -37,8 +33,9 @@ function templateName (uri) {
 
 module.exports = resolve
 module.exports.contentURI = contentURI
-module.exports.engine = engine
 module.exports.resolve = resolve
 module.exports.templateName = templateName
 
-// const Templates = require('./templates')
+if (module === require.main) {
+  console.log(resolve(process.argv[2]))
+}

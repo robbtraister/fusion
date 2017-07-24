@@ -9,10 +9,10 @@ const React = require('react')
 const ReactDOM = require('react-dom')
 
 // require consumer so that it is compiled and available for client components
-require('../../content/consumer')
-const Provider = require('../../content/provider/client')
+require('../content/consumer')
+const Provider = require('../content/provider/client')
 
-const fetcher = require('../../content/fetcher/client')()
+const fetcher = require('../content/fetcher/client')()
 
 window.render = function (props) {
   ReactDOM.render(

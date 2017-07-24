@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 'use strict'
 
 require('babel-core/register')
@@ -7,6 +9,7 @@ const Content = require('./content')
 const Templates = require('./templates')
 
 const fetcher = require('../../content/fetcher/server')
+const engine = require(`../../engine/server`)
 
 const wrapper = require('./wrapper')
 
@@ -25,21 +28,20 @@ function Rendering (uri, options) {
   this.component = Templates.load(this.templateName)
 }
 
-Rendering.prototype.render = function () {
-  return require(`../../engine/${this.engine}/server`)(this)
-    .then(hydration => wrapper(this, hydration))
-}
-
 Rendering.prototype.hydrate = function () {
-  this.options.hydrated = true
+  const render = () => {
+    return engine(this)
+      .then(hydration => wrapper(this, hydration))
+  }
 
   return Content.fetch(this.contentURI)
     .then(JSON.parse.bind(JSON))
     .then(content => {
       this.content = content
+      this.options.hydrated = true
 
       // render with no cache; fetch will populate it as necessary
-      let dehydratedHTMLPromise = this.render()
+      let dehydratedHTMLPromise = render()
       let cacheKeys = Object.keys(this.cache)
 
       let cachePromise = Promise.all(cacheKeys.map(k => this.cache[k]))
@@ -54,7 +56,7 @@ Rendering.prototype.hydrate = function () {
           .then(() => this.cache),
         // if no component content, don't re-render
         render: () => cacheKeys.length
-          ? cachePromise.then(() => this.render())
+          ? cachePromise.then(() => render())
           : dehydratedHTMLPromise
       }
     })
@@ -82,5 +84,7 @@ module.exports.renderDehydrated = renderDehydrated
 module.exports.renderHydrated = renderHydrated
 
 if (module === require.main) {
-  renderDehydrated(process.argv[2] || '/').then(console.log)
+  renderDehydrated(process.argv[2] || '/')
+    .then(console.log)
+    .then(console.error)
 }

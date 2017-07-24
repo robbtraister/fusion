@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 'use strict'
 
 const fs = require('fs')
@@ -25,3 +27,9 @@ function fetch (uri) {
 
 module.exports.fetch = fetch
 module.exports.resolve = Resolver.contentURI
+
+if (module === require.main) {
+  fetch(process.argv[2])
+    .then(console.log)
+    .catch(console.error)
+}

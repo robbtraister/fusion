@@ -5,20 +5,6 @@ const path = require('path')
 
 const glob = require('glob')
 
-function getComponentSource (d) {
-  function ignoreError (p) {
-    let f = null
-    try {
-      f = require.resolve(p)
-    } catch (e) {}
-    return f
-  }
-
-  return ignoreError(`${d}/index.jsx`) ||
-    ignoreError(`${d}/index.vue`) ||
-    ignoreError(d)
-}
-
 const collections = {}
 ;['components', 'templates'].forEach(k => {
   let list = glob.sync('*/', {
@@ -30,12 +16,12 @@ const collections = {}
 
   collections[k] = {}
   list.forEach(item => {
-    collections[k][item] = getComponentSource(`./${k}/${item}`)
+    collections[k][item] = require.resolve(`./${k}/${item}`)
   })
 })
 
 function excludeLibs (context, request, callback) {
-  if (request === 'react' || request === 'vue' || request === 'consumer') {
+  if (request === 'react' || request === 'consumer') {
     return callback(null, request)
   }
   callback()
@@ -52,11 +38,10 @@ const resolvePreact = {
 module.exports = [
   {
     entry: {
-      react: require.resolve('./src/engine/react/client'),
-      vue: require.resolve('./src/engine/vue/client')
+      engine: require.resolve('./src/engine/client')
     },
     output: {
-      path: path.resolve('./dist/engine'),
+      path: path.resolve('./dist'),
       filename: '[name].js'
     },
     devServer: {
@@ -72,12 +57,8 @@ module.exports = [
           loader: ['expose-loader?Consumer']
         },
         {
-          test: require.resolve('./src/engine/react/client'),
+          test: require.resolve('./src/engine/client'),
           loader: ['expose-loader?react']
-        },
-        {
-          test: require.resolve('./src/engine/vue/client'),
-          loader: ['expose-loader?vue']
         },
         {
           test: /\.js$/,
@@ -131,7 +112,7 @@ module.exports = [
           loader: ['expose-loader?Components']
         },
         {
-          test: /\.js$/,
+          test: /\.jsx?$/,
           exclude: /node_modules/,
           loader: ['babel-loader']
         }
@@ -149,17 +130,13 @@ module.exports = [
     module: {
       loaders: [
         {
+          include: path.resolve('./templates'),
           loader: ['expose-loader?Templates']
         },
         {
           test: /\.jsx?$/,
           exclude: /node_modules/,
           loader: ['babel-loader']
-        },
-        {
-          test: /\.vue$/,
-          exclude: /node_modules/,
-          loader: ['vue-loader']
         }
       ]
     }

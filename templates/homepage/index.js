@@ -13,8 +13,6 @@ const Homepage = (props) => {
       {props.content}
       <p />
       <a href='/blurbs'>Blurbs</a>
-      <p />
-      <a href='/section'>Section</a>
     </Body>
     <Footer />
   </div>

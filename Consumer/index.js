@@ -1,1 +1,1 @@
-module.exports = require('../../src/context/consumer')
+module.exports = require('../../src/content/consumer')

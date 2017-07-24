@@ -10,7 +10,7 @@ const Resolver = require('./resolver')
 const base = path.join(__dirname, '..', '..', '..', 'content')
 
 function fetch (uri) {
-  let s = Resolver.content(uri)
+  let s = Resolver.contentURI(uri)
   debug('content source:', s)
   return new Promise((resolve, reject) => {
     fs.readFile(path.join(base, `${s}.json`), (err, data) => {
@@ -24,4 +24,4 @@ function fetch (uri) {
 }
 
 module.exports.fetch = fetch
-module.exports.resolve = Resolver.content
+module.exports.resolve = Resolver.contentURI

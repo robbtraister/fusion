@@ -16,7 +16,7 @@ function router () {
 
     res.set('Cache-Control', 'no-cache, no-store, must-revalidate')
 
-    res.redirect(302, `/_assets/templates/${templateName.toLowerCase()}.js`)
+    res.redirect(302, `/_/assets/templates/${templateName.toLowerCase()}.js`)
   }
 }
 

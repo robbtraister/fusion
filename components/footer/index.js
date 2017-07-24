@@ -1,14 +1,14 @@
 'use strict'
 
 import React from 'react'
-import Consumer from 'consumer'
+import Consumer from 'Consumer'
 
 // @Consumer
 const Footer = Consumer(
 class Footer extends React.Component {
   constructor (props) {
     super(props)
-    this.fetch(`/_content/${props.source}.json`, props.async)
+    this.fetch(`/_/content/${props.source}.json`, props.async)
   }
 
   /*

@@ -86,7 +86,7 @@ http {
     location / {
       access_log off;
       etag off;
-      proxy_pass http://localhost:8080;
+      proxy_pass http://0.0.0.0:8080;
     }
 
     location /favicon.ico {
@@ -94,7 +94,7 @@ http {
       etag on;
     }
 
-    location ~ ^/_assets/(.*) {
+    location ~ ^/_/assets/(.*) {
       root ..;
       etag on;
       expires ${CACHE_MAX_AGE:-0};

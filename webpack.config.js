@@ -18,8 +18,8 @@ const collections = {}
   })
 })
 
-function excludeReact (context, request, callback) {
-  if (request === 'react' || request === 'Consumer') {
+function excludeLibs (context, request, callback) {
+  if (request === 'react' || request === 'vue' || request === 'consumer') {
     return callback(null, request)
   }
   callback()
@@ -36,10 +36,11 @@ const resolvePreact = {
 module.exports = [
   {
     entry: {
-      engine: require.resolve('./src/engine')
+      react: require.resolve('./src/engine/react/client'),
+      vue: require.resolve('./src/engine/vue/client')
     },
     output: {
-      path: path.resolve('./dist'),
+      path: path.resolve('./dist/engine'),
       filename: '[name].js'
     },
     devServer: {
@@ -51,12 +52,16 @@ module.exports = [
     module: {
       loaders: [
         {
-          test: require.resolve('./src/engine'),
+          test: require.resolve('./src/content/consumer'),
+          loader: ['expose-loader?Consumer']
+        },
+        {
+          test: require.resolve('./src/engine/react/client'),
           loader: ['expose-loader?react']
         },
         {
-          test: require.resolve('./src/context/consumer'),
-          loader: ['expose-loader?Consumer']
+          test: require.resolve('./src/engine/vue/client'),
+          loader: ['expose-loader?vue']
         },
         {
           test: /\.js$/,
@@ -72,7 +77,7 @@ module.exports = [
       components: require.resolve('./components'),
       templates: require.resolve('./templates')
     },
-    externals: excludeReact,
+    externals: excludeLibs,
     output: {
       path: path.resolve('./dist'),
       filename: '[name].js'
@@ -98,7 +103,7 @@ module.exports = [
 
   {
     entry: collections.components,
-    externals: excludeReact,
+    externals: excludeLibs,
     output: {
       path: path.resolve('./dist/components'),
       filename: '[name].js'
@@ -119,7 +124,7 @@ module.exports = [
 
   {
     entry: collections.templates,
-    externals: excludeReact,
+    externals: excludeLibs,
     output: {
       path: path.resolve('./dist/templates'),
       filename: '[name].js'

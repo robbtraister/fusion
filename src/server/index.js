@@ -7,12 +7,9 @@ const express = require('express')
 const morgan = require('morgan')
 const compression = require('compression')
 
-const assets = require('./routers/assets')
-const content = require('./routers/content')
-const render = require('./routers/render')
-const template = require('./routers/template')
+const router = require('./router')
 
-function server () {
+function serve (port) {
   let app = express()
 
   app.set('x-powered-by', false)
@@ -24,10 +21,7 @@ function server () {
     app.use(compression())
   }
 
-  app.use('/_assets', assets())
-  app.use('/_content', content())
-  app.use('/_template', template())
-  app.use(render())
+  app.use(router())
 
   app.use((err, req, res, next) => {
     console.error(err.stack)
@@ -37,7 +31,7 @@ function server () {
     return res.sendStatus(404)
   })
 
-  const port = process.env.NODEJS_PORT || process.env.PORT || 8080
+  port = port || process.env.NODEJS_PORT || process.env.PORT || 8080
   return app.listen(port, (err) => {
     if (err) {
       console.error(err)
@@ -47,8 +41,8 @@ function server () {
   })
 }
 
-module.exports = server
+module.exports = serve
 
 if (module === require.main) {
-  server()
+  serve(process.argv[2])
 }

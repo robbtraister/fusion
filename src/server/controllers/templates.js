@@ -31,4 +31,4 @@ function load (name) {
 }
 
 module.exports.load = load
-module.exports.resolve = Resolver.template
+module.exports.resolve = Resolver.templateName

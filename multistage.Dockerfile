@@ -24,7 +24,7 @@ COPY components ./components
 COPY templates ./templates
 COPY src ./src
 
-COPY consumer ./node_modules/consumer
+COPY Consumer ./node_modules/Consumer
 
 RUN \
     npm run test && \
@@ -50,7 +50,7 @@ COPY package.json ./
 RUN \
     npm install --production
 
-COPY consumer ./node_modules/consumer
+COPY Consumer ./node_modules/Consumer
 
 FROM alpine
 

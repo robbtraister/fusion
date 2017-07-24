@@ -4,12 +4,18 @@ require('babel-core/register')
 
 const debug = require('debug')(`fusion:controllers:render:${process.pid}`)
 
-const ReactDOMServer = require('react-dom/server')
 const request = require('request-promise-native')
 
+const Resolver = require('./resolver')
 const Content = require('./content')
 const Templates = require('./templates')
+
 const wrapper = require('./wrapper')
+
+function render (rendering) {
+  return require(`../../engine/${rendering.engine}/server`)(rendering)
+    .then(hydration => wrapper(rendering, hydration))
+}
 
 function Rendering (uri, options) {
   if (!(this instanceof Rendering)) {
@@ -20,8 +26,9 @@ function Rendering (uri, options) {
   this.options.hydrated = false
 
   this.uri = uri
-  this.contentURI = Content.resolve(uri)
-  this.templateName = Templates.resolve(uri)
+  Object.assign(this, Resolver.resolve(uri))
+  // this.contentURI = Content.resolve(uri)
+  // this.templateName = Templates.resolve(uri)
   this.component = Templates.load(this.templateName)
 }
 
@@ -62,7 +69,7 @@ Rendering.prototype.hydrate = function () {
       }
 
       // render with no cache; fetch will populate it as necessary
-      let dehydratedHTML = this.render()
+      let dehydratedHTMLPromise = this.render()
       let cacheKeys = Object.keys(this.cache)
 
       let cachePromise = Promise.all(cacheKeys.map(k => this.cache[k]))
@@ -78,16 +85,9 @@ Rendering.prototype.hydrate = function () {
         // if no component content, don't re-render
         render: () => cacheKeys.length
           ? cachePromise.then(() => this.render())
-          : dehydratedHTML
+          : dehydratedHTMLPromise
       }
     })
-}
-
-function render (rendering) {
-  return '<!DOCTYPE html>' +
-    ReactDOMServer.renderToStaticMarkup(
-      wrapper(rendering)
-    )
 }
 
 function content (uri, options) {
@@ -97,7 +97,7 @@ function content (uri, options) {
 }
 
 function renderDehydrated (uri) {
-  return Promise.resolve(render(new Rendering(uri, { includeScripts: true })))
+  return render(new Rendering(uri, { includeScripts: true }))
 }
 
 function renderHydrated (uri, options) {

@@ -1,21 +1,9 @@
 'use strict'
 
 const React = require('react')
+const ReactDOMServer = require('react-dom/server')
 
-class Provider extends require('../../context/provider') {
-  render () {
-    if (this.props.cache) {
-      return <div>
-        <script dangerouslySetInnerHTML={{ __html: `var contentCache=${JSON.stringify(this.props.cache)}` }} />
-        {super.render()}
-      </div>
-    } else {
-      return super.render()
-    }
-  }
-}
-
-const Wrapper = (rendering) => {
+const Wrapper = (rendering, html) => {
   return <html>
     <head>
       {!rendering.options.hydrated &&
@@ -24,33 +12,34 @@ const Wrapper = (rendering) => {
         </noscript>
       }
       {rendering.options.includeScripts &&
-        <script src={`/_assets/engine.js`} defer='defer' />
+        <script src={`/_/engine?uri=${rendering.uri}`} defer='defer' />
       }
       {rendering.options.includeScripts &&
-        <script src={`/_template?uri=${rendering.uri}`} defer='defer' />
+        <script src={`/_/template?uri=${rendering.uri}`} defer='defer' />
       }
 
       <title>React Rendering Engine</title>
 
-      <link rel='icon' type='image/png' sizes='96x96' href='/_assets/favicon-96x96.png' />
-      <link rel='icon' type='image/png' sizes='32x32' href='/_assets/favicon-32x32.png' />
-      <link rel='icon' type='image/png' sizes='16x16' href='/_assets/favicon-16x16.png' />
-      <link rel='stylesheet' type='text/css' href={`/_assets/style.css`} />
+      <link rel='icon' type='image/png' sizes='96x96' href='/_/assets/favicon-96x96.png' />
+      <link rel='icon' type='image/png' sizes='32x32' href='/_/assets/favicon-32x32.png' />
+      <link rel='icon' type='image/png' sizes='16x16' href='/_/assets/favicon-16x16.png' />
+      <link rel='stylesheet' type='text/css' href='/_/assets/style.css' />
     </head>
     <body>
-      <div id='App'>
-        {rendering.options.hydrated &&
-          <Provider fetch={rendering.fetch} cache={rendering.options.includeScripts && rendering.cache}>
-            <rendering.component {...rendering.content} />
-          </Provider>
-        }
-      </div>
+      <div id='App' dangerouslySetInnerHTML={{ __html: html }} />
       {rendering.options.includeScripts &&
-        <script src={`/_content?uri=${rendering.uri}&f=render`} defer='defer' />
+        <script src={`/_/content?f=render&uri=${rendering.uri}`} defer='defer' />
       }
     </body>
   </html>
 }
 
-module.exports = Wrapper
-module.exports.Wrapper = Wrapper
+function render (rendering, html) {
+  return Promise.resolve(
+    ReactDOMServer.renderToStaticMarkup(
+      Wrapper(rendering, html)
+    )
+  )
+}
+
+module.exports = render

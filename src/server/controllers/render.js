@@ -12,11 +12,6 @@ const Templates = require('./templates')
 
 const wrapper = require('./wrapper')
 
-function render (rendering) {
-  return require(`../../engine/${rendering.engine}/server`)(rendering)
-    .then(hydration => wrapper(rendering, hydration))
-}
-
 function Rendering (uri, options) {
   if (!(this instanceof Rendering)) {
     return new Rendering(uri, options)
@@ -44,7 +39,7 @@ function Rendering (uri, options) {
         // don't add global content to the cache unless a component requests it
         this.cache[uri] = (
           (uri === this.contentURI)
-          ? content
+          ? this.content
           : request({
             uri: `http://0.0.0.0:8080${uri}`,
             json: true

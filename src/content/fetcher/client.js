@@ -1,16 +1,24 @@
 'use strict'
 
-/* global contentCache, fetch */
+/* global contentCache */
 
-const cache = {}
-function cachedFetch (uri, component) {
-  if (!cache.hasOwnProperty(uri)) {
-    cache[uri] = fetch(uri)
-      .then(res => res.json())
+function fetcher () {
+  const cache = {}
+
+  function fetch (uri, component) {
+    if (!cache.hasOwnProperty(uri)) {
+      cache[uri] = window.fetch(uri)
+        .then(res => res.json())
+    }
+
+    cache[uri] = cache[uri].then(json => component.setState(json))
+    return ((typeof contentCache !== 'undefined') && contentCache[uri]) || null
   }
 
-  cache[uri] = cache[uri].then(json => component.setState(json))
-  return ((typeof contentCache !== 'undefined') && contentCache[uri]) || null
+  return {
+    cache,
+    fetch
+  }
 }
 
-module.exports = cachedFetch
+module.exports = fetcher

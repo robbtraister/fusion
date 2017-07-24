@@ -2,13 +2,11 @@
 
 require('babel-core/register')
 
-const debug = require('debug')(`fusion:controllers:render:${process.pid}`)
-
-const request = require('request-promise-native')
-
 const Resolver = require('./resolver')
 const Content = require('./content')
 const Templates = require('./templates')
+
+const fetcher = require('../../content/fetcher/server')
 
 const wrapper = require('./wrapper')
 
@@ -21,34 +19,10 @@ function Rendering (uri, options) {
   this.options.hydrated = false
 
   this.uri = uri
-  Object.assign(this, Resolver.resolve(uri))
+  Object.assign(this, fetcher(), Resolver.resolve(uri))
   // this.contentURI = Content.resolve(uri)
   // this.templateName = Templates.resolve(uri)
   this.component = Templates.load(this.templateName)
-
-  this.cache = {}
-  this.fetch = (uri, component, asyncOnly) => {
-    if (!asyncOnly) {
-      debug('sync fetching', uri)
-
-      if (this.cache.hasOwnProperty(uri)) {
-        if (!(this.cache[uri] instanceof Promise)) {
-          return this.cache[uri]
-        }
-      } else {
-        // don't add global content to the cache unless a component requests it
-        this.cache[uri] = (
-          (uri === this.contentURI)
-          ? this.content
-          : request({
-            uri: `http://0.0.0.0:8080${uri}`,
-            json: true
-          })
-        ).then(json => { this.cache[uri] = json })
-      }
-    }
-    return null
-  }
 }
 
 Rendering.prototype.render = function () {

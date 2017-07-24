@@ -10,12 +10,13 @@ const ReactDOM = require('react-dom')
 
 // require consumer so that it is compiled and available for client components
 require('../../content/consumer')
-const fetcher = require('../../content/fetcher')
-const Provider = require('../../content/provider')
+const Provider = require('../../content/provider/client')
+
+const fetcher = require('../../content/fetcher/client')()
 
 window.render = function (props) {
   ReactDOM.render(
-    <Provider fetch={fetcher}>
+    <Provider fetch={fetcher.fetch}>
       <Templates.default {...props} />
     </Provider>,
     document.getElementById('App')

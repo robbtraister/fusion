@@ -16,7 +16,7 @@ const Homepage = (props) => {
       <p />
       <a href='/section'>Section</a>
     </Body>
-    <Footer async='true' />
+    <Footer />
   </div>
 }
 

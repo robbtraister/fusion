@@ -37,7 +37,7 @@ const Wrapper = (rendering, html) => {
 function render (rendering, html) {
   return Promise.resolve(
     ReactDOMServer.renderToStaticMarkup(
-      Wrapper(rendering, html)
+      Wrapper(rendering, html || '')
     )
   )
 }

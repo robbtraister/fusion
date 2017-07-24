@@ -30,10 +30,35 @@ function Rendering (uri, options) {
   // this.contentURI = Content.resolve(uri)
   // this.templateName = Templates.resolve(uri)
   this.component = Templates.load(this.templateName)
+
+  this.cache = {}
+  this.fetch = (uri, component, asyncOnly) => {
+    if (!asyncOnly) {
+      debug('sync fetching', uri)
+
+      if (this.cache.hasOwnProperty(uri)) {
+        if (!(this.cache[uri] instanceof Promise)) {
+          return this.cache[uri]
+        }
+      } else {
+        // don't add global content to the cache unless a component requests it
+        this.cache[uri] = (
+          (uri === this.contentURI)
+          ? content
+          : request({
+            uri: `http://0.0.0.0:8080${uri}`,
+            json: true
+          })
+        ).then(json => { this.cache[uri] = json })
+      }
+    }
+    return null
+  }
 }
 
 Rendering.prototype.render = function () {
-  return render(this)
+  return require(`../../engine/${this.engine}/server`)(this)
+    .then(hydration => wrapper(this, hydration))
 }
 
 Rendering.prototype.hydrate = function () {
@@ -43,30 +68,6 @@ Rendering.prototype.hydrate = function () {
     .then(JSON.parse.bind(JSON))
     .then(content => {
       this.content = content
-
-      this.cache = {}
-      this.fetch = (uri, component, asyncOnly) => {
-        if (!asyncOnly) {
-          debug('sync fetching', uri)
-
-          if (this.cache.hasOwnProperty(uri)) {
-            if (!(this.cache[uri] instanceof Promise)) {
-              return this.cache[uri]
-            }
-          } else {
-            // don't add global content to the cache unless a component requests it
-            this.cache[uri] = (
-              (uri === this.contentURI)
-              ? content
-              : request({
-                uri: `http://0.0.0.0:8080${uri}`,
-                json: true
-              })
-            ).then(json => { this.cache[uri] = json })
-          }
-        }
-        return null
-      }
 
       // render with no cache; fetch will populate it as necessary
       let dehydratedHTMLPromise = this.render()
@@ -97,7 +98,7 @@ function content (uri, options) {
 }
 
 function renderDehydrated (uri) {
-  return render(new Rendering(uri, { includeScripts: true }))
+  return wrapper(new Rendering(uri, { includeScripts: true }))
 }
 
 function renderHydrated (uri, options) {

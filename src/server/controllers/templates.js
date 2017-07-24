@@ -9,14 +9,14 @@ global.react = require('react')
 
 const Resolver = require('./resolver')
 
-const Templates = {}
+const templateMap = {}
 const templateWatchers = {}
 
 function loadTemplate (p, name) {
   debug('(re)loading', p)
   delete require.cache[p]
-  global.Templates = require(p)
-  Templates[name] = global.Templates[name]
+  let mod = require(p)
+  templateMap[name] = mod[name] || mod.default
 }
 
 function load (name) {
@@ -27,7 +27,7 @@ function load (name) {
     templateWatchers[p] = fs.watch(p, () => loadTemplate(p, name))
   }
 
-  return Templates[name]
+  return templateMap[name]
 }
 
 module.exports.load = load

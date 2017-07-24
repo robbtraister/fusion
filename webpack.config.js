@@ -1,7 +1,23 @@
-const fs = require('fs')
+'use strict'
+
+// const fs = require('fs')
 const path = require('path')
 
 const glob = require('glob')
+
+function getComponentSource (d) {
+  function ignoreError (p) {
+    let f = null
+    try {
+      f = require.resolve(p)
+    } catch (e) {}
+    return f
+  }
+
+  return ignoreError(`${d}/index.jsx`) ||
+    ignoreError(`${d}/index.vue`) ||
+    ignoreError(d)
+}
 
 const collections = {}
 ;['components', 'templates'].forEach(k => {
@@ -10,11 +26,11 @@ const collections = {}
   })
     .map(d => d.replace(/\/*$/, ''))
 
-  fs.writeFileSync(`./${k}/index.js`, list.map(item => `export * from './${item}'`).join('\n'))
+  // fs.writeFileSync(`./${k}/index.js`, list.map(item => `export * from './${item}'`).join('\n'))
 
   collections[k] = {}
   list.forEach(item => {
-    collections[k][item] = require.resolve(`./${k}/${item}`)
+    collections[k][item] = getComponentSource(`./${k}/${item}`)
   })
 })
 
@@ -72,6 +88,7 @@ module.exports = [
     }
   },
 
+/*
   {
     entry: {
       components: require.resolve('./components'),
@@ -100,7 +117,7 @@ module.exports = [
       ]
     }
   },
-
+*/
   {
     entry: collections.components,
     externals: excludeLibs,
@@ -135,9 +152,14 @@ module.exports = [
           loader: ['expose-loader?Templates']
         },
         {
-          test: /\.js$/,
+          test: /\.jsx?$/,
           exclude: /node_modules/,
           loader: ['babel-loader']
+        },
+        {
+          test: /\.vue$/,
+          exclude: /node_modules/,
+          loader: ['vue-loader']
         }
       ]
     }

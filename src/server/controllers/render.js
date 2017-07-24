@@ -59,7 +59,7 @@ Rendering.prototype.hydrate = function () {
               (uri === this.contentURI)
               ? content
               : request({
-                uri: `http://localhost:8080${uri}`,
+                uri: `http://0.0.0.0:8080${uri}`,
                 json: true
               })
             ).then(json => { this.cache[uri] = json })

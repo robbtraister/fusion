@@ -44,6 +44,7 @@ const Template = (rendering) => {
 
 function render (rendering) {
   return Promise.resolve(
+    '<!DOCTYPE html>' +
     ReactDOMServer.renderToStaticMarkup(
       Template(rendering)
     )

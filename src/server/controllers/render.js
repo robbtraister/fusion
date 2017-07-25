@@ -71,8 +71,15 @@ function renderHydrated (uri, options) {
     .then(data => data.render())
 }
 
-module.exports = renderHydrated
+function render (uri, options) {
+  return options.hydrated
+    ? renderHydrated(uri, options)
+    : renderDehydrated(uri)
+}
+
+module.exports = render
 module.exports.content = content
+module.exports.render = render
 module.exports.renderDehydrated = renderDehydrated
 module.exports.renderHydrated = renderHydrated
 

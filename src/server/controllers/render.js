@@ -11,8 +11,6 @@ const Templates = require('./templates')
 const fetcher = require('../../content/fetcher/server')
 const engine = require(`../../engine/server`)
 
-const wrapper = require('./wrapper')
-
 function Rendering (uri, options) {
   if (!(this instanceof Rendering)) {
     return new Rendering(uri, options)
@@ -29,11 +27,6 @@ function Rendering (uri, options) {
 }
 
 Rendering.prototype.hydrate = function () {
-  const render = () => {
-    return engine(this)
-      .then(hydration => wrapper(this, hydration))
-  }
-
   return Content.fetch(this.contentURI)
     .then(JSON.parse.bind(JSON))
     .then(content => {
@@ -41,7 +34,7 @@ Rendering.prototype.hydrate = function () {
       this.options.hydrated = true
 
       // render with no cache; fetch will populate it as necessary
-      let dehydratedHTMLPromise = render()
+      let dehydratedHTMLPromise = engine(this)
       let cacheKeys = Object.keys(this.cache)
 
       let cachePromise = Promise.all(cacheKeys.map(k => this.cache[k]))
@@ -56,7 +49,7 @@ Rendering.prototype.hydrate = function () {
           .then(() => this.cache),
         // if no component content, don't re-render
         render: () => cacheKeys.length
-          ? cachePromise.then(() => render())
+          ? cachePromise.then(() => engine(this))
           : dehydratedHTMLPromise
       }
     })
@@ -69,7 +62,7 @@ function content (uri, options) {
 }
 
 function renderDehydrated (uri) {
-  return wrapper(new Rendering(uri, { includeScripts: true }))
+  return engine(new Rendering(uri, { includeScripts: true }))
 }
 
 function renderHydrated (uri, options) {

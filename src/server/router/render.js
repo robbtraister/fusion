@@ -14,18 +14,18 @@ function getRenderingOptions (query) {
 
   if (hasQueryParam('norender')) {
     return {
-      hydrated: false,
+      hydrate: false,
       includeScripts: true
     }
   } else if (hasQueryParam('noscript')) {
     return {
-      hydrated: true,
+      hydrate: true,
       includeScripts: false
     }
   }
 
   return {
-    hydrated: true,
+    hydrate: true,
     includeScripts: true
   }
 }

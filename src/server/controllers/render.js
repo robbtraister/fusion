@@ -4,6 +4,8 @@
 
 require('babel-core/register')
 
+const debug = require('debug')(`fusion:controllers:render:${process.pid}`)
+
 const Resolver = require('./resolver')
 const Content = require('./content')
 const Templates = require('./templates')
@@ -17,7 +19,7 @@ function Rendering (uri, options) {
   }
 
   this.options = options || {}
-  this.options.hydrated = false
+  this.hydrated = false
 
   this.uri = uri
   Object.assign(this, fetcher(), Resolver.resolve(uri))
@@ -31,7 +33,7 @@ Rendering.prototype.hydrate = function () {
     .then(JSON.parse.bind(JSON))
     .then(content => {
       this.content = content
-      this.options.hydrated = true
+      this.hydrated = true
 
       // render with no cache; fetch will populate it as necessary
       let dehydratedHTMLPromise = engine(this)
@@ -55,36 +57,31 @@ Rendering.prototype.hydrate = function () {
     })
 }
 
+Rendering.prototype.render = function () {
+  debug('rendering options', this.options)
+  return this.options.hydrate
+    ? this.hydrate()
+          .then(data => data.render())
+    : engine(this)
+}
+
 function content (uri, options) {
   return new Rendering(uri, options)
     .hydrate()
     .then(data => data.content())
 }
 
-function renderDehydrated (uri) {
-  return engine(new Rendering(uri, { includeScripts: true }))
-}
-
-function renderHydrated (uri, options) {
-  return new Rendering(uri, options)
-    .hydrate()
-    .then(data => data.render())
-}
-
 function render (uri, options) {
-  return options.hydrated
-    ? renderHydrated(uri, options)
-    : renderDehydrated(uri)
+  return new Rendering(uri, options)
+    .render()
 }
 
 module.exports = render
 module.exports.content = content
 module.exports.render = render
-module.exports.renderDehydrated = renderDehydrated
-module.exports.renderHydrated = renderHydrated
 
 if (module === require.main) {
-  renderDehydrated(process.argv[2] || '/')
+  render(process.argv[2] || '/', { hydrated: true, includeScripts: true })
     .then(console.log)
     .then(console.error)
 }

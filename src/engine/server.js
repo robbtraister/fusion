@@ -8,7 +8,7 @@ const Provider = require('../content/provider/server')
 const Template = (rendering) => {
   return <html>
     <head>
-      {!rendering.options.hydrated &&
+      {!rendering.hydrated &&
         <noscript>
           <meta httpEquiv='refresh' content='0; url=?noscript' />
         </noscript>
@@ -29,7 +29,7 @@ const Template = (rendering) => {
     </head>
     <body>
       <div id='App'>
-        {rendering.options.hydrated &&
+        {rendering.hydrated &&
           <Provider fetch={rendering.fetch.bind(rendering)} cache={rendering.options.includeScripts && rendering.cache}>
             <rendering.component {...rendering.content} />
           </Provider>

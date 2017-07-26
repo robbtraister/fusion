@@ -83,10 +83,17 @@ http {
     sendfile           on;
     sendfile_max_chunk 1m;
 
-    location / {
+    location @render {
       access_log off;
       etag off;
       proxy_pass http://0.0.0.0:8080;
+    }
+
+    location / {
+      access_log off;
+      etag off;
+      root ../renderings;
+      try_files /\$uri.html @render;
     }
 
     location /favicon.ico {

@@ -65,8 +65,8 @@ Rendering.prototype.render = function () {
     : engine(this)
 }
 
-function content (uri, options) {
-  return new Rendering(uri, options)
+function content (uri) {
+  return new Rendering(uri, { includeScripts: false })
     .hydrate()
     .then(data => data.content())
 }
@@ -81,7 +81,7 @@ module.exports.content = content
 module.exports.render = render
 
 if (module === require.main) {
-  render(process.argv[2] || '/', { hydrated: true, includeScripts: true })
+  render(process.argv[2] || '/', { hydrate: true, includeScripts: true })
     .then(console.log)
     .then(console.error)
 }

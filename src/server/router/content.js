@@ -15,7 +15,7 @@ function router () {
     debug('Content URI:', uri)
 
     if (req.query.all === 'true') {
-      Render.content(uri, { includeScripts: true })
+      Render.content(uri)
         .then(res.send.bind(res))
     } else {
       Content.fetch(uri)

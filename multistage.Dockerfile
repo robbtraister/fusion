@@ -83,11 +83,13 @@ RUN \
           ./proxy/tmp/proxy \
           ./proxy/tmp/scgi \
           ./proxy/tmp/uwsgi \
+          ./renderings \
           && \
     ln -sf /dev/stdout ./proxy/logs/access.log && \
     ln -sf /dev/stdout ./proxy/logs/error.log && \
     chown -R ${USER}:${USER} \
-          ./proxy
+          ./proxy \
+          ./renderings
 
 USER ${USER}
 

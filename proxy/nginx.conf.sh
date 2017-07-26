@@ -93,6 +93,11 @@ http {
       access_log off;
       etag off;
       root ../renderings;
+
+      location = / {
+        try_files /index.html @render;
+      }
+
       try_files /\$uri.html @render;
     }
 

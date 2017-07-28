@@ -1,23 +1,25 @@
 'use strict'
 
 const debug = require('debug')(`fusion:render:${process.pid}`)
+
 const express = require('express')
 
+const Cache = require('../controllers/cache')
 const Render = require('../controllers/render')
+
+function hasQueryParam (query, q) {
+  return query.hasOwnProperty(q) && ['false', '0'].indexOf(query[q]) < 0
+}
 
 function getRenderingOptions (query) {
   debug('query:', query)
 
-  function hasQueryParam (q) {
-    return query.hasOwnProperty(q) && ['false', '0'].indexOf(query[q]) < 0
-  }
-
-  if (hasQueryParam('norender')) {
+  if (hasQueryParam(query, 'norender')) {
     return {
       hydrate: false,
       includeScripts: true
     }
-  } else if (hasQueryParam('noscript')) {
+  } else if (hasQueryParam(query, 'noscript')) {
     return {
       hydrate: true,
       includeScripts: false
@@ -30,25 +32,56 @@ function getRenderingOptions (query) {
   }
 }
 
-function router () {
+function errHandler (err, next) {
+  next({
+    status: 500,
+    message: err.message,
+    stack: err.stack
+  })
+}
+
+function clear () {
   let router = express.Router()
 
-  router.use((req, res, next) => {
-    function errHandler (err) {
-      next({
-        status: 500,
-        message: err.message,
-        stack: err.stack
-      })
-    }
-
-    Render(req.path, getRenderingOptions(req.query))
-      .then(res.send.bind(res))
-      .catch(errHandler)
-  })
+  router.route('*')
+    .post((req, res, next) => {
+      Cache.clear(req.query.uri)
+        .then(res.send.bind(res))
+        .catch(err => {
+          if (err.code === 'ENOENT') {
+            res.sendStatus(404)
+          } else {
+            errHandler(err, next)
+          }
+        })
+    })
+    .get((req, res, next) => {
+      res.sendStatus(405)
+    })
 
   return router
 }
 
-module.exports = router
-module.exports.router = router
+function render () {
+  return function renderMiddleware (req, res, next) {
+    let uri = req.path
+
+    Cache.read(uri)
+      .then(res.send.bind(res))
+      .catch(err => {
+        if (err.code === 'ENOENT') {
+          return Render(uri, getRenderingOptions(req.query))
+            .then(data => {
+              res.send(data)
+              Cache.write(uri, data)
+            })
+        } else {
+          errHandler(err, next)
+        }
+      })
+  }
+}
+
+module.exports = render
+module.exports.clear = clear
+module.exports.render = render

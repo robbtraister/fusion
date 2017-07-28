@@ -6,9 +6,6 @@ require('babel-core/register')
 
 const debug = require('debug')(`fusion:controllers:render:${process.pid}`)
 
-const fs = require('fs')
-const url = require('url')
-
 const Resolver = require('./resolver')
 const Content = require('./content')
 const Templates = require('./templates')
@@ -77,10 +74,6 @@ function content (uri) {
 function render (uri, options) {
   return new Rendering(uri, options)
     .render()
-    .then(src => {
-      fs.writeFile(`${__dirname}/../../../renderings/${url.parse(uri).pathname.replace(/^\/*/, '') || 'index'}.html`, src)
-      return src
-    })
 }
 
 module.exports = render

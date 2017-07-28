@@ -71,9 +71,15 @@ http {
 
   proxy_cache_path ./tmp/cache keys_zone=cache:10m levels=1:2 inactive=600s max_size=100m;
 
+  upstream renderer {
+    server 0.0.0.0:8080;
+  }
+
   server {
     listen ${NGINX_PORT} default_server;
     server_name _;
+
+    etag on;
 
     proxy_cache cache;
     proxy_cache_lock on;
@@ -83,32 +89,29 @@ http {
     sendfile           on;
     sendfile_max_chunk 1m;
 
-    location @render {
+    location /favicon.ico {
+      root ../resources;
+      expires ${CACHE_MAX_AGE:-0};
+    }
+
+    location @renderer {
       access_log off;
-      etag off;
-      proxy_pass http://0.0.0.0:8080;
+      proxy_pass http://renderer;
     }
 
     location / {
-      access_log off;
-      etag off;
       root ../renderings;
+      expires ${CACHE_MAX_AGE:-0};
 
       location = / {
-        try_files /index.html @render;
+        try_files /index.html @renderer;
       }
 
-      try_files /\$uri.html @render;
-    }
-
-    location /favicon.ico {
-      root ../resources;
-      etag on;
+      try_files /\$uri.html @renderer;
     }
 
     location ~ ^/_/assets/(.*) {
       root ..;
-      etag on;
       expires ${CACHE_MAX_AGE:-0};
       try_files /dist/\$1 /resources/\$1 =404;
     }

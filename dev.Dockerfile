@@ -26,7 +26,7 @@ COPY components ./components
 COPY templates ./templates
 COPY src ./src
 
-COPY Consumer ./node_modules/Consumer
+COPY consumer ./node_modules/consumer
 
 RUN \
     npm run test && \

@@ -1,9 +1,11 @@
 'use strict'
 
+const childProcess = require('child_process')
 const fs = require('fs')
+const path = require('path')
 const url = require('url')
 
-const CACHE_DIR = `${__dirname}/../../../renderings`
+const CACHE_ROOT = `${__dirname}/../../../renderings`
 
 function clear (uri) {
   return new Promise((resolve, reject) => {
@@ -14,7 +16,12 @@ function clear (uri) {
 }
 
 function file (uri) {
-  return `${CACHE_DIR}/${url.parse(uri).pathname.replace(/^\/*/, '') || 'index'}.html`
+  let pieces = url.parse(uri, true)
+  let base = pieces.pathname.replace(/^\/*/, '')
+  let outputType = pieces.query.outputType || 'default'
+  let experiment = pieces.query.experiment || 'index'
+
+  return `${CACHE_ROOT}/${base}/${outputType}/${experiment}.html`
 }
 
 function read (uri) {
@@ -27,8 +34,15 @@ function read (uri) {
 
 function write (uri, data) {
   return new Promise((resolve, reject) => {
-    fs.writeFile(file(uri), data, err => {
-      err ? reject(err) : resolve()
+    let target = file(uri)
+    childProcess.exec(`mkdir -p ${path.dirname(target)}`, (err) => {
+      if (err) {
+        reject(err)
+      } else {
+        fs.writeFile(file(uri), data, err => {
+          err ? reject(err) : resolve()
+        })
+      }
     })
   })
 }

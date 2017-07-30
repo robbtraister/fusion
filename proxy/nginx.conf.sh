@@ -69,6 +69,16 @@ http {
     default 1;
   }
 
+  map \$arg_outputType \$output_type {
+    "" "default";
+    default \$arg_outputType;
+  }
+
+  map \$arg_experiment \$file_name {
+    "" "index";
+    default \$arg_experiment;
+  }
+
   proxy_cache_path ./tmp/cache keys_zone=cache:10m levels=1:2 inactive=600s max_size=100m;
 
   upstream renderer {
@@ -100,19 +110,31 @@ http {
     }
 
     location / {
-      root ../renderings;
       expires ${CACHE_MAX_AGE:-0};
 
-      location = / {
-        try_files /index.html @renderer;
+      location ~ (.*?)\.html?\$ {
+        absolute_redirect off;
+        return 302 \$1\$is_args\$args;
       }
 
-      try_files /\$uri.html @renderer;
+      rewrite ^/?\$ /homepage break;
+
+      root ../renderings;
+      try_files \$uri/\$output_type/\$file_name.html @renderer;
+
+      # proxy_pass http://cache-bucket.s3.amazonaws.com/\$uri/\$output_type/\$file_name.html;
+      # error_page 403 404 = @renderer;
+    }
+
+    location /_ {
+      access_log off;
+      proxy_pass http://renderer;
     }
 
     location ~ ^/_/assets/(.*) {
-      root ..;
       expires ${CACHE_MAX_AGE:-0};
+
+      root ..;
       try_files /dist/\$1 /resources/\$1 =404;
     }
   }

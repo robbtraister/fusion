@@ -64,7 +64,7 @@ function clear () {
 
 function render () {
   return function renderMiddleware (req, res, next) {
-    let uri = req.path
+    let uri = req.url
 
     Cache.read(uri)
       .then(res.send.bind(res))

@@ -20,9 +20,10 @@ function contentURI (uri) {
 }
 
 function templateName (uri) {
+  let p = url.parse(uri).pathname.replace(/\.html?$/, '')
   let templateName = 'Article'
   debug('template uri:', uri)
-  if (/^\/(homepage\/?)?$/i.test(uri.replace(/\.html?$/, ''))) {
+  if (/^\/(homepage\/?)?$/i.test(p)) {
     templateName = 'Homepage'
   } else if (/^\/section(\/|$)/.test(uri)) {
     templateName = 'Section'

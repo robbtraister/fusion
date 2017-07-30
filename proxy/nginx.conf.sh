@@ -131,11 +131,13 @@ http {
       proxy_pass http://renderer;
     }
 
-    location ~ ^/_/assets/(.*) {
+    location /_/assets {
       expires ${CACHE_MAX_AGE:-0};
 
+      rewrite ^/_/assets/(.*) \$1 break;
+
       root ..;
-      try_files /dist/\$1 /resources/\$1 =404;
+      try_files /dist/\$uri /resources/\$uri =404;
     }
   }
 }

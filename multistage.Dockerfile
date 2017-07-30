@@ -93,4 +93,4 @@ RUN \
 
 USER ${USER}
 
-CMD ./proxy/run.sh && node src/server/cluster
+CMD node src/server/cluster & ./proxy/run.sh

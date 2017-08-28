@@ -13,12 +13,12 @@ class Provider extends React.Component {
 
   render () {
     if (this.props.cache) {
-      return E('div', {}, Array.prototype.concat(
+      return E('div', {},
         E('script', {dangerouslySetInnerHTML: { __html: `var contentCache=${JSON.stringify(this.props.cache)}` }}),
         this.props.children
-      ))
+      )
     } else {
-      return super.render()
+      return this.props.children
     }
   }
 }

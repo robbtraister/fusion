@@ -1,0 +1,60 @@
+#!/usr/bin/env node
+
+'use strict'
+
+// const debug = require('debug')(`app:index:${process.pid}`)
+const express = require('express')
+const logger = require('winston')
+const morgan = require('morgan')
+
+const hbs = require('./engines/hbs')
+const jsx = require('./engines/jsx')
+const vue = require('./engines/vue')
+
+function server (port) {
+  const app = express()
+
+  app.enable('trust proxy')
+  app.disable('x-powered-by')
+
+  // Enable templating engines
+  app.engine('.hbs', hbs({extname: '.hbs', layoutsDir: `${__dirname}/../assets/layouts`, defaultLayout: 'layout'}))
+  app.engine('.jsx', jsx({extname: '.jsx', layoutsDir: `${__dirname}/../assets/layouts`, defaultLayout: 'layout'}))
+  app.engine('.vue', vue({extname: '.vue'}))
+  app.set('view engine', '.hbs')
+  app.set('views', `${__dirname}/../assets/templates`)
+
+  app.use(morgan('dev', {
+    stream: {
+      write: log => logger.info(log.replace(/\s+$/, ''))
+    }
+  }))
+
+  app.use(require('compression')())
+
+  app.use(require('./router')())
+
+  app.use((err, req, res, next) => {
+    res.status(500).send(/^prod/i.test(process.env.NODE_ENV) ? '' : err)
+    logger.error(err)
+  })
+
+  app.use((req, res, next) => {
+    res.sendStatus(404)
+  })
+
+  port = port || process.env.PORT || 8080
+  return app.listen(port, err => {
+    if (err) {
+      logger.error(err)
+    } else {
+      logger.info(`Listening on port: ${port}`)
+    }
+  })
+}
+
+module.exports = server
+
+if (module === require.main) {
+  server()
+}

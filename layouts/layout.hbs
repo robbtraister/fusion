@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="/_assets/engine.js" defer="defer"></script>
+    <script src="/_template{{ uri }}" onerror="notFound()" defer="defer"></script>
+
+    <title>{{# if title }}{{ title }}{{ else }}Handlebars Layout{{/ if }}</title>
+
+    <!-- <link rel="icon" type="image/png" sizes="96x96" href="/_assets/favicon-96x96.png" /> -->
+    <!-- <link rel="icon" type="image/png" sizes="32x32" href="/_assets/favicon-32x32.png" /> /-->
+    <!-- <link rel="icon" type="image/png" sizes="16x16" href="/_assets/favicon-16x16.png" /> /-->
+    <!-- <link rel="stylesheet" type="text/css" href="/_assets/style.css" /> /-->
+  </head>
+  <body>
+    <div id="App">
+      {{{ body }}}
+    </div>
+
+    <script src="/_content{{ uri }}?f=render" onerror="notFound()" defer="defer"></script>
+  </body>
+</html>

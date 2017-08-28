@@ -70,9 +70,9 @@ WORKDIR /app
 COPY package.json ./
 
 COPY --from=modules /workdir/node_modules ./node_modules
-COPY --from=client /workdir/dist ./assets
-COPY --from=layouts /workdir/dist ./assets/layouts
-COPY --from=templates /workdir/dist ./assets/templates
+COPY --from=client /workdir/dist ./dist
+COPY --from=layouts /workdir/dist/layouts ./dist/layouts
+COPY --from=templates /workdir/dist/templates ./dist/templates
 COPY server ./server
 
-CMD $(node -e "console.log(require('./package.json').scripts.start || 'node .')")
+CMD node server/cluster

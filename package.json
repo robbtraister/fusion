@@ -4,11 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "webpack",
-    "build:dev": "webpack",
     "build:prod": "NODE_ENV=production webpack -p",
+    "build:dev:client": "webpack --watch --config webpack.client.js",
+    "build:dev:templates": "webpack --watch --config webpack.templates.js",
     "start": "node server",
-    "start:dev": "node server",
+    "start:dev": "node --inspect=9229 server",
     "start:prod": "node server/cluster",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -23,6 +23,8 @@
     "morgan": "^1.8.2",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
+    "request": "^2.81.0",
+    "request-promise-native": "^1.0.4",
     "source-map-support": "^0.4.16",
     "vue": "^2.4.2",
     "vue-server-renderer": "^2.4.2",

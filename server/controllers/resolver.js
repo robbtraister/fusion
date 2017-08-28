@@ -3,7 +3,7 @@
 const Content = require('./content')
 const Template = require('./template')
 
-function resolver (uri) {
+function Resolver (uri) {
   const content = Content(uri)
   const template = Template(uri)
 
@@ -19,4 +19,4 @@ function resolver (uri) {
   return resolver
 }
 
-module.exports = resolver
+module.exports = Resolver

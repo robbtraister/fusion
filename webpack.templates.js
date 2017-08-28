@@ -19,7 +19,7 @@ function config (Type) {
 
   const entries = {}
   glob.sync(`./${types}/**/*.{jsx,vue}`)
-    .forEach(v => { entries[path.parse(v).base] = v })
+    .forEach(f => { entries[path.parse(f).base] = f })
 
   return Object.keys(entries).length
     ? {
@@ -27,7 +27,7 @@ function config (Type) {
       externals: excludeLibs,
       output: {
         filename: '[name]',
-        path: path.resolve(__dirname, 'dist')
+        path: path.resolve(__dirname, 'dist', types)
         // libraryTarget: 'commonjs2'
       },
       module: {

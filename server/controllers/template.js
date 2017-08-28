@@ -1,5 +1,5 @@
 'use strict'
 
-const template = uri => Promise.resolve('template.jsx')
+const Template = uri => Promise.resolve('template.jsx')
 
-module.exports = template
+module.exports = Template

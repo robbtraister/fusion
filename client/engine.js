@@ -5,9 +5,14 @@
 const React = require('react')
 const ReactDOM = require('react-dom')
 
+const Provider = require('./provider')
+const fetcher = require('./fetcher')()
+
 window.render = props => {
   ReactDOM.render(
-    <Template {...props} />,
+    <Provider fetch={fetcher.fetch}>
+      <Template {...props} />
+    </Provider>,
     document.getElementById('App')
   )
 }

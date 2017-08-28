@@ -18,11 +18,11 @@ function server (port) {
   app.disable('x-powered-by')
 
   // Enable templating engines
-  app.engine('.hbs', hbs({extname: '.hbs', layoutsDir: `${__dirname}/../assets/layouts`, defaultLayout: 'layout'}))
-  app.engine('.jsx', jsx({extname: '.jsx', layoutsDir: `${__dirname}/../assets/layouts`, defaultLayout: 'layout'}))
+  app.engine('.hbs', hbs({extname: '.hbs', layoutsDir: `${__dirname}/../dist/layouts`, defaultLayout: 'layout'}))
+  app.engine('.jsx', jsx({extname: '.jsx', layoutsDir: `${__dirname}/../dist/layouts`, defaultLayout: 'layout'}))
   app.engine('.vue', vue({extname: '.vue'}))
   app.set('view engine', '.hbs')
-  app.set('views', `${__dirname}/../assets/templates`)
+  app.set('views', `${__dirname}/../dist/templates`)
 
   app.use(morgan('dev', {
     stream: {

@@ -3,14 +3,10 @@
 const path = require('path')
 
 // Components/Templates bundles do not include react lib; must expose it globally
-const React = global.react = require('react')
-const E = React.createElement
+global.react = require('react')
 const renderer = require('react-dom/server')
 
-const fetcher = require('./fetcher')
 const Provider = require('./provider')
-
-const Wrapper = Component => props => E(Provider, fetcher(), E(Component, props, null))
 
 const load = /^prod/i.test(process.env.NODE_ENV)
   ? fp => require(path.resolve(fp))
@@ -20,22 +16,33 @@ const load = /^prod/i.test(process.env.NODE_ENV)
     return require(fp)
   }
 
-module.exports = options => function (fp, data, cb) {
-  try {
-    const Template = Wrapper(load(fp))
+const render = component => `<!DOCTYPE html>${renderer.renderToStaticMarkup(component)}`
 
-    const layout = (data.layout || options.defaultLayout)
-    let rendering = null
-    if (layout) {
-      const viewsDir = data.settings && data.settings.views
-      const layoutTemplate = load(path.join(options.layoutsDir || viewsDir || '.', `${layout}.jsx`))
-      rendering = layoutTemplate(Template)(data)
-    } else {
-      rendering = Template(data)
+module.exports = options => {
+  return (templateFile, props, cb) => {
+    try {
+      let Component = Provider(load(templateFile))
+      const contentCache = Component.cache
+
+      const layoutName = (props.layout || options.defaultLayout)
+      if (layoutName) {
+        const viewsDir = props.settings && props.settings.views
+        const Layout = load(path.join(options.layoutsDir || viewsDir || '.', `${layoutName}.jsx`))
+        Component = Layout(Component)
+      }
+
+      const component = Component(props)
+      const html = render(component)
+
+      const cacheKeys = Object.keys(contentCache)
+      if (cacheKeys && cacheKeys.length > 0) {
+        Promise.all(cacheKeys.map(k => contentCache[k]))
+          .then(() => cb(null, render(component)))
+      } else {
+        cb(null, html)
+      }
+    } catch (e) {
+      cb(e)
     }
-
-    cb(null, `<!DOCTYPE html>${renderer.renderToStaticMarkup(rendering)}`)
-  } catch (e) {
-    cb(e)
   }
 }

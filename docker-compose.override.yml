@@ -4,6 +4,8 @@ services:
     build:
       context: .
       dockerfile: dev.Dockerfile
+    environment:
+      NODE_ENV: dev
     ports:
       - "9229:9229"
     volumes:

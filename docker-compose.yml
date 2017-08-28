@@ -4,5 +4,7 @@ services:
     build:
       context: .
       dockerfile: prod.Dockerfile
+    environment:
+      NODE_ENV: prod
     ports:
       - "80:8080"

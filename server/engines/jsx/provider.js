@@ -4,6 +4,8 @@ const React = require('react')
 const E = React.createElement
 const PropTypes = require('prop-types')
 
+const Fetcher = require('./fetcher')
+
 class Provider extends React.Component {
   getChildContext () {
     return {
@@ -27,4 +29,9 @@ Provider.childContextTypes = {
   fetch: PropTypes.func
 }
 
-module.exports = Provider
+module.exports = Template => {
+  const fetcher = Fetcher()
+  const wrapper = props => E(Provider, fetcher, E(Template, props, null))
+  wrapper.cache = fetcher.cache
+  return wrapper
+}

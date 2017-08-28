@@ -12,8 +12,11 @@ function router () {
     Content(req.path)
       .then(content => {
         if (content) {
-          const f = req.query.f || 'f'
-          res.send(`${f}(${JSON.stringify(content)})`)
+          if (req.query.f) {
+            res.send(`${req.query.f}(${JSON.stringify(content)})`)
+          } else {
+            res.send(content)
+          }
         } else {
           res.sendStatus(404)
         }

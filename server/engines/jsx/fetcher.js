@@ -2,7 +2,8 @@
 
 const request = require('request-promise-native')
 
-function fetcher () {
+function fetcher (precache) {
+  precache = precache || {}
   const cache = {}
 
   function fetch (uri, component, asyncOnly) {
@@ -14,8 +15,8 @@ function fetcher () {
       } else {
         // don't add global content to the cache unless a component requests it
         cache[uri] = (
-          (uri === this.contentURI)
-          ? this.content
+          (uri in precache)
+          ? precache[uri]
           : request({
             uri: `http://0.0.0.0:8080${uri}`,
             json: true

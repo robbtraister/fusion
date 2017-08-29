@@ -2,7 +2,7 @@
 
 /* global contentCache */
 
-function fetcher () {
+function Fetcher () {
   const cache = {}
 
   function fetch (uri, component) {
@@ -21,4 +21,4 @@ function fetcher () {
   }
 }
 
-module.exports = fetcher
+module.exports = Fetcher

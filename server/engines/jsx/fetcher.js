@@ -2,7 +2,7 @@
 
 const request = require('request-promise-native')
 
-function fetcher (precache) {
+function Fetcher (precache) {
   precache = precache || {}
   const cache = {}
 
@@ -18,7 +18,7 @@ function fetcher (precache) {
           (uri in precache)
           ? precache[uri]
           : request({
-            uri: `http://0.0.0.0:8080${uri}`,
+            uri: `http://${process.env.CONTENT_HOST || `0.0.0.0:${process.env.PORT || 8080}`}${uri}`,
             json: true
           })
         ).then(json => { cache[uri] = json })
@@ -33,4 +33,4 @@ function fetcher (precache) {
   }
 }
 
-module.exports = fetcher
+module.exports = Fetcher

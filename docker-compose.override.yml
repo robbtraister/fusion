@@ -1,15 +1,10 @@
 version: "3"
 services:
-  node:
+  renderer:
     build:
-      context: .
       dockerfile: dev.Dockerfile
-    environment:
-      NODE_ENV: dev
+    image: fusion/renderer-dev
     ports:
       - "9229:9229"
-    volumes:
-      - "./client:/workdir/client"
-      - "./layouts:/workdir/layouts"
-      - "./templates:/workdir/templates"
-      - "./server:/workdir/server"
+    environment:
+      NODE_ENV: dev

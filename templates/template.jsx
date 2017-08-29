@@ -7,7 +7,8 @@ const Test = require('./components/test.jsx')
 const Template = props => {
   return <div id='body'>
     {props.body || 'React Body'}
-    <Test />
+    <Test content='/_content/sync' />
+    <Test async content='/_content/async' />
   </div>
 }
 

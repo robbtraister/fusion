@@ -6,11 +6,11 @@ const Consumer = require('./consumer')
 class Test extends React.Component {
   constructor (props) {
     super(props)
-    this.fetch(`/_content/test-component`)
+    this.fetch(props.content || `/_content/test-component`, props.async)
   }
 
   render () {
-    return <div>{this.state.body}</div>
+    return <div is uri={this.props.content}>{this.state.body}</div>
   }
 }
 

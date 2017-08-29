@@ -5,12 +5,14 @@
   "main": "index.js",
   "scripts": {
     "build:prod": "NODE_ENV=production webpack -p",
-    "build:dev:client": "webpack --watch --config webpack.client.js",
-    "build:dev:templates": "webpack --watch --config webpack.templates.js",
+    "build:dev:client": "webpack --config webpack.client.js",
+    "build:dev:templates": "webpack --config webpack.templates.js",
     "start": "node server",
     "start:dev": "node --inspect=9229 server",
     "start:prod": "node server/cluster",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch:client": "webpack --watch --config webpack.client.js",
+    "watch:templates": "webpack --watch --config webpack.templates.js"
   },
   "keywords": [],
   "author": "",

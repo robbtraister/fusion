@@ -12,10 +12,13 @@ WORKDIR /workdir
 COPY package*.json ./
 RUN npm install
 
-COPY .babelrc ./
-COPY webpack.*.js ./
+COPY . ./
+
+RUN \
+    npm run build:dev:client && \
+    npm run build:dev:templates
 
 CMD \
-    npm run build:dev:client & \
-    npm run build:dev:templates & \
+    npm run watch:client & \
+    npm run watch:templates & \
     npm run start:dev

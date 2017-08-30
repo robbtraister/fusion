@@ -11,7 +11,6 @@ const morgan = require('morgan')
 
 const hbs = require('./engines/hbs')
 const jsx = require('./engines/jsx')
-const vue = require('./engines/vue')
 
 function server (port) {
   const router = /^prod/i.test(process.env.NODE_ENV)
@@ -32,7 +31,6 @@ function server (port) {
   // Enable templating engines
   app.engine('.hbs', hbs({extname: '.hbs', layoutsDir: `${__dirname}/../dist/layouts`, defaultLayout: 'layout'}))
   app.engine('.jsx', jsx({extname: '.jsx', layoutsDir: `${__dirname}/../dist/layouts`, defaultLayout: 'layout'}))
-  app.engine('.vue', vue({extname: '.vue'}))
   app.set('view engine', '.hbs')
   app.set('views', `${__dirname}/../dist/templates`)
 

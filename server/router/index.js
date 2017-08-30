@@ -6,7 +6,7 @@ const express = require('express')
 // const Template = require('../controllers/template')
 const Resolver = require('../controllers/resolver')
 
-const Render = (template, status) => data => (req, res, next) => {
+const render = (template, status) => data => (req, res, next) => {
   if (status) {
     res.status(status)
   }
@@ -30,21 +30,17 @@ function router () {
   router.use('/_content', require('./content')())
   router.use('/_template', require('./template')())
 
-  // router.get('/hbs', render('template.hbs')())
-  // router.get('/jsx', render('template.jsx')())
-  // router.get('/vue', render('template.vue')())
-
   router.get('*', (req, res, next) => {
     Resolver(req.path)
       .then(data => {
         data.content
-          ? Render(data.template)(data.content)(req, res, next)
+          ? render(data.template)(data.content)(req, res, next)
           : next()
       })
       .catch(next)
   })
 
-  router.get('*', Render('404.jsx', 404)())
+  router.get('*', render('404.jsx', 404)())
 
   return router
 }

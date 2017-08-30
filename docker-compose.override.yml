@@ -6,5 +6,11 @@ services:
     image: fusion/renderer-dev
     ports:
       - "9229:9229"
+    volumes:
+      - "./client:/workdir/client"
+      - "./components:/workdir/components"
+      - "./layouts:/workdir/layouts"
+      - "./server:/workdir/server"
+      - "./templates:/workdir/templates"
     environment:
       NODE_ENV: dev

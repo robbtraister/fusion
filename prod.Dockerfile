@@ -42,6 +42,7 @@ RUN npm run build:prod
 FROM bundler AS templates
 
 COPY webpack.templates.js webpack.config.js
+COPY components ./components
 COPY templates ./templates
 
 RUN npm run build:prod

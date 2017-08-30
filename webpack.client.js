@@ -15,11 +15,11 @@ const resolvePreact = {
 module.exports = [
   {
     entry: {
-      engine: './client/engine.js'
+      engine: './client/react/engine.js'
     },
     output: {
       filename: '[name].js',
-      path: path.resolve(__dirname, 'dist')
+      path: path.resolve(__dirname, 'dist', 'react')
     },
     resolve: /^prod/i.test(process.env.NODE_ENV) ? resolvePreact : {},
     module: {

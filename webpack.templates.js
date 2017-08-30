@@ -14,6 +14,17 @@ function excludeLibs (context, request, callback) {
   callback()
 }
 
+// if consumer is not found, attempt to build without it
+let resolveConsumer = {}
+try {
+  resolveConsumer = {
+    extensions: ['.js', '.jsx'],
+    alias: {
+      'consumer': require.resolve('./components/consumer')
+    }
+  }
+} catch (e) {}
+
 function config (Type) {
   const types = `${Type.toLowerCase()}s`
 
@@ -30,6 +41,7 @@ function config (Type) {
         path: path.resolve(__dirname, 'dist', types)
         // libraryTarget: 'commonjs2'
       },
+      resolve: resolveConsumer,
       module: {
         loaders: [
           {

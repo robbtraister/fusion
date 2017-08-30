@@ -5,7 +5,7 @@ const React = require('react')
 const Layout = Component => props => {
   return <html>
     <head>
-      <script src='/_assets/engine.js' defer='defer' />
+      <script src='/_assets/react/engine.js' defer='defer' />
       <script src={`/_template${props.uri}`} is onerror='notFound()' defer='defer' />
       <script src={`/_content${props.uri}?v=content`} is onerror='notFound()' defer='defer' />
 

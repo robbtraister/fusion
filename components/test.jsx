@@ -1,7 +1,7 @@
 'use strict'
 
 const React = require('react')
-const Consumer = require('./consumer')
+const Consumer = require('consumer')
 
 class Test extends React.Component {
   constructor (props) {

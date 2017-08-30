@@ -2,15 +2,15 @@
 
 const path = require('path')
 
-// const CopyWebpackPlugin = require('copy-webpack-plugin')
-
-const resolvePreact = {
-  extensions: ['.js', '.jsx'],
-  alias: {
-    react: 'preact-compat',
-    'react-dom': 'preact-compat'
+const resolvePreact = /^prod/i.test(process.env.NODE_ENV)
+  ? {
+    extensions: ['.js', '.jsx'],
+    alias: {
+      react: 'preact-compat',
+      'react-dom': 'preact-compat'
+    }
   }
-}
+  : {}
 
 module.exports = [
   {
@@ -21,7 +21,7 @@ module.exports = [
       filename: '[name].js',
       path: path.resolve(__dirname, 'dist', 'react')
     },
-    resolve: /^prod/i.test(process.env.NODE_ENV) ? resolvePreact : {},
+    resolve: resolvePreact,
     module: {
       loaders: [
         {

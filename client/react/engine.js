@@ -1,6 +1,6 @@
 'use strict'
 
-/* global Template */
+/* global Template, window */
 
 const React = require('react')
 const ReactDOM = require('react-dom')

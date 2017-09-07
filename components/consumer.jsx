@@ -9,6 +9,10 @@ function Consumer (Component) {
       super(props, context)
 
       class ConsumerComponent extends Component {
+        get uri () {
+          return context.uri
+        }
+
         async (uri) {
           this.fetch(uri, true)
         }
@@ -29,6 +33,7 @@ function Consumer (Component) {
   }
 
   ContextWrapper.contextTypes = {
+    uri: PropTypes.string,
     fetch: PropTypes.func
   }
 

@@ -10,7 +10,7 @@ class Test extends React.Component {
   }
 
   render () {
-    return <div is uri={this.props.content}>{this.state.body}</div>
+    return <div>{this.state.body}</div>
   }
 }
 

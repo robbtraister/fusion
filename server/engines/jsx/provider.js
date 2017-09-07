@@ -9,6 +9,7 @@ const Fetcher = require('./fetcher')
 class Provider extends React.Component {
   getChildContext () {
     return {
+      uri: this.props.uri,
       fetch: this.props.fetch
     }
   }
@@ -26,12 +27,13 @@ class Provider extends React.Component {
 }
 
 Provider.childContextTypes = {
+  uri: PropTypes.string,
   fetch: PropTypes.func
 }
 
 module.exports = Template => {
   const fetcher = Fetcher()
-  const wrapper = props => E(Provider, fetcher, E(Template, props, null))
+  const wrapper = props => E(Provider, Object.assign(fetcher, {uri: props.uri}), E(Template, props, null))
   wrapper.cache = fetcher.cache
   return wrapper
 }

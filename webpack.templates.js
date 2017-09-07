@@ -20,7 +20,7 @@ try {
   resolveConsumer = {
     extensions: ['.js', '.jsx'],
     alias: {
-      'consumer': require.resolve('./components/consumer')
+      'consumer': require.resolve('./components/consumer.jsx')
     }
   }
 } catch (e) {}

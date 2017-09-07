@@ -1,5 +1,5 @@
 'use strict'
 
-const Template = uri => Promise.resolve(uri === '404' ? '404.jsx' : 'template.jsx')
+const Template = uri => Promise.resolve(uri === '/' ? 'homepage.jsx' : 'article.jsx')
 
 module.exports = Template

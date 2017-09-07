@@ -10,7 +10,8 @@ services:
       - "./client:/workdir/client"
       - "./components:/workdir/components"
       - "./layouts:/workdir/layouts"
+      - "./resources:/workdir/resources"
       - "./server:/workdir/server"
       - "./templates:/workdir/templates"
     environment:
-      NODE_ENV: dev
+      NODE_ENV: development

@@ -8,4 +8,4 @@ services:
     ports:
       - "80:8080"
     environment:
-      NODE_ENV: prod
+      NODE_ENV: production

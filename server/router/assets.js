@@ -6,6 +6,7 @@ function assets () {
   const router = express.Router()
 
   router.use(express.static(`${__dirname}/../../dist`))
+  router.use(express.static(`${__dirname}/../../resources`))
 
   router.use((req, res, next) => {
     res.sendStatus(404)

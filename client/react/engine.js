@@ -10,7 +10,7 @@ const fetcher = require('./fetcher')()
 
 window.render = props => {
   ReactDOM.render(
-    <Provider fetch={fetcher.fetch}>
+    <Provider fetch={fetcher.fetch} uri={window.location.pathname + window.location.search}>
       <Template {...props} />
     </Provider>,
     document.getElementById('App')

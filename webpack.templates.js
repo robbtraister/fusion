@@ -5,7 +5,7 @@ const path = require('path')
 const glob = require('glob')
 const webpack = require('webpack')
 
-const CopyWebpackPlugin = require('copy-webpack-plugin')
+// const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 function excludeLibs (context, request, callback) {
   if (request === 'react') {
@@ -29,8 +29,26 @@ function config (Type) {
   const types = `${Type.toLowerCase()}s`
 
   const entries = {}
-  glob.sync(`./${types}/**/*.{jsx,vue}`)
+  glob.sync(`./${types}/**/*.{hbs,jsx,vue}`)
     .forEach(f => { entries[path.parse(f).base] = f })
+
+  const plugins = [
+    new webpack.BannerPlugin({
+      banner: `var module=module||{};var ${Type}=module.exports=`,
+      raw: true,
+      entryOnly: true,
+      test: /\.(hbs|jsx?|vue)$/i
+    })
+    // new CopyWebpackPlugin([
+    //   {from: `./${types}/**/*.hbs`, to: '[name].[ext]'}
+    // ])
+  ]
+
+  if (/^prod/i.test(process.env.NODE_ENV)) {
+    plugins.push(new webpack.optimize.UglifyJsPlugin({
+      test: /\.(hbs|jsx?|vue)$/i
+    }))
+  }
 
   return Object.keys(entries).length
     ? {
@@ -45,30 +63,23 @@ function config (Type) {
       module: {
         loaders: [
           {
+            test: /\.hbs$/i,
+            exclude: /node_modules/,
+            loader: ['handlebars-loader']
+          },
+          {
             test: /\.jsx?$/i,
             exclude: /node_modules/,
             loader: ['babel-loader']
           },
           {
             test: /\.vue$/i,
+            exclude: /node_modules/,
             loader: ['vue-loader']
           }
         ]
       },
-      plugins: [
-        new webpack.BannerPlugin({
-          banner: `var module=module||{};var ${Type}=module.exports=`,
-          raw: true,
-          entryOnly: true,
-          test: /\.(jsx?|vue)$/i
-        }),
-        new CopyWebpackPlugin([
-          {from: `./${types}/**/*.hbs`, to: '[name].[ext]'}
-        ]),
-        new webpack.optimize.UglifyJsPlugin({
-          test: /\.jsx?$/
-        })
-      ]
+      plugins
     }
     : null
 }

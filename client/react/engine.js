@@ -13,14 +13,14 @@ window.render = props => {
     <Provider fetch={fetcher.fetch} uri={window.location.pathname + window.location.search}>
       <Template {...props} />
     </Provider>,
-    document.getElementById('App')
+    document.body
   )
 }
 
 window.notFound = () => {
   const noscript = document.getElementById('404')
   if (noscript) {
-    document.body.innerHTML = noscript.innerText
+    noscript.parentElement.innerHTML = noscript.innerText
   }
 }
 

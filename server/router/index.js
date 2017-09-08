@@ -2,6 +2,8 @@
 
 const express = require('express')
 
+const debug = require('debug')('server:router')
+
 // const Content = require('../controllers/content')
 // const Template = require('../controllers/template')
 const Resolver = require('../controllers/resolver')
@@ -30,9 +32,13 @@ function router () {
   router.use('/_content', require('./content')())
   router.use('/_template', require('./template')())
 
+  // send a 404 to verify it loads dynamically
+  router.get('/politics', render('404.jsx', 404)())
+
   router.get('*', (req, res, next) => {
     Resolver(req.path)
       .then(data => {
+        debug(data)
         data.content
           ? render(data.template)(data.content)(req, res, next)
           : next()

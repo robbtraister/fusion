@@ -2,16 +2,18 @@
 
 const React = require('react')
 
-const Body = require('../components/body.jsx')
-const Header = require('../components/header.jsx')
+const Body = require('../components/body')
+const Header = require('../components/header')
 
 const Template = props => {
-  return <div id='body'>
-    <Header />
-    <Body>
-      Homepage
-    </Body>
-  </div>
+  return (
+    <div>
+      <Header />
+      <Body>
+        Homepage
+      </Body>
+    </div>
+  )
 }
 
 module.exports = Template

@@ -1,5 +1,11 @@
 'use strict'
 
-const Template = uri => Promise.resolve(uri === '/' ? 'homepage.jsx' : 'article.jsx')
+const templates = {
+  '/': 'homepage.jsx',
+  '/sports': 'article.jsx',
+  '/hbs': '404.hbs'
+}
+
+const Template = uri => Promise.resolve(templates[uri] || 'simple.jsx')
 
 module.exports = Template

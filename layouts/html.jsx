@@ -19,9 +19,7 @@ const Layout = Component => props => {
       {/* <link rel='stylesheet' type='text/css' href='/_assets/style.css' /> */}
     </head>
     <body is onload='render(content)'>
-      <div id='App'>
-        {Component && <Component {...props} />}
-      </div>
+      {Component && <Component {...props} />}
     </body>
   </html>
 }

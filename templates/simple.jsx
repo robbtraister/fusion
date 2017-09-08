@@ -10,9 +10,7 @@ const Template = props => {
     <div>
       <Header />
       <Body>
-        <noscript id='404'>
-          <div>This page cannot be found</div>
-        </noscript>
+        {props.body}
       </Body>
     </div>
   )

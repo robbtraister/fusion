@@ -5,7 +5,10 @@ const React = require('react')
 const Layout = Component => props => {
   return <html>
     <head>
-      <title>{props.title || 'React Layout'}</title>
+      <title>{props.title || 'WaPo React'}</title>
+
+      <script src='/_assets/jquery/js/jquery-3.2.1.min.js' defer='defer' />
+      <script src='/_assets/bootstrap/js/bootstrap.min.js' defer='defer' />
 
       <script src='/_assets/react/engine.js' defer='defer' />
       <script src={`/_template${props.uri}`} is onerror='notFound()' defer='defer' />
@@ -19,7 +22,9 @@ const Layout = Component => props => {
       {/* <link rel='stylesheet' type='text/css' href='/_assets/style.css' /> */}
     </head>
     <body is onload='render(content)'>
-      {Component && <Component {...props} />}
+      <div id='App'>
+        {Component && <Component {...props} />}
+      </div>
     </body>
   </html>
 }

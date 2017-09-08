@@ -13,7 +13,7 @@ window.render = props => {
     <Provider fetch={fetcher.fetch} uri={window.location.pathname + window.location.search}>
       <Template {...props} />
     </Provider>,
-    document.body
+    document.getElementById('App')
   )
 }
 

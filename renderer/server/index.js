@@ -13,15 +13,15 @@ const hbs = require('./engines/hbs')
 const jsx = require('./engines/jsx')
 
 function server (port) {
-  const router = /^prod/i.test(process.env.NODE_ENV)
-    ? require('./router')
-    : () => {
+  const router = process.env.WATCH === 'true'
+    ? () => {
       require('shell-watcher').pipe({target: path.resolve('.')})
 
       return (req, res, next) => {
         require('./router')()(req, res, next)
       }
     }
+    : require('./router')
 
   const app = express()
 

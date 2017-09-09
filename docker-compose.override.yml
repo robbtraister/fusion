@@ -23,3 +23,4 @@ services:
       - "./renderer/templates:/renderer/templates:ro"
     environment:
       NODE_ENV: development
+      WATCH: "true"

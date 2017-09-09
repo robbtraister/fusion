@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cat <<EOF
+cat <<EOB
 daemon off;
 
 pid ./nginx.pid;
@@ -44,7 +44,6 @@ http {
   proxy_cache_background_update on;
   proxy_cache_use_stale error timeout updating;
   proxy_cache_valid any 60m;
-  proxy_cache cache;
 
   upstream _renderer {
     server ${TARGET};
@@ -53,6 +52,16 @@ http {
   server {
     listen ${PORT:-8080} default_server;
     server_name _;
+EOB
+
+if [ "$WATCH" != 'true' ]
+then
+cat <<EOB
+    proxy_cache cache;
+EOB
+fi
+
+cat <<EOB
 
     location ~ /_assets/(.*) {
       root .;
@@ -60,7 +69,6 @@ http {
     }
 
     location ~ /_(content|template) {
-      #return 404;
       proxy_pass http://_renderer;
     }
 
@@ -69,8 +77,8 @@ http {
     }
 
     location / {
-      try_files /abc @renderer;
+      try_files /__placeholder__ @renderer;
     }
   }
 }
-EOF
+EOB

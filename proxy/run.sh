@@ -34,7 +34,7 @@ watch() {
   done
 }
 
-if [ $WATCH == 'true' ]
+if [ "$WATCH" == 'true' ]
 then
   watch &
 fi

@@ -33,18 +33,18 @@ function router () {
   router.use('/_template', require('./template')())
 
   // send a 404 to verify it loads dynamically
-  router.get('/politics', render('404.jsx', 404)())
-
-  router.get('*', (req, res, next) => {
-    Resolver(req.path)
-      .then(data => {
-        debug(data)
-        data.content
-          ? render(data.template)(data.content)(req, res, next)
-          : next()
-      })
-      .catch(next)
-  })
+  // router.get('/politics', render('404.jsx', 404)())
+  //
+  // router.get('*', (req, res, next) => {
+  //   Resolver(req.path)
+  //     .then(data => {
+  //       debug(data)
+  //       data.content
+  //         ? render(data.template)(data.content)(req, res, next)
+  //         : next()
+  //     })
+  //     .catch(next)
+  // })
 
   router.get('*', render('404.jsx', 404)())
 

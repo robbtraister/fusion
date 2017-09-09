@@ -44,6 +44,11 @@ http {
   proxy_cache_background_update on;
   proxy_cache_use_stale error timeout updating;
   proxy_cache_valid any 60m;
+  proxy_cache cache;
+
+  upstream _renderer {
+    server ${TARGET};
+  }
 
   server {
     listen ${PORT:-8080} default_server;
@@ -54,9 +59,17 @@ http {
       try_files /dist/\$1 /resources/\$1 =404;
     }
 
+    location ~ /_(content|template) {
+      #return 404;
+      proxy_pass http://_renderer;
+    }
+
+    location @renderer {
+      proxy_pass http://_renderer;
+    }
+
     location / {
-      proxy_cache cache;
-      proxy_pass http://${TARGET};
+      try_files /abc @renderer;
     }
   }
 }

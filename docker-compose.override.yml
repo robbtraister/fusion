@@ -2,7 +2,10 @@ version: "3"
 services:
   proxy:
     volumes:
-      - "./proxy/tmp:/proxy/tmp"
+      - "./proxy/conf.d:/proxy/conf.d:ro"
+      - "./proxy/tmp:/proxy/tmp:rw"
+    environment:
+      WATCH: "true"
 
   renderer:
     build:

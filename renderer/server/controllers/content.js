@@ -1,5 +1,10 @@
 'use strict'
 
-const Content = uri => Promise.resolve(uri === '/404' ? null : {body: decodeURIComponent(uri.replace(/^\/+/, ''))})
+const content = {
+  '/404': null,
+  '/breaking-news': {content: null}
+}
+
+const Content = uri => Promise.resolve(uri in content ? content[uri] : {content: decodeURIComponent(uri.replace(/^\/+/, ''))})
 
 module.exports = Content

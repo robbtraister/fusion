@@ -9,7 +9,7 @@ const Article = props => (
         <div className='card-body'>
           <h3 className='card-title'>{props.title}</h3>
           <h6 className='card-subtitle'>by {props.author}</h6>
-          <p className='card-text'>{props.body}</p>
+          <p className='card-text'>{props.content}</p>
         </div>
       </div>
     </div>

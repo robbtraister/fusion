@@ -12,7 +12,7 @@ const Template = props => {
     <div>
       <Header />
       <Body>
-        <Article body={props.body || 'Homepage'} title='Article' author='abc' />
+        <Article content={props.content || 'Homepage'} title='Article' author='abc' />
         <Test content='/_content/sync' />
         <Test async content='/_content/async' />
       </Body>

@@ -8,7 +8,7 @@ const Consumer = require('consumer')
 class Breaking extends React.Component {
   constructor (props) {
     super(props)
-    this.async(props.content || `/_content/404`)
+    this.async(props.content || `/_content/breaking-news`)
   }
 
   componentDidMount () {
@@ -16,13 +16,13 @@ class Breaking extends React.Component {
   }
 
   render () {
-    return this.state && this.state.body
+    return this.state && this.state.content
       ? (
         <div className='alert alert-secondary alert-dismissible' role='alert'>
           <button type='button' className='close' data-dismiss='alert' aria-label='Close'>
             <span aria-hidden='true'>&times;</span>
           </button>
-          <strong>Breaking News:</strong> {this.state.body}
+          <strong>Breaking News:</strong> {this.state.content}
         </div>
       )
       : <div />

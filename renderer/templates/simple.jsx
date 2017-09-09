@@ -10,7 +10,7 @@ const Template = props => {
     <div>
       <Header />
       <Body>
-        {props.body}
+        {props.content}
       </Body>
     </div>
   )

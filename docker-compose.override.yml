@@ -1,18 +1,22 @@
 version: "3"
 services:
+  proxy:
+    volumes:
+      - "./proxy/tmp:/proxy/tmp"
+
   renderer:
     build:
+      context: ./renderer
       dockerfile: dev.Dockerfile
     image: fusion/renderer-dev
     ports:
       - "9229:9229"
     volumes:
-      - "./client:/workdir/client"
-      - "./components:/workdir/components"
-      - "./layouts:/workdir/layouts"
-      - "./proxy/cache:/workdir/proxy/cache"
-      - "./resources:/workdir/resources"
-      - "./server:/workdir/server"
-      - "./templates:/workdir/templates"
+      - "./renderer/client:/renderer/client:ro"
+      - "./renderer/components:/renderer/components:ro"
+      - "./renderer/layouts:/renderer/layouts:ro"
+      - "./renderer/resources:/renderer/resources:ro"
+      - "./renderer/server:/renderer/server:ro"
+      - "./renderer/templates:/renderer/templates:ro"
     environment:
       NODE_ENV: development

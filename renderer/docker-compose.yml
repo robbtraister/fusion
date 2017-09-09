@@ -1,0 +1,19 @@
+version: "3"
+services:
+  renderer:
+    build:
+      context: .
+      dockerfile: dev.Dockerfile
+    image: fusion/renderer-prod
+    ports:
+      - "80:8080"
+    volumes:
+      - "./client:/renderer/client:ro"
+      - "./components:/renderer/components:ro"
+      - "./layouts:/renderer/layouts:ro"
+      - "./resources:/renderer/resources:ro"
+      - "./server:/renderer/server:ro"
+      - "./templates:/renderer/templates:ro"
+    environment:
+      PORT: 8080
+      NODE_ENV: development

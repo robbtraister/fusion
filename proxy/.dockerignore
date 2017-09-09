@@ -1,0 +1,10 @@
+**/.DS_Store
+.docker*
+.git*
+
+Dockerfile
+*.Dockerfile
+docker-compose.yml
+docker-compose.override.yml
+
+**/tmp

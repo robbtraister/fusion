@@ -1,3 +1,6 @@
+#!/bin/sh
+
+cat <<EOF
 daemon off;
 
 pid ./nginx.pid;
@@ -24,8 +27,8 @@ http {
   error_log ./logs/error.log;
 
   include /etc/nginx/mime.types;
-  underscores_in_headers on;
-  default_type  application/octet-stream;
+  # underscores_in_headers on;
+  # default_type  application/octet-stream;
 
   gzip             on;
   gzip_comp_level  5;
@@ -36,24 +39,25 @@ http {
   # resolver {{ DNS_SERVER }};
   # statsd_server 172.17.0.1:8125;
 
-  proxy_cache_key $uri$is_args$args;
-  proxy_cache_path ./cache levels=1:2 keys_zone=cache:10m;
+  proxy_cache_key \$uri\$is_args\$args;
+  proxy_cache_path ./tmp/cache levels=1:2 keys_zone=cache:10m;
   proxy_cache_background_update on;
   proxy_cache_use_stale error timeout updating;
   proxy_cache_valid any 60m;
 
   server {
-    listen 8080 default_server;
+    listen ${PORT:-8080} default_server;
     server_name _;
 
     location ~ /_assets/(.*) {
-      root ..;
-      try_files /dist/$1 /resources/$1 =404;
+      root .;
+      try_files /dist/\$1 /resources/\$1 =404;
     }
 
     location / {
       proxy_cache cache;
-      proxy_pass http://0.0.0.0:8081;
+      proxy_pass http://${TARGET};
     }
   }
 }
+EOF

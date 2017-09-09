@@ -26,7 +26,9 @@ const render = (template, status) => data => (req, res, next) => {
 function router () {
   const router = express.Router()
 
-  // router.use('/_assets', require('./assets')())
+  if (!/^prod/i.test(process.env.NODE_ENV)) {
+    router.use('/_assets', require('./assets')())
+  }
   router.use('/_content', require('./content')())
   router.use('/_template', require('./template')())
 

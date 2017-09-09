@@ -1,11 +1,33 @@
 version: "3"
 services:
-  renderer:
+  proxy:
     build:
-      context: .
-      dockerfile: prod.Dockerfile
-    image: fusion/renderer-prod
+      context: ./proxy
+      dockerfile: Dockerfile
+    image: fusion/proxy
+    links:
+      - renderer
     ports:
       - "80:8080"
+    volumes:
+      - "fusion-dist-volume:/proxy/dist:ro"
+      - "fusion-resources-volume:/proxy/resources:ro"
     environment:
+      PORT: 8080
+      TARGET: renderer:8080
+
+  renderer:
+    build:
+      context: ./renderer
+      dockerfile: prod.Dockerfile
+    image: fusion/renderer-prod
+    volumes:
+      - "fusion-dist-volume:/renderer/dist:rw"
+      - "fusion-resources-volume:/renderer/resources:rw"
+    environment:
+      PORT: 8080
       NODE_ENV: production
+
+volumes:
+  fusion-dist-volume: {}
+  fusion-resources-volume: {}

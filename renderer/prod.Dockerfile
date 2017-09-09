@@ -61,14 +61,12 @@ RUN \
     apk update && \
     apk upgrade && \
     apk add --no-cache \
-            nginx \
             nodejs \
             && \
-    nginx -v && \
     node -v && \
     rm -rf /var/cache/apk/*
 
-WORKDIR /app
+WORKDIR /renderer
 
 COPY package.json ./
 
@@ -76,21 +74,7 @@ COPY --from=modules /workdir/node_modules ./node_modules
 COPY --from=client /workdir/dist ./dist
 COPY --from=layouts /workdir/dist/layouts ./dist/layouts
 COPY --from=templates /workdir/dist/templates ./dist/templates
-COPY proxy ./proxy
-RUN mkdir -p \
-          ./proxy/cache \
-          ./proxy/logs \
-          ./proxy/tmp/client_body \
-          ./proxy/tmp/fastcgi \
-          ./proxy/tmp/proxy \
-          ./proxy/tmp/scgi \
-          ./proxy/tmp/uwsgi \
-          && \
-    ln -sf /dev/stdout ./proxy/logs/access.log && \
-    ln -sf /dev/stderr ./proxy/logs/error.log
 COPY resources ./resources
 COPY server ./server
 
-CMD rm -rf ./proxy/cache/* && \
-    PORT=8081 node server/cluster & \
-    nginx -p ./proxy -c ./nginx.conf
+CMD node server/cluster

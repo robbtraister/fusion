@@ -7,7 +7,7 @@ const path = require('path')
 // const debug = require('debug')(`app:index:${process.pid}`)
 const express = require('express')
 const logger = require('winston')
-// const morgan = require('morgan')
+const morgan = require('morgan')
 
 const hbs = require('./engines/hbs')
 const jsx = require('./engines/jsx')
@@ -34,11 +34,13 @@ function server (port) {
   app.set('view engine', '.hbs')
   app.set('views', `${__dirname}/../dist/templates`)
 
-  // app.use(morgan('dev', {
-  //   stream: {
-  //     write: log => logger.info(log.replace(/\s+$/, ''))
-  //   }
-  // }))
+  if (!/^prod/i.test(process.env.NODE_ENV)) {
+    app.use(morgan('dev', {
+      stream: {
+        write: log => logger.info(log.replace(/\s+$/, ''))
+      }
+    }))
+  }
 
   // app.use(require('compression')())
 

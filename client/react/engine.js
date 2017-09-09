@@ -20,7 +20,7 @@ window.render = props => {
 window.notFound = () => {
   const noscript = document.getElementById('404')
   if (noscript) {
-    noscript.parentElement.innerHTML = noscript.innerText
+    noscript.parentElement.innerHTML += noscript.innerText
   }
 }
 

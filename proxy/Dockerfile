@@ -26,6 +26,6 @@ RUN mkdir -p \
 
 COPY . ./
 
-CMD rm -rf ./cache/* && \
+CMD rm -rf ./tmp/cache/* && \
     ./nginx.conf.sh > ./nginx.conf && \
     nginx -p ./ -c ./nginx.conf

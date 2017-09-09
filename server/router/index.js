@@ -4,8 +4,6 @@ const express = require('express')
 
 const debug = require('debug')('server:router')
 
-// const Content = require('../controllers/content')
-// const Template = require('../controllers/template')
 const Resolver = require('../controllers/resolver')
 
 const render = (template, status) => data => (req, res, next) => {
@@ -28,7 +26,7 @@ const render = (template, status) => data => (req, res, next) => {
 function router () {
   const router = express.Router()
 
-  router.use('/_assets', require('./assets')())
+  // router.use('/_assets', require('./assets')())
   router.use('/_content', require('./content')())
   router.use('/_template', require('./template')())
 

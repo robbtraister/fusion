@@ -8,7 +8,7 @@ const Consumer = require('consumer')
 class Breaking extends React.Component {
   constructor (props) {
     super(props)
-    this.async(props.content || `/_content/Breaking%20News`)
+    this.async(props.content || `/_content/404`)
   }
 
   componentDidMount () {

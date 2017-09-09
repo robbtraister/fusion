@@ -10,6 +10,7 @@ services:
       - "./client:/workdir/client"
       - "./components:/workdir/components"
       - "./layouts:/workdir/layouts"
+      - "./proxy/cache:/workdir/proxy/cache"
       - "./resources:/workdir/resources"
       - "./server:/workdir/server"
       - "./templates:/workdir/templates"

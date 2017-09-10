@@ -15,6 +15,7 @@ const Layout = Component => props => {
       <script src={`/_content${props.uri}?v=content`} is onerror='notFound()' defer='defer' />
 
       <link rel='stylesheet' type='text/css' href='/_assets/bootstrap/css/bootstrap.min.css' />
+      {props.cssFile && <link rel='stylesheet' id='template-style' type='text/css' href={`/_assets/templates/${props.cssFile}`} />}
 
       {/* <link rel='icon' type='image/png' sizes='96x96' href='/_assets/favicon-96x96.png' /> */}
       {/* <link rel='icon' type='image/png' sizes='32x32' href='/_assets/favicon-32x32.png' /> */}

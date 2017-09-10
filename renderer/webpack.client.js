@@ -23,7 +23,7 @@ module.exports = [
     },
     resolve: resolvePreact,
     module: {
-      loaders: [
+      rules: [
         {
           test: /\.jsx?$/i,
           exclude: /node_modules/,

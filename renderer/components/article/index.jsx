@@ -2,8 +2,10 @@
 
 const React = require('react')
 
+require('./style.scss')
+
 const Article = props => (
-  <div className='row'>
+  <div className='row article'>
     <div className='col-sm-8'>
       <div className='card'>
         <div className='card-body'>

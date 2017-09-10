@@ -12,11 +12,13 @@ WORKDIR /renderer
 COPY package*.json ./
 RUN npm install
 
-COPY .babelrc webpack.*.js ./
+COPY .babelrc ./
 
+COPY webpack.client.js ./
 COPY client ./client
 RUN npm run build:dev:client
 
+COPY webpack.templates.js ./
 COPY components ./components
 COPY layouts ./layouts
 COPY templates ./templates

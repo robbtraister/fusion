@@ -6,6 +6,9 @@ const glob = require('glob')
 const webpack = require('webpack')
 
 // const CopyWebpackPlugin = require('copy-webpack-plugin')
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
+
+const PRODUCTION = /^prod/i.test(process.env.NODE_ENV)
 
 function excludeLibs (context, request, callback) {
   if (request === 'react') {
@@ -32,23 +35,25 @@ function config (Type) {
   glob.sync(`./${types}/**/*.{hbs,jsx,vue}`)
     .forEach(f => { entries[path.parse(f).base] = f })
 
+  const cssExtractor = new ExtractTextPlugin('[name].css')
   const plugins = [
     new webpack.BannerPlugin({
       banner: `var module=module||{};var ${Type}=module.exports=`,
       raw: true,
       entryOnly: true,
       test: /\.(hbs|jsx?|vue)$/i
-    })
+    }),
+    cssExtractor
     // new CopyWebpackPlugin([
     //   {from: `./${types}/**/*.hbs`, to: '[name].[ext]'}
     // ])
-  ]
-
-  if (/^prod/i.test(process.env.NODE_ENV)) {
-    plugins.push(new webpack.optimize.UglifyJsPlugin({
-      test: /\.(hbs|jsx?|vue)$/i
-    }))
-  }
+  ].concat(
+    PRODUCTION
+      ? new webpack.optimize.UglifyJsPlugin({
+        test: /\.(hbs|jsx?|vue)$/i
+      })
+      : []
+  )
 
   return Object.keys(entries).length
     ? {
@@ -61,7 +66,7 @@ function config (Type) {
       },
       resolve: resolveConsumer,
       module: {
-        loaders: [
+        rules: [
           {
             test: /\.hbs$/i,
             exclude: /node_modules/,
@@ -76,6 +81,36 @@ function config (Type) {
             test: /\.vue$/i,
             exclude: /node_modules/,
             loader: ['vue-loader']
+          },
+          {
+            test: /\.css$/,
+            loader: cssExtractor.extract({
+              fallback: 'style-loader',
+              use: {
+                loader: 'css-loader',
+                options: {
+                  minimize: PRODUCTION
+                }
+              }
+            })
+          },
+          {
+            test: /\.s[ac]ss$/,
+            loader: cssExtractor.extract({
+              fallback: 'style-loader',
+              use: [
+                {
+                  loader: 'css-loader',
+                  options: {
+                    importLoaders: 1,
+                    minimize: PRODUCTION
+                  }
+                },
+                {
+                  loader: 'sass-loader'
+                }
+              ]
+            })
           }
         ]
       },

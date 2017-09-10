@@ -2,8 +2,6 @@
 
 'use strict'
 
-const path = require('path')
-
 // const debug = require('debug')(`app:index:${process.pid}`)
 const express = require('express')
 const logger = require('winston')
@@ -12,17 +10,19 @@ const morgan = require('morgan')
 const hbs = require('./engines/hbs')
 const jsx = require('./engines/jsx')
 
-function server (port) {
-  const router = process.env.WATCH === 'true'
-    ? () => {
-      require('shell-watcher').pipe({target: path.resolve('.')})
+const router = options => {
+  if (!/^prod/i.test(process.env.NODE_ENV) && process.env.WATCH === 'true') {
+    require('shell-watcher')()
 
-      return (req, res, next) => {
-        require('./router')()(req, res, next)
-      }
+    return (req, res, next) => {
+      require('./router')(options)(req, res, next)
     }
-    : require('./router')
+  } else {
+    return require('./router')(options)
+  }
+}
 
+function server (port) {
   const app = express()
 
   app.enable('trust proxy')

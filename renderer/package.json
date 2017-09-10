@@ -47,7 +47,7 @@
     "preact": "^8.2.4",
     "preact-compat": "^3.17.0",
     "shebang-loader": "0.0.1",
-    "shell-watcher": "0.0.8",
+    "shell-watcher": "^0.1.2",
     "vue-loader": "^13.0.4",
     "vue-template-compiler": "^2.4.2",
     "webpack": "^3.5.5"

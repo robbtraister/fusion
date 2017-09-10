@@ -5,6 +5,7 @@ services:
       - "./proxy/conf.d:/proxy/conf.d:ro"
       - "./proxy/tmp:/proxy/tmp:rw"
     environment:
+      CACHE: "true"
       WATCH: "true"
 
   renderer:

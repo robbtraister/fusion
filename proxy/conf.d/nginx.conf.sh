@@ -54,7 +54,7 @@ http {
     server_name _;
 EOB
 
-if [ "$WATCH" != 'true' ]
+if [ "$CACHE" != 'false' ]
 then
 cat <<EOB
     proxy_cache cache;
@@ -69,6 +69,7 @@ cat <<EOB
     }
 
     location ~ /_(content|template) {
+      proxy_cache off;
       proxy_pass http://_renderer;
     }
 

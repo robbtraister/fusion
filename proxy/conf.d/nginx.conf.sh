@@ -52,16 +52,6 @@ http {
   server {
     listen ${PORT:-8080} default_server;
     server_name _;
-EOB
-
-if [ "$CACHE" != 'false' ]
-then
-cat <<EOB
-    proxy_cache cache;
-EOB
-fi
-
-cat <<EOB
 
     location ~ /_assets/(.*) {
       root .;
@@ -73,12 +63,18 @@ cat <<EOB
       proxy_pass http://_renderer;
     }
 
-    location @renderer {
-      proxy_pass http://_renderer;
-    }
-
     location / {
-      try_files /__placeholder__ @renderer;
+      proxy_pass http://_renderer;
+EOB
+
+if [ "$CACHE" != 'false' ]
+then
+cat <<EOB
+      proxy_cache cache;
+EOB
+fi
+
+cat <<EOB
     }
   }
 }

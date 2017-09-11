@@ -27,7 +27,7 @@ RUN npm run build:dev:templates
 COPY . ./
 
 CMD \
-    if [ $WATCH == 'true' ]; then \
+    if [ "$WATCH" == 'true' ]; then \
       npm run watch:client & \
       npm run watch:templates & \
     fi && \

@@ -19,7 +19,8 @@ module.exports = [
     },
     output: {
       filename: '[name].js',
-      path: path.resolve(__dirname, 'dist', 'react')
+      path: path.resolve(__dirname, 'dist', 'react'),
+      library: 'react'
     },
     resolve: resolvePreact,
     module: {

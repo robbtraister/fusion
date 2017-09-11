@@ -14,21 +14,14 @@ RUN npm install
 
 COPY .babelrc ./
 
-COPY webpack.client.js ./
+COPY webpack.config.js ./
 COPY client ./client
-RUN npm run build:dev:client
-
-COPY webpack.templates.js ./
-COPY components ./components
-COPY layouts ./layouts
-COPY templates ./templates
-RUN npm run build:dev:templates
+RUN npm run build:dev
 
 COPY . ./
 
 CMD \
-    if [ $WATCH == 'true' ]; then \
-      npm run watch:client & \
-      npm run watch:templates & \
+    if [ "$WATCH" == 'true' ]; then \
+      npm run watch & \
     fi && \
     npm run start:dev

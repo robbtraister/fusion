@@ -1,5 +1,16 @@
 version: "3"
 services:
+  assets:
+    build:
+      context: ./assets
+      dockerfile: Dockerfile
+    image: fusion/assets
+    volumes:
+      - "fusion-dist-volume:/assets/dist:rw"
+      - "fusion-resources-volume:/assets/resources:rw"
+    environment:
+      NODE_ENV: production
+
   proxy:
     build:
       context: ./proxy
@@ -23,7 +34,6 @@ services:
     image: fusion/renderer-prod
     volumes:
       - "fusion-dist-volume:/renderer/dist:rw"
-      - "fusion-resources-volume:/renderer/resources:rw"
     environment:
       PORT: 8080
       NODE_ENV: production

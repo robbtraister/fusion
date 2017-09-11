@@ -23,27 +23,8 @@ COPY .babelrc ./
 # client rendering engine
 FROM bundler AS client
 
-COPY webpack.client.js webpack.config.js
+COPY webpack.config.js ./
 COPY client ./client
-
-RUN npm run build:prod
-
-
-# layouts
-FROM bundler AS layouts
-
-COPY webpack.templates.js webpack.config.js
-COPY layouts ./layouts
-
-RUN npm run build:prod
-
-
-# templates
-FROM bundler AS templates
-
-COPY webpack.templates.js webpack.config.js
-COPY components ./components
-COPY templates ./templates
 
 RUN npm run build:prod
 
@@ -72,9 +53,6 @@ COPY package.json ./
 
 COPY --from=modules /workdir/node_modules ./node_modules
 COPY --from=client /workdir/dist ./dist
-COPY --from=layouts /workdir/dist/layouts ./dist/layouts
-COPY --from=templates /workdir/dist/templates ./dist/templates
-COPY resources ./resources
 COPY server ./server
 
 CMD node server/cluster

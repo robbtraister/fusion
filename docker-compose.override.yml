@@ -1,5 +1,15 @@
 version: "3"
 services:
+  assets:
+    volumes:
+      - "./assets/components:/assets/components:ro"
+      - "./assets/layouts:/assets/layouts:ro"
+      - "./assets/resources:/assets/resources:ro"
+      - "./assets/templates:/assets/templates:ro"
+    environment:
+      NODE_ENV: development
+      WATCH: "true"
+
   proxy:
     volumes:
       - "./proxy/conf.d:/proxy/conf.d:ro"

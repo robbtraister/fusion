@@ -49,5 +49,5 @@ COPY --from=templates /workdir/dist/templates ./dist/templates
 
 CMD \
     if [ "$WATCH" == 'true' ]; then \
-      npm run watch:client & \
+      npm run watch & \
     fi

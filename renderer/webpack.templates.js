@@ -7,7 +7,6 @@ const webpack = require('webpack')
 
 // const CopyWebpackPlugin = require('copy-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
-const ManifestPlugin = require('webpack-manifest-plugin')
 
 const PRODUCTION = /^prod/i.test(process.env.NODE_ENV)
 
@@ -123,13 +122,6 @@ function config (Type) {
         ]
       },
       plugins: [
-        new ManifestPlugin(),
-        // new webpack.BannerPlugin({
-        //   banner: `var module=module||{};var ${Type}=module.exports=`,
-        //   raw: true,
-        //   entryOnly: true,
-        //   test: /\.(hbs|jsx?|vue)$/i
-        // }),
         new TemplateExportPlugin(Type),
         cssExtractor
         // new CopyWebpackPlugin([

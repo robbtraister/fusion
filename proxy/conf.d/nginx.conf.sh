@@ -43,7 +43,6 @@ http {
   proxy_cache_path ./tmp/cache levels=1:2 keys_zone=cache:10m;
   proxy_cache_background_update on;
   proxy_cache_use_stale error timeout updating;
-  proxy_cache_valid any 60m;
 
   upstream _renderer {
     server ${TARGET};
@@ -67,9 +66,10 @@ http {
       proxy_pass http://_renderer;
 EOB
 
-if [ "$CACHE" != 'false' ]
+if [ "$TTL" ]
 then
 cat <<EOB
+      proxy_cache_valid any $TTL;
       proxy_cache cache;
 EOB
 fi

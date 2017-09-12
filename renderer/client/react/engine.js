@@ -6,7 +6,7 @@ const React = require('react')
 const ReactDOM = require('react-dom')
 
 const Provider = require('./provider')
-const fetcher = require('./fetcher')()
+const fetcher = require('./fetcher')
 
 window.render = props => {
   const templateStyle = document.getElementById('template-style')
@@ -15,7 +15,7 @@ window.render = props => {
   }
 
   ReactDOM.render(
-    <Provider fetch={fetcher.fetch} uri={window.location.pathname + window.location.search}>
+    <Provider fetch={fetcher().fetch} uri={window.location.pathname + window.location.search}>
       <Template {...props} />
     </Provider>,
     document.getElementById('App')

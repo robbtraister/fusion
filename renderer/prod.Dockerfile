@@ -74,6 +74,7 @@ COPY --from=modules /workdir/node_modules ./node_modules
 COPY --from=client /workdir/dist ./dist
 COPY --from=layouts /workdir/dist/layouts ./dist/layouts
 COPY --from=templates /workdir/dist/templates ./dist/templates
+COPY resolvers ./resolvers
 COPY resources ./resources
 COPY server ./server
 

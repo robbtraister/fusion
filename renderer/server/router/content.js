@@ -2,8 +2,7 @@
 
 const express = require('express')
 
-const Content = require('../controllers/content')
-// const Resolver = require('../controllers/resolver')
+const Resolver = require('../controllers/resolver')
 
 const jsMask = /^[_$a-z][_$a-z0-9]*$/i
 
@@ -19,8 +18,8 @@ function router () {
       return
     }
 
-    Content(req.path)
-      .then(content => {
+    Resolver(req.path)
+      .then(({content}) => {
         if (content) {
           content = JSON.stringify(content)
           if (field) {

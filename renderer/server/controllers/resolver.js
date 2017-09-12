@@ -1,22 +1,41 @@
 'use strict'
 
-const Content = require('./content')
-const Template = require('./template')
+const debug = require('debug')('server:controllers:resolver')
 
-function Resolver (uri) {
-  const content = Content(uri)
-  const template = Template(uri)
+const resolvers = require('../../resolvers')
+  .map(resolver => {
+    const match = (resolver.match instanceof RegExp)
+      ? resolver.match.exec.bind(resolver.match)
+      : uri => resolver.match === uri ? uri : null
 
-  const resolver = Promise.all([content, template])
-    .then(data => ({
-      content: data[0],
-      template: data[1]
-    }))
+    const content = (typeof resolver.content === 'function' || resolver.content instanceof Function)
+      ? resolver.content
+      : () => resolver.content
 
-  resolver.content = content
-  resolver.template = template
+    return {
+      match,
+      template: resolver.template,
+      content
+    }
+  })
 
-  return resolver
+function resolve (uri) {
+  debug('resolving', uri)
+
+  let match
+  const resolver = resolvers.find(resolver => {
+    match = resolver.match(uri)
+    return match
+  })
+
+  if (resolver) {
+    return Promise.resolve({
+      template: resolver.template,
+      content: resolver.content(match)
+    })
+  }
+
+  return Promise.reject(new Error('NO_MATCH'))
 }
 
-module.exports = Resolver
+module.exports = resolve

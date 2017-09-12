@@ -2,14 +2,14 @@
 
 const express = require('express')
 
-const Template = require('../controllers/template')
+const Resolver = require('../controllers/resolver')
 
 function router () {
   const router = express.Router()
 
   router.get('*', (req, res, next) => {
-    Template(req.path)
-      .then(template => { template ? res.redirect(`/_assets/templates/${template}`) : res.sendStatus(404) })
+    Resolver(req.path)
+      .then(({template}) => { template ? res.redirect(`/_assets/templates/${template}`) : res.sendStatus(404) })
       .catch(next)
   })
 

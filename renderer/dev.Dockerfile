@@ -47,13 +47,13 @@ RUN npm run build:dev:templates
 FROM packages
 
 COPY webpack*.js ./
-COPY --from=client /renderer/dist ./dist
-COPY --from=layouts /renderer/dist/layouts ./dist/layouts
-COPY --from=templates /renderer/dist/templates ./dist/templates
-COPY resources ./resources
-COPY server ./server
+COPY --from=client /renderer/dist ./build
+COPY --from=layouts /renderer/dist/layouts ./build/layouts
+COPY --from=templates /renderer/dist/templates ./build/templates
 
 CMD \
+    rm -rf ./dist/* && \
+    cp -R ./build/* ./dist/ && \
     if [ "$WATCH" == 'true' ]; then \
       npm run watch:client & \
       npm run watch:templates & \

@@ -71,10 +71,13 @@ WORKDIR /renderer
 COPY package.json ./
 
 COPY --from=modules /workdir/node_modules ./node_modules
-COPY --from=client /workdir/dist ./dist
-COPY --from=layouts /workdir/dist/layouts ./dist/layouts
-COPY --from=templates /workdir/dist/templates ./dist/templates
+COPY --from=client /workdir/dist ./build
+COPY --from=layouts /workdir/dist/layouts ./build/layouts
+COPY --from=templates /workdir/dist/templates ./build/templates
 COPY resources ./resources
 COPY server ./server
 
-CMD node server/cluster
+CMD \
+    rm -rf ./dist/* && \
+    cp -R ./build/* ./dist/ && \
+    node server/cluster

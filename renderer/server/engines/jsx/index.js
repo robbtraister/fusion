@@ -27,7 +27,7 @@ module.exports = options => {
       let Component = Provider(template)
       const contentCache = Component.cache
 
-      const layoutName = (props.layout || options.defaultLayout)
+      const layoutName = props.layout === undefined ? options.defaultLayout : props.layout
       if (layoutName) {
         const viewsDir = props.settings && props.settings.views
         const Layout = load(path.join(options.layoutsDir || viewsDir || '.', `${layoutName}.jsx`))

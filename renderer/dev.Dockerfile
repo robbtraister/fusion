@@ -7,7 +7,7 @@ RUN apk add nodejs-npm && npm install -g npm
 RUN node -v
 RUN npm -v
 
-WORKDIR /renderer
+WORKDIR /workdir
 
 COPY package*.json ./
 RUN npm install
@@ -24,38 +24,19 @@ COPY client ./client
 RUN npm run build:dev:client
 
 
-# layouts
-FROM packages AS layouts
-
-COPY webpack.templates.js ./
-COPY layouts ./layouts
-
-RUN npm run build:dev:templates
-
-
-# templates
-FROM packages AS templates
-
-COPY webpack.templates.js ./
-COPY components ./components
-COPY templates ./templates
-
-RUN npm run build:dev:templates
-
-
 # final image
 FROM packages
 
 COPY webpack*.js ./
-COPY --from=client /renderer/dist ./build
-COPY --from=layouts /renderer/dist/layouts ./build/layouts
-COPY --from=templates /renderer/dist/templates ./build/templates
+COPY --from=client /workdir/dist ./build
+
+RUN ls /workdir/build
 
 CMD \
-    rm -rf ./dist/* && \
-    cp -R ./build/* ./dist/ && \
+    mkdir -p ./dist/client/ && \
+    rm -rf ./dist/client/* && \
+    cp -R ./build/client/* ./dist/client/ && \
     if [ "$WATCH" == 'true' ]; then \
       npm run watch:client & \
-      npm run watch:templates & \
     fi && \
     npm run start:dev

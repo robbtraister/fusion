@@ -29,25 +29,6 @@ COPY client ./client
 RUN npm run build:prod
 
 
-# layouts
-FROM bundler AS layouts
-
-COPY webpack.templates.js webpack.config.js
-COPY layouts ./layouts
-
-RUN npm run build:prod
-
-
-# templates
-FROM bundler AS templates
-
-COPY webpack.templates.js webpack.config.js
-COPY components ./components
-COPY templates ./templates
-
-RUN npm run build:prod
-
-
 # production modules
 FROM packages AS modules
 
@@ -66,18 +47,16 @@ RUN \
     node -v && \
     rm -rf /var/cache/apk/*
 
-WORKDIR /renderer
+WORKDIR /workdir
 
 COPY package.json ./
 
 COPY --from=modules /workdir/node_modules ./node_modules
 COPY --from=client /workdir/dist ./build
-COPY --from=layouts /workdir/dist/layouts ./build/layouts
-COPY --from=templates /workdir/dist/templates ./build/templates
-COPY resources ./resources
 COPY server ./server
 
 CMD \
-    rm -rf ./dist/* && \
-    cp -R ./build/* ./dist/ && \
+    mkdir -p ./dist/client/ && \
+    rm -rf ./dist/client/* && \
+    cp -R ./build/client/* ./dist/client/ && \
     node server/cluster

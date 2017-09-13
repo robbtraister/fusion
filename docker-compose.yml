@@ -1,5 +1,16 @@
 version: "3"
 services:
+  assets:
+    build:
+      context: ./assets
+      dockerfile: prod.Dockerfile
+    image: fusion/assets-prod
+    volumes:
+      - "fusion-dist-volume:/workdir/dist:rw"
+      - "fusion-resources-volume:/workdir/resources:rw"
+    environment:
+      NODE_ENV: production
+
   proxy:
     build:
       context: ./proxy
@@ -10,8 +21,8 @@ services:
     ports:
       - "80:8080"
     volumes:
-      - "fusion-dist-volume:/proxy/dist:ro"
-      - "fusion-resources-volume:/proxy/resources:ro"
+      - "fusion-dist-volume:/workdir/dist:ro"
+      - "fusion-resources-volume:/workdir/resources:ro"
     environment:
       PORT: 8080
       TARGET: renderer:8080
@@ -21,10 +32,11 @@ services:
     build:
       context: ./renderer
       dockerfile: prod.Dockerfile
+    depends_on:
+      - "assets"
     image: fusion/renderer-prod
     volumes:
-      - "fusion-dist-volume:/renderer/dist:rw"
-      - "fusion-resources-volume:/renderer/resources:rw"
+      - "fusion-dist-volume:/workdir/dist:rw"
     environment:
       PORT: 8080
       NODE_ENV: production

@@ -2,7 +2,7 @@
 
 const debug = require('debug')('server:controllers:resolver')
 
-const resolvers = require('../resolvers')
+const resolvers = require('../../dist/resolvers')
   .map(resolver => {
     const match = (resolver.match instanceof RegExp)
       ? resolver.match.exec.bind(resolver.match)

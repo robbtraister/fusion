@@ -10,7 +10,7 @@ const Layout = Component => props => {
       <script src='/_assets/jquery/js/jquery-3.2.1.min.js' defer='defer' />
       <script src='/_assets/bootstrap/js/bootstrap.min.js' defer='defer' />
 
-      <script src='/_assets/react/engine.js' defer='defer' />
+      <script src='/_assets/client/react.js' defer='defer' />
       <script src={`/_template${props.uri}`} is onerror='notFound()' defer='defer' />
       <script src={`/_content${props.uri}?v=content`} is onerror='notFound()' defer='defer' />
 

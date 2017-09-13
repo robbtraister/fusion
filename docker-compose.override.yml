@@ -1,27 +1,36 @@
 version: "3"
 services:
+  assets:
+    build:
+      dockerfile: dev.Dockerfile
+    image: fusion/assets-dev
+    volumes:
+      - "./assets/components:/workdir/components:ro"
+      - "./assets/layouts:/workdir/layouts:ro"
+      - "./assets/templates:/workdir/templates:ro"
+    environment:
+      NODE_ENV: development
+      WATCH: "true"
+
   proxy:
     volumes:
-      - "./proxy/conf.d:/proxy/conf.d:ro"
-      - "./proxy/tmp:/proxy/tmp:rw"
+      - "./proxy/conf.d:/workdir/conf.d:ro"
+      - "./proxy/tmp:/workdir/tmp:rw"
+      - "./assets/resources:/workdir/resources:ro"
     environment:
       TTL: 10m
       WATCH: "true"
 
   renderer:
     build:
-      context: ./renderer
       dockerfile: dev.Dockerfile
     image: fusion/renderer-dev
     ports:
       - "9229:9229"
     volumes:
-      - "./renderer/client:/renderer/client:ro"
-      - "./renderer/components:/renderer/components:ro"
-      - "./renderer/layouts:/renderer/layouts:ro"
-      - "./renderer/resources:/renderer/resources:ro"
-      - "./renderer/server:/renderer/server:ro"
-      - "./renderer/templates:/renderer/templates:ro"
+      - "./renderer/client:/workdir/client:ro"
+      - "./renderer/server:/workdir/server:ro"
+      - "./assets/resolvers:/workdir/dist/resolvers:ro"
     environment:
       NODE_ENV: development
       WATCH: "true"

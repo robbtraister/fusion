@@ -14,17 +14,44 @@ RUN npm install
 
 COPY .babelrc ./
 
+
+# client bundle
+FROM packages as client
+
 COPY webpack.client.js ./
 COPY client ./client
+
 RUN npm run build:dev:client
+
+
+# layouts
+FROM packages AS layouts
+
+COPY webpack.templates.js ./
+COPY layouts ./layouts
+
+RUN npm run build:dev:templates
+
+
+# templates
+FROM packages AS templates
 
 COPY webpack.templates.js ./
 COPY components ./components
-COPY layouts ./layouts
 COPY templates ./templates
+
 RUN npm run build:dev:templates
 
-COPY . ./
+
+# final image
+FROM packages
+
+COPY webpack*.js ./
+COPY --from=client /renderer/dist ./dist
+COPY --from=layouts /renderer/dist/layouts ./dist/layouts
+COPY --from=templates /renderer/dist/templates ./dist/templates
+COPY resources ./resources
+COPY server ./server
 
 CMD \
     if [ "$WATCH" == 'true' ]; then \

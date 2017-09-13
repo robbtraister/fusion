@@ -8,7 +8,7 @@ const content = match => {
 module.exports = [
   {
     match: '/',
-    template: 'homepage.jsx',
+    template: 'article.jsx',
     content
   },
   {

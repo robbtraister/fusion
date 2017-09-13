@@ -4,24 +4,8 @@ const express = require('express')
 
 const debug = require('debug')('server:router')
 
-const Resolver = require('../controllers/resolver')
-
-const render = (template, status) => data => (req, res, next) => {
-  if (status) {
-    res.status(status)
-  }
-
-  data = data || {}
-  const uri = req.path
-  Object.assign(data, {uri})
-
-  res.render(template, data, (err, html) => {
-    if (err) {
-      return next(err)
-    }
-    res.send(html)
-  })
-}
+const render = require('../controllers/render')
+const resolve = require('../controllers/resolve')
 
 function router () {
   const router = express.Router()
@@ -33,7 +17,7 @@ function router () {
   router.use('/_template', require('./template')())
 
   router.get('*', (req, res, next) => {
-    Resolver(req.path)
+    resolve(req.path)
       .then(data => {
         debug(data)
         data.content

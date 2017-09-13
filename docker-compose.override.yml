@@ -5,7 +5,7 @@ services:
       - "./proxy/conf.d:/proxy/conf.d:ro"
       - "./proxy/tmp:/proxy/tmp:rw"
     environment:
-      TTL: "10m"
+      TTL: ""
       WATCH: "true"
 
   renderer:

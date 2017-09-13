@@ -15,6 +15,7 @@ services:
     environment:
       PORT: 8080
       TARGET: renderer:8080
+      TTL: 10m
 
   renderer:
     build:

@@ -2,6 +2,8 @@
 
 'use strict'
 
+const path = require('path')
+
 // const debug = require('debug')(`app:index:${process.pid}`)
 const express = require('express')
 const logger = require('winston')
@@ -12,7 +14,12 @@ const jsx = require('./engines/jsx')
 
 const router = options => {
   if (!/^prod/i.test(process.env.NODE_ENV) && process.env.WATCH === 'true') {
-    require('shell-watcher')()
+    require('shell-watcher')({
+      targets: [
+        path.resolve(__dirname),
+        path.resolve(`${__dirname}/../dist/resolvers`)
+      ]
+    })
 
     return (req, res, next) => {
       require('./router')(options)(req, res, next)

@@ -10,8 +10,8 @@ const content = match => {
 module.exports = [
   {
     match: '/',
-    template: 'article.jsx',
-    content
+    template: 'simple.jsx',
+    content: {content: 'Homepage'}
   },
   {
     match: /^(\/sports)\/?$/,

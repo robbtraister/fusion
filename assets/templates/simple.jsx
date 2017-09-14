@@ -2,17 +2,13 @@
 
 const React = require('react')
 
-const Body = require('../components/body')
-const Header = require('../components/header')
+const Wrapper = require('../components/wrapper')
 
 const Template = props => {
   return (
-    <div>
-      <Header />
-      <Body>
-        {props.content}
-      </Body>
-    </div>
+    <Wrapper>
+      {props.content}
+    </Wrapper>
   )
 }
 

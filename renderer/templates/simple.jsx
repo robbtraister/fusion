@@ -2,17 +2,13 @@
 
 const React = require('react')
 
-const Banner = require('../components/banner')
-const Body = require('../components/body')
+const Wrapper = require('../components/wrapper')
 
 const Template = props => {
   return (
-    <div>
-      <Banner />
-      <Body>
-        {props.content}
-      </Body>
-    </div>
+    <Wrapper>
+      {props.content}
+    </Wrapper>
   )
 }
 

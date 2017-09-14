@@ -3,20 +3,16 @@
 const React = require('react')
 
 const Article = require('../components/article')
-const Banner = require('../components/banner')
-const Body = require('../components/body')
+const Wrapper = require('../components/wrapper')
 const Test = require('../components/test')
 
 const Template = props => {
   return (
-    <div>
-      <Banner />
-      <Body>
-        <Article content={props.content || 'Homepage'} title='Article' author='abc' />
-        <Test content='/_content/sync' />
-        <Test async content='/_content/async' />
-      </Body>
-    </div>
+    <Wrapper>
+      <Article content={props.content || 'Homepage'} title='Article' author='abc' />
+      <Test content='/_content/sync' />
+      <Test async content='/_content/async' />
+    </Wrapper>
   )
 }
 

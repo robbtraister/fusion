@@ -1,7 +1,9 @@
 'use strict'
 
 const content = match => {
-  const str = (match && match.length > 1) ? match[1] : match
+  const str = (match instanceof Array)
+    ? match[match.length - 1]
+    : match
   return ({content: decodeURIComponent(str.replace(/^\/+/, ''))})
 }
 

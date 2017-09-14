@@ -3,12 +3,12 @@
 const React = require('react')
 
 const Body = require('../components/body')
-const Header = require('../components/header')
+const Banner = require('../components/banner')
 
 const Template = props => {
   return (
     <div>
-      <Header />
+      <Banner />
       <Body>
         <noscript id='404'>
           <div>This page cannot be found</div>

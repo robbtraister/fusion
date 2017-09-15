@@ -12,8 +12,6 @@ WORKDIR /workdir
 COPY package*.json ./
 RUN npm install
 
-COPY .babelrc ./
-
 
 # client bundle
 FROM packages as client

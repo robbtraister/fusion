@@ -17,8 +17,6 @@ FROM packages AS bundler
 
 RUN npm install
 
-COPY .babelrc ./
-
 
 # client rendering engine
 FROM bundler AS client

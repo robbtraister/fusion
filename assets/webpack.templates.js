@@ -82,7 +82,19 @@ function config (Type) {
           {
             test: /\.jsx?$/i,
             exclude: /node_modules/,
-            loader: ['babel-loader']
+            use: {
+              loader: 'babel-loader',
+              options: {
+                babelrc: false,
+                presets: [
+                  'es2015',
+                  'react'
+                ],
+                'plugins': [
+                  'transform-decorators-legacy'
+                ]
+              }
+            }
           },
           {
             test: /\.vue$/i,

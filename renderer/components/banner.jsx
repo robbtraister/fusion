@@ -13,7 +13,7 @@ const sections = [
   'World'
 ]
 
-const Header = props => (
+const Banner = props => (
   <nav className='navbar fixed-top navbar-expand navbar-dark bg-dark'>
     {/* <a className='navbar-brand' href='/'>
       Washington Post
@@ -29,4 +29,4 @@ const Header = props => (
   </nav>
 )
 
-module.exports = Header
+module.exports = Banner

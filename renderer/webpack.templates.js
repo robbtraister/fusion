@@ -7,6 +7,7 @@ const webpack = require('webpack')
 
 // const CopyWebpackPlugin = require('copy-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const ManifestPlugin = require('webpack-manifest-plugin')
 
 const PRODUCTION = /^prod/i.test(process.env.NODE_ENV)
 
@@ -134,6 +135,7 @@ function config (Type) {
         ]
       },
       plugins: [
+        new ManifestPlugin(),
         new TemplateExportPlugin(Type),
         cssExtractor
         // new CopyWebpackPlugin([

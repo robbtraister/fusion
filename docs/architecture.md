@@ -94,14 +94,16 @@ There are certain types of articles that are not enumerated by our content syste
 
 The solution I am proposing is to provide a custom 404 page that wraps its message in a noscript tag. This way, any noscript users will immediately be presented with a 404 page. However, the 404 template will also generate an asynchronous content request. If the content responds appropriately, it will be rendered into the appropriate template and presented to the user as the article. If the content fails to load, it likely does not exist and the 404 message will be moved from inside the noscript tag into the primary body of the document, presenting a script-enabled user with a traditional 404 page after a short delay.
 
-## PageBuilder
+## Comparison
 
-### Pros
+### PageBuilder
+
+#### Pros
 
 1.  Always up-to-date
 1.  Supports asynchronous and custom content
 
-### Cons
+#### Cons
 
 1.  On-Demand rendering
     -   Performance and scaling issues
@@ -115,9 +117,9 @@ The solution I am proposing is to provide a custom 404 page that wraps its messa
 1.  Maintenance Costs
     -   Because JSP isn't a fully-featured templating language, a large portion of PageBuilder development time goes into extending JSP capabilities
 
-## Fusion
+### Fusion
 
-### Pros
+#### Pros
 
 1.  Always up-to-date
 1.  Supports asynchronous and custom content
@@ -130,6 +132,6 @@ The solution I am proposing is to provide a custom 404 page that wraps its messa
 1.  React JSX templating
     -   Could likely be modified to support Vue.js or Angular
 
-### Cons
+#### Cons
 
 1.  Noscript users are not guaranteed to get the latest layout

@@ -56,7 +56,7 @@ If we choose to implement live update of content, we will need to provide a simi
 
 The primary downside to server-side pre-rendering is out-of-date templates. A single template publish can invalidate (hundreds of?) thousands of articles. Server-side pre-rendering cannot be expected to re-render an entire site with a single publish.
 
-In order to mitigate this delay in server-side rendering, the updated template will be loaded into the client browser and used to re-render the article. The browser will initially load and paint the static pre-rendered version of the page, quickly re-rendering to the updated version based on the loaded template file.
+In order to mitigate this delay in server-side rendering, Fusion is designed to use react components for templating, thus supporting both server-side and client-side rendering. When an article is requested, the updated template will be loaded into the client browser and used to re-render the article. The browser will initially load and paint the static pre-rendered version of the page, quickly re-rendering to the updated version based on the loaded template file.
 
 ## Considerations
 

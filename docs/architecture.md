@@ -135,3 +135,4 @@ The solution I am proposing is to provide a custom 404 page that wraps its messa
 #### Cons
 
 1.  Noscript users are not guaranteed to get the latest layout
+1.  Increase in initial 404s

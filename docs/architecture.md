@@ -94,6 +94,14 @@ There are certain types of articles that are not enumerated by our content syste
 
 The solution I am proposing is to provide a custom 404 page that wraps its message in a noscript tag. This way, any noscript users will immediately be presented with a 404 page. However, the 404 template will also generate an asynchronous content request. If the content responds appropriately, it will be rendered into the appropriate template and presented to the user as the article. If the content fails to load, it likely does not exist and the 404 message will be moved from inside the noscript tag into the primary body of the document, presenting a script-enabled user with a traditional 404 page after a short delay.
 
+### PB Admin
+
+The PageBuilder Admin application will need to be modified to support the new rendering model. The ideal approach would be to rebuild the admin app to work directly with the react templates. A second approach would be to stub out the existing API endpoints that the admin app currently uses and duplicate their functionality with server-side component rendering.
+
+The admin app rewrite would be more future proof, but would also be more time-consuming and likely delay the rollout of any pre-rendering deployments. Even if choosing the server-side approach initially, the long-term goal should be to integrate the admin app with the react templating engine.
+
+The server-side approach would result in the creation of a temporary service to be later deprecated, but would likely be simpler and faster to implement.
+
 ## Comparison
 
 ### PageBuilder

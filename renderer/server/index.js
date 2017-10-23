@@ -9,6 +9,7 @@ const express = require('express')
 const logger = require('winston')
 const morgan = require('morgan')
 
+const js = require('./engines/js')
 const hbs = require('./engines/hbs')
 const jsx = require('./engines/jsx')
 
@@ -36,6 +37,7 @@ function server (port) {
   app.disable('x-powered-by')
 
   // Enable templating engines
+  app.engine('.js', js({extname: '.js'}))
   app.engine('.hbs', hbs({extname: '.hbs', layoutsDir: `${__dirname}/../dist/layouts`, defaultLayout: 'html'}))
   app.engine('.jsx', jsx({extname: '.jsx', layoutsDir: `${__dirname}/../dist/layouts`, defaultLayout: 'html'}))
   app.set('view engine', '.hbs')

@@ -58,7 +58,7 @@ function config (Type) {
 
   const entries = {}
 
-  glob.sync(`./${types}/**/*.{hbs,jsx,vue}`)
+  glob.sync(`./${types}/**/*.{hbs,js,jsx,vue}`)
     .forEach(f => { entries[path.parse(f).base] = f })
 
   const cssExtractor = new ExtractTextPlugin('[name].[contenthash].css')

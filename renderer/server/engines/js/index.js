@@ -14,7 +14,7 @@ module.exports = options => (fp, data, cb) => {
   const fn = load(fp)
   const result = fn(data, cb)
 
-  return (result instanceof Promise)
-    ? result.then(cb)
-    : result
+  if (result instanceof Promise) {
+    result.then(r => cb(null, r))
+  }
 }

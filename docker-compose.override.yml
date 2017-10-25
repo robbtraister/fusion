@@ -18,7 +18,7 @@ services:
       - "./proxy/tmp:/workdir/tmp:rw"
       - "./assets/resources:/workdir/resources:ro"
     environment:
-      TTL: 10m
+      TTL: ""
       WATCH: "true"
 
   renderer:
@@ -34,3 +34,4 @@ services:
     environment:
       NODE_ENV: development
       WATCH: "true"
+      # DEBUG: server:router,controllers:render

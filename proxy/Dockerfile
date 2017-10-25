@@ -10,7 +10,7 @@ RUN \
     nginx -v && \
     rm -rf /var/cache/apk/*
 
-WORKDIR /proxy
+WORKDIR /workdir
 
 RUN mkdir -p \
           ./logs \

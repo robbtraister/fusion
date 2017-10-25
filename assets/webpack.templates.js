@@ -5,7 +5,7 @@ const path = require('path')
 const glob = require('glob')
 const webpack = require('webpack')
 
-// const CopyWebpackPlugin = require('copy-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
 
@@ -58,10 +58,88 @@ function config (Type) {
 
   const entries = {}
 
-  glob.sync(`./${types}/**/*.{hbs,jsx,vue}`)
+  glob.sync(`./${types}/**/*.{${(PRODUCTION ? 'hbs,' : '')}js,jsx,vue}`)
     .forEach(f => { entries[path.parse(f).base] = f })
 
   const cssExtractor = new ExtractTextPlugin('[name].[contenthash].css')
+
+  const plugins = [
+    new ManifestPlugin(),
+    new TemplateExportPlugin(Type),
+    cssExtractor
+  ]
+  if (!PRODUCTION) {
+    plugins.push(new CopyWebpackPlugin([
+      {from: `./${types}/**/*.hbs`, to: '[name].[ext]'}
+    ]))
+  }
+  if (PRODUCTION) {
+    plugins.push(new webpack.optimize.UglifyJsPlugin({
+      test: /\.(hbs|jsx?|vue)$/i
+    }))
+  }
+
+  const rules = [
+    {
+      test: /\.jsx?$/i,
+      exclude: /node_modules/,
+      use: {
+        loader: 'babel-loader',
+        options: {
+          babelrc: false,
+          presets: [
+            'es2015',
+            'react'
+          ],
+          'plugins': [
+            'transform-decorators-legacy'
+          ]
+        }
+      }
+    },
+    {
+      test: /\.vue$/i,
+      exclude: /node_modules/,
+      loader: ['vue-loader']
+    },
+    {
+      test: /\.css$/,
+      loader: cssExtractor.extract({
+        fallback: 'style-loader',
+        use: {
+          loader: 'css-loader',
+          options: {
+            minimize: PRODUCTION
+          }
+        }
+      })
+    },
+    {
+      test: /\.s[ac]ss$/,
+      loader: cssExtractor.extract({
+        fallback: 'style-loader',
+        use: [
+          {
+            loader: 'css-loader',
+            options: {
+              importLoaders: 1,
+              minimize: PRODUCTION
+            }
+          },
+          {
+            loader: 'sass-loader'
+          }
+        ]
+      })
+    }
+  ]
+  if (PRODUCTION) {
+    rules.unshift({
+      test: /\.hbs$/i,
+      exclude: /node_modules/,
+      loader: ['handlebars-loader']
+    })
+  }
 
   return Object.keys(entries).length
     ? {
@@ -73,81 +151,8 @@ function config (Type) {
         // libraryTarget: 'commonjs2'
       },
       resolve: resolveConsumer,
-      module: {
-        rules: [
-          {
-            test: /\.hbs$/i,
-            exclude: /node_modules/,
-            loader: ['handlebars-loader']
-          },
-          {
-            test: /\.jsx?$/i,
-            exclude: /node_modules/,
-            use: {
-              loader: 'babel-loader',
-              options: {
-                babelrc: false,
-                presets: [
-                  'es2015',
-                  'react'
-                ],
-                'plugins': [
-                  'transform-decorators-legacy'
-                ]
-              }
-            }
-          },
-          {
-            test: /\.vue$/i,
-            exclude: /node_modules/,
-            loader: ['vue-loader']
-          },
-          {
-            test: /\.css$/,
-            loader: cssExtractor.extract({
-              fallback: 'style-loader',
-              use: {
-                loader: 'css-loader',
-                options: {
-                  minimize: PRODUCTION
-                }
-              }
-            })
-          },
-          {
-            test: /\.s[ac]ss$/,
-            loader: cssExtractor.extract({
-              fallback: 'style-loader',
-              use: [
-                {
-                  loader: 'css-loader',
-                  options: {
-                    importLoaders: 1,
-                    minimize: PRODUCTION
-                  }
-                },
-                {
-                  loader: 'sass-loader'
-                }
-              ]
-            })
-          }
-        ]
-      },
-      plugins: [
-        new ManifestPlugin(),
-        new TemplateExportPlugin(Type),
-        cssExtractor
-        // new CopyWebpackPlugin([
-        //   {from: `./${types}/**/*.hbs`, to: '[name].[ext]'}
-        // ])
-      ].concat(
-        PRODUCTION
-          ? new webpack.optimize.UglifyJsPlugin({
-            test: /\.(hbs|jsx?|vue)$/i
-          })
-          : []
-      )
+      module: { rules },
+      plugins
     }
     : null
 }

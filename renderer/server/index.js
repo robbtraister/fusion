@@ -2,17 +2,25 @@
 
 'use strict'
 
+const path = require('path')
+
 // const debug = require('debug')(`app:index:${process.pid}`)
 const express = require('express')
 const logger = require('winston')
 const morgan = require('morgan')
 
+const js = require('./engines/js')
 const hbs = require('./engines/hbs')
 const jsx = require('./engines/jsx')
 
 const router = options => {
   if (!/^prod/i.test(process.env.NODE_ENV) && process.env.WATCH === 'true') {
-    require('shell-watcher')()
+    require('shell-watcher')({
+      targets: [
+        path.resolve(__dirname),
+        path.resolve(`${__dirname}/../dist/resolvers`)
+      ]
+    })
 
     return (req, res, next) => {
       require('./router')(options)(req, res, next)
@@ -29,6 +37,7 @@ function server (port) {
   app.disable('x-powered-by')
 
   // Enable templating engines
+  app.engine('.js', js({extname: '.js'}))
   app.engine('.hbs', hbs({extname: '.hbs', layoutsDir: `${__dirname}/../dist/layouts`, defaultLayout: 'html'}))
   app.engine('.jsx', jsx({extname: '.jsx', layoutsDir: `${__dirname}/../dist/layouts`, defaultLayout: 'html'}))
   app.set('view engine', '.hbs')

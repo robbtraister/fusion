@@ -34,6 +34,11 @@ module.exports = [
     content: () => ({content: null})
   },
   {
+    match: /^\/data\/?$/,
+    template: 'data.js',
+    content: () => ({content: {data: 'data'}})
+  },
+  {
     match: /^(.*)$/,
     template: 'simple.jsx',
     content

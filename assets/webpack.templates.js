@@ -58,7 +58,7 @@ function config (Type) {
 
   const entries = {}
 
-  glob.sync(`./${types}/**/*.{${(PRODUCTION ? 'hbs,' : '')}js,jsx,vue}`)
+  glob.sync(`./${types}/**/*.{js,jsx,vue}`)
     .forEach(f => { entries[path.parse(f).base] = f })
 
   const cssExtractor = new ExtractTextPlugin('[name].[contenthash].css')
@@ -66,13 +66,11 @@ function config (Type) {
   const plugins = [
     new ManifestPlugin(),
     new TemplateExportPlugin(Type),
-    cssExtractor
-  ]
-  if (!PRODUCTION) {
-    plugins.push(new CopyWebpackPlugin([
+    cssExtractor,
+    new CopyWebpackPlugin([
       {from: `./${types}/**/*.hbs`, to: '[name].[ext]'}
-    ]))
-  }
+    ])
+  ]
   if (PRODUCTION) {
     plugins.push(new webpack.optimize.UglifyJsPlugin({
       test: /\.(hbs|jsx?|vue)$/i
@@ -133,13 +131,6 @@ function config (Type) {
       })
     }
   ]
-  if (PRODUCTION) {
-    rules.unshift({
-      test: /\.hbs$/i,
-      exclude: /node_modules/,
-      loader: ['handlebars-loader']
-    })
-  }
 
   return Object.keys(entries).length
     ? {

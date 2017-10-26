@@ -16,6 +16,7 @@ RUN npm install
 # layouts
 FROM packages AS layouts
 
+COPY .babelrc .
 COPY webpack.templates.js ./
 COPY layouts ./layouts
 
@@ -25,6 +26,7 @@ RUN npm run build:dev:templates
 # templates
 FROM packages AS templates
 
+COPY .babelrc .
 COPY webpack.templates.js ./
 COPY components ./components
 COPY templates ./templates

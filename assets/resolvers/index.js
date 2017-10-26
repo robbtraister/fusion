@@ -24,6 +24,11 @@ module.exports = [
     content
   },
   {
+    match: /^(\/vue)\/?$/,
+    template: 'template.vue',
+    content
+  },
+  {
     match: /^\/404\/?$/,
     template: 'simple.jsx',
     content: () => null
@@ -31,7 +36,12 @@ module.exports = [
   {
     match: /^\/breaking-news\/?$/,
     template: 'simple.jsx',
-    content: () => ({content: null})
+    content: () => ({content: 'BREAKING NEWS!'})
+  },
+  {
+    match: /^\/in-the-news\/?$/,
+    template: 'simple.jsx',
+    content: () => ({content: ['Hurricane Jose', 'Irma', 'Richard Branson']})
   },
   {
     match: /^\/data\/?$/,

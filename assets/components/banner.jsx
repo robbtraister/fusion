@@ -10,7 +10,8 @@ const sections = [
   'Sports',
   'Local',
   'National',
-  'World'
+  'World',
+  'Vue'
 ]
 
 const Banner = props => (
@@ -23,7 +24,7 @@ const Banner = props => (
     </button>
     <div className='collapse navbar-collapse' id='navbarNav'>
       <ul className='navbar-nav'>
-        {sections.map(s => <NavItem label={s} />)}
+        {sections.map(s => <NavItem key={s} label={s} />)}
       </ul>
     </div>
   </nav>

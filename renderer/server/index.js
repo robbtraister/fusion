@@ -12,6 +12,7 @@ const morgan = require('morgan')
 const js = require('./engines/js')
 const hbs = require('./engines/hbs')
 const jsx = require('./engines/jsx')
+const vue = require('./engines/vue')
 
 const router = options => {
   if (!/^prod/i.test(process.env.NODE_ENV) && process.env.WATCH === 'true') {
@@ -40,6 +41,7 @@ function server (port) {
   app.engine('.js', js({extname: '.js'}))
   app.engine('.hbs', hbs({extname: '.hbs', layoutsDir: `${__dirname}/../dist/layouts`, defaultLayout: 'html'}))
   app.engine('.jsx', jsx({extname: '.jsx', layoutsDir: `${__dirname}/../dist/layouts`, defaultLayout: 'html'}))
+  app.engine('.vue', vue({extname: '.vue', layoutsDir: `${__dirname}/../dist/layouts`, defaultLayout: 'html'}))
   app.set('view engine', '.hbs')
   app.set('views', `${__dirname}/../dist/templates`)
 

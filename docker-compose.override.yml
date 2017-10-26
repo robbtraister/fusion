@@ -34,4 +34,4 @@ services:
     environment:
       NODE_ENV: development
       WATCH: "true"
-      # DEBUG: server:router,controllers:render
+      DEBUG: server:engines:*

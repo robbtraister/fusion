@@ -2,22 +2,29 @@
 
 const React = require('react')
 
+const Consumer = require('consumer')
+
 const NavItem = require('./nav-item')
 
-const items = [
-  'Hurricane Jose',
-  'Irma',
-  'Richard Branson'
-]
+class InTheNews extends React.Component {
+  constructor (props) {
+    super(props)
+    this.fetch(`/_content/in-the-news`)
+  }
 
-const InTheNews = props => (
-  <div>
-    <hr style={{margin: 0, borderColor: '#000', borderWidth: '4px'}} />
-    <ul className='nav'>
-      {items.map(i => <NavItem label={i} />)}
-    </ul>
-    <hr style={{margin: 0, borderColor: '#000'}} />
-  </div>
-)
+  render () {
+    return this.state && this.state.content
+      ? (
+        <div>
+          <hr style={{margin: 0, borderColor: '#000', borderWidth: '4px'}} />
+          <ul className='nav'>
+            {this.state.content.map(i => <NavItem key={i} label={i} />)}
+          </ul>
+          <hr style={{margin: 0, borderColor: '#000'}} />
+        </div>
+      )
+      : <div />
+  }
+}
 
-module.exports = InTheNews
+module.exports = Consumer(InTheNews)

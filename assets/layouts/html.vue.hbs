@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ typeof title === 'undefined' ? 'Vue Layout' : title }}</title>
+
+    <script src="/_assets/jquery/js/jquery-3.2.1.min.js" defer="defer"></script>
+    <script src="/_assets/bootstrap/js/bootstrap.min.js" defer="defer"></script>
+
+    <script src="/_assets/client/vuejs.js" defer="defer"></script>
+    <script src="/_template{{ uri }}" defer="defer"></script>
+    <script src="/_content{{ uri }}?v=content" defer="defer"></script>
+
+    <link rel="stylesheet" type="text/css" href="/_assets/bootstrap/css/bootstrap.min.css" />
+    {{{ cssFile ? `<link rel="stylesheet" type="text/css" href="/_assets/templates/${cssFile}" />` : '' }}}
+  </head>
+  <body>
+    <div id="App">
+      <!--vue-ssr-outlet-->
+    </div>
+  </body>
+</html>

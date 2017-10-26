@@ -1,6 +1,6 @@
 'use strict'
 
-/* global Template, window */
+/* global content, Template, window */
 
 const React = require('react')
 const ReactDOM = require('react-dom')
@@ -8,7 +8,7 @@ const ReactDOM = require('react-dom')
 const Provider = require('./provider')
 const fetcher = require('./fetcher')
 
-window.render = props => {
+function render (props) {
   const templateStyle = document.getElementById('template-style')
   if (Template.cssFile) {
     templateStyle.href = `/_assets/templates/${Template.cssFile}`
@@ -20,6 +20,10 @@ window.render = props => {
     </Provider>,
     document.getElementById('App')
   )
+}
+
+document.body.onload = () => {
+  typeof content === 'undefined' || render(content)
 }
 
 window.notFound = () => {

@@ -22,7 +22,7 @@ const Layout = Component => props => {
       {/* <link rel='icon' type='image/png' sizes='16x16' href='/_assets/favicon-16x16.png' /> */}
       {/* <link rel='stylesheet' type='text/css' href='/_assets/style.css' /> */}
     </head>
-    <body is onload="typeof content !== 'undefined' && render(content)">
+    <body>
       <div id='App'>
         {Component && <Component {...props} />}
       </div>

@@ -1,7 +1,5 @@
 'use strict'
 
-/* global $ */
-
 const React = require('react')
 const Consumer = require('consumer')
 
@@ -9,10 +7,6 @@ class Breaking extends React.Component {
   constructor (props) {
     super(props)
     this.async(props.content || `/_content/breaking-news`)
-  }
-
-  componentDidMount () {
-    $('.alert').alert()
   }
 
   render () {

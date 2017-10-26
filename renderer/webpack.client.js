@@ -15,7 +15,8 @@ const resolvePreact = /^prod/i.test(process.env.NODE_ENV)
 module.exports = [
   {
     entry: {
-      react: './client/react/engine.js'
+      react: './client/react/engine.js',
+      vuejs: './client/vuejs/engine.js'
     },
     output: {
       filename: '[name].js',

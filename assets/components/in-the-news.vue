@@ -9,9 +9,9 @@
 </template>
 
 <script>
-import NavItem from './nav-item.vue'
+const NavItem = require('./nav-item.vue')
 
-export default {
+module.exports = {
   components: {
     NavItem
   },

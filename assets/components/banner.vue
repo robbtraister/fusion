@@ -12,10 +12,9 @@
 </template>
 
 <script>
+const NavItem = require('./nav-item.vue')
 
-import NavItem from './nav-item.vue'
-
-export default {
+module.exports = {
   components: {
     NavItem
   },
@@ -31,5 +30,4 @@ export default {
     ]
   })
 }
-
 </script>

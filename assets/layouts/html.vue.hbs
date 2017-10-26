@@ -7,8 +7,8 @@
     <script src="/_assets/bootstrap/js/bootstrap.min.js" defer="defer"></script>
 
     <script src="/_assets/client/vuejs.js" defer="defer"></script>
-    <script src="/_template{{ uri }}" defer="defer"></script>
-    <script src="/_content{{ uri }}?v=content" defer="defer"></script>
+    <script src="/_template{{ uri }}" onerror="notFound()" defer="defer"></script>
+    <script src="/_content{{ uri }}?v=content" onerror="notFound()" defer="defer"></script>
 
     <link rel="stylesheet" type="text/css" href="/_assets/bootstrap/css/bootstrap.min.css" />
     {{{ cssFile ? `<link rel="stylesheet" type="text/css" href="/_assets/templates/${cssFile}" />` : '' }}}

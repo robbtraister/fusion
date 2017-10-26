@@ -26,14 +26,6 @@ document.body.onload = () => {
   typeof content === 'undefined' || render(content)
 }
 
-window.notFound = () => {
-  const noscript = document.getElementById('404')
-  if (noscript) {
-    const html = noscript.innerText
-    const parent = noscript.parentElement
-    parent.removeChild(noscript)
-    parent.innerHTML += html
-  }
-}
+require('../not-found')
 
 window.react = React

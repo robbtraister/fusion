@@ -8,12 +8,13 @@ const Vue = require('vue').default
 // const Provider = require('../context/provider')
 
 function render (data) {
-  const App = Template.default
-  App.data = data
-  App.el = '#App'
-  return new Vue(App)
+  Template.data = data
+  Template.el = '#App'
+  return new Vue(Template)
 }
 
 document.body.onload = () => {
   typeof content === 'undefined' || render(content)
 }
+
+require('../not-found')

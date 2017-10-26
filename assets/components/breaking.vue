@@ -8,7 +8,7 @@
 </template>
 
 <script>
-export default {
+module.exports = {
   data () {
     (typeof window !== 'undefined') &&
       window.fetch(`/_content/breaking-news`)

@@ -5,7 +5,7 @@
 </template>
 
 <script>
-export default {
+module.exports = {
   props: ['label', 'href'],
   data () {
     const computedHref = this.href || `/${this.label.replace(' ', '-').toLowerCase()}`

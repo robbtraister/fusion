@@ -7,9 +7,9 @@
 </template>
 
 <script>
-import Wrapper from '../components/wrapper.vue'
+const Wrapper = require('../components/wrapper.vue')
 
-export default {
+module.exports = {
   components: {
     Wrapper
   }

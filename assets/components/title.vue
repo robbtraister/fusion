@@ -9,5 +9,5 @@
 </template>
 
 <script>
-import styles from './title/style.css'
+require('./title/style.css')
 </script>

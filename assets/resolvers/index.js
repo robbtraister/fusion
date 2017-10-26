@@ -25,7 +25,7 @@ module.exports = [
   },
   {
     match: /^(\/vue)\/?$/,
-    template: 'template.vue',
+    template: 'article.vue',
     content
   },
   {

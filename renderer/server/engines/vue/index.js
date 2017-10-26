@@ -56,15 +56,10 @@ module.exports = options => {
 
       renderer.then(renderer => {
         const Template = load(templateFile)
-        const App = Template.default
-        App.data = data
 
         renderer.renderToString(
-          new Vue(App),
-          Object.assign({},
-            data,
-            {cssFile: Template.cssFile || ''}
-          ),
+          new Vue(Object.assign({}, Template, {data})),
+          Object.assign({}, data, {cssFile: Template.cssFile || ''}),
           (err, html) => {
             if (err) {
               return cb(err)

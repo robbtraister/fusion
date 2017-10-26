@@ -11,12 +11,12 @@
 </template>
 
 <script>
-import Banner from './banner.vue'
-import Breaking from './breaking.vue'
-import InTheNews from './in-the-news.vue'
-import AppTitle from './title.vue'
+const Banner = require('./banner.vue')
+const Breaking = require('./breaking.vue')
+const InTheNews = require('./in-the-news.vue')
+const AppTitle = require('./title.vue')
 
-export default {
+module.exports = {
   components: {
     Banner,
     Breaking,

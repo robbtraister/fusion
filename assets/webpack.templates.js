@@ -98,7 +98,12 @@ function config (Type) {
     {
       test: /\.vue$/i,
       exclude: /node_modules/,
-      loader: ['vue-loader']
+      use: {
+        loader: 'vue-loader',
+        options: {
+          esModule: false
+        }
+      }
     },
     {
       test: /\.css$/,

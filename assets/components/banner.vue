@@ -26,7 +26,8 @@ module.exports = {
       'Local',
       'National',
       'World',
-      'Vue'
+      'Vue',
+      'Handlebars'
     ]
   })
 }

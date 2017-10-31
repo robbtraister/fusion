@@ -8,6 +8,7 @@ const createRenderer = require('vue-server-renderer').createRenderer
 
 const debug = require('debug')('server:engines:vue')
 
+// templates are compiled to js, so we can require them
 const load = /^prod/i.test(process.env.NODE_ENV)
   ? fp => require(path.resolve(fp))
   : fp => {
@@ -16,6 +17,7 @@ const load = /^prod/i.test(process.env.NODE_ENV)
     return require(fp)
   }
 
+// layouts are templated html, not js, so can't require them
 const readFresh = fp => {
   return new Promise((resolve, reject) => {
     fs.readFile(fp, (err, content) => {
@@ -27,6 +29,7 @@ const readFresh = fp => {
   })
 }
 
+// in production, cache layout files to avoid unnecessary fs reads
 const cache = {}
 const readCached = fp => {
   cache[fp] = cache[fp] || readFresh(fp)
@@ -47,7 +50,7 @@ module.exports = options => {
       const renderer = layoutName
         ? (() => {
           const viewsDir = data.settings && data.settings.views
-          const layoutFile = path.join(options.layoutsDir || viewsDir || '.', `${layoutName}.vue.hbs`)
+          const layoutFile = path.join(options.layoutsDir || viewsDir || '.', `${layoutName}.vue.html`)
           debug('layout file:', layoutFile)
 
           return read(layoutFile).then(template => createRenderer({ template }))

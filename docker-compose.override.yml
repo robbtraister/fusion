@@ -18,7 +18,7 @@ services:
       - "./proxy/tmp:/workdir/tmp:rw"
       - "./assets/resources:/workdir/resources:ro"
     environment:
-      TTL: ""
+      TTL: "2m"
       WATCH: "true"
 
   renderer:

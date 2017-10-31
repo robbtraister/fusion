@@ -11,7 +11,8 @@ const sections = [
   'Local',
   'National',
   'World',
-  'Vue'
+  'Vue',
+  'Handlebars'
 ]
 
 const Banner = props => (

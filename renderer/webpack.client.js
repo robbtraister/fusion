@@ -15,6 +15,7 @@ const resolvePreact = /^prod/i.test(process.env.NODE_ENV)
 module.exports = [
   {
     entry: {
+      hbs: './client/hbs/engine.js',
       react: './client/react/engine.js',
       vuejs: './client/vuejs/engine.js'
     },

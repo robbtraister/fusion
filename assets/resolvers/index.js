@@ -14,37 +14,37 @@ module.exports = [
     content: {content: 'Homepage'}
   },
   {
-    match: /^(\/sports)\/?$/,
+    match: /^(\/sports)\/?$/i,
     template: 'article.jsx',
     content
   },
   {
-    match: /^(\/hbs)\/?$/,
-    template: '404.hbs',
+    match: /^(\/handlebars)\/?$/i,
+    template: 'article.hbs',
     content
   },
   {
-    match: /^(\/vue)\/?$/,
+    match: /^(\/vue)\/?$/i,
     template: 'article.vue',
     content
   },
   {
-    match: /^\/404\/?$/,
+    match: /^\/404\/?$/i,
     template: 'simple.jsx',
     content: () => null
   },
   {
-    match: /^\/breaking-news\/?$/,
+    match: /^\/breaking-news\/?$/i,
     template: 'simple.jsx',
     content: () => ({content: 'BREAKING NEWS!'})
   },
   {
-    match: /^\/in-the-news\/?$/,
+    match: /^\/in-the-news\/?$/i,
     template: 'simple.jsx',
     content: () => ({content: ['Hurricane Jose', 'Irma', 'Richard Branson']})
   },
   {
-    match: /^\/data\/?$/,
+    match: /^\/data\/?$/i,
     template: 'data.js',
     content: () => ({content: {data: 'data'}})
   },

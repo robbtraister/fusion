@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>hbs test</title>
+    <script src="/handlebars.runtime-v4.0.11.js"></script>
+    <script src="/temp.hbs.js"></script>
+  </head>
+  <body>
+    <script>
+      document.body.innerHTML=Handlebars.templates['temp.hbs']({abc: 'test content'})
+    </script>
+  </body>
+</html>

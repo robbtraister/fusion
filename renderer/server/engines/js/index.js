@@ -10,8 +10,8 @@ const load = /^prod/i.test(process.env.NODE_ENV)
     return require(fp)
   }
 
-module.exports = options => (fp, data, cb) => {
-  const fn = load(fp)
+module.exports = options => (templateFile, data, cb) => {
+  const fn = load(templateFile)
   const result = fn(data, cb)
 
   if (result instanceof Promise) {

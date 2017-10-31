@@ -11,7 +11,7 @@
     <script src="/_content{{ uri }}?v=content" onerror="notFound()" defer="defer"></script>
 
     <link rel="stylesheet" type="text/css" href="/_assets/bootstrap/css/bootstrap.min.css" />
-    {{{ cssFile ? `<link rel="stylesheet" type="text/css" href="/_assets/templates/${cssFile}" />` : '' }}}
+    {{{ cssFile ? `<link rel="stylesheet" id="template-style" type="text/css" href="/_assets/templates/${cssFile}" />` : '' }}}
   </head>
   <body>
     <div id="App">

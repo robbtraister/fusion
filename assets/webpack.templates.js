@@ -58,7 +58,7 @@ function config (Type) {
 
   const entries = {}
 
-  glob.sync(`./${types}/**/*.{js,jsx,vue}`)
+  glob.sync(`./${types}/**/*.{hbs,js,jsx,vue}`)
     .forEach(f => { entries[path.parse(f).base] = f })
 
   const cssExtractor = new ExtractTextPlugin('[name].[contenthash].css')
@@ -68,7 +68,7 @@ function config (Type) {
     new TemplateExportPlugin(Type),
     cssExtractor,
     new CopyWebpackPlugin([
-      {from: `./${types}/**/*.hbs`, to: '[name].[ext]'}
+      {from: `./${types}/**/*.vue.html`, to: '[name].[ext]'}
     ])
   ]
   if (PRODUCTION) {
@@ -102,6 +102,17 @@ function config (Type) {
         loader: 'vue-loader',
         options: {
           esModule: false
+        }
+      }
+    },
+    {
+      test: /\.hbs$/i,
+      exclude: /node_modules/,
+      use: {
+        loader: 'handlebars-loader',
+        options: {
+          helperDirs: path.resolve(__dirname, 'components'),
+          partialDirs: path.resolve(__dirname, 'components')
         }
       }
     },

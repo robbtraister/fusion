@@ -17,8 +17,8 @@ class Provider extends React.Component {
   render () {
     if (this.props.cache) {
       return E('div', {},
-        E('script', {dangerouslySetInnerHTML: { __html: `var contentCache=${JSON.stringify(this.props.cache)}` }}),
-        this.props.children
+        this.props.children,
+        E('script', {dangerouslySetInnerHTML: { __html: `var contentCache=${JSON.stringify(this.props.cache)}` }})
       )
     } else {
       return this.props.children

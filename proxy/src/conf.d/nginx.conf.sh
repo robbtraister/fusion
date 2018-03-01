@@ -28,7 +28,7 @@ events {
 worker_rlimit_nofile           30000;
 
 http {
-  include                      /etc/nginx/mime.types;
+  include                      /etc/nginx/conf/mime.types;
   default_type                 application/octet-stream;
 
   server_tokens                off;
@@ -166,11 +166,6 @@ cat <<EOB
       proxy_pass               http://rendering;
     }
 
-    location / {
-      error_page               418 = @lambda;
-      return                   418;
-    }
-
     location @resources {
       return 404;
     }
@@ -191,7 +186,12 @@ cat <<EOB
     location /health {
       access_log               off;
       add_header               Content-Type text/html;
-      return                   200 "OK";
+      return                   200 'OK';
+    }
+
+    location / {
+      error_page               418 = @lambda;
+      return                   418;
     }
   }
 }

@@ -1,19 +1,19 @@
 #!/bin/sh
 
 compile() {
-  ./conf.d/nginx.conf.sh > ./nginx.conf
+  ./src/conf.d/nginx.conf.sh > ./conf/nginx.conf
 }
 
 test() {
-  compile && nginx -t -p ./ -c ./nginx.conf
+  compile && nginx -t -p ./ -c ./conf/nginx.conf
 }
 
 start() {
-  test && nginx -p ./ -c ./nginx.conf
+  test && nginx -p ./ -c ./conf/nginx.conf
 }
 
 reload() {
-  test && nginx -p ./ -c ./nginx.conf -s reload
+  test && nginx -p ./ -c ./conf/nginx.conf -s reload
 }
 
 watch() {
@@ -33,8 +33,6 @@ watch() {
     sleep ${SLEEP:-1}
   done
 }
-
-cd $(dirname "$0")
 
 mkdir -p "./tmp/$(hostname)"
 

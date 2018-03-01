@@ -140,7 +140,7 @@ cat <<EOB
     listen                     ${PORT:-8080};
     server_name                _;
 
-    location / {
+    location @lambda {
       # let \$status_class     \$status / 100 ;
       # statsd_count           "fusion.proxy.requests#app:pagebuilder,nile_env:${NILE_ENV},valid:\$valid_request,status-code:\$status,status-class:\${status_class}xx" 1;
       # statsd_timing          "fusion.proxy.latency#app:pagebuilder,nile_env:${NILE_ENV},valid:\$valid_request,status-code:\$status,status-class:\${status_class}xx" "\$request_time";
@@ -166,6 +166,11 @@ cat <<EOB
       proxy_pass               http://rendering;
     }
 
+    location / {
+      error_page               418 = @lambda;
+      return                   418;
+    }
+
     location @resources {
       return 404;
     }
@@ -176,6 +181,11 @@ cat <<EOB
 
       set \$target http://${S3_BUCKET:-${NILE_NAMESPACE:-fusion}}.s3.amazonaws.com/\${environment}/resources/\${version}/\$1;
       proxy_pass \$target;
+    }
+
+    location /${PB_CONTEXT:-pb}/api/v2/ {
+      error_page               418 = @lambda;
+      return                   418;
     }
 
     location /health {

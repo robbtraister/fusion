@@ -117,7 +117,7 @@ cat <<EOB
   }
 
   map \$cookie_version \$cookieVersion {
-    ''                         '${DEFAULT:-__default__}';
+    ''                         '${DEFAULT:-latest}';
     default                    \$cookie_version;
   }
 
@@ -187,6 +187,10 @@ cat <<EOB
       access_log               off;
       add_header               Content-Type text/html;
       return                   200 'OK';
+    }
+
+    location /lambda {
+      lambda arn:aws:lambda:${AWS_REGION:-us-east-1}:${AWS_ID:-397853141546}:function:nginx-lambda:\$version;
     }
 
     location / {

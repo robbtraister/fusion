@@ -41,3 +41,5 @@ then
   watch &
 fi
 start
+
+sleep 10000

@@ -58,18 +58,21 @@ RUN \
 RUN \
     mkdir -p \
           ./logs \
+          ./tmp \
           && \
     ln -sf /dev/stdout ./logs/access.log && \
-    ln -sf /dev/stderr ./logs/error.log
+    ln -sf /dev/stderr ./logs/error.log && \
+    chown -R ${USER}:${USER} \
+          ./logs \
+          ./tmp
 
 COPY ./src ./src
-
-#VOLUME /etc/nginx/tmp
-
-# Use nginx user
 RUN chown -R ${USER}:${USER} ./src
 
-# USER ${USER}
+VOLUME /etc/nginx/tmp
+
+# Use nginx user
+USER ${USER}
 
 # Launch init to configure PB and start supervisord on startup
 CMD ./src/run.sh

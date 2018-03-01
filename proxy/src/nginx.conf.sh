@@ -86,7 +86,7 @@ cat <<EOB
     keepalive 1;
   }
 
-  # statsd_server ${PB_DATADOG_STATSD_HOST:-172.17.0.1}:${PB_DATADOG_STATSD_PORT:-8125};
+  # statsd_server ${DATADOG_STATSD_HOST:-172.17.0.1}:${DATADOG_STATSD_PORT:-8125};
 
   map \$uri \$valid_request {
     ~[\{\}]                    'false';
@@ -141,9 +141,9 @@ cat <<EOB
     server_name                _;
 
     location @lambda {
-      # let \$status_class     \$status / 100 ;
-      # statsd_count           "fusion.proxy.requests#app:pagebuilder,nile_env:${NILE_ENV},valid:\$valid_request,status-code:\$status,status-class:\${status_class}xx" 1;
-      # statsd_timing          "fusion.proxy.latency#app:pagebuilder,nile_env:${NILE_ENV},valid:\$valid_request,status-code:\$status,status-class:\${status_class}xx" "\$request_time";
+      let \$status_class       \$status / 100 ;
+      statsd_count             "fusion.proxy.requests#app:pagebuilder,nile_env:${NILE_ENV},valid:\$valid_request,status-code:\$status,status-class:\${status_class}xx" 1;
+      statsd_timing            "fusion.proxy.latency#app:pagebuilder,nile_env:${NILE_ENV},valid:\$valid_request,status-code:\$status,status-class:\${status_class}xx" "\$request_time";
 
       # location block uses decoded uri, so must use 'if' on un-decoded request_uri
       if (\$valid_request = "false") {

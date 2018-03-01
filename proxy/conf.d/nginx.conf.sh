@@ -178,7 +178,7 @@ cat <<EOB
       proxy_pass \$target;
     }
 
-    location /${PB_CONTEXT:-pb}/health {
+    location /health {
       access_log               off;
       add_header               Content-Type text/html;
       return                   200 "OK";

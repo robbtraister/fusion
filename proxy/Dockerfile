@@ -18,8 +18,10 @@ WORKDIR /etc/nginx
 
 # build nginx with let and statsd module
 RUN \
-    DEV_PACKAGES='g++ git make openssl-dev pcre-dev wget zlib-dev' && \
+    addgroup ${USER} 2> /dev/null && \
+    adduser -S ${USER} -G ${USER} -s /bin/sh 2> /dev/null && \
     # add dev packages
+    DEV_PACKAGES='g++ git make openssl-dev pcre-dev wget zlib-dev' && \
     apk add --update --no-cache ${DEV_PACKAGES} && \
     # download nginx src
     wget --no-check-certificate -O nginx.tar.gz https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz && \
@@ -33,6 +35,8 @@ RUN \
     rm -rf ./modules/nginx-statsd/.git && \
     # build nginx
     ./configure \
+                --user=${USER} \
+                --group=${USER} \
                 --with-http_realip_module \
                 --add-module=modules/nginx-let \
                 --add-module=modules/nginx-statsd \
@@ -51,8 +55,6 @@ RUN \
     # remove dev packages
     apk del ${DEV_PACKAGES} && \
     rm -rf /var/cache/apk/* && \
-    addgroup ${USER} 2> /dev/null && \
-    adduser -S ${USER} -G ${USER} -s /bin/sh 2> /dev/null && \
     chown -R ${USER}:${USER} ./
 
 RUN \

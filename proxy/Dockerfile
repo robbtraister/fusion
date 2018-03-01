@@ -9,7 +9,7 @@ RUN \
     rm -rf /var/cache/apk/* && \
     nginx -v
 
-WORKDIR /workdir
+WORKDIR /etc/nginx
 
 RUN \
     mkdir -p \

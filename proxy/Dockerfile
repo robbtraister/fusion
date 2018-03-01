@@ -57,7 +57,6 @@ RUN \
 
 RUN \
     mkdir -p \
-          ./conf.d \
           ./logs \
           && \
     ln -sf /dev/stdout ./logs/access.log && \

@@ -10,6 +10,6 @@ services:
       - "10.65.0.2"
       - "10.67.0.2"
     volumes:
-      - "./src/conf.d:/etc/nginx/src/conf.d"
+      - "./src:/etc/nginx/src"
     environment:
       WATCH: "true"

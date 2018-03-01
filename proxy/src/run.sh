@@ -1,7 +1,7 @@
 #!/bin/sh
 
 compile() {
-  ./src/conf.d/nginx.conf.sh > ./conf/nginx.conf
+  ./src/nginx.conf.sh > ./conf/nginx.conf
 }
 
 test() {
@@ -25,7 +25,7 @@ watch() {
   while [ true ]
   do
     touch "${LOOP_FILE}"
-    if [ $(find ./conf.d -type f -newer "${MOD_FILE}") ]
+    if [ $(find ./src -type f -newer "${MOD_FILE}") ]
     then
       mv -f "${LOOP_FILE}" "${MOD_FILE}"
       reload

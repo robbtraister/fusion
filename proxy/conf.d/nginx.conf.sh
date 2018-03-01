@@ -68,6 +68,7 @@ http {
   server_names_hash_bucket_size 128;
 
   proxy_cache_path "./tmp/$HOSTNAME/cache/" levels=1:2 keys_zone=proxy:${CACHE_SIZE:-512m} max_size=${CACHE_MAX_SIZE:-100g} inactive=${CACHE_INACTIVE:-48h};
+  # proxy_cache_key \$scheme\$proxy_host\$request_uri;
 
 EOB
 
@@ -88,51 +89,56 @@ cat <<EOB
   # statsd_server ${PB_DATADOG_STATSD_HOST:-172.17.0.1}:${PB_DATADOG_STATSD_PORT:-8125};
 
   map \$uri \$valid_request {
-    ~[\{\}]   "false";
-    default   "true";
+    ~[\{\}]                    'false';
+    default                    'true';
   }
 
   map \$http_x_forwarded_host \$host_header {
-    ""        \$host;
-    default   \$http_x_forwarded_host;
+    ""                         \$host;
+    default                    \$http_x_forwarded_host;
   }
 
   # request_time is recorded in s with ms resolution; remove the '.' for ms
   map \$request_time \$latency_padded {
-    ~^(?<int>[0-9]*)\.(?<dec>[0-9]*)\$ \$int\$dec ;
-    default "NaN" ;
+    ~^(?<i>\d*)\.(?<d>\d*)\$   \$i\$d ;
+    default                    'NaN';
   }
 
   # this is just to cleanup stray 0 padding
   map \$latency_padded \$latency {
-    "0000" 0ms ;
-    ~^0*(?<num>[^0].*)\$ "\${num}ms" ;
-    default \$latency_padded ;
+    '0000'                     '0';
+    ~^0*(?<num>[^0].*)\$       \$num;
+    default                    \$latency_padded;
   }
 
   map \$request_uri \$context_free_uri {
-    ~^/${PB_CONTEXT:-pb}/(.*) /\$1;
-    default \$request_uri;
+    ~^/${PB_CONTEXT:-pb}/(.*)  /\$1;
+    default                    \$request_uri;
   }
 
   map \$cookie_version \$cookieVersion {
-    default \$cookie_version;
-    '' '${DEFAULT}';
+    ''                         '${DEFAULT:-__default__}';
+    default                    \$cookie_version;
   }
 
   map \$http_version \$headerVersion {
-    default \$http_version;
-    '' \$cookieVersion;
+    ''                         \$cookieVersion;
+    default                    \$http_version;
   }
 
   map \$arg_v \$version {
-    default \$arg_v;
-    '' \$headerVersion;
+    ''                         \$headerVersion;
+    default                    \$arg_v;
+  }
+
+  map \$host \$environment {
+    default                    '__default__';
+    ~^(?<env>[^.]+)            \$env;
   }
 
   server {
-    listen       ${PORT:-8080};
-    server_name  _;
+    listen                     ${PORT:-8080};
+    server_name                _;
 
     location / {
       # let \$status_class     \$status / 100 ;
@@ -168,7 +174,7 @@ cat <<EOB
       proxy_intercept_errors   on;
       error_page               400 403 404 418 = @resources;
 
-      set \$target http://${S3_BUCKET:-${NILE_NAMESPACE:-fusion}}.s3.amazonaws.com/${S3_PREFIX:-${NILE_ENV}}/resources/\${version}/\$1;
+      set \$target http://${S3_BUCKET:-${NILE_NAMESPACE:-fusion}}.s3.amazonaws.com/\${environment}/resources/\${version}/\$1;
       proxy_pass \$target;
     }
 

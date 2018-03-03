@@ -14,10 +14,18 @@ function externals (context, request, callback) {
   callback()
 }
 
+// if consumer is not found, attempt to build without it
+let alias = {}
+try {
+  alias = {
+    'consumer': require.resolve('./src/consumer.js')
+  }
+} catch (e) {}
+
 function config (Type) {
   const types = `${Type.toLowerCase()}s`
 
-  const typeDir = `${__dirname}/src/assets/${types}/`
+  const typeDir = `${__dirname}/assets/${types}/`
   const entry = {}
   glob.sync(`${typeDir}**/*.{hbs,js,jsx,vue}`)
     .forEach(f => { entry[f.substr(typeDir.length)] = f })
@@ -54,7 +62,11 @@ function config (Type) {
         path: path.resolve(__dirname, 'dist', types),
         libraryTarget: 'commonjs2'
       },
-      plugins: [new ManifestPlugin()]
+      plugins: [new ManifestPlugin()],
+      resolve: {
+        alias,
+        extensions: ['.js', '.jsx']
+      }
     }
     : null
 }

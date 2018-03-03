@@ -32,6 +32,7 @@ services:
     ports:
       - "8081:80"
     volumes:
+      - "./assets:/workdir/lambda/assets:ro"
       - "./render/src:/workdir/lambda/src:ro"
 
   resolver-server:

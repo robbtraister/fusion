@@ -1,0 +1,22 @@
+[
+  {
+    "uri": "/homepage",
+    "template": "homepage",
+    "content": "homepage"
+  },
+  {
+    "uri": "/sports",
+    "template": "sports",
+    "content": "sports"
+  },
+  {
+    "pattern": "^/video/.*",
+    "template": "video",
+    "content": "article"
+  },
+  {
+    "pattern": ".*",
+    "template": "article",
+    "content": "article"
+  }
+]

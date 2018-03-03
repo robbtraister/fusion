@@ -179,8 +179,7 @@ cat <<EOB
     }
 
     location /${PB_CONTEXT:-pb}/api/v2/ {
-      error_page               418 = @lambda;
-      return                   418;
+      ${API_HANDLER};
     }
 
     location /health {
@@ -189,13 +188,9 @@ cat <<EOB
       return                   200 'OK';
     }
 
-    location /lambda {
-      lambda arn:aws:lambda:${AWS_REGION:-us-east-1}:${AWS_ID:-397853141546}:function:nginx-lambda:\$version;
-    }
-
     location / {
-      error_page               418 = @lambda;
-      return                   418;
+      ${DEFAULT_HANDLER};
+      # lambda arn:aws:lambda:${AWS_REGION:-us-east-1}:${AWS_ID:-397853141546}:function:nginx-lambda:\$version;
     }
   }
 }

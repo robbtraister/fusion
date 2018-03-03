@@ -1,0 +1,50 @@
+version: "2"
+services:
+  entry-proxy:
+    build: ./proxy
+    dns:
+      - "8.8.8.8"
+      - "8.8.4.4"
+      - "10.65.0.2"
+      - "10.67.0.2"
+    environment:
+      API_HANDLER: "proxy_pass http://render-server"
+      DEFAULT_HANDLER: "proxy_pass http://resolver-server"
+      WATCH: "true"
+    links:
+      - "render-server"
+      - "resolver-server"
+    ports:
+      - "8080:8080"
+    volumes:
+      - "./proxy/src:/etc/nginx/src:ro"
+
+  render-server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+      args:
+        LAMBDA: render
+    environment:
+      DEBUG: watcher:*
+      PORT: 80
+      WATCH: "true"
+    ports:
+      - "8081:80"
+    volumes:
+      - "./render/src:/workdir/lambda/src:ro"
+
+  resolver-server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+      args:
+        LAMBDA: resolver
+    environment:
+      DEBUG: watcher:*
+      PORT: 80
+      WATCH: "true"
+    ports:
+      - "8082:80"
+    volumes:
+      - "./resolver/src:/workdir/lambda/src:ro"

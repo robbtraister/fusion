@@ -1,6 +1,9 @@
 version: "2"
 services:
-  proxy:
+  entry-proxy:
     build: .
+    environment:
+      API_HANDLER: 'lambda arn:aws:lambda:${AWS_REGION:-us-east-1}:${AWS_ID:-397853141546}:function:fusion-render:\$version'
+      DEFAULT_HANDLER: 'lambda arn:aws:lambda:${AWS_REGION:-us-east-1}:${AWS_ID:-397853141546}:function:fusion-resolver:\$version'
     ports:
       - "8080:8080"

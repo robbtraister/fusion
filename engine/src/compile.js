@@ -6,7 +6,7 @@ const React = require('react')
 
 const componentRoot = process.env.COMPONENT_ROOT || '../dist/components'
 
-const renderAll = function (renderableItems) {
+const renderAll = function renderAll (renderableItems) {
   return (renderableItems || [])
     .map(renderableItem)
     .filter(ri => ri)
@@ -29,9 +29,17 @@ const feature = function feature (config) {
 }
 
 const chain = function chain (config) {
+  const component = (() => {
+    try {
+      return require(`${componentRoot}/${config.chainConfig}.jsx`)
+    } catch (e) {
+      return 'div'
+    }
+  })()
+
   return React.createElement(
-    'div',
-    {key: config.chainConfig.id},
+    component,
+    {key: config.id},
     renderAll(config.features)
   )
 }

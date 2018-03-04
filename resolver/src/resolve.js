@@ -2,34 +2,55 @@
 
 'use strict'
 
-const resolvers = require('./resolvers.json')
-  .map(resolver => Object.assign(resolver, resolver.pattern ? {pattern: new RegExp(resolver.pattern)} : {}))
-
 const fetch = require('./fetch')
 
-const resolve = function resolve (uri) {
-  const match = function match (resolver) {
-    return resolver.uri ? resolver.uri === uri
-      : resolver.pattern ? resolver.pattern.test(uri)
-      : null
+const hydrate = function hydrate (resolver, ...args) {
+  const getTemplate = function getTemplate (content) {
+    return resolver.template
   }
 
-  const inflate = function inflate (resolver) {
-    const getTemplate = function getTemplate (content) {
-      return resolver.template
-    }
-
-    return fetch(resolver.content, uri)
+  const hydrateUri = function hydrateUri (requestUri) {
+    return fetch(resolver.content, requestUri)
       .then(content => ({
+        requestUri,
         content,
         template: getTemplate(content)
       }))
   }
 
-  const resolver = resolvers.find(match)
+  return (args.length === 0)
+    ? hydrateUri
+    : hydrateUri(...args)
+}
+
+const match = function match (resolver, ...args) {
+  const matchUri =
+      resolver.uri ? (requestUri) => resolver.uri === requestUri
+    : resolver.pattern ? (
+      () => {
+        const pattern = new RegExp(resolver.pattern)
+        return (requestUri) => pattern.test(requestUri)
+      })()
+    : () => null
+
+  return (args.length === 0)
+    ? matchUri
+    : matchUri(...args)
+}
+
+const resolvers = require('./resolvers.json')
+  .map(resolver => Object.assign(resolver,
+    {
+      hydrate: hydrate(resolver),
+      match: match(resolver)
+    }
+  ))
+
+const resolve = function resolve (requestUri) {
+  const resolver = resolvers.find(resolver => resolver.match(requestUri))
 
   return resolver
-    ? inflate(resolver)
+    ? resolver.hydrate(requestUri)
     : Promise.resolve(null)
 }
 

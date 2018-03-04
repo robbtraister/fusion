@@ -1,7 +1,7 @@
 'use strict'
 
 const middleware = function middleware (req, res, next) {
-  require('./render')()
+  require('./render')({})
     .then(data => res.send(data))
     .catch(next)
 }

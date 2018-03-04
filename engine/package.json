@@ -1,5 +1,5 @@
 {
-  "name": "fusion-rendering",
+  "name": "fusion-engine",
   "version": "1.0.0",
   "description": "",
   "main": "src/render.js",
@@ -13,6 +13,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "graphql": "^0.13.1",
+    "lodash": "^4.17.5",
+    "prop-types": "^15.6.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "request-promise-native": "^1.0.5"

@@ -12,8 +12,6 @@ do
   fi
 done
 
-HOSTNAME=$(hostname)
-
 cat <<EOB
 daemon off;
 pid ./nginx.pid;
@@ -34,7 +32,10 @@ http {
   server_tokens                off;
   underscores_in_headers       on;
 
-  access_log                   ./logs/access.log;
+
+  log_format simple '\$status \$request_method \$uri\$query_params \$latency';
+
+  access_log                   ./logs/access.log simple;
   error_log                    ./logs/error.log;
 
   # ELB/ALB is likely set to 60s; ensure we stay open at least that long
@@ -44,11 +45,11 @@ http {
   real_ip_header               X-Forwarded-For;
   real_ip_recursive            on;
 
-  client_body_temp_path        "./tmp/$HOSTNAME/client_body";
-  fastcgi_temp_path            "./tmp/$HOSTNAME/fastcgi";
-  proxy_temp_path              "./tmp/$HOSTNAME/proxy";
-  scgi_temp_path               "./tmp/$HOSTNAME/scgi";
-  uwsgi_temp_path              "./tmp/$HOSTNAME/uwsgi";
+  client_body_temp_path        "./tmp/$(hostname)/client_body";
+  fastcgi_temp_path            "./tmp/$(hostname)/fastcgi";
+  proxy_temp_path              "./tmp/$(hostname)/proxy";
+  scgi_temp_path               "./tmp/$(hostname)/scgi";
+  uwsgi_temp_path              "./tmp/$(hostname)/uwsgi";
 
   large_client_header_buffers  4 64k;
   client_body_buffer_size      16k;
@@ -67,7 +68,7 @@ http {
 
   server_names_hash_bucket_size 128;
 
-  proxy_cache_path "./tmp/$HOSTNAME/cache/" levels=1:2 keys_zone=proxy:${CACHE_SIZE:-512m} max_size=${CACHE_MAX_SIZE:-100g} inactive=${CACHE_INACTIVE:-48h};
+  # proxy_cache_path "./tmp/$(hostname)/cache/" levels=1:2 keys_zone=proxy:${CACHE_SIZE:-512m} max_size=${CACHE_MAX_SIZE:-100g} inactive=${CACHE_INACTIVE:-48h};
   # proxy_cache_key \$scheme\$proxy_host\$request_uri;
 
 EOB
@@ -96,6 +97,11 @@ cat <<EOB
   map \$http_x_forwarded_host \$host_header {
     ""                         \$host;
     default                    \$http_x_forwarded_host;
+  }
+
+  map \$is_args \$query_params {
+    '?'                        \$is_args\$args;
+    default                    '';
   }
 
   # request_time is recorded in s with ms resolution; remove the '.' for ms

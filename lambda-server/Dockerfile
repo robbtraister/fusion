@@ -18,9 +18,9 @@ FROM npm as server
 
 WORKDIR /workdir/server
 
-COPY ./server/package*.json ./
+COPY ./lambda-server/package*.json ./
 RUN npm install
-COPY ./server ./
+COPY ./lambda-server ./
 
 
 
@@ -33,7 +33,7 @@ COPY ./${LAMBDA}/package*.json ./
 RUN npm install
 
 COPY ./${LAMBDA}/ ./
-RUN npm run build || echo ''
+RUN npm run build 2> /dev/null || true
 
 
 

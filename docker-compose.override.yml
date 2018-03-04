@@ -1,0 +1,5 @@
+version: "2"
+services:
+  engine-server:
+    volumes:
+      - "./assets:/workdir/lambda/assets:ro"

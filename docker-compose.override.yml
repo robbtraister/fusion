@@ -1,5 +1,7 @@
 version: "2"
 services:
   engine-server:
+    environment:
+      CONTENT_BASE: 'https://${API_USERNAME}:${API_PASSWORD}@api.${ARC_ORG_NAME}.arcpublishing.com'
     volumes:
-      - "./assets:/workdir/lambda/assets:ro"
+      - "${ASSET_DIR}:/workdir/lambda/assets:ro"

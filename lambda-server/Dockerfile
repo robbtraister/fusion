@@ -8,6 +8,7 @@ RUN \
             nodejs-npm \
             && \
     npm install -g npm && \
+    git --version && \
     npm -v && \
     node -v && \
     rm -rf /var/cache/apk/*

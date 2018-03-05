@@ -11,6 +11,7 @@ services:
       API_HANDLER: "proxy_pass http://engine-server:8080"
       DEFAULT_HANDLER: "proxy_pass http://resolver-server:8080"
       WATCH: "true"
+    image: fusion-proxy
     links:
       - "engine-server"
       - "resolver-server"
@@ -33,6 +34,7 @@ services:
     environment:
       DEBUG: watcher:*
       WATCH: "true"
+    image: fusion-engine
     ports:
       - "8081:8080"
     volumes:
@@ -47,6 +49,7 @@ services:
     environment:
       DEBUG: watcher:*
       WATCH: "true"
+    image: fusion-resolver
     ports:
       - "8082:8080"
     volumes:

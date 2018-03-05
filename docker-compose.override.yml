@@ -3,5 +3,6 @@ services:
   engine-server:
     environment:
       CONTENT_BASE: 'https://${API_USERNAME}:${API_PASSWORD}@api.${ARC_ORG_NAME}.arcpublishing.com'
+      PB_ADMIN: 'http://${ARC_ORG_NAME}.pb.arc.pub'
     volumes:
       - "${ASSET_DIR}:/workdir/lambda/assets:ro"

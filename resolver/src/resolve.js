@@ -26,12 +26,12 @@ const hydrate = function hydrate (resolver, ...args) {
 const match = function match (resolver, ...args) {
   const matchUri =
       resolver.uri ? (requestUri) => resolver.uri === requestUri
-    : resolver.pattern ? (
-      () => {
-        const pattern = new RegExp(resolver.pattern)
-        return (requestUri) => pattern.test(requestUri)
-      })()
-    : () => null
+        : resolver.pattern ? (
+          () => {
+            const pattern = new RegExp(resolver.pattern)
+            return (requestUri) => pattern.test(requestUri)
+          })()
+          : () => null
 
   return (args.length === 0)
     ? matchUri

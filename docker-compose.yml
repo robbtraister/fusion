@@ -8,8 +8,8 @@ services:
       - "10.65.0.2"
       - "10.67.0.2"
     environment:
-      API_HANDLER: "proxy_pass http://engine-server:8080"
-      DEFAULT_HANDLER: "proxy_pass http://resolver-server:8080"
+      ENGINE_HANDLER: "proxy_pass http://engine-server:8080"
+      RESOLVER_HANDLER: "proxy_pass http://resolver-server:8080"
       WATCH: "true"
     image: fusion-proxy
     links:

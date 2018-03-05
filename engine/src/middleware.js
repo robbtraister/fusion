@@ -15,7 +15,9 @@ const middleware = function middleware (req, res, next) {
       .then(data => res.send(data))
       .catch(next)
   } else {
-    require('./render')({})
+    require('./render')({
+      template: 'r0EYwGFP86htkq'
+    })
       .then(data => res.send(data))
       .catch(next)
   }

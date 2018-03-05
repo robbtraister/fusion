@@ -47,7 +47,7 @@ const chain = function chain (config) {
 const renderableItem = function renderableItem (config) {
   return (config.featureConfig) ? feature(config)
     : (config.chainConfig) ? chain(config)
-    : null
+      : null
 }
 
 const layoutItem = function layoutItem (config) {
@@ -67,7 +67,6 @@ const layout = function layout (config, item) {
 }
 
 const compile = function compile (rendering) {
-  rendering = rendering || require('./rendering.json')
   return (props) => React.createElement(
     'div',
     props,

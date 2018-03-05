@@ -172,6 +172,14 @@ cat <<EOB
       proxy_pass               http://rendering;
     }
 
+    location @engine {
+      ${ENGINE_HANDLER};
+    }
+
+    location @resolver {
+      ${RESOLVER_HANDLER};
+    }
+
     location @resources {
       return 404;
     }
@@ -184,8 +192,19 @@ cat <<EOB
       proxy_pass \$target;
     }
 
+    location /${CONTEXT:-pb}/api/v2/resolve {
+      error_page               418 = @resolver;
+      return                   418;
+    }
+
     location /${CONTEXT:-pb}/api/v2/ {
-      ${API_HANDLER};
+      error_page               418 = @engine;
+      return                   418;
+    }
+
+    location /${CONTEXT:-pb}/admin/api/ {
+      error_page               418 = @engine;
+      return                   418;
     }
 
     location /health {
@@ -195,8 +214,8 @@ cat <<EOB
     }
 
     location / {
-      ${DEFAULT_HANDLER};
-      # lambda arn:aws:lambda:${AWS_REGION:-us-east-1}:${AWS_ID:-397853141546}:function:nginx-lambda:\$version;
+      error_page 418 = @resolver;
+      return 418;
     }
   }
 }

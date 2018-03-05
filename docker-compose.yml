@@ -25,6 +25,11 @@ services:
       dockerfile: lambda-server/Dockerfile
       args:
         LAMBDA: engine
+    dns:
+      - "8.8.8.8"
+      - "8.8.4.4"
+      - "10.65.0.2"
+      - "10.67.0.2"
     environment:
       DEBUG: watcher:*
       WATCH: "true"

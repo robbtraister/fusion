@@ -118,7 +118,7 @@ cat <<EOB
   }
 
   map \$request_uri \$context_free_uri {
-    ~^/${PB_CONTEXT:-pb}/(.*)  /\$1;
+    ~^/${CONTEXT:-pb}/(.*)  /\$1;
     default                    \$request_uri;
   }
 
@@ -176,7 +176,7 @@ cat <<EOB
       return 404;
     }
 
-    location ~ ^/${PB_CONTEXT:-pb}/resources/(.*) {
+    location ~ ^/${CONTEXT:-pb}/resources/(.*) {
       proxy_intercept_errors   on;
       error_page               400 403 404 418 = @resources;
 
@@ -184,7 +184,7 @@ cat <<EOB
       proxy_pass \$target;
     }
 
-    location /${PB_CONTEXT:-pb}/api/v2/ {
+    location /${CONTEXT:-pb}/api/v2/ {
       ${API_HANDLER};
     }
 

@@ -1,8 +1,12 @@
 'use strict'
 
+const url = require('url')
+
 const request = require('request-promise-native')
 
 const getSource = require('./sources')
+
+const contentBase = process.env.CONTENT_BASE
 
 const fetch = function fetch (sourceName, ...args) {
   const source = getSource(sourceName)
@@ -12,7 +16,7 @@ const fetch = function fetch (sourceName, ...args) {
       ? source.uri(key)
       : source.uri
 
-    return request(uri)
+    return request(url.resolve(contentBase, uri))
   }
 
   return (args.length === 0)

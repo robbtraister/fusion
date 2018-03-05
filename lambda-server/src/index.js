@@ -19,7 +19,7 @@ const server = function server (port) {
 
   app.use(
     bodyParser.urlencoded({extended: true}),
-    // wrap this require in a function to ensure it loads the latest after shell-watcher invalidation
+    // re-require on request to ensure invalidated cache is reloaded
     (req, res, next) => require(`${__dirname}/../../lambda/src/middleware`)(req, res, next)
   )
 

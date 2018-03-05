@@ -1,6 +1,7 @@
 'use strict'
 
 const _ = require('lodash')
+const JSONNormalize = require('json-normalize')
 
 const React = require('react')
 const E = React.createElement
@@ -21,7 +22,9 @@ class Provider extends React.Component {
         const source = getSource(sourceName)
 
         const getSourceContent = (key, query) => {
-          const keyCache = sourceCache[key] = sourceCache[key] || {
+          // alphabetize object keys to ensure proper cacheability
+          const keyString = JSONNormalize.stringify(key)
+          const keyCache = sourceCache[keyString] = sourceCache[keyString] || {
             data: undefined,
             filtered: undefined,
             promise: fetch(sourceName, key)

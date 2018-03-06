@@ -1,13 +1,17 @@
 {
   "name": "fusion-resolver",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "src/resolve.js",
   "scripts": {
-    "start": "node ../server",
+    "start": "sls offline start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.2",
+    "serverless-http": "^1.5.3"
+  }
 }

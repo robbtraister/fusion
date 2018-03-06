@@ -1,5 +1,6 @@
 **/.DS_Store
 **/.env
+**/.serverless
 
 **/dist
 **/node_modules

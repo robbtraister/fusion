@@ -1,6 +1,13 @@
 'use strict'
 
-const middleware = function middleware (req, res, next) {
+const express = require('express')
+const serverless = require('serverless-http')
+
+const app = express()
+
+const router = express.Router()
+
+router.get('*', (req, res, next) => {
   if (req.query.source) {
     new Promise((resolve, reject) => {
       try {
@@ -21,6 +28,12 @@ const middleware = function middleware (req, res, next) {
       .then(data => res.send(data))
       .catch(next)
   }
-}
+})
 
-module.exports = middleware
+app.use(router)
+
+module.exports = {
+  app,
+  router,
+  serverless: serverless(app)
+}

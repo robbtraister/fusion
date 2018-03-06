@@ -1,0 +1,28 @@
+# serverless.yml
+
+service: fusion-engine
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  stage: dev
+  region: us-east-1
+
+functions:
+  engine:
+    handler: src/app.serverless
+    events:
+      - http: ANY /
+      - http: 'ANY {proxy+}'
+
+package:
+  exclude:
+    - webpack.config.js
+
+plugins:
+  - serverless-offline
+
+custom:
+  serverless-offline:
+    host: '0.0.0.0'
+    port: 8080

@@ -4,45 +4,60 @@
 
 const fetch = require('./fetch')
 
-const hydrate = function hydrate (resolver, ...args) {
-  const getTemplate = function getTemplate (content) {
-    return resolver.template
-  }
-
-  const hydrateUri = function hydrateUri (requestUri) {
-    return fetch(resolver.content, requestUri)
-      .then(content => ({
-        requestUri,
-        content,
-        template: getTemplate(content)
-      }))
-  }
-
-  return (args.length === 0)
-    ? hydrateUri
-    : hydrateUri(...args)
+const getTemplateResolver = function getTemplateResolver (resolver) {
+  return (content) => resolver.template
 }
 
-const match = function match (resolver, ...args) {
-  const matchUri =
-      resolver.uri ? (requestUri) => resolver.uri === requestUri
-    : resolver.pattern ? (
-      () => {
-        const pattern = new RegExp(resolver.pattern)
-        return (requestUri) => pattern.test(requestUri)
-      })()
-    : () => null
+// const getTemplate = function getTemplate (resolver, ...args) {
+//   const templateResolver = getTemplateResolver(resolver)
+//
+//   return (args.length === 0)
+//     ? templateResolver
+//     : templateResolver(...args)
+// }
 
-  return (args.length === 0)
-    ? matchUri
-    : matchUri(...args)
+const getResolverHydrater = function getResolverHydrater (resolver) {
+  const templateResolver = getTemplateResolver(resolver)
+  return (requestUri) => fetch(resolver.content, requestUri)
+    .then(content => ({
+      requestUri,
+      content,
+      template: templateResolver(content)
+    }))
 }
+
+// const hydrate = function hydrate (resolver, ...args) {
+//   const hydrater = getResolverHydrater(resolver)
+//
+//   return (args.length === 0)
+//     ? hydrater
+//     : hydrater(...args)
+// }
+
+const getResolverMatcher = function getResolverMatcher (resolver) {
+  if (resolver.uri) {
+    return (requestUri) => resolver.uri === requestUri
+  } else if (resolver.pattern) {
+    const pattern = new RegExp(resolver.pattern)
+    return (requestUri) => pattern.test(requestUri)
+  }
+  return () => null
+}
+
+// const match = function match (resolver, ...args) {
+//   const matcher = getResolverMatcher(resolver)
+//
+//   return (args.length === 0)
+//     ? matcher
+//     : matcher(...args)
+// }
 
 const resolvers = require('./resolvers.json')
   .map(resolver => Object.assign(resolver,
     {
-      hydrate: hydrate(resolver),
-      match: match(resolver)
+      // getTemplate: getTemplateResolver(resolver),
+      hydrate: getResolverHydrater(resolver),
+      match: getResolverMatcher(resolver)
     }
   ))
 

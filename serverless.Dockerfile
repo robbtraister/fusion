@@ -24,5 +24,11 @@ RUN \
     npm install serverless-offline
 COPY ./${LAMBDA}/ ./
 
+# This only existed to run webpack
+# Since this Dockerfile is only used for local development
+#   and the assets are volume mapped and hot-reloaded,
+#   there is no point to pre-building
+# RUN npm run build 2> /dev/null || true
+
 ENTRYPOINT ["npm", "run"]
 CMD ["start"]

@@ -8,6 +8,7 @@ services:
       - "10.65.0.2"
       - "10.67.0.2"
     environment:
+      PORT: '8080'
       API_HANDLER: "proxy_pass http://engine-server:8080"
       DEFAULT_HANDLER: "proxy_pass http://resolver-server:8080"
       WATCH: "true"
@@ -32,6 +33,7 @@ services:
       - "10.65.0.2"
       - "10.67.0.2"
     environment:
+      PORT: '8080'
       DEBUG: watcher:*
       WATCH: "true"
     image: fusion-engine
@@ -47,6 +49,7 @@ services:
       args:
         LAMBDA: resolver
     environment:
+      PORT: '8080'
       DEBUG: watcher:*
       WATCH: "true"
     image: fusion-resolver

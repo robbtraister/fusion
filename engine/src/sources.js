@@ -14,12 +14,20 @@ const getSourceFetcher = function getSourceFetcher (source) {
   return (key) => request(url.resolve(contentBase, source.resolve(key)))
 }
 
+const expandProperties = function expandProperties (string, properties) {
+  return string.replace(/\$\{([^}]+)\}/g, function (match, prop) {
+    return (prop === 'key')
+      ? properties
+      : properties[prop.replace(/^key\./, '')] || match
+  })
+}
+
 const getSourceResolver = function getSourceResolver (source) {
   const nativeResolve = source.resolve
   return (nativeResolve instanceof Function)
-    ? (key) => nativeResolve(key)
-    : (nativeResolve)
-      ? (key) => nativeResolve
+    ? nativeResolve
+    : (source.pattern)
+      ? (key) => expandProperties(source.pattern, key)
       : () => source.uri
 }
 

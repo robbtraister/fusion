@@ -1,33 +1,31 @@
+#!/usr/bin/env node
+
 'use strict'
 
 const { graphql } = require('graphql')
 
 const getSchema = require('./schemas')
 
-const getQuery = function getQuery (query) {
-  return query
-}
-
 const filter = function filter (schemaName, ...args) {
-  const filterQuery = function filterQuery (query, ...args) {
-    const filterData = (query)
-      ? (data) => graphql(getSchema(schemaName), getQuery(query), data)
-        .then(result => {
-          if (result.errors) {
-            throw result.errors[0]
-          }
-          return result.data
-        })
-      : (data) => Promise.resolve(data)
+  const schema = getSchema(schemaName)
 
-    return (args.length === 0)
-      ? filterData
-      : filterData(...args)
-  }
+  const filterData = (schema)
+    ? (query, data) => {
+      return (query)
+        ? graphql(schema, query, data)
+          .then(result => {
+            if (result.errors) {
+              throw result.errors[0]
+            }
+            return result.data
+          })
+        : Promise.resolve(data)
+    }
+    : (query, data) => Promise.resolve(data)
 
   return (args.length === 0)
-    ? filterQuery
-    : filterQuery(...args)
+    ? filterData
+    : filterData(...args)
 }
 
 module.exports = filter

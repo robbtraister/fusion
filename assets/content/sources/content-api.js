@@ -1,19 +1,14 @@
-#!/usr/bin/env node
-
 'use strict'
 
-const uri = function uri (key) {
-  const requestUri = `/content/v3/stories/?canonical_url=${key.uri}`
+const resolve = function resolve (key) {
+  const requestUri = `/content/v3/stories/?canonical_url=${key}`
 
-  return ('published' in key)
+  return (key.hasOwnProperty('published'))
     ? `${requestUri}&published=${key.published}`
     : requestUri
 }
 
 module.exports = {
-  uri
-}
-
-if (module === require.main) {
-  console.log(uri(process.argv[2]))
+  resolve,
+  schemaName: 'minimal'
 }

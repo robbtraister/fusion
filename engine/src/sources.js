@@ -1,13 +1,47 @@
 'use strict'
 
-const sourcesRoot = process.env.SOURCES_ROOT || '../assets/content/sources'
+const path = require('path')
+const url = require('url')
 
-const sources = {}
+const request = require('request-promise-native')
+
+const contentBase = process.env.CONTENT_BASE || ''
+const sourcesRoot = path.resolve(process.env.SOURCES_ROOT || `${__dirname}/../assets/content/sources`)
+
+const getSchemaFilter = require('./filter')
+
+const getSourceFetcher = function getSourceFetcher (source) {
+  return (key) => request(url.resolve(contentBase, source.resolve(key)))
+}
+
+const getSourceResolver = function getSourceResolver (source) {
+  const nativeResolve = source.resolve
+  return (nativeResolve instanceof Function)
+    ? (key) => nativeResolve(key)
+    : (nativeResolve)
+      ? (key) => nativeResolve
+      : () => source.uri
+}
+
+const sourceCache = {}
 const getSource = function getSource (sourceName) {
-  if (!(sourceName in sources)) {
-    sources[sourceName] = require(`${sourcesRoot}/${sourceName}`)
+  if (!(sourceName in sourceCache)) {
+    try {
+      const source = require(`${sourcesRoot}/${sourceName}`)
+      sourceCache[sourceName] = Object.assign(
+        source,
+        {
+          fetch: getSourceFetcher(source),
+          filter: getSchemaFilter(source.schemaName),
+          resolve: getSourceResolver(source)
+        }
+      )
+    } catch (err) {
+      console.log(err)
+      throw err
+    }
   }
-  return sources[sourceName]
+  return sourceCache[sourceName]
 }
 
 module.exports = getSource

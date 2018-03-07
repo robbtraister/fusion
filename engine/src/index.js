@@ -1,24 +1,15 @@
-#!/usr/bin/env node
-
 'use strict'
 
-const fetch = require('./fetch')
-const filter = require('./filter')
-const render = require('./render')
+const serverless = require('serverless-http')
 
-const actions = {
-  fetch,
-  filter,
-  render
-}
+const app = require('./app')
 
-const main = function main (action, data) {
-  const handler = actions[action]
-  return handler && handler(data)
-}
-
-module.exports = main
-
-if (module === require.main) {
-  main(...process.argv.slice(2))
+module.exports = {
+  app,
+  filter: require('./filter'),
+  render: require('./react/render'),
+  router: require('./router'),
+  schemas: require('./schemas'),
+  serverless: serverless(app),
+  sources: require('./sources')
 }

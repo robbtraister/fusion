@@ -10,7 +10,7 @@ provider:
 
 functions:
   engine:
-    handler: src/app.serverless
+    handler: src/index.serverless
     events:
       - http: ANY /
       - http: 'ANY {proxy+}'

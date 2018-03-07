@@ -4,8 +4,9 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "build": "webpack",
-    "prestart": "webpack --watch &",
+    "build:assets": "webpack --config ./webpack.assets.js",
+    "watch:assets": "npm run build:assets -- --watch",
+    "prestart": "npm run watch:assets &",
     "start": "sls offline start",
     "test": "node render ./rendering.json"
   },
@@ -13,10 +14,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.18.2",
     "express": "^4.16.2",
     "graphql": "^0.13.1",
     "json-normalize": "^1.1.2",
     "lodash": "^4.17.5",
+    "mongoose": "^5.0.9",
     "prop-types": "^15.6.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",

@@ -4,16 +4,21 @@ const { buildSchema, GraphQLSchema } = require('graphql')
 
 const schemasRoot = process.env.SCHEMAS_ROOT || '../assets/content/schemas'
 
-const schemas = {}
+const schemaCache = {}
 const getSchema = function getSchema (schemaName) {
-  if (!(schemaName in schemas)) {
-    const schema = require(`${schemasRoot}/${schemaName}`)
+  if (!(schemaName in schemaCache)) {
+    try {
+      const schema = require(`${schemasRoot}/${schemaName}`)
 
-    schemas[schemaName] = (schema instanceof GraphQLSchema)
-      ? schema
-      : buildSchema(schema)
+      schemaCache[schemaName] = (schema instanceof GraphQLSchema)
+        ? schema
+        : buildSchema(schema)
+    } catch (err) {
+      console.error(err)
+      throw err
+    }
   }
-  return schemas[schemaName]
+  return schemaCache[schemaName]
 }
 
 module.exports = getSchema

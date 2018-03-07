@@ -2,22 +2,18 @@
 
 'use strict'
 
-const request = require('request-promise-native')
-
 const ReactDOM = require('react-dom/server')
 
 const compile = require('./compile')
-const Provider = require('./components/provider')
+const Provider = require('../components/provider')
+
+// const renderings = require('./models/schemaless')(process.env.MONGO_URL).collection('rendering')
+const Rendering = require('../models/rendering')
 
 const getRendering = function getRendering (template) {
   return (template instanceof String || typeof template === 'string')
-    ? request({
-      uri: `${process.env.PB_ADMIN}/pb/admin/api/rendering/${template}`,
-      headers: {
-        'ARC_USERNAME': 'fusion'
-      }
-    })
-      .then(rendering => JSON.parse(rendering))
+    ? Rendering.then(model => model.findById(template))
+      .then(rendering => rendering._doc)
     : Promise.resolve(template)
 }
 
@@ -54,7 +50,7 @@ module.exports = render
 
 if (module === require.main) {
   const input = (process.argv.length > 2)
-    ? Promise.resolve(require(process.argv[2]))
+    ? Promise.resolve(process.argv[2])
     : new Promise((resolve, reject) => {
       let data = ''
       process.stdin.on('data', (chunk) => {
@@ -70,7 +66,7 @@ if (module === require.main) {
     })
 
   input
-    .then((rendering) => render(rendering))
+    .then((rendering) => render({template: rendering}))
     .then(console.log)
     .catch(console.error)
 }

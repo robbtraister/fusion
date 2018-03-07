@@ -8,8 +8,6 @@ const E = React.createElement
 
 const contextTypes = require('./types')
 
-const fetch = require('../fetch')
-const filter = require('../filter')
 const getSource = require('../sources')
 
 class Provider extends React.Component {
@@ -27,7 +25,7 @@ class Provider extends React.Component {
           const keyCache = sourceCache[keyString] = sourceCache[keyString] || {
             data: undefined,
             filtered: undefined,
-            promise: fetch(sourceName, key)
+            promise: source.fetch(key)
               .then(data => {
                 keyCache.data = data
                 return data
@@ -36,7 +34,7 @@ class Provider extends React.Component {
 
           keyCache.promise = keyCache.promise
             .then(data => (query && source && source.schemaName)
-              ? filter(source.schemaName, query, data)
+              ? source.filter(query, data)
               : data
             )
             .then(filtered => {

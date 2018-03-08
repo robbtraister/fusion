@@ -59,7 +59,7 @@ router.post(['/', '/page/:page', '/template/:template'],
         ? getPageRendering(payload.page)
         : getTemplateRendering(payload.template)
     )
-      .then(rendering => render(Object.assign({}, payload, {rendering})))
+      .then(rendering => render(Object.assign({}, payload, {rendering, requestUri: req.originalUrl})))
       .then(data => res.send(data))
       .then(() => {
         debugTimer('complete response', tic.toc())

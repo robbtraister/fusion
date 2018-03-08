@@ -2,7 +2,37 @@
 
 const path = require('path')
 
+const debug = require('debug')('fusion:timer:react:component')
+
 const React = require('react')
+
+const timer = require('../timer')
+
+const TimedComponent = function TimedComponent (Component) {
+  if (Component.prototype instanceof React.Component) {
+    let tic
+    return class TimedComponent extends Component {
+      constructor (props, context) {
+        super(props, context)
+        tic = timer.tic()
+      }
+      render () {
+        const result = super.render()
+        debug(this.props.type, this.props.id, tic.toc())
+        return result
+      }
+    }
+  } else {
+    const TimedComponent = function TimedComponent (props, context) {
+      const tic = timer.tic()
+      const result = Component(props, context)
+      debug(props.type, props.id, tic.toc())
+      return result
+    }
+    TimedComponent.contextTypes = Component.contextTypes
+    return TimedComponent
+  }
+}
 
 const componentRoot = path.resolve(process.env.COMPONENT_ROOT || `${__dirname}/../../dist/components`)
 
@@ -17,10 +47,12 @@ const feature = function feature (config) {
   const customFields = config.customFields || {}
 
   try {
-    const component = require(`${componentRoot}/features/${config.featureConfig}.jsx`)
+    const component = TimedComponent(require(`${componentRoot}/features/${config.featureConfig}.jsx`))
+    const props = Object.assign({key: config.id, id: config.id, type: config.featureConfig}, customFields, contentConfigValues)
+
     return React.createElement(
       component,
-      Object.assign({key: config.id, featureId: config.id}, customFields, contentConfigValues)
+      props
     )
   } catch (e) {
     // console.error(e)
@@ -31,7 +63,7 @@ const feature = function feature (config) {
 const chain = function chain (config) {
   const component = (() => {
     try {
-      return require(`${componentRoot}/chains/${config.chainConfig}.jsx`)
+      return TimedComponent(require(`${componentRoot}/chains/${config.chainConfig}.jsx`))
     } catch (e) {
       return 'div'
     }
@@ -39,7 +71,7 @@ const chain = function chain (config) {
 
   return React.createElement(
     component,
-    {key: config.id},
+    {key: config.id, id: config.id, type: config.chainConfig},
     renderAll(config.features)
   )
 }

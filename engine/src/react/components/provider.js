@@ -21,7 +21,7 @@ class Provider extends React.Component {
 
         const getSourceContent = (key, query) => {
           // alphabetize object keys to ensure proper cacheability
-          const keyString = JSONNormalize.stringify(key)
+          const keyString = JSONNormalize.stringifySync(key)
           const keyCache = sourceCache[keyString] = sourceCache[keyString] || {
             data: undefined,
             filtered: undefined,
@@ -49,8 +49,8 @@ class Provider extends React.Component {
           ? getSourceContent
           : getSourceContent(...args)
       },
-      globalContent: this.context.globalContent,
-      requestUri: this.context.requestUri
+      globalContent: this.props.globalContent,
+      requestUri: this.props.requestUri
     }
   }
 
@@ -69,8 +69,8 @@ class Provider extends React.Component {
         })
 
       return E(React.Fragment, {},
-        this.props.children,
-        E('script', {dangerouslySetInnerHTML: { __html: `var contentCache=${JSON.stringify(condensedMap, (key, value) => value == null ? undefined : value)}` }})
+        this.props.children
+        // E('script', {dangerouslySetInnerHTML: { __html: `var contentCache=${JSON.stringify(condensedMap, (key, value) => value == null ? undefined : value)}` }})
       )
     } else {
       return this.props.children

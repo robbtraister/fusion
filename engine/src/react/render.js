@@ -21,11 +21,15 @@ const render = function render ({requestUri, content, rendering}) {
       return Provider(component)
     })
     .then(Template => {
+      debugTimer('provider wrapping', tic.toc())
+      tic = timer.tic()
+
       const renderHtml = () => ReactDOM.renderToStaticMarkup(Layout(Template)({
         globalContent: content,
         requestUri
       }))
 
+      tic = timer.tic()
       // render once without feature content
       const html = renderHtml()
 

@@ -31,10 +31,7 @@ router.get(['/', '/:source', '/:source/:key'],
     })
       .catch(() => keyString)
       .then(key => source.fetch(key))
-      .then(data => query
-        ? source.filter(query, JSON.parse(data))
-        : data
-      )
+      .then(data => source.filter(query, data))
       .then(data => res.send(data))
       .catch(next)
   }

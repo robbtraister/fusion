@@ -20,7 +20,7 @@ class Provider extends React.Component {
         const source = getSource(sourceName)
 
         const getSourceContent = (key, query) => {
-          // alphabetize object keys to ensure proper cacheability
+          // alphabetize object keys to ensure proper cacheing
           const keyString = JSONNormalize.stringifySync(key)
           const keyCache = sourceCache[keyString] = sourceCache[keyString] || {
             data: undefined,
@@ -42,7 +42,7 @@ class Provider extends React.Component {
             })
             .then(() => keyCache.data)
 
-          return keyCache.data
+          return keyCache.data || {}
         }
 
         return (args.length === 0)

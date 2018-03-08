@@ -34,7 +34,7 @@ services:
       - "10.67.0.2"
     environment:
       PORT: '8080'
-      DEBUG: watcher:*
+      DEBUG: watcher:*,fusion:*
       WATCH: "true"
     image: fusion-engine
     ports:

@@ -8,7 +8,7 @@ const E = React.createElement
 
 const contextTypes = require('./types')
 
-const getSource = require('../sources')
+const getSource = require('../../sources')
 
 class Provider extends React.Component {
   getChildContext () {

@@ -3,9 +3,14 @@
 const bodyParser = require('body-parser')
 const express = require('express')
 
+const debugTimer = require('debug')('fusion:timer:router')
+
 const render = require('./react/render')
 
+const timer = require('./timer')
+
 const getSource = require('./sources')
+const { getPageRendering, getTemplateRendering } = require('./renderings')
 
 const router = express.Router()
 
@@ -35,11 +40,30 @@ router.get(['/', '/:source', '/:source/:key'],
   }
 )
 
-router.post('/',
+router.post(['/', '/page/:page', '/template/:template'],
   bodyParser.json(),
   (req, res, next) => {
-    render(req.body)
+    const tic = timer.tic()
+    const payload = (req.body.page || req.body.template)
+      ? req.body
+      : Object.assign(
+        {
+          page: req.params.page,
+          template: req.params.template
+        },
+        req.body
+      )
+
+    ;(
+      (payload.page)
+        ? getPageRendering(payload.page)
+        : getTemplateRendering(payload.template)
+    )
+      .then(rendering => render(Object.assign({}, payload, {rendering})))
       .then(data => res.send(data))
+      .then(() => {
+        debugTimer('complete response', tic.toc())
+      })
       .catch(next)
   }
 )

@@ -2,33 +2,35 @@
 
 'use strict'
 
+const debugTimer = require('debug')('fusion:timer:react:render')
+
 const ReactDOM = require('react-dom/server')
 
 const compile = require('./compile')
-const Provider = require('../components/provider')
+const Provider = require('./components/provider')
+const Layout = require('../../dist/components/output-types/html.jsx')
 
-// const renderings = require('./models/schemaless')(process.env.MONGO_URL).collection('rendering')
-const Rendering = require('../models/rendering')
+const timer = require('../timer')
 
-const getRendering = function getRendering (template) {
-  return (template instanceof String || typeof template === 'string')
-    ? Rendering.then(model => model.findById(template))
-      .then(rendering => rendering._doc)
-    : Promise.resolve(template)
-}
-
-const render = function render ({requestUri, content, template}) {
-  return getRendering(template)
-    .then(rendering => compile(rendering))
-    .then(component => Provider(component))
+const render = function render ({requestUri, content, rendering}) {
+  let tic = timer.tic()
+  return Promise.resolve(compile(rendering))
+    .then(component => {
+      debugTimer('compilation', tic.toc())
+      tic = timer.tic()
+      return Provider(component)
+    })
     .then(Template => {
-      const renderHtml = () => ReactDOM.renderToStaticMarkup(Template({
+      const renderHtml = () => ReactDOM.renderToStaticMarkup(Layout(Template)({
         globalContent: content,
         requestUri
       }))
 
       // render once without feature content
       const html = renderHtml()
+
+      debugTimer('first render', tic.toc())
+      tic = timer.tic()
 
       // collect content cache into Promise array
       const cacheMap = Template.cacheMap || {}
@@ -42,7 +44,15 @@ const render = function render ({requestUri, content, template}) {
         ? Promise.resolve(html)
         // if feature content is requested, wait for it, then render again
         : Promise.all(contentPromises)
+          .then(() => {
+            debugTimer('content hydration', tic.toc())
+            tic = timer.tic()
+          })
           .then(renderHtml)
+          .then((html) => {
+            debugTimer('second render', tic.toc())
+            return html
+          })
     })
 }
 

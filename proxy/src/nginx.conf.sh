@@ -207,6 +207,16 @@ cat <<EOB
       return                   418;
     }
 
+    # test paths for hitting the engine lambda
+    location ~ ^/content(/.*|$) {
+      ${ENGINE_HANDLER}\$1\$is_args\$args;
+    }
+
+    location ~ ^/render(/.*|$) {
+      proxy_method 'POST';
+      ${ENGINE_HANDLER}\$1\$is_args\$args;
+    }
+
     location /health {
       access_log               off;
       add_header               Content-Type text/html;

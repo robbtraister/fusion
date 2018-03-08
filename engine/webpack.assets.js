@@ -20,7 +20,7 @@ function externals (context, request, callback) {
 let alias = {}
 try {
   alias = {
-    'consumer': require.resolve('./src/components/consumer.js')
+    'consumer': require.resolve('./src/react/components/consumer.js')
   }
 } catch (e) {}
 

@@ -68,10 +68,12 @@ const compile = function compile (rendering) {
     }
   })()
 
+  const children = rendering.layoutItems.map(renderableItem)
+
   return (props) => React.createElement(
     component,
     props,
-    rendering.layoutItems.map(renderableItem)
+    children
   )
 }
 

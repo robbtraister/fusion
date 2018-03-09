@@ -6,7 +6,7 @@ const url = require('url')
 const request = require('request-promise-native')
 
 const contentBase = process.env.CONTENT_BASE || ''
-const sourcesRoot = path.resolve(process.env.SOURCES_ROOT || `${__dirname}/../assets/content/sources`)
+const sourcesRoot = path.resolve(process.env.SOURCES_ROOT || `${__dirname}/../../bundle/content/sources`)
 
 const getSchemaFilter = require('./filter')
 

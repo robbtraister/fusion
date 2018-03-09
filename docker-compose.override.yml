@@ -7,4 +7,4 @@ services:
         #'mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DATABASE}'
       PB_ADMIN: 'http://${ARC_ORG_NAME}.pb.arc.pub'
     volumes:
-      - "${ASSET_DIR}:/workdir/assets:ro"
+      - "${BUNDLE_DIR}:/workdir/engine/bundle:ro"

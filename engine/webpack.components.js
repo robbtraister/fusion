@@ -5,7 +5,7 @@ const glob = require('glob')
 
 const ManifestPlugin = require('webpack-manifest-plugin')
 
-const assetsRoot = process.env.ASSETS_ROOT || `${__dirname}/assets`
+const bundleRoot = process.env.BUNDLE_ROOT || `${__dirname}/bundle`
 
 const VENDOR_PACKAGES = ['react']
 
@@ -24,7 +24,7 @@ try {
   }
 } catch (e) {}
 
-const componentDir = path.resolve(`${assetsRoot}/components`)
+const componentDir = path.resolve(`${bundleRoot}/components`)
 const entry = {}
 glob.sync(`${componentDir}/**/*.{hbs,js,jsx,vue}`)
   .forEach(f => { entry[f.substr(componentDir.length + 1)] = f })
@@ -33,7 +33,7 @@ module.exports = Object.keys(entry).length
   ? {
     entry,
     externals,
-    mode: 'development',
+    mode: 'production',
     module: {
       rules: [
         {

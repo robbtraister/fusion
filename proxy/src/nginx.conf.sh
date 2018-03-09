@@ -208,13 +208,8 @@ cat <<EOB
     }
 
     # test paths for hitting the engine lambda
-    location ~ ^/content(/.*|$) {
-      ${ENGINE_HANDLER}\$1\$is_args\$args;
-    }
-
-    location ~ ^/render(/.*|$) {
-      proxy_method 'POST';
-      ${ENGINE_HANDLER}\$1\$is_args\$args;
+    location ~ ^/(content|render)(/.*|$) {
+      ${ENGINE_HANDLER};
     }
 
     location /health {

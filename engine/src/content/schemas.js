@@ -2,7 +2,7 @@
 
 const { buildSchema, GraphQLSchema } = require('graphql')
 
-const schemasRoot = process.env.SCHEMAS_ROOT || '../assets/content/schemas'
+const schemasRoot = process.env.SCHEMAS_ROOT || '../../bundle/content/schemas'
 
 const schemaCache = {}
 const getSchema = function getSchema (schemaName) {

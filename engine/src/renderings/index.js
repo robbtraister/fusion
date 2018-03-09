@@ -7,7 +7,7 @@ const Pages = model('page')
 const Renderings = model('rendering')
 const Templates = model('template')
 
-const timer = require('./timer')
+const timer = require('../timer')
 
 const getRendering = function getRendering (id) {
   return Renderings.then(model => model.findById(id))

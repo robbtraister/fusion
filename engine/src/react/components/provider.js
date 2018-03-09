@@ -1,14 +1,14 @@
 'use strict'
 
 const _ = require('lodash')
-const JSONNormalize = require('json-normalize')
+const JSONNormalize = require('./normalize')
 
 const React = require('react')
 const E = React.createElement
 
 const contextTypes = require('./types')
 
-const getSource = require('../../sources')
+const getSource = require('../../content/sources')
 
 class Provider extends React.Component {
   getChildContext () {
@@ -21,7 +21,7 @@ class Provider extends React.Component {
 
         const getSourceContent = (key, query) => {
           // alphabetize object keys to ensure proper cacheing
-          const keyString = JSONNormalize.stringifySync(key)
+          const keyString = JSONNormalize.stringify(key)
           const keyCache = sourceCache[keyString] = sourceCache[keyString] || {
             data: undefined,
             filtered: undefined,

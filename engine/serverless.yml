@@ -1,12 +1,14 @@
 # serverless.yml
 
-service: fusion-engine
+service: fusion
 
 provider:
   name: aws
   runtime: nodejs6.10
   stage: dev
   region: us-east-1
+  environment:
+    TEST: 'abc'
 
 functions:
   engine:
@@ -17,7 +19,12 @@ functions:
 
 package:
   exclude:
-    - webpack.config.js
+    - bundle/components/**/*
+    - package.json
+    - package-lock.json
+    - src/rendering.json
+    - serverless.yml
+    - webpack.components.js
 
 plugins:
   - serverless-offline

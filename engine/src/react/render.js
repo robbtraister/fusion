@@ -8,7 +8,7 @@ const ReactDOM = require('react-dom/server')
 
 const compile = require('./compile')
 const Provider = require('./components/provider')
-const Layout = require('../../dist/components/output-types/html.jsx')
+// const Layout = require('../../dist/components/output-types/html.jsx')
 
 const timer = require('../timer')
 
@@ -24,7 +24,7 @@ const render = function render ({requestUri, content, rendering}) {
       debugTimer('provider wrapping', tic.toc())
       tic = timer.tic()
 
-      const renderHtml = () => ReactDOM.renderToStaticMarkup(Layout(Template)({
+      const renderHtml = () => ReactDOM.renderToStaticMarkup(Template({
         globalContent: content,
         requestUri
       }))

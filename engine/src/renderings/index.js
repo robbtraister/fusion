@@ -14,7 +14,7 @@ const getRendering = function getRendering (id) {
     .then(rendering => rendering._doc)
 }
 
-const getPageOrTemplateRendering = (Collection) => (id) => {
+const getPageOrTemplateHead = (Collection) => (id) => {
   const tic = timer.tic()
 
   return Collection.then(model => model.findById(id))
@@ -27,11 +27,28 @@ const getPageOrTemplateRendering = (Collection) => (id) => {
     })
 }
 
-const getPageRendering = getPageOrTemplateRendering(Pages)
-const getTemplateRendering = getPageOrTemplateRendering(Templates)
+const getAllRenderables = function getAllRenderables (rendering) {
+  const children = [].concat(
+    rendering.layoutItems || [],
+    rendering.renderableItems || [],
+    rendering.features || []
+  )
+  return [rendering].concat(
+    children,
+    ...children.map(getAllRenderables)
+  )
+}
+
+const findRenderableItem = (rendering) => (childId) => {
+  return getAllRenderables(rendering).find(renderableItem => renderableItem.id === childId)
+}
+
+const getPageHead = getPageOrTemplateHead(Pages)
+const getTemplateHead = getPageOrTemplateHead(Templates)
 
 module.exports = {
-  getPageRendering,
+  findRenderableItem,
+  getPageHead,
   getRendering,
-  getTemplateRendering
+  getTemplateHead
 }

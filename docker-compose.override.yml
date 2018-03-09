@@ -5,6 +5,5 @@ services:
       CONTENT_BASE: 'https://${API_USERNAME}:${API_PASSWORD}@api.${ARC_ORG_NAME}.arcpublishing.com'
       MONGO_URL:
         #'mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DATABASE}'
-      PB_ADMIN: 'http://${ARC_ORG_NAME}.pb.arc.pub'
     volumes:
       - "${BUNDLE_DIR}:/workdir/engine/bundle:ro"

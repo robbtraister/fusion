@@ -36,9 +36,13 @@ const TimedComponent = function TimedComponent (Component) {
 
 const componentRoot = path.resolve(process.env.COMPONENT_ROOT || `${__dirname}/../../dist/components`)
 
+// The calculated result we export for rendering must be a Component (not Element)
+// For simplification, create each element as a functional component
+// This allows any feature to be exported for rendering
+// When compiling container children, execute the functional Component to get the Element
 const renderAll = function renderAll (renderableItems) {
   return (renderableItems || [])
-    .map(renderableItem)
+    .map(ri => renderableItem(ri)())
     .filter(ri => ri)
 }
 
@@ -50,7 +54,7 @@ const feature = function feature (config) {
     const component = TimedComponent(require(`${componentRoot}/features/${config.featureConfig}.jsx`))
     const props = Object.assign({key: config.id, id: config.id, type: config.featureConfig}, customFields, contentConfigValues)
 
-    return React.createElement(
+    return () => React.createElement(
       component,
       props
     )
@@ -69,7 +73,7 @@ const chain = function chain (config) {
     }
   })()
 
-  return React.createElement(
+  return () => React.createElement(
     component,
     {key: config.id, id: config.id, type: config.chainConfig},
     renderAll(config.features)
@@ -77,21 +81,14 @@ const chain = function chain (config) {
 }
 
 const section = function section (config) {
-  return React.createElement(
+  return () => React.createElement(
     'section',
     {},
     renderAll(config.renderableItems)
   )
 }
 
-const renderableItem = function renderableItem (config) {
-  return (config.featureConfig) ? feature(config)
-    : (config.chainConfig) ? chain(config)
-      : (config.renderableItems) ? section(config)
-        : null
-}
-
-const compile = function compile (rendering) {
+const template = function template (rendering) {
   const component = (() => {
     try {
       return require(`${componentRoot}/layouts/${rendering.layout}.jsx`)
@@ -100,13 +97,22 @@ const compile = function compile (rendering) {
     }
   })()
 
-  const children = rendering.layoutItems.map(renderableItem)
+  const children = renderAll(rendering.layoutItems)
 
-  return (props) => React.createElement(
+  return () => React.createElement(
     component,
-    props,
+    {},
     children
   )
 }
 
-module.exports = compile
+const renderableItem = function renderableItem (config) {
+  return ((config.featureConfig) ? feature(config)
+    : (config.chainConfig) ? chain(config)
+      : (config.renderableItems) ? section(config)
+        : (config.layoutItems) ? template(config)
+          : null
+  ) || (() => null)
+}
+
+module.exports = renderableItem

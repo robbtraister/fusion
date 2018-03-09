@@ -7,8 +7,13 @@ provider:
   runtime: nodejs6.10
   stage: dev
   region: us-east-1
-  environment:
-    TEST: 'abc'
+  vpc:
+    securityGroupIds:
+      - sg-59fef325
+    subnetIds:
+      - subnet-e3737fbb
+      - subnet-f3718dba
+      - subnet-d1ece0fb
 
 functions:
   engine:

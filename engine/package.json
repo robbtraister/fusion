@@ -6,6 +6,8 @@
   "scripts": {
     "build:components": "webpack --config ./webpack.components.js",
     "watch:components": "npm run build:components -- --watch",
+    "predeploy": "npm install && npm run build:components",
+    "deploy": "sls deploy",
     "prestart": "npm run watch:components &",
     "start": "sls offline start",
     "test": "node render ./rendering.json"
@@ -37,6 +39,7 @@
     "copy-webpack-plugin": "^4.5.0",
     "extract-text-webpack-plugin": "^3.0.2",
     "glob": "^7.1.2",
+    "serverless-domain-manager": "^2.3.4",
     "serverless-offline": "^3.18.0",
     "webpack": "^4.1.0",
     "webpack-cli": "^2.0.10",

@@ -1,24 +1,17 @@
 'use strict'
 
 const express = require('express')
-const serverless = require('serverless-http')
-
-const resolve = require('./resolve')
 
 const app = express()
 
-const router = express.Router()
+app.disable('x-powered-by')
 
-router.get('*', (req, res, next) => {
-  resolve(req.originalUrl)
-    .then(data => res.send(data))
-    .catch(next)
-})
+app.use(require('./router'))
 
-app.use(router)
+app.use(
+  /^prod/i.test(process.env.NODE_ENV || '')
+    ? (_, req, res, next) => { res.sendStatus(500) }
+    : (err, req, res, next) => { res.status(500).send(err) }
+)
 
-module.exports = {
-  app,
-  router,
-  serverless: serverless(app)
-}
+module.exports = app

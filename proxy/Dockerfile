@@ -27,9 +27,6 @@ RUN \
     wget --no-check-certificate -O nginx.tar.gz https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz && \
     tar zxvf nginx.tar.gz --strip-components 1 && \
     rm nginx.tar.gz && \
-    # download nginx lambda module
-    git clone --branch=master --single-branch --depth=1 https://github.com/washingtonpost/nginx-lambda ./modules/nginx-lambda && \
-    rm -rf ./modules/nginx-lambda/.git && \
     # download nginx let module
     git clone --branch=master --single-branch --depth=1 https://github.com/arut/nginx-let-module ./modules/nginx-let && \
     rm -rf ./modules/nginx-let/.git && \
@@ -41,7 +38,6 @@ RUN \
                 --user=${USER} \
                 --group=${USER} \
                 --with-http_realip_module \
-                --add-module=modules/nginx-lambda \
                 --add-module=modules/nginx-let \
                 --add-module=modules/nginx-statsd \
                 && \
@@ -51,9 +47,9 @@ RUN \
     rm -rf \
        /etc/nginx/CHANGES* \
        /etc/nginx/auto \
-       /etc/nginx/src \
+       /etc/nginx/modules \
        /etc/nginx/objs/src \
-       /etc/nginx/modules/* \
+       /etc/nginx/src \
        && \
     nginx -v && \
     # remove dev packages
@@ -71,6 +67,17 @@ RUN \
     chown -R ${USER}:${USER} \
           ./logs \
           ./tmp
+
+COPY ./package*.json ./
+RUN \
+    apk add --update --no-cache \
+            nodejs-npm \
+            && \
+    npm install -g npm && \
+    npm install && \
+    npm uninstall -g npm && \
+    node -v && \
+    rm -rf /var/cache/apk/*
 
 COPY ./src ./src
 RUN chown -R ${USER}:${USER} ./src

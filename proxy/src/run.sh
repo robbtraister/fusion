@@ -9,7 +9,11 @@ test() {
 }
 
 start() {
-  test && nginx -p ./ -c ./conf/nginx.conf
+  test && \
+    (
+      PORT=8081 node ./src/cluster & \
+      nginx -p ./ -c ./conf/nginx.conf \
+    )
 }
 
 reload() {

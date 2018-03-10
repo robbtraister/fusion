@@ -172,14 +172,6 @@ cat <<EOB
       proxy_pass               http://rendering;
     }
 
-    location @engine {
-      ${ENGINE_HANDLER};
-    }
-
-    location @resolver {
-      ${RESOLVER_HANDLER};
-    }
-
     location @resources {
       return 404;
     }
@@ -192,35 +184,24 @@ cat <<EOB
       proxy_pass \$target;
     }
 
-    location /${CONTEXT:-pb}/api/v2/resolve {
-      error_page               418 = @resolver;
-      return                   418;
-    }
-
-    location /${CONTEXT:-pb}/api/v2/ {
-      error_page               418 = @engine;
-      return                   418;
-    }
-
-    location /${CONTEXT:-pb}/admin/api/ {
-      error_page               418 = @engine;
-      return                   418;
+    # test paths for hitting the resolver lambda
+    location ~ ^/(resolve)(/.*|$) {
+      proxy_set_header 'X-FunctionName' '${RESOLVER_LAMBDA}';
+      proxy_set_header 'Content-Type' 'application/json';
+      proxy_pass http://0.0.0.0:8081;
     }
 
     # test paths for hitting the engine lambda
     location ~ ^/(content|render)(/.*|$) {
-      ${ENGINE_HANDLER};
+      proxy_set_header 'X-FunctionName' '${ENGINE_LAMBDA}';
+      proxy_set_header 'Content-Type' 'application/json';
+      proxy_pass http://0.0.0.0:8081;
     }
 
     location /health {
       access_log               off;
       add_header               Content-Type text/html;
       return                   200 'OK';
-    }
-
-    location / {
-      error_page 418 = @resolver;
-      return 418;
     }
   }
 }

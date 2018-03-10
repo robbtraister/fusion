@@ -2,8 +2,17 @@ version: "2"
 services:
   entry-proxy:
     build: .
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+      - 10.65.0.2
+      - 10.67.0.2
     environment:
-      ENGINE_HANDLER: 'lambda arn:aws:lambda:us-east-1:397853141546:function:fusion-engine:$$version'
-      RESOLVER_HANDLER: 'lambda arn:aws:lambda:us-east-1:397853141546:function:fusion-resolver:$$version'
+      ENGINE_LAMBDA: 'arn:aws:lambda:us-east-1:397853141546:function:fusion-engine-staging-engine'
+      RESOLVER_LAMBDA: 'arn:aws:lambda:us-east-1:397853141546:function:fusion-resolver-staging-resolver'
+      WATCH: 'true'
     ports:
       - "8080:8080"
+    volumes:
+      - "~/.aws:/home/nginx/.aws:ro"
+      - "./src:/etc/nginx/src:ro"

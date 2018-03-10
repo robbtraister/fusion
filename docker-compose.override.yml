@@ -2,6 +2,8 @@ version: "2"
 services:
   engine-server:
     environment:
+      ENGINE_LAMBDA: "arn:aws:lambda:us-east-1:397853141546:function:fusion-engine-staging-engine"
+      RESOLVER_LAMBDA: "arn:aws:lambda:us-east-1:397853141546:function:fusion-resolver-staging-resolver"
       CONTENT_BASE: 'https://${API_USERNAME}:${API_PASSWORD}@api.${ARC_ORG_NAME}.arcpublishing.com'
       MONGO_URL:
         #'mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DATABASE}'

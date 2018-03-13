@@ -2,18 +2,5 @@ version: "2"
 services:
   entry-proxy:
     build: .
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
-      - 10.65.0.2
-      - 10.67.0.2
-    env_file:
-      - ../.env
-    environment:
-      PORT: '8080'
-      WATCH: 'true'
     ports:
-      - "8080:8080"
-    volumes:
-      - "~/.aws:/home/nginx/.aws:ro"
-      - "./src:/etc/nginx/src:ro"
+      - '8080'

@@ -1,21 +1,25 @@
-version: "2"
+version: '2'
 services:
   entry-proxy:
     build: ./proxy
-    env_file:
-      - ./.env
     environment:
       PORT: '8080'
-      WATCH: "true"
+      NODEJS_PORT: '8081'
+      WATCH: 'true'
+      ENGINE_HANDLER: http://engine-server:8082
+      ENGINE_LAMBDA:
+      RESOLVER_HANDLER: http://resolver-server:8083
+      RESOLVER_LAMBDA:
     image: fusion-proxy
     links:
-      - "engine-server"
-      - "resolver-server"
+      - 'engine-server'
+      - 'resolver-server'
     ports:
-      - "8080:8080"
+      - '8080:8080'
+      - '8081:8081'
     volumes:
-      - "~/.aws:/home/nginx/.aws:ro"
-      - "./proxy/src:/etc/nginx/src:ro"
+      - '~/.aws:/home/nginx/.aws:ro'
+      - './proxy/src:/etc/nginx/src:ro'
 
   engine-server:
     build:
@@ -24,17 +28,17 @@ services:
       args:
         LAMBDA: engine
     environment:
-      PORT: '8080'
+      PORT: '8082'
       DEBUG: watcher:*,fusion:*
-      WATCH: "true"
+      WATCH: 'true'
       CONTENT_BASE:
       MONGO_URL:
     image: fusion-engine
     ports:
-      - "8081:8080"
+      - '8082:8082'
     volumes:
-      - "${BUNDLE_DIR}:/workdir/engine/bundle:ro"
-      - "./engine/src:/workdir/src:ro"
+      - '${BUNDLE_DIR}:/workdir/engine/bundle:ro'
+      - './engine/src:/workdir/src:ro'
 
   resolver-server:
     build:
@@ -43,11 +47,11 @@ services:
       args:
         LAMBDA: resolver
     environment:
-      PORT: '8080'
+      PORT: '8083'
       DEBUG: watcher:*
-      WATCH: "true"
+      WATCH: 'true'
     image: fusion-resolver
     ports:
-      - "8082:8080"
+      - '8083:8083'
     volumes:
-      - "./resolver/src:/workdir/src:ro"
+      - './resolver/src:/workdir/src:ro'

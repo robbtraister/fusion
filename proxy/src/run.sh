@@ -1,9 +1,7 @@
 #!/bin/sh
 
-set
-
 compile() {
-  ./src/nginx.conf.sh > ./conf/nginx.conf
+  ./src/nginx/nginx.conf.sh > ./conf/nginx.conf
 }
 
 test() {
@@ -13,7 +11,7 @@ test() {
 start() {
   test && \
     (
-      PORT=8081 node ./src/cluster & \
+      PORT=${NODEJS_PORT:-8081} node ./src/nodejs/cluster & \
       nginx -p ./ -c ./conf/nginx.conf \
     )
 }

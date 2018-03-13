@@ -6,7 +6,7 @@
   "scripts": {
     "predeploy": "npm install",
     "deploy": "sls deploy",
-    "start": "sls offline start",
+    "start": "sls --stage=offline offline start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

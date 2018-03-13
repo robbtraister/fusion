@@ -18,9 +18,7 @@ provider:
 functions:
   engine:
     handler: src/index.serverless
-    events:
-      - http: ANY /
-      - http: 'ANY /{proxy+}'
+    events: ${file(./events.${opt:stage}.yml):events}
 
 package:
   exclude:

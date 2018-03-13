@@ -15,19 +15,10 @@ provider:
       - subnet-c3ece0e9
       - subnet-ee718da7
 
-resources:
-  Resources:
-    ApiGatewayRestApi:
-      Type: AWS::ApiGateway::RestApi
-      Properties:
-        Name: ${self:service}
-
 functions:
   resolver:
     handler: src/index.serverless
-    events:
-      - http: ANY /
-      - http: 'ANY /{proxy+}'
+    events: ${file(./events.${opt:stage}.yml):events}
 
 package:
   exclude:
@@ -36,16 +27,9 @@ package:
     - serverless.yml
 
 plugins:
-  - serverless-domain-manager
   - serverless-offline
 
 custom:
-  customDomain:
-    domainName: 'fusion.staging.arcpublishing.com'
-    stage: ${self:provider.stage}
-    basePath: resolve
-    createRoute53Record: true
-
   serverless-offline:
     host: '0.0.0.0'
     port: ${env:PORT, '8080'}

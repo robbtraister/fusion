@@ -9,7 +9,7 @@
     "predeploy": "npm install && npm run build:components",
     "deploy": "sls deploy",
     "prestart": "npm run watch:components &",
-    "start": "sls offline start",
+    "start": "sls --stage=offline offline start",
     "test": "node render ./rendering.json"
   },
   "keywords": [],

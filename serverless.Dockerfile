@@ -19,9 +19,7 @@ WORKDIR /workdir
 ARG LAMBDA
 
 COPY ./${LAMBDA}/package*.json ./
-RUN \
-    npm install && \
-    npm install serverless-offline
+RUN npm install
 COPY ./${LAMBDA}/ ./
 
 # This only existed to run webpack

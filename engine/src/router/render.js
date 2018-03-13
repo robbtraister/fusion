@@ -5,7 +5,11 @@ const express = require('express')
 
 const debugTimer = require('debug')('fusion:timer:router')
 
-const render = require('../react/render')
+const {
+  compileOutputType,
+  compileRenderable,
+  render
+} = require('../react/render')
 
 const timer = require('../timer')
 
@@ -18,7 +22,7 @@ const {
 
 const renderRouter = express.Router()
 
-function getTypeRouter (compiler) {
+function getTypeRouter (fetch, compile) {
   const typeRouter = express.Router()
   typeRouter.all(['/', '/:id', '/:id/:child'],
     bodyParser.json(),
@@ -32,12 +36,16 @@ function getTypeRouter (compiler) {
         req.body
       )
 
-      compiler(payload.id)
-        .then(rendering => payload.child
+      fetch(payload.id)
+        .then((rendering) => (payload.child)
           ? findRenderableItem(rendering)(payload.child)
           : rendering
         )
-        .then(rendering => render(Object.assign({}, payload, {rendering, requestUri: req.originalUrl})))
+        .then((renderable) => (payload.child)
+          ? compileRenderable(renderable)
+          : compileOutputType(renderable)
+        )
+        .then(Component => render(Object.assign({}, payload, {Component, requestUri: req.originalUrl})))
         .then(data => res.send(data))
         .then(() => {
           debugTimer('complete response', tic.toc())

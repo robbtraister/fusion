@@ -8,36 +8,24 @@ const ReactDOM = require('react-dom/server')
 
 const compile = require('./compile')
 const Provider = require('./components/provider')
-// const Layout = require('../../dist/components/output-types/html.jsx')
+const OutputType = require('../../dist/components/output-types/html.jsx')
 
 const timer = require('../timer')
 
-const render = function render ({requestUri, content, rendering}) {
+const render = function render ({requestUri, content, Component}) {
+  const renderHtml = () => ReactDOM.renderToStaticMarkup(Component({
+    globalContent: content,
+    requestUri
+  }))
+
   let tic = timer.tic()
-  return Promise.resolve(compile(rendering))
-    .then(component => {
-      debugTimer('compilation', tic.toc())
-      tic = timer.tic()
-      return Provider(component)
-    })
-    .then(Template => {
-      debugTimer('provider wrapping', tic.toc())
-      tic = timer.tic()
-
-      const renderHtml = () => ReactDOM.renderToStaticMarkup(Template({
-        globalContent: content,
-        requestUri
-      }))
-
-      tic = timer.tic()
-      // render once without feature content
-      const html = renderHtml()
-
+  return Promise.resolve(renderHtml())
+    .then((html) => {
       debugTimer('first render', tic.toc())
       tic = timer.tic()
 
       // collect content cache into Promise array
-      const cacheMap = Template.cacheMap || {}
+      const cacheMap = Component.cacheMap || {}
       const contentPromises = [].concat(...Object.keys(cacheMap).map(source => {
         const sourceCache = cacheMap[source]
         return Object.keys(sourceCache).map(key => sourceCache[key].promise)
@@ -60,7 +48,38 @@ const render = function render ({requestUri, content, rendering}) {
     })
 }
 
-module.exports = render
+const compileRenderable = function compileRenderable (rendering) {
+  let tic = timer.tic()
+  return Promise.resolve(compile(rendering))
+    .then(Feature => {
+      debugTimer('compilation', tic.toc())
+      tic = timer.tic()
+      return Provider(Feature)
+    })
+    .then((Component) => {
+      debugTimer('provider wrapping', tic.toc())
+      return Component
+    })
+}
+
+const compileOutputType = function compileOutputType (rendering) {
+  let tic
+  return compileRenderable(rendering)
+    .then((Feature) => {
+      tic = timer.tic()
+      return OutputType(Feature)
+    })
+    .then((Component) => {
+      debugTimer('output-type wrapping', tic.toc())
+      return Component
+    })
+}
+
+module.exports = {
+  compileOutputType,
+  compileRenderable,
+  render
+}
 
 if (module === require.main) {
   const input = (process.argv.length > 2)

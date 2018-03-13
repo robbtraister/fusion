@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set
+
 compile() {
   ./src/nginx.conf.sh > ./conf/nginx.conf
 }

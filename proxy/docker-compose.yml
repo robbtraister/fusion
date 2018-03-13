@@ -7,9 +7,10 @@ services:
       - 8.8.4.4
       - 10.65.0.2
       - 10.67.0.2
+    env_file:
+      - ../.env
     environment:
-      ENGINE_LAMBDA: 'arn:aws:lambda:us-east-1:397853141546:function:fusion-engine-staging-engine'
-      RESOLVER_LAMBDA: 'arn:aws:lambda:us-east-1:397853141546:function:fusion-resolver-staging-resolver'
+      PORT: '8080'
       WATCH: 'true'
     ports:
       - "8080:8080"

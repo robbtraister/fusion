@@ -2,15 +2,10 @@ version: "2"
 services:
   entry-proxy:
     build: ./proxy
-    dns:
-      - "8.8.8.8"
-      - "8.8.4.4"
-      - "10.65.0.2"
-      - "10.67.0.2"
+    env_file:
+      - ./.env
     environment:
       PORT: '8080'
-      ENGINE_HANDLER: "proxy_pass http://engine-server:8080"
-      RESOLVER_HANDLER: "proxy_pass http://resolver-server:8080"
       WATCH: "true"
     image: fusion-proxy
     links:
@@ -19,6 +14,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
+      - "~/.aws:/home/nginx/.aws:ro"
       - "./proxy/src:/etc/nginx/src:ro"
 
   engine-server:
@@ -27,19 +23,17 @@ services:
       dockerfile: serverless.Dockerfile
       args:
         LAMBDA: engine
-    dns:
-      - "8.8.8.8"
-      - "8.8.4.4"
-      - "10.65.0.2"
-      - "10.67.0.2"
     environment:
       PORT: '8080'
       DEBUG: watcher:*,fusion:*
       WATCH: "true"
+      CONTENT_BASE:
+      MONGO_URL:
     image: fusion-engine
     ports:
       - "8081:8080"
     volumes:
+      - "${BUNDLE_DIR}:/workdir/engine/bundle:ro"
       - "./engine/src:/workdir/src:ro"
 
   resolver-server:

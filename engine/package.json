@@ -21,6 +21,7 @@
     "express": "^4.16.2",
     "graphql": "^0.13.1",
     "lodash": "^4.17.5",
+    "mongodb": "^3.0.4",
     "mongoose": "^5.0.9",
     "prop-types": "^15.6.1",
     "react": "^16.2.0",

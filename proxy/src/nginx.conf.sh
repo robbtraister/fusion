@@ -118,7 +118,7 @@ cat <<EOB
   }
 
   map \$request_uri \$context_free_uri {
-    ~^/${CONTEXT:-pb}/(.*)  /\$1;
+    ~^/${CONTEXT:-pb}/(.*)     /\$1;
     default                    \$request_uri;
   }
 
@@ -172,6 +172,40 @@ cat <<EOB
       proxy_pass               http://rendering;
     }
 
+    location @engine {
+EOB
+if [[ "${ENGINE_LAMBDA}" ]]
+then
+  cat <<EOB
+      proxy_set_header 'X-FunctionName' '${ENGINE_LAMBDA}';
+      proxy_set_header 'Content-Type' 'application/json';
+      proxy_pass ${LAMBDA_PROXY:-http://0.0.0.0:8081}\$context_free_uri\$is_args\$args;
+EOB
+else
+  cat <<EOB
+      proxy_pass ${ENGINE_HANDLER:-http://engine-server:8080};
+EOB
+fi
+cat <<EOB
+    }
+
+    location @resolver {
+EOB
+if [[ "${RESOLVER_LAMBDA}" ]]
+then
+  cat <<EOB
+      proxy_set_header 'X-FunctionName' '${RESOLVER_LAMBDA}';
+      proxy_set_header 'Content-Type' 'application/json';
+      proxy_pass ${LAMBDA_PROXY:-http://0.0.0.0:8081}\$context_free_uri\$is_args\$args;
+EOB
+else
+  cat <<EOB
+      proxy_pass ${RESOLVER_HANDLER:-http://resolver-server:8080};
+EOB
+fi
+cat <<EOB
+    }
+
     location @resources {
       return 404;
     }
@@ -184,18 +218,16 @@ cat <<EOB
       proxy_pass \$target;
     }
 
-    # test paths for hitting the resolver lambda
-    location ~ ^/(resolve)(/.*|$) {
-      proxy_set_header 'X-FunctionName' '${RESOLVER_LAMBDA}';
-      proxy_set_header 'Content-Type' 'application/json';
-      proxy_pass http://0.0.0.0:8081;
-    }
-
     # test paths for hitting the engine lambda
     location ~ ^/(content|render)(/.*|$) {
-      proxy_set_header 'X-FunctionName' '${ENGINE_LAMBDA}';
-      proxy_set_header 'Content-Type' 'application/json';
-      proxy_pass http://0.0.0.0:8081;
+      error_page               418 = @engine;
+      return                   418;
+    }
+
+    # test paths for hitting the resolver lambda
+    location ~ ^/(resolve)(/.*|$) {
+      error_page               418 = @resolver;
+      return                   418;
     }
 
     location /health {

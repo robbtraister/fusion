@@ -1,0 +1,15 @@
+version: "2"
+services:
+  fusion:
+    image: quay.io/washpost/fusion-localhost
+    ports:
+      - "8080-8083:8080-8083"
+    environment:
+      ENGINE_HANDLER: http://0.0.0.0:8082
+      RESOLVER_HANDLER: http://0.0.0.0:8083
+      CONTENT_BASE:
+      MONGO_URL:
+    volumes:
+      - '~/.aws:/home/nginx/.aws:ro'
+      - '${BUNDLE_DIR}:/workdir/engine/bundle:ro'
+      - '${RESOLVER_DIR}:/workdir/resolver/config:ro'

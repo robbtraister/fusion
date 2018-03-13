@@ -52,7 +52,7 @@ const getResolverMatcher = function getResolverMatcher (resolver) {
 //     : matcher(...args)
 // }
 
-const resolvers = require('./resolvers.json')
+const resolvers = require('../config/resolvers.json')
   .map(resolver => Object.assign(resolver,
     {
       // getTemplate: getTemplateResolver(resolver),

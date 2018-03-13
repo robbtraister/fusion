@@ -5,12 +5,19 @@ RUN \
     apk upgrade && \
     # used for mongodb-tools
     apk add --update --no-cache \
+            git \
+            nodejs-npm \
             openssl \
             pcre \
             zlib \
             && \
     rm -rf /var/cache/apk/* && \
-    openssl version
+    npm install -g npm serverless && \
+    git --version && \
+    npm -v && \
+    node -v && \
+    openssl version && \
+    sls -v
 
 ARG NGINX_VERSION=1.12.2
 ENV USER=nginx
@@ -21,7 +28,7 @@ RUN \
     addgroup ${USER} 2> /dev/null && \
     adduser -S ${USER} -G ${USER} -s /bin/sh 2> /dev/null && \
     # add dev packages
-    DEV_PACKAGES='g++ git make openssl-dev pcre-dev wget zlib-dev' && \
+    DEV_PACKAGES='g++ make openssl-dev pcre-dev wget zlib-dev' && \
     apk add --update --no-cache ${DEV_PACKAGES} && \
     # download nginx src
     wget --no-check-certificate -O nginx.tar.gz https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz && \
@@ -61,32 +68,50 @@ RUN \
     mkdir -p \
           ./logs \
           ./tmp \
+          /workdir/engine \
+          /workdir/resolver \
           && \
     ln -sf /dev/stdout ./logs/access.log && \
     ln -sf /dev/stderr ./logs/error.log && \
     chown -R ${USER}:${USER} \
           ./logs \
-          ./tmp
+          ./tmp \
+          /workdir/engine \
+          /workdir/resolver
 
-COPY ./package*.json ./
-RUN \
-    apk add --update --no-cache \
-            nodejs-npm \
-            && \
-    npm install -g npm && \
-    npm install --production && \
-    npm cache clean --force && \
-    npm uninstall -g npm && \
-    rm -rf /var/cache/apk/* && \
-    node -v
+COPY ./proxy/package*.json ./
+RUN npm install
 
-COPY ./src ./src
+
+WORKDIR /workdir/engine
+COPY ./engine/package*.json ./
+RUN npm install
+
+
+WORKDIR /workdir/resolver
+COPY ./resolver/package*.json ./
+RUN npm install
+
+
+WORKDIR /etc/nginx
+COPY ./proxy/src ./src/
 RUN chown -R ${USER}:${USER} ./src
 
-VOLUME /etc/nginx/tmp
+COPY ./engine/ /workdir/engine/
+COPY ./resolver/ /workdir/resolver/
+
 
 # Use nginx user
 USER ${USER}
 
 # Launch init to configure PB and start supervisord on startup
-CMD ./src/run.sh
+CMD \
+    ( \
+      cd /workdir/engine/ && \
+      PORT=${ENGINE_PORT:-8082} npm run start \
+    ) & \
+    ( \
+      cd /workdir/resolver/ && \
+      PORT=${RESOLVER_PORT:-8083} npm run start \
+    ) & \
+    ./src/run.sh

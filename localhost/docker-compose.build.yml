@@ -1,0 +1,7 @@
+version: "2"
+services:
+  fusion:
+    build:
+      context: ..
+      dockerfile: localhost/build.Dockerfile
+    image: quay.io/washpost/fusion-localhost

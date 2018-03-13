@@ -15,8 +15,7 @@ services:
       - 'engine-server'
       - 'resolver-server'
     ports:
-      - '8080:8080'
-      - '8081:8081'
+      - "8080-8081:8080-8081"
     volumes:
       - '~/.aws:/home/nginx/.aws:ro'
       - './proxy/src:/etc/nginx/src:ro'
@@ -37,8 +36,8 @@ services:
     ports:
       - '8082:8082'
     volumes:
-      - '${BUNDLE_DIR}:/workdir/engine/bundle:ro'
-      - './engine/src:/workdir/src:ro'
+      - './engine/bundle:/workdir/engine/bundle:ro'
+      - './engine/src:/workdir/engine/src:ro'
 
   resolver-server:
     build:
@@ -54,4 +53,5 @@ services:
     ports:
       - '8083:8083'
     volumes:
-      - './resolver/src:/workdir/src:ro'
+      - './resolver/config:/workdir/resolver/config:ro'
+      - './resolver/src:/workdir/resolver/src:ro'

@@ -8,15 +8,15 @@ RUN \
             nodejs-npm \
             && \
     npm install -g npm serverless && \
+    rm -rf /var/cache/apk/* && \
     git --version && \
     npm -v && \
     node -v && \
-    sls -v && \
-    rm -rf /var/cache/apk/*
-
-WORKDIR /workdir
+    sls -v
 
 ARG LAMBDA
+
+WORKDIR /workdir/${LAMBDA}
 
 COPY ./${LAMBDA}/package*.json ./
 RUN npm install

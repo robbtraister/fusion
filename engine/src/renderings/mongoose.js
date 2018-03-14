@@ -65,6 +65,4 @@ function Mongoose (mongoUrl) {
   }
 }
 
-console.log('mongoose')
-
 module.exports = Mongoose(process.env.MONGO_URL).getModel

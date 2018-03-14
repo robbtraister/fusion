@@ -42,7 +42,7 @@ class Provider extends React.Component {
             })
             .then(() => keyCache.data)
 
-          return keyCache.data || {}
+          return keyCache.data || keyCache.promise
         }
 
         return (args.length === 0)

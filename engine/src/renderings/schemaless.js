@@ -128,6 +128,4 @@ function Mongo (mongoUrl) {
   }
 }
 
-console.log('schemaless')
-
 module.exports = Mongo(process.env.MONGO_URL).getModel

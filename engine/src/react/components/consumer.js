@@ -24,6 +24,16 @@ const HOC = function HOC (Component) {
         }
         return this.context.getContent.apply(this, args)
       }
+      getContentAs (prop) {
+        return (...args) => {
+          const content = this.getContent(...args)
+          if (content instanceof Promise) {
+            content.then(data => { this.setState({[prop]: data}) })
+          } else {
+            this.state[prop] = content
+          }
+        }
+      }
     }
     Consumer.contextTypes = contextTypes
     return Consumer
@@ -77,6 +87,16 @@ Consumer.parent = React.Component.prototype
 
 Consumer.prototype.getContent = function (...args) {
   return this.context.getContent.apply(this, args)
+}
+Consumer.prototype.getContentAs = function (prop) {
+  return (...args) => {
+    const content = this.getContent(...args)
+    if (content instanceof Promise) {
+      content.then(data => { this.setState({[prop]: data}) })
+    } else {
+      this.state[prop] = content
+    }
+  }
 }
 
 Consumer.contextTypes = contextTypes

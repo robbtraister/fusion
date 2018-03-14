@@ -67,7 +67,10 @@ const compileOutputType = function compileOutputType (rendering) {
   return compileRenderable(rendering)
     .then((Feature) => {
       tic = timer.tic()
-      return OutputType(Feature)
+      const Component = OutputType(Feature)
+      // bubble up the Provider cacheMap
+      Component.cacheMap = Feature.cacheMap
+      return Component
     })
     .then((Component) => {
       debugTimer('output-type wrapping', tic.toc())

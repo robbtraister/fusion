@@ -1,6 +1,6 @@
 # Fusion Context
 
-Fusion features are React components. The values that used to come from custom configuration are now passed as component properties. But how do you get access to global content? Or fetch custom feature level content? These capabilities (I would call them features, but...) are optionally provided to your component via context. This document explains how to use them.
+In Fusion, features are React components. The custom configuration values that used to come from request attributes are now passed as component properties. But how do you get access to global content? Or fetch custom feature content? These capabilities (I would call them features, but...) are optionally provided to your component via context. This document explains how to use them.
 
 If you want to know more about React context: [https://reactjs.org/docs/context.html](https://reactjs.org/docs/context.html)
 
@@ -49,7 +49,7 @@ class MyComponent extends React.Component {
 module.exports = Consumer(MyComponent)
 ```
 
-Once you have designated (annotated, but not using official annotations?) your component as a consumer, it will have access to the following context properties and, if a class, instance methods. Context is accessed using the second input parameter for functional components, or `this.context` for class components. Instance methods are only available for class components and will be accessed directly on `this` (e.g., `this.getContent()`)
+Once you have designated (annotated, but not necessarily using official javascript annotations?) your component as a consumer, it will have access to the following context properties and, if a class, instance methods. Context is accessed using the second input parameter for functional components, or `this.context` for class components. Instance methods are only available for class components and will be accessed directly on `this` (e.g., `this.getContent()`)
 
 ### Context Properties
 
@@ -65,7 +65,7 @@ This is the uri that was requested to initiate this rendering
 
 -   getContent(sourceName, key, [query])
 
-The `getContent` method will asynchronously fetch content and optionally return the data if it has already been fetched and is in cache, or a Promise that will resolve to the final data.
+The `getContent` method will fetch content and optionally return the data if it has already been fetched and is in cache, or a Promise that will resolve to the final data.
 
 The first input parameter, `sourceName`, is simply the name of the content source from which you want to fetch. This content source must be configured in your bundle.
 
@@ -81,20 +81,30 @@ class MyComponent extends Consumer {
     super(props, context)
 
     this.state = this.getContent('content-api', {uri: '/some/data'}, '{type version}')
-      .then(content => this.setState({content}))
+    if (this.state instanceof Promise) {
+      this.state.then(content => this.setState({content}))
+    }
+  }
+
+  render () {
+    return <div>{this.state && this.state.content && this.state.content.type}</div>
   }
 }
 ```
 
-If you are fetching content asynchronously from the client only, you should either make the call from `componentDidMount` (which is not called during server-side-rendering), or wrap it in a window check.
+If you are fetching content asynchronously from the client only, you should either make the call from `componentDidMount` (which is not called during server-side-rendering), or wrap it in a `window` check.
 
-Also, if using only asynchronous client-side fetching, there is no need to set `this.state` on initial call as the client-side cache will not be populated with any server-rendered data.
+Also, if using only asynchronous client-side fetching, there is no need to set `this.state` on initial call as the client-side cache will not be pre-populated with any server-rendered data, and thus the call to getContent will always return a Promise.
 
 ```jsx
 class MyComponent extends Consumer {
   componentDidMount () {
     this.getContent('content-api', {uri: '/some/data'}, '{type version}')
       .then(content => this.setState({content}))
+  }
+
+  render () {
+    return <div>{this.state && this.state.content && this.state.content.type}</div>
   }
 }
 ```
@@ -111,6 +121,10 @@ class MyComponent extends Consumer {
         .then(content => this.setState({content}))
     }
   }
+
+  render () {
+    return <div>{this.state && this.state.content && this.state.content.type}</div>
+  }
 }
 ```
 
@@ -118,17 +132,47 @@ You can fetch multiple pieces of content by making multiple calls to getContent.
 
 ```jsx
 class MyComponent extends Consumer {
-  constructor () {
-    this.state = {
-      ...this.getContent('content-api', {uri: '/some/data'}, '{type version}')
-        .then(content1 => this.setState({content1})),
-      ...this.getContent('content-api', {uri: '/some/other/data'}, '{type version}')
-        .then(content2 => this.setState({content2}))
+  constructor (props, context) {
+    super(props, context)
+
+    const content1 = this.getContent('content-api', {uri: '/some/data'}, '{type version}')
+    if (content1 instanceof Promise) {
+      content1.then(content1 => this.setState({content1}))
+    } else {
+      this.state.content1 = content1
+    }
+
+    const content2 = this.getContent('content-api', {uri: '/some/other/data'}, '{type version}')
+    if (content2 instanceof Promise) {
+      content2.then(content2 => this.setState({content2}))
+    } else {
+      this.state.content2 = content2
     }
   }
 
   render () {
-    return <div>{this.state.content1.type} / {this.state.content2.type}</div>
+    return <div>{this.state.content1 && this.state.content1.type} / {this.state.content2 && this.state.content2.type}</div>
+  }
+}
+```
+
+-   setContent(contentFetches)
+
+The `setContent` method is syntactic sugar for the Promise instanceof check when using `this.getContent`. It is used as follows:
+
+```jsx
+class MyComponent extends Consumer {
+  constructor (props, context) {
+    super(props, context)
+
+    this.setContent({
+      content1: this.getContent('content-api', {uri: '/some/data'}, '{type version}'),
+      content2: this.getContent('content-api', {uri: '/some/other/data'}, '{type version}')
+    })
+  }
+
+  render () {
+    return <div>{this.state.content1 && this.state.content1.type} / {this.state.content2 && this.state.content2.type}</div>
   }
 }
 ```

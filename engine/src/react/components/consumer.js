@@ -1,8 +1,12 @@
 'use strict'
 
+/* global window */
+
 const React = require('react')
 
 const contextTypes = require('./types')
+
+const isClient = typeof window !== 'undefined'
 
 const prepareProps = function prepareProps (props) {
   return props
@@ -17,33 +21,23 @@ const prepareContext = function prepareContext (context) {
 const HOC = function HOC (Component) {
   if (Component.prototype instanceof React.Component) {
     // if Component is a React Component class, wrap it with new class with context access and `getContent` instance method
-    const Consumer = class Consumer extends Component {
+    const HOConsumer = class HOConsumer extends Component {
       getContent (...args) {
-        if (!this.context) {
-          throw new Error('Context is required; did you remember to pass `props` _and_ `context` to `super`')
-        }
-        return this.context.getContent.apply(this, args)
+        return Consumer.prototype.getContent.apply(this, args)
       }
-      getContentAs (prop) {
-        return (...args) => {
-          const content = this.getContent(...args)
-          if (content instanceof Promise) {
-            content.then(data => { this.setState({[prop]: data}) })
-          } else {
-            this.state[prop] = content
-          }
-        }
+      setContent (contents) {
+        Consumer.prototype.setContent.call(this, contents)
       }
     }
-    Consumer.contextTypes = contextTypes
-    return Consumer
+    HOConsumer.contextTypes = contextTypes
+    return HOConsumer
   } else {
     // if Component is a functional component, make context available
-    const Consumer = (props, context) => {
+    const HOConsumer = (props, context) => {
       return Component(prepareProps(props), prepareContext(context))
     }
-    Consumer.contextTypes = contextTypes
-    return Consumer
+    HOConsumer.contextTypes = contextTypes
+    return HOConsumer
   }
 }
 
@@ -86,17 +80,28 @@ Consumer.prototype.constructor = Consumer
 Consumer.parent = React.Component.prototype
 
 Consumer.prototype.getContent = function (...args) {
+  if (!this.context) {
+    throw new Error('Context is required; did you remember to pass both `props` _and_ `context` to `super`')
+  }
   return this.context.getContent.apply(this, args)
 }
-Consumer.prototype.getContentAs = function (prop) {
-  return (...args) => {
-    const content = this.getContent(...args)
+Consumer.prototype.setContent = function (contents) {
+  this.state = this.state || {}
+  Object.keys(contents).forEach(key => {
+    const content = contents[key]
     if (content instanceof Promise) {
-      content.then(data => { this.setState({[prop]: data}) })
+      if (isClient) {
+        // this case is only necessary on the client
+        // on the server, we will wait for the content to hydrate and manually re-render
+        content.then(data => { this.setState({[key]: data}) })
+      }
     } else {
-      this.state[prop] = content
+      // this case is only possible if content was fetched server-side
+      // content can only be fetched server-side if requested prior to mounting (.e.g, constructor or componentWillMount)
+      // prior to mounting, we should set state directly, not using the `setState` method
+      this.state[key] = content
     }
-  }
+  })
 }
 
 Consumer.contextTypes = contextTypes

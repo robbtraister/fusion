@@ -63,7 +63,9 @@ module.exports = Object.keys(entry).length
       path: path.resolve(__dirname, 'dist', 'components'),
       libraryTarget: 'commonjs2'
     },
-    plugins: [new ManifestPlugin()],
+    plugins: [
+      new ManifestPlugin()
+    ],
     resolve: {
       alias,
       extensions: ['.js', '.jsx']

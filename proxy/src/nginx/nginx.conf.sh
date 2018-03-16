@@ -220,7 +220,7 @@ cat <<EOB
     }
 
     # test paths for hitting the engine lambda
-    location ~ ^/(compile|content|engine|render)(/.*|$) {
+    location ~ ^/(compile|content|render|resources)(/.*|$) {
       error_page               418 = @engine;
       return                   418;
     }

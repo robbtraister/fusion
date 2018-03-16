@@ -9,8 +9,8 @@ const webpack = require('webpack')
 const debugTimer = require('debug')('fusion:timer:react:compile:pack')
 
 const compileSource = require('./source')
-const timer = require('../../timer')
-const getConfigs = require('../../../webpack-configs.js')
+const timer = require('../../../timer')
+const getConfigs = require('../../../../webpack-jsx-configs.js')
 
 const sourceFile = '/workdir/engine/bundle/components/templates/Template.jsx'
 const destFile = '/workdir/engine/dist/components/templates/Template.jsx'

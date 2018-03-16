@@ -46,7 +46,7 @@ const getSource = function getSource (sourceName) {
         }
       )
     } catch (err) {
-      console.log(err)
+      console.error(err)
       throw err
     }
   }

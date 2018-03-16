@@ -1,12 +1,12 @@
 'use strict'
 
 const _ = require('lodash')
-const JSONNormalize = require('./normalize')
+const JSONNormalize = require('../../utils/normalize')
 
 const React = require('react')
 const E = React.createElement
 
-const contextTypes = require('./types')
+const contextTypes = require('../shared/context-types')
 
 const getSource = require('../../content/sources')
 
@@ -39,10 +39,12 @@ class Provider extends React.Component {
             )
             .then(filtered => {
               keyCache.filtered = _.merge(keyCache.filtered, filtered)
+              return keyCache.data
             })
-            .then(() => keyCache.data)
 
-          return keyCache.data || keyCache.promise
+          // Server-side, we never need to worry about the Promise or async content
+          // we will re-render using the cached content if necessary
+          return keyCache.data // || keyCache.promise
         }
 
         return (args.length === 0)
@@ -69,8 +71,8 @@ class Provider extends React.Component {
         })
 
       return E(React.Fragment, {},
-        this.props.children
-        // E('script', {dangerouslySetInnerHTML: { __html: `var contentCache=${JSON.stringify(condensedMap, (key, value) => value == null ? undefined : value)}` }})
+        this.props.children,
+        E('script', {dangerouslySetInnerHTML: { __html: `var contentCache=${JSON.stringify(condensedMap, (key, value) => value == null ? undefined : value)}` }})
       )
     } else {
       return this.props.children

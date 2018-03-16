@@ -7,7 +7,7 @@ const app = require('./app')
 module.exports = {
   app,
   filter: require('./content/filter'),
-  render: require('./react/render'),
+  render: require('./react/server/render'),
   router: require('./router'),
   schemas: require('./content/schemas'),
   serverless: serverless(app),

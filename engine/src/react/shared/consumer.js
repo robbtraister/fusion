@@ -4,7 +4,7 @@
 
 const React = require('react')
 
-const contextTypes = require('./types')
+const contextTypes = require('./context-types')
 
 const isClient = typeof window !== 'undefined'
 
@@ -85,6 +85,7 @@ Consumer.prototype.getContent = function (...args) {
   }
   return this.context.getContent.apply(this, args)
 }
+
 Consumer.prototype.setContent = function (contents) {
   this.state = this.state || {}
   Object.keys(contents).forEach(key => {

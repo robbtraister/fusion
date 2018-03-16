@@ -5,7 +5,7 @@ const express = require('express')
 
 // const debugTimer = require('debug')('fusion:timer:router')
 
-const compile = require('../react/compile/pack')
+const compile = require('../react/server/compile/pack')
 
 // const timer = require('../timer')
 

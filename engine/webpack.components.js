@@ -10,4 +10,4 @@ const entry = {}
 glob.sync(`${componentDir}/**/*.{hbs,js,jsx,vue}`)
   .forEach(f => { entry[f.substr(componentDir.length + 1)] = f })
 
-module.exports = require('./webpack-configs')(entry)
+module.exports = require('./webpack-jsx-configs')(entry)

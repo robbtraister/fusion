@@ -2,39 +2,20 @@
 
 const path = require('path')
 
-const debug = require('debug')('fusion:timer:react:component')
+const debugTimer = require('debug')('fusion:timer:react:component')
 
 const React = require('react')
 
-const timer = require('../../timer')
+const timer = require('../../../timer')
 
-const TimedComponent = function TimedComponent (Component) {
-  if (Component.prototype instanceof React.Component) {
-    let tic
-    return class TimedComponent extends Component {
-      constructor (props, context) {
-        super(props, context)
-        tic = timer.tic()
-      }
-      render () {
-        const result = super.render()
-        debug(this.props.type, this.props.id, tic.toc())
-        return result
-      }
-    }
-  } else {
-    const TimedComponent = function TimedComponent (props, context) {
-      const tic = timer.tic()
-      const result = Component(props, context)
-      debug(props.type, props.id, tic.toc())
-      return result
-    }
-    TimedComponent.contextTypes = Component.contextTypes
-    return TimedComponent
-  }
+const componentRoot = path.resolve(process.env.COMPONENT_ROOT || `${__dirname}/../../../../dist/components`)
+
+const TimedComponent = (Component) => (props) => {
+  const tic = timer.tic()
+  const result = React.createElement(Component, props)
+  debugTimer(props.type, props.id, tic.toc())
+  return result
 }
-
-const componentRoot = path.resolve(process.env.COMPONENT_ROOT || `${__dirname}/../../../dist/components`)
 
 // The calculated result we export for rendering must be a Component (not Element)
 // For simplification, create each element as a functional component

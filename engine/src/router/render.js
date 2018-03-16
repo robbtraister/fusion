@@ -9,7 +9,7 @@ const {
   compileOutputType,
   compileRenderable,
   render
-} = require('../react/render')
+} = require('../react/server/render')
 
 const timer = require('../timer')
 

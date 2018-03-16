@@ -4,23 +4,36 @@
 
 const debugTimer = require('debug')('fusion:timer:react:render')
 
+const React = require('react')
 const ReactDOM = require('react-dom/server')
 
 const compile = require('./compile/component')
-const Provider = require('./components/provider')
-const OutputType = require('../../dist/components/output-types/html.jsx')
+const Provider = require('./provider')
+const OutputType = require('../../../dist/components/output-types/react.jsx')
 
-const timer = require('../timer')
+const timer = require('../../timer')
 
 const render = function render ({requestUri, content, Component}) {
-  const renderHtml = () => ReactDOM.renderToStaticMarkup(Component({
-    globalContent: content,
-    requestUri
-  }))
+  const renderHTML = () => new Promise((resolve, reject) => {
+    try {
+      const html = ReactDOM.renderToStaticMarkup(
+        React.createElement(
+          Component,
+          {
+            globalContent: content,
+            requestUri
+          }
+        )
+      )
+      resolve(html)
+    } catch (e) {
+      reject(e)
+    }
+  })
 
   let tic = timer.tic()
-  return Promise.resolve(renderHtml())
-    .then((html) => {
+  return renderHTML()
+    .then((element) => {
       debugTimer('first render', tic.toc())
       tic = timer.tic()
 
@@ -33,14 +46,14 @@ const render = function render ({requestUri, content, Component}) {
 
       return contentPromises.length === 0
         // if no feature content is requested, return original rendering
-        ? Promise.resolve(html)
+        ? Promise.resolve(ReactDOM.renderToStaticMarkup(element))
         // if feature content is requested, wait for it, then render again
         : Promise.all(contentPromises)
           .then(() => {
             debugTimer('content hydration', tic.toc())
             tic = timer.tic()
           })
-          .then(renderHtml)
+          .then(renderHTML)
           .then((html) => {
             debugTimer('second render', tic.toc())
             return html

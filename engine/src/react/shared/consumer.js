@@ -22,6 +22,9 @@ const HOC = function HOC (Component) {
   if (Component.prototype instanceof React.Component) {
     // if Component is a React Component class, wrap it with new class with context access and `getContent` instance method
     const HOConsumer = class HOConsumer extends Component {
+      getAsyncContent (...args) {
+        return Consumer.prototype.getAsyncContent.apply(this, args)
+      }
       getContent (...args) {
         return Consumer.prototype.getContent.apply(this, args)
       }
@@ -79,6 +82,12 @@ Consumer.prototype = Object.create(React.Component.prototype)
 Consumer.prototype.constructor = Consumer
 Consumer.parent = React.Component.prototype
 
+Consumer.prototype.getAsyncContent = function (...args) {
+  if (!this.context) {
+    throw new Error('Context is required; did you remember to pass both `props` _and_ `context` to `super`')
+  }
+  return this.context.getAsyncContent.apply(this, args)
+}
 Consumer.prototype.getContent = function (...args) {
   if (!this.context) {
     throw new Error('Context is required; did you remember to pass both `props` _and_ `context` to `super`')
@@ -90,18 +99,16 @@ Consumer.prototype.setContent = function (contents) {
   this.state = this.state || {}
   Object.keys(contents).forEach(key => {
     const content = contents[key]
-    if (content instanceof Promise) {
-      if (isClient) {
-        // this case is only necessary on the client
-        // on the server, we will wait for the content to hydrate and manually re-render
-        content.then(data => { this.setState({[key]: data}) })
-      }
-    } else {
-      // this case is only possible if content was fetched server-side
-      // content can only be fetched server-side if requested prior to mounting (.e.g, constructor or componentWillMount)
-      // prior to mounting, we should set state directly, not using the `setState` method
-      this.state[key] = content
+    if (isClient) {
+      // this case is only necessary on the client
+      // on the server, we will wait for the content to hydrate and manually re-render
+      content.promise.then(data => { this.setState({[key]: data}) })
     }
+
+    // this case is only possible if content was fetched server-side
+    // content can only be fetched server-side if requested prior to mounting (.e.g, constructor or componentWillMount)
+    // prior to mounting, we should set state directly, not using the `setState` method
+    this.state[key] = content.cached
   })
 }
 

@@ -65,7 +65,7 @@ This is the uri that was requested to initiate this rendering
 
 -   getContent(sourceName, key, [query])
 
-The `getContent` method will fetch content and optionally return the data if it has already been fetched and is in cache, or a Promise that will resolve to the final data.
+The `getContent` method will fetch content and return an object with two properties, `cached` and `promise`. The first property, `cached`, will contain the synchronous data as already pre-fetched on the server. The second property, `promise`, will be a Promise object that resolves to freshly re-fetched content.
 
 The first input parameter, `sourceName`, is simply the name of the content source from which you want to fetch. This content source must be configured in your bundle.
 
@@ -80,10 +80,9 @@ class MyComponent extends Consumer {
   constructor (props, context) {
     super(props, context)
 
-    this.state = this.getContent('content-api', {uri: '/some/data'}, '{type version}')
-    if (this.state instanceof Promise) {
-      this.state.then(content => this.setState({content}))
-    }
+    const {cached, promise} = this.getContent('content-api', {uri: '/some/data'}, '{type version}')
+    this.state = cached || {}
+    promise.then(data => this.setState(data))
   }
 
   render () {
@@ -94,12 +93,13 @@ class MyComponent extends Consumer {
 
 If you are fetching content asynchronously from the client only, you should either make the call from `componentDidMount` (which is not called during server-side-rendering), or wrap it in a `window` check.
 
-Also, if using only asynchronous client-side fetching, there is no need to set `this.state` on initial call as the client-side cache will not be pre-populated with any server-rendered data, and thus the call to getContent will always return a Promise.
+Also, if using only asynchronous client-side fetching, there is no need to set `this.state` on initial call as the client-side cache will not be pre-populated with any server-rendered data. In this case, you can just access the promise directly.
 
 ```jsx
 class MyComponent extends Consumer {
   componentDidMount () {
     this.getContent('content-api', {uri: '/some/data'}, '{type version}')
+      .promise
       .then(content => this.setState({content}))
   }
 
@@ -118,6 +118,7 @@ class MyComponent extends Consumer {
 
     if (typeof window !== 'undefined') {
       this.getContent('content-api', {uri: '/some/data'}, '{type version}')
+        .promise
         .then(content => this.setState({content}))
     }
   }
@@ -135,19 +136,15 @@ class MyComponent extends Consumer {
   constructor (props, context) {
     super(props, context)
 
+    this.state = {}
+
     const content1 = this.getContent('content-api', {uri: '/some/data'}, '{type version}')
-    if (content1 instanceof Promise) {
-      content1.then(content1 => this.setState({content1}))
-    } else {
-      this.state.content1 = content1
-    }
+    this.state.content1 = content1.cached
+    content1.promise.then(content1 => this.setState({content1}))
 
     const content2 = this.getContent('content-api', {uri: '/some/other/data'}, '{type version}')
-    if (content2 instanceof Promise) {
-      content2.then(content2 => this.setState({content2}))
-    } else {
-      this.state.content2 = content2
-    }
+    this.state.content2 = content2.cached
+    content2.promise.then(content2 => this.setState({content2}))
   }
 
   render () {
@@ -158,7 +155,7 @@ class MyComponent extends Consumer {
 
 -   setContent(contentFetches)
 
-The `setContent` method is syntactic sugar for the Promise instanceof check when using `this.getContent`. It is used as follows:
+The `setContent` method is syntactic sugar for setting both the initial state property and calling setState on the resolved Promise. It is used as follows:
 
 ```jsx
 class MyComponent extends Consumer {

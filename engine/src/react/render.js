@@ -6,7 +6,7 @@ const debugTimer = require('debug')('fusion:timer:react:render')
 
 const ReactDOM = require('react-dom/server')
 
-const compile = require('./compile')
+const compile = require('./compile/component')
 const Provider = require('./components/provider')
 const OutputType = require('../../dist/components/output-types/html.jsx')
 

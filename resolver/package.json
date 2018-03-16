@@ -13,11 +13,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.16.2",
+    "express": "^4.16.3",
     "serverless-http": "^1.5.3"
   },
   "devDependencies": {
-    "serverless-domain-manager": "^2.3.4",
     "serverless-offline": "^3.18.0"
   }
 }

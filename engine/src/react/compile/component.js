@@ -6,7 +6,7 @@ const debug = require('debug')('fusion:timer:react:component')
 
 const React = require('react')
 
-const timer = require('../timer')
+const timer = require('../../timer')
 
 const TimedComponent = function TimedComponent (Component) {
   if (Component.prototype instanceof React.Component) {
@@ -34,7 +34,7 @@ const TimedComponent = function TimedComponent (Component) {
   }
 }
 
-const componentRoot = path.resolve(process.env.COMPONENT_ROOT || `${__dirname}/../../dist/components`)
+const componentRoot = path.resolve(process.env.COMPONENT_ROOT || `${__dirname}/../../../dist/components`)
 
 // The calculated result we export for rendering must be a Component (not Element)
 // For simplification, create each element as a functional component
@@ -107,12 +107,16 @@ const template = function template (rendering) {
 }
 
 const renderableItem = function renderableItem (config) {
-  return ((config.featureConfig) ? feature(config)
-    : (config.chainConfig) ? chain(config)
-      : (config.renderableItems) ? section(config)
-        : (config.layoutItems) ? template(config)
+  const component = (config.featureConfig)
+    ? feature(config)
+    : (config.chainConfig)
+      ? chain(config)
+      : (config.renderableItems)
+        ? section(config)
+        : (config.layoutItems)
+          ? template(config)
           : null
-  ) || (() => null)
+  return component || (() => null)
 }
 
 module.exports = renderableItem

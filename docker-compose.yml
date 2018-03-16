@@ -27,6 +27,7 @@ services:
       args:
         LAMBDA: engine
     environment:
+      NODE_ENV: development
       PORT: '8082'
       DEBUG: watcher:*,fusion:*
       WATCH: 'true'

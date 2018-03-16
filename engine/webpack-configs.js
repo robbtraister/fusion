@@ -2,6 +2,7 @@
 
 const path = require('path')
 
+const UglifyWebpackPlugin = require('uglifyjs-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
 
 const VENDOR_PACKAGES = ['react']
@@ -21,8 +22,14 @@ try {
   }
 } catch (e) {}
 
-module.exports = (entry, outputPath) => {
-  return Object.keys(entry).length
+const minimizer = (process.env.NODE_ENV === 'production')
+  ? [new UglifyWebpackPlugin({
+    test: /\.jsx?$/i
+  })]
+  : []
+
+module.exports = (entry) =>
+  (Object.keys(entry).length)
     ? {
       entry,
       externals,
@@ -51,9 +58,12 @@ module.exports = (entry, outputPath) => {
           }
         ]
       },
+      optimization: {
+        minimizer
+      },
       output: {
         filename: `[name]`,
-        path: outputPath || path.resolve(__dirname, 'dist', 'components'),
+        path: path.resolve(__dirname, 'dist', 'components'),
         libraryTarget: 'commonjs2'
       },
       plugins: [
@@ -65,4 +75,3 @@ module.exports = (entry, outputPath) => {
       }
     }
     : null
-}

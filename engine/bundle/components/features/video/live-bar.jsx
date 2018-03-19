@@ -8,8 +8,13 @@ const headlineQuery = '{headlines{basic}}'
 class LiveBar extends React.Component {
   componentWillMount () {
     this.setContent({
-      mlb: this.getContent('content-api', {uri: '/sports/mlb/new-blockquote-test'}, headlineQuery),
       redskins: this.getContent('content-api', {uri: '/sports/redskins/football-insider/aoeu-7'}, headlineQuery)
+    })
+  }
+
+  componentDidMount () {
+    this.setContent({
+      mlb: this.getContent('content-api', {uri: '/sports/mlb/new-blockquote-test'}, headlineQuery)
     })
   }
 

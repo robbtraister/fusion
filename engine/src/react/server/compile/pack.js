@@ -60,8 +60,8 @@ const pack = function pack (rendering) {
         const configs = getConfigs({
           'templates/Template.jsx': sourceFile
         })
-        configs.output.library = 'Template'
-        configs.output.libraryTarget = 'var'
+        configs.output.library = 'window.Fusion=window.Fusion||{};Fusion.Template'
+        configs.output.libraryTarget = 'assign'
 
         debugTimer('webpack configs', tic.toc())
         tic = timer.tic()

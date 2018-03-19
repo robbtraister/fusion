@@ -31,6 +31,7 @@ services:
       PORT: '8082'
       DEBUG: watcher:*,fusion:*
       WATCH: 'true'
+      ON_DEMAND:
       CONTENT_BASE:
       MONGO_URL:
     image: fusion-engine

@@ -136,15 +136,16 @@ class MyComponent extends Consumer {
   constructor (props, context) {
     super(props, context)
 
-    this.state = {}
-
     const content1 = this.getContent('content-api', {uri: '/some/data'}, '{type version}')
-    this.state.content1 = content1.cached
     content1.promise.then(content1 => this.setState({content1}))
 
     const content2 = this.getContent('content-api', {uri: '/some/other/data'}, '{type version}')
-    this.state.content2 = content2.cached
     content2.promise.then(content2 => this.setState({content2}))
+
+    this.state = {
+      content1: content1.cached
+      content2: content2.cached
+    }
   }
 
   render () {
@@ -155,7 +156,7 @@ class MyComponent extends Consumer {
 
 -   setContent(contentFetches)
 
-The `setContent` method is syntactic sugar for setting both the initial state property and calling setState on the resolved Promise. It is used as follows:
+The `setContent` method is syntactic sugar for setting both the cached data to the initial state property and calling setState on the resolved Promise. It is used as follows:
 
 ```jsx
 class MyComponent extends Consumer {

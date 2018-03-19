@@ -1,6 +1,8 @@
 'use strict'
 
-/* global contentCache, Template */
+/* global Fusion */
+
+window.Fusion = window.Fusion || {}
 
 const React = require('react')
 
@@ -29,24 +31,24 @@ const render = () => {
   if (!didRender) {
     didRender = true
 
-    if (typeof Template === 'undefined') {
+    if (typeof Fusion.Template === 'undefined') {
       console.error('404')
       notFound()
     } else {
       const templateStyle = window.document.getElementById('template-style')
-      if (Template.cssFile) {
-        templateStyle.href = `/_assets/templates/${Template.cssFile}`
+      if (Fusion.Template.cssFile) {
+        templateStyle.href = `/_assets/templates/${Fusion.Template.cssFile}`
       }
 
       ReactDOM.hydrate(
         React.createElement(
           Provider,
           {
-            contentCache,
+            contentCache: Fusion.cache,
             requestUri: window.location.pathname + window.location.search
           },
           React.createElement(
-            Template
+            Fusion.Template
           // globalContent
           )
         ),

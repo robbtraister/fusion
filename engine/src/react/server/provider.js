@@ -75,7 +75,8 @@ class Provider extends React.Component {
 
       return E(React.Fragment, {},
         this.props.children,
-        E('script', {dangerouslySetInnerHTML: { __html: `var contentCache=${JSON.stringify(condensedMap, (key, value) => value == null ? undefined : value)}` }})
+        // set `isFresh` property so the client knows if content needs to be refreshed
+        E('script', {dangerouslySetInnerHTML: { __html: `window.Fusion=window.Fusion||{};Fusion.context='${process.env.CONTEXT || 'pb'}';Fusion.isFresh=${process.env.ON_DEMAND === 'true' ? 'true' : 'false'};Fusion.cache=${JSON.stringify(condensedMap, (key, value) => value == null ? undefined : value)}` }})
       )
     } else {
       return this.props.children

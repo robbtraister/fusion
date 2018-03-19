@@ -1,5 +1,7 @@
 'use strict'
 
+/* global Fusion */
+
 const React = require('react')
 
 const contextTypes = require('../shared/context-types')
@@ -13,7 +15,7 @@ class Provider extends React.Component {
 
     const getContent = function getContent (source, ...args) {
       const fetchContent = (source, keyString, filter) =>
-        window.fetch(`/content/${source}?key=${keyString}` + (filter ? `&filter=${filter.replace(/\s+/g, ' ').trim()}` : ''))
+        window.fetch(`/${Fusion.context}/api/v3/content/${source}?key=${keyString}` + (filter ? `&filter=${filter.replace(/\s+/g, ' ').trim()}` : ''))
           .then(resp => resp.json())
 
       const getSourceContent = (key, filter) => {
@@ -22,7 +24,11 @@ class Provider extends React.Component {
 
         const sourceCache = fetchCache[source] = fetchCache[source] || {}
         const keyCache = sourceCache[keyString] = sourceCache[keyString] || {}
-        const promise = keyCache[filter] = keyCache[filter] || fetchContent(source, keyString, filter)
+        const promise = keyCache[filter] = keyCache[filter] || (
+          (Fusion.isFresh && cached)
+            ? Promise.resolve(cached)
+            : fetchContent(source, keyString, filter)
+        )
 
         try {
           return {

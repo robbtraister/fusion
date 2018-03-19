@@ -1,5 +1,7 @@
 #!/bin/sh
 
+API_PREFIX="/${CONTEXT:-pb}/api/v3"
+
 DNS_SERVER=''
 for word in $(cat '/etc/resolv.conf')
 do
@@ -220,13 +222,15 @@ cat <<EOB
     }
 
     # test paths for hitting the engine lambda
-    location ~ ^/(compile|content|render|resources)(/.*|$) {
+    location ~ ^${API_PREFIX}/(compile|content|render|resources)(/.*|$) {
+      rewrite                  ^${API_PREFIX}(/|$)(.*) /\$2;
       error_page               418 = @engine;
       return                   418;
     }
 
     # test paths for hitting the resolver lambda
-    location ~ ^/(resolve)(/.*|$) {
+    location ~ ^${API_PREFIX}/(resolve)(/.*|$) {
+      rewrite                  ^${API_PREFIX}(/|$)(.*) /\$2;
       error_page               418 = @resolver;
       return                   418;
     }

@@ -6,6 +6,10 @@ const Consumer = require('consumer')
 const headlineQuery = '{headlines{basic}}'
 
 class LiveBar extends React.Component {
+  constructor (props, context) {
+    super(props, context)
+    this.onButtonClick = this.onButtonClick.bind(this)
+  }
   componentWillMount () {
     this.setContent({
       redskins: this.getContent('content-api', {uri: '/sports/redskins/football-insider/aoeu-7'}, headlineQuery)
@@ -18,6 +22,10 @@ class LiveBar extends React.Component {
     })
   }
 
+  onButtonClick () {
+    console.log('clicked')
+  }
+
   render () {
     return <div className={this.props.type} id={this.props.id}>
       {this.props.headline}
@@ -26,6 +34,7 @@ class LiveBar extends React.Component {
         <br />
         {this.state && this.state.redskins && this.state.redskins.headlines.basic}
       </p>
+      <button onClick={this.onButtonClick}>click me</button>
     </div>
   }
 }

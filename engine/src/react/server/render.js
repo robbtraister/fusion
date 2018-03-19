@@ -80,7 +80,33 @@ const compileOutputType = function compileOutputType (rendering) {
   return compileRenderable(rendering)
     .then((Feature) => {
       tic = timer.tic()
-      const Component = OutputType(Feature)
+      const Component = (props) => React.createElement(
+        OutputType,
+        {
+          scripts: [
+            React.createElement(
+              'script',
+              {
+                type: 'text/javascript',
+                src: '/pb/api/v3/resources/engine/react.js'
+              }
+            ),
+            React.createElement(
+              'script',
+              {
+                type: 'text/javascript',
+                src: '/pb/api/v3' + props.requestUri.replace('/render/', '/compile/')
+              }
+            )
+          ]
+        },
+        React.createElement(
+          Feature,
+          // pass down the original props
+          props
+        )
+      )
+      // const Component = OutputType(Feature)
       // bubble up the Provider cacheMap
       Component.cacheMap = Feature.cacheMap
       return Component

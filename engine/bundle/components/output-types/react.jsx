@@ -2,16 +2,15 @@
 
 const React = require('react')
 
-const Layout = (Template) => (props) =>
+const Layout = (props) =>
   <html>
     <head>
       <title>Fusion Rendering</title>
-      <script type='text/javascript' src='/pb/api/v3/resources/engine/react.js' />
-      <script type='text/javascript' src='/pb/api/v3/compile/page/pdhHhQ1hVAO1iq' />
+      {props.scripts}
     </head>
     <body>
       <div id='App'>
-        <Template {...props} />
+        {props.children}
       </div>
     </body>
   </html>

@@ -6,3 +6,5 @@
 **/docker-compose*.yml
 **/dist
 **/node_modules
+
+/engine/resources

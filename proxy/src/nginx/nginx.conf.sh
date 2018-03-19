@@ -186,7 +186,7 @@ else
   cat <<EOB
       proxy_set_header         'X-FunctionName' '${ENGINE_LAMBDA:-arn:aws:lambda:${AWS_REGION:-us-east-1}:${AWS_ACCOUNT_ID:-397853141546}:function:fusion-engine-\$\{environment\}-engine}';
       proxy_set_header         'Content-Type' 'application/json';
-      proxy_pass               ${LAMBDA_PROXY:-http://0.0.0.0:${NODEJS_PORT:-8081}}\$context_free_uri\$is_args\$args;
+      proxy_pass               ${LAMBDA_PROXY:-http://0.0.0.0:${NODEJS_PORT:-8081}}\$uri\$is_args\$args;
 EOB
 fi
 cat <<EOB
@@ -203,7 +203,7 @@ else
   cat <<EOB
       proxy_set_header         'X-FunctionName' '${RESOLVER_LAMBDA:-arn:aws:lambda:${AWS_REGION:-us-east-1}:${AWS_ACCOUNT_ID:-397853141546}:function:fusion-resolver-\$\{environment\}-resolver}';
       proxy_set_header         'Content-Type' 'application/json';
-      proxy_pass               ${LAMBDA_PROXY:-http://0.0.0.0:${NODEJS_PORT:-8081}}\$context_free_uri\$is_args\$args;
+      proxy_pass               ${LAMBDA_PROXY:-http://0.0.0.0:${NODEJS_PORT:-8081}}\$uri\$is_args\$args;
 EOB
 fi
 cat <<EOB

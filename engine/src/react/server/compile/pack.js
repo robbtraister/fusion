@@ -12,8 +12,8 @@ const compileSource = require('./source')
 const timer = require('../../../timer')
 const getConfigs = require('../../../../webpack-jsx-configs.js')
 
-const sourceFile = '/workdir/engine/bundle/components/templates/Template.jsx'
-const destFile = '/workdir/engine/dist/components/templates/Template.jsx'
+const sourceFile = path.resolve(`${__dirname}/../../../../bundle/components/templates/Template.jsx`)
+const destFile = path.resolve(`${__dirname}/../../../../dist/components/templates/Template.jsx`)
 
 const getMemoryFS = function getMemoryFS () {
   const memFs = new MemoryFS()

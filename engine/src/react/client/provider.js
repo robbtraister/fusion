@@ -15,7 +15,7 @@ class Provider extends React.Component {
 
     const getContent = function getContent (source, ...args) {
       const fetchContent = (source, keyString, filter) =>
-        window.fetch(`/${Fusion.context}/api/v3/content/${source}?key=${keyString}` + (filter ? `&filter=${filter.replace(/\s+/g, ' ').trim()}` : ''))
+        window.fetch(`${Fusion.context || '/'}/api/v3/content/${source}?key=${keyString}` + (filter ? `&filter=${filter.replace(/\s+/g, ' ').trim()}` : ''))
           .then(resp => resp.json())
 
       const getSourceContent = (key, filter) => {

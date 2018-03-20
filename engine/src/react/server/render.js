@@ -14,7 +14,8 @@ const OutputType = require('../../../dist/components/output-types/react.jsx')
 const timer = require('../../timer')
 
 const {
-  getScriptUrl
+  getApiPrefix,
+  getScriptUri
 } = require('../../resources')
 
 const render = function render ({requestUri, content, Component}) {
@@ -92,14 +93,14 @@ const compileOutputType = function compileOutputType (rendering, pt) {
               'script',
               {
                 type: 'text/javascript',
-                src: '/pb/api/v3/resources/engine/react.js'
+                src: `${getApiPrefix()}/resources/engine/react.js`
               }
             ),
             React.createElement(
               'script',
               {
                 type: 'text/javascript',
-                src: getScriptUrl(pt) // '/pb/api/v3' + props.requestUri.replace('/render/', '/compile/')
+                src: getScriptUri(pt)
               }
             )
           ]

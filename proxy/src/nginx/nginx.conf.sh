@@ -6,8 +6,7 @@ DNS_SERVER=''
 for word in $(cat '/etc/resolv.conf')
 do
   # the dns must be 4 segments of digits separated by '.'s
-  # ignore local DNS servers that start with 127.0.
-  dns=$(echo "${word}" | egrep '^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$' | grep -v '^127\.0\.')
+  dns=$(echo "${word}" | egrep '^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$')
   if [[ "${dns}"  ]]
   then
     DNS_SERVER="${DNS_SERVER}${dns} "
@@ -217,7 +216,7 @@ cat <<EOB
       proxy_intercept_errors   on;
       error_page               400 403 404 418 = @resources;
 
-      set \$target http://${S3_BUCKET:-${NILE_NAMESPACE:-fusion}}.s3.amazonaws.com/\${environment}/resources/\${version}/\$1;
+      set \$target http://${S3_BUCKET:-${NILE_NAMESPACE:-pagebuilder-fusion}}.s3.amazonaws.com/\${environment}/resources/\${version}/\$1;
       proxy_pass \$target;
     }
 
@@ -233,6 +232,15 @@ cat <<EOB
       rewrite                  ^${API_PREFIX}(/|$)(.*) /\$2;
       error_page               418 = @resolver;
       return                   418;
+    }
+
+    # test paths for hitting the engine lambda
+    location ~ ^${API_PREFIX}/(script)(/.*|$) {
+      proxy_intercept_errors   on;
+      error_page               400 403 404 418 = @resources;
+
+      set \$target http://${S3_BUCKET:-${NILE_NAMESPACE:-pagebuilder-fusion}}.s3.amazonaws.com/staging/resources\$2;
+      proxy_pass \$target;
     }
 
     location /health {

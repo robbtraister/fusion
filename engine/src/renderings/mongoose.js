@@ -2,6 +2,10 @@
 
 const mongoose = require('mongoose')
 
+const debugTimer = require('debug')('fusion:timer:renderings:schemaless')
+
+const timer = require('../timer')
+
 const schema = new mongoose.Schema({_id: String})
 
 function getNewConnection (mongoUrl) {
@@ -49,14 +53,45 @@ function Mongoose (mongoUrl) {
   return {
     getModel (modelName) {
       models[modelName] = models[modelName] || {
+        name: modelName,
+
         find (query) {
+          let tic
           return getCollection(modelName)
-            .then((model) => model.find(query))
+            .then((model) => {
+              tic = timer.tic()
+              return model.find(query)
+            })
+            .then((data) => {
+              debugTimer(`${modelName}.find()`, tic.toc())
+              return data
+            })
         },
 
         findById (_id) {
+          let tic
           return getCollection(modelName)
-            .then((model) => model.findById(_id))
+            .then((model) => {
+              tic = timer.tic()
+              return model.findById(_id)
+            })
+            .then((data) => {
+              debugTimer(`${modelName}.findById(${_id})`, tic.toc())
+              return data
+            })
+        },
+
+        findOne (query) {
+          let tic
+          return getCollection(modelName)
+            .then((model) => {
+              tic = timer.tic()
+              return model.findOne(query)
+            })
+            .then((data) => {
+              debugTimer(`${modelName}.findOne()`, tic.toc())
+              return data
+            })
         }
       }
 

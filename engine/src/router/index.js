@@ -11,5 +11,6 @@ router.use('/resources', [
   express.static(`${__dirname}/../../bundle/resources`),
   express.static(`${__dirname}/../../resources`)
 ])
+router.use('/scripts', require('./scripts'))
 
 module.exports = router

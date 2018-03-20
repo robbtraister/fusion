@@ -13,7 +13,7 @@ const componentRoot = path.resolve(process.env.COMPONENT_ROOT || `${__dirname}/.
 const TimedComponent = (Component) => (props) => {
   const tic = timer.tic()
   const result = React.createElement(Component, props)
-  debugTimer(props.type, props.id, tic.toc())
+  debugTimer(`render(${props.type}:${props.id})`, tic.toc())
   return result
 }
 

@@ -174,6 +174,7 @@ cat <<EOB
     }
 
     location @engine {
+      rewrite                  ^${API_PREFIX}(/|$)(.*) /\$2 break;
 EOB
 if [[ "${ENGINE_HANDLER}" ]]
 then
@@ -192,6 +193,7 @@ cat <<EOB
     }
 
     location @resolver {
+      rewrite                  ^${API_PREFIX}(/|$)(.*) /\$2 break;
 EOB
 if [[ "${RESOLVER_HANDLER}" ]]
 then
@@ -216,31 +218,28 @@ cat <<EOB
       proxy_intercept_errors   on;
       error_page               400 403 404 418 = @resources;
 
-      set \$target http://${S3_BUCKET:-${NILE_NAMESPACE:-pagebuilder-fusion}}.s3.amazonaws.com/\${environment}/resources/\${version}/\$1;
-      proxy_pass \$target;
+      set                      \$target http://${S3_BUCKET:-${NILE_NAMESPACE:-pagebuilder-fusion}}.s3.amazonaws.com/\${environment}/resources/\${version}/\$1;
+      proxy_pass               \$target;
     }
 
     # test paths for hitting the engine lambda
     location ~ ^${API_PREFIX}/(compile|content|render|resources)(/.*|$) {
-      rewrite                  ^${API_PREFIX}(/|$)(.*) /\$2;
       error_page               418 = @engine;
       return                   418;
     }
 
     # test paths for hitting the resolver lambda
     location ~ ^${API_PREFIX}/(resolve)(/.*|$) {
-      rewrite                  ^${API_PREFIX}(/|$)(.*) /\$2;
       error_page               418 = @resolver;
       return                   418;
     }
 
-    # test paths for hitting the engine lambda
-    location ~ ^${API_PREFIX}/(script)(/.*|$) {
+    location ~ ^${API_PREFIX}/(scripts)(/.*|$) {
       proxy_intercept_errors   on;
-      error_page               400 403 404 418 = @resources;
+      error_page               400 403 404 418 = @engine;
 
-      set \$target http://${S3_BUCKET:-${NILE_NAMESPACE:-pagebuilder-fusion}}.s3.amazonaws.com/staging/resources\$2;
-      proxy_pass \$target;
+      set                      \$target http://${S3_BUCKET:-${NILE_NAMESPACE:-pagebuilder-fusion}}.s3.amazonaws.com/staging/resources\$2;
+      proxy_pass               \$target;
     }
 
     location /health {

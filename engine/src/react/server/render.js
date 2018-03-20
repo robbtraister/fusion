@@ -70,7 +70,7 @@ const compileRenderable = function compileRenderable (rendering) {
   let tic = timer.tic()
   return Promise.resolve(compile(rendering))
     .then(Feature => {
-      debugTimer('compilation', tic.toc())
+      debugTimer(`compile(${rendering._id})`, tic.toc())
       tic = timer.tic()
       return Provider(Feature)
     })

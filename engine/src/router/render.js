@@ -24,6 +24,7 @@ const renderRouter = express.Router()
 
 function getTypeRouter (fetch) {
   const typeRouter = express.Router()
+
   typeRouter.all(['/', '/:id', '/:id/:child'],
     bodyParser.json(),
     (req, res, next) => {
@@ -54,6 +55,7 @@ function getTypeRouter (fetch) {
         .catch(next)
     }
   )
+
   return typeRouter
 }
 

@@ -2,6 +2,10 @@
 
 const url = require('url')
 
+const debugTimer = require('debug')('fusion:timer:renderings:schemaless')
+
+const timer = require('../timer')
+
 const MongoClient = require('mongodb').MongoClient
 //
 // function Mongo (mongoUrl) {
@@ -111,15 +115,46 @@ function Mongo (mongoUrl) {
   return {
     getModel (modelName) {
       models[modelName] = models[modelName] || {
+        name: modelName,
+
         find (query) {
+          let tic
           return getCollection(modelName)
-            .then((collection) => collection.find(query))
+            .then((collection) => {
+              tic = timer.tic()
+              return collection.find(query)
+            })
             .then((cursor) => cursor.toArray())
+            .then((data) => {
+              debugTimer(`${modelName}.find()`, tic.toc())
+              return data
+            })
         },
 
         findById (_id) {
+          let tic
           return getCollection(modelName)
-            .then((collection) => collection.findOne({_id}))
+            .then((collection) => {
+              tic = timer.tic()
+              return collection.findOne({_id})
+            })
+            .then((data) => {
+              debugTimer(`${modelName}.findById(${_id})`, tic.toc())
+              return data
+            })
+        },
+
+        findOne (query) {
+          let tic
+          return getCollection(modelName)
+            .then((collection) => {
+              tic = timer.tic()
+              return collection.findOne(query)
+            })
+            .then((data) => {
+              debugTimer(`${modelName}.findOne()`, tic.toc())
+              return data
+            })
         }
       }
 

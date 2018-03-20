@@ -8,9 +8,8 @@ const express = require('express')
 // const timer = require('../timer')
 
 const {
-  getPageHead,
-  getRendering,
-  getTemplateHead
+  getPageByName,
+  getTemplateByName
 } = require('../renderings')
 
 const {
@@ -19,23 +18,22 @@ const {
 
 const renderRouter = express.Router()
 
-function getTypeRouter (fetch) {
+function getTypeRouter (fetchByName) {
   const typeRouter = express.Router()
 
-  typeRouter.all(['/', '/:id', '/:id/:child'],
+  typeRouter.all(['/:name'],
     bodyParser.json(),
     (req, res, next) => {
       // const tic = timer.tic()
       const payload = Object.assign(
         {
-          id: req.params.id,
-          child: req.params.child
+          name: req.params.name.replace(/\.js$/, '')
         },
         req.body
       )
 
-      fetch(payload.id)
-        .then(({pt, rendering}) => compile(pt, rendering, payload.child))
+      fetchByName(payload.name)
+        .then(({pt, rendering}) => compile(pt, rendering))
         .then((src) => { res.send(src) })
         .catch(next)
     }
@@ -44,8 +42,7 @@ function getTypeRouter (fetch) {
   return typeRouter
 }
 
-renderRouter.use('/page', getTypeRouter(getPageHead))
-renderRouter.use('/rendering', getTypeRouter(getRendering))
-renderRouter.use('/template', getTypeRouter(getTemplateHead))
+renderRouter.use('/pages', getTypeRouter(getPageByName))
+renderRouter.use('/templates', getTypeRouter(getTemplateByName))
 
 module.exports = renderRouter

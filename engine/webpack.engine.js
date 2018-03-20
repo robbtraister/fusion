@@ -14,11 +14,15 @@ const ManifestPlugin = require('webpack-manifest-plugin')
 //   callback()
 // }
 
-const minimizer = (process.env.NODE_ENV === 'production')
-  ? [new UglifyWebpackPlugin({
-    test: /\.jsx?$/i
-  })]
-  : []
+// const minimizer = (process.env.NODE_ENV === 'production')
+//   ? [new UglifyWebpackPlugin({
+//     test: /\.jsx?$/i
+//   })]
+//   : []
+
+const minimizer = [new UglifyWebpackPlugin({
+  test: /\.jsx?$/i
+})]
 
 module.exports = {
   entry: {

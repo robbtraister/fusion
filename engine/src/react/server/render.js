@@ -13,6 +13,10 @@ const OutputType = require('../../../dist/components/output-types/react.jsx')
 
 const timer = require('../../timer')
 
+const {
+  getScriptUrl
+} = require('../../resources')
+
 const render = function render ({requestUri, content, Component}) {
   const renderHTML = () => new Promise((resolve, reject) => {
     try {
@@ -75,7 +79,7 @@ const compileRenderable = function compileRenderable (rendering) {
     })
 }
 
-const compileOutputType = function compileOutputType (rendering) {
+const compileOutputType = function compileOutputType (rendering, pt) {
   let tic
   return compileRenderable(rendering)
     .then((Feature) => {
@@ -95,7 +99,7 @@ const compileOutputType = function compileOutputType (rendering) {
               'script',
               {
                 type: 'text/javascript',
-                src: '/pb/api/v3' + props.requestUri.replace('/render/', '/compile/')
+                src: getScriptUrl(pt) // '/pb/api/v3' + props.requestUri.replace('/render/', '/compile/')
               }
             )
           ]

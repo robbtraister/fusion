@@ -37,14 +37,15 @@ function getTypeRouter (fetch) {
       )
 
       fetch(payload.id)
-        .then((rendering) => (payload.child)
-          ? findRenderableItem(rendering)(payload.child)
-          : rendering
-        )
-        .then((renderable) => (payload.child)
-          ? compileRenderable(renderable)
-          : compileOutputType(renderable)
-        )
+        .then(({pt, rendering}) => {
+          const renderable = (payload.child)
+            ? findRenderableItem(rendering)(payload.child)
+            : rendering
+
+          return (payload.child)
+            ? compileRenderable(renderable)
+            : compileOutputType(renderable, pt)
+        })
         .then(Component => render(Object.assign({}, payload, {Component, requestUri: req.originalUrl})))
         .then(data => res.send(data))
         .then(() => {

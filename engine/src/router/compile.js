@@ -16,6 +16,10 @@ const {
   getTemplateHead
 } = require('../renderings')
 
+const {
+  uploadScript
+} = require('../resources')
+
 const renderRouter = express.Router()
 
 function getTypeRouter (fetch) {
@@ -33,12 +37,25 @@ function getTypeRouter (fetch) {
       )
 
       fetch(payload.id)
-        .then((rendering) => (payload.child)
-          ? findRenderableItem(rendering)(payload.child)
-          : rendering
-        )
-        .then(compile)
-        .then(data => res.send(data))
+        .then(({pt, rendering}) => {
+          const {rootRenderable, upload} = (payload.child)
+            ? {
+              rootRenderable: findRenderableItem(rendering)(payload.child),
+              upload: () => null
+            }
+            : {
+              rootRenderable: rendering,
+              upload: (pt)
+                ? (src) => uploadScript(pt, src)
+                : () => null
+            }
+
+          return compile(rootRenderable)
+            .then(src => {
+              return upload(src)
+                .then(() => res.send(src))
+            })
+        })
         .catch(next)
     }
   )

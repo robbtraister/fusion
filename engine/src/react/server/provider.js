@@ -10,6 +10,9 @@ const contextTypes = require('../shared/context-types')
 
 const getSource = require('../../content/sources')
 
+const CONTEXT = (process.env.CONTEXT || 'pb').replace(/^\/*/, '/')
+const IS_FRESH = process.env.ON_DEMAND === 'true' ? 'true' : 'false'
+
 class Provider extends React.Component {
   getChildContext () {
     const cacheMap = this.props.cacheMap || {}
@@ -76,7 +79,7 @@ class Provider extends React.Component {
       return E(React.Fragment, {},
         this.props.children,
         // set `isFresh` property so the client knows if content needs to be refreshed
-        E('script', {dangerouslySetInnerHTML: { __html: `window.Fusion=window.Fusion||{};Fusion.context='${(process.env.CONTEXT || 'pb').replace(/^\/*/, '/')}';Fusion.isFresh=${process.env.ON_DEMAND === 'true' ? 'true' : 'false'};Fusion.cache=${JSON.stringify(condensedMap, (key, value) => value == null ? undefined : value)}` }})
+        E('script', {dangerouslySetInnerHTML: { __html: `window.Fusion=window.Fusion||{};Fusion.context='${CONTEXT}';Fusion.isFresh=${IS_FRESH};Fusion.cache=${JSON.stringify(condensedMap, (key, value) => value == null ? undefined : value)}` }})
       )
     } else {
       return this.props.children

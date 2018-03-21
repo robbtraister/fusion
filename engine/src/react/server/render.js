@@ -15,8 +15,9 @@ const timer = require('../../timer')
 
 const {
   getApiPrefix,
-  getScriptUri
-} = require('../../resources')
+  getScriptUri,
+  getVersion
+} = require('../../scripts')
 
 const render = function render ({requestUri, content, Component}) {
   const renderHTML = () => new Promise((resolve, reject) => {
@@ -85,33 +86,34 @@ const compileOutputType = function compileOutputType (rendering, pt) {
   return compileRenderable(rendering)
     .then((Feature) => {
       tic = timer.tic()
+
+      const scripts = [
+        React.createElement(
+          'script',
+          {
+            type: 'text/javascript',
+            src: `${getApiPrefix()}/scripts/engine/react.js?v=${getVersion()}`
+          }
+        ),
+        React.createElement(
+          'script',
+          {
+            type: 'text/javascript',
+            src: `${getScriptUri(pt)}?v=${getVersion()}`
+          }
+        )
+      ]
+
       const Component = (props) => React.createElement(
         OutputType,
-        {
-          scripts: [
-            React.createElement(
-              'script',
-              {
-                type: 'text/javascript',
-                src: `${getApiPrefix()}/resources/engine/react.js`
-              }
-            ),
-            React.createElement(
-              'script',
-              {
-                type: 'text/javascript',
-                src: getScriptUri(pt)
-              }
-            )
-          ]
-        },
+        { scripts },
         React.createElement(
           Feature,
           // pass down the original props
           props
         )
       )
-      // const Component = OutputType(Feature)
+
       // bubble up the Provider cacheMap
       Component.cacheMap = Feature.cacheMap
       return Component

@@ -46,11 +46,11 @@ http {
   real_ip_header               X-Forwarded-For;
   real_ip_recursive            on;
 
-  client_body_temp_path        "./tmp/$(hostname)/client_body";
-  fastcgi_temp_path            "./tmp/$(hostname)/fastcgi";
-  proxy_temp_path              "./tmp/$(hostname)/proxy";
-  scgi_temp_path               "./tmp/$(hostname)/scgi";
-  uwsgi_temp_path              "./tmp/$(hostname)/uwsgi";
+  client_body_temp_path        './tmp/$(hostname)/client_body';
+  fastcgi_temp_path            './tmp/$(hostname)/fastcgi';
+  proxy_temp_path              './tmp/$(hostname)/proxy';
+  scgi_temp_path               './tmp/$(hostname)/scgi';
+  uwsgi_temp_path              './tmp/$(hostname)/uwsgi';
 
   large_client_header_buffers  4 64k;
   client_body_buffer_size      16k;
@@ -69,7 +69,7 @@ http {
 
   server_names_hash_bucket_size 128;
 
-  # proxy_cache_path "./tmp/$(hostname)/cache/" levels=1:2 keys_zone=proxy:${CACHE_SIZE:-512m} max_size=${CACHE_MAX_SIZE:-100g} inactive=${CACHE_INACTIVE:-48h};
+  # proxy_cache_path './tmp/$(hostname)/cache/' levels=1:2 keys_zone=proxy:${CACHE_SIZE:-512m} max_size=${CACHE_MAX_SIZE:-100g} inactive=${CACHE_INACTIVE:-48h};
   # proxy_cache_key \$scheme\$proxy_host\$request_uri;
 
 EOB
@@ -84,11 +84,15 @@ fi
 
 cat <<EOB
   upstream rendering {
-    server 0.0.0.0:${RENDERING_PORT:-8081} max_conns=128;
-    keepalive 1;
+    server                     0.0.0.0:${RENDERING_PORT:-8081} max_conns=128;
+    keepalive                  1;
   }
 
-  # statsd_server ${DATADOG_STATSD_HOST:-172.17.0.1}:${DATADOG_STATSD_PORT:-8125};
+  # statsd_server              ${DATADOG_STATSD_HOST:-172.17.0.1}:${DATADOG_STATSD_PORT:-8125};
+
+  geo \$dollar {
+    default                    '\$';
+  }
 
   map \$uri \$valid_request {
     ~[\{\}]                    'false';
@@ -96,7 +100,7 @@ cat <<EOB
   }
 
   map \$http_x_forwarded_host \$host_header {
-    ""                         \$host;
+    ''                         \$host;
     default                    \$http_x_forwarded_host;
   }
 
@@ -124,7 +128,7 @@ cat <<EOB
   }
 
   map \$cookie_version \$cookieVersion {
-    ''                         '${DEFAULT:-latest}';
+    ''                         '\${dollar}LATEST';
     default                    \$cookie_version;
   }
 
@@ -139,39 +143,13 @@ cat <<EOB
   }
 
   map \$host \$environment {
-    default                    '__default__';
-    ~^(?<env>[^.]+)            \$env;
+    default                    'staging';
+    # ~^(?<env>[^.]+)            \$env;
   }
 
   server {
     listen                     ${PORT:-8080};
     server_name                _;
-
-    location @lambda {
-      let \$status_class       \$status / 100 ;
-      statsd_count             "fusion.proxy.requests#app:pagebuilder,nile_env:${NILE_ENV},valid:\$valid_request,status-code:\$status,status-class:\${status_class}xx" 1;
-      statsd_timing            "fusion.proxy.latency#app:pagebuilder,nile_env:${NILE_ENV},valid:\$valid_request,status-code:\$status,status-class:\${status_class}xx" "\$request_time";
-
-      # location block uses decoded uri, so must use 'if' on un-decoded request_uri
-      if (\$valid_request = "false") {
-        add_header             Content-Type text/html;
-        return 400             "Invalid URL: \$request_uri";
-      }
-
-      proxy_read_timeout       20;
-      proxy_send_timeout       20; # this should match arc-origin proxy_read_timeout
-
-      proxy_ignore_headers     "X-Accel-Expires" "Expires" "Cache-Control" "Set-Cookie";
-
-      # required for upstream keepalive
-      proxy_http_version       1.1;
-      proxy_set_header         Connection "";
-
-      proxy_set_header         X-Forwarded-For \$proxy_add_x_forwarded_for;
-      proxy_set_header         X-Forwarded-Host \$host_header;
-      proxy_set_header         Host \$host_header;
-      proxy_pass               http://rendering;
-    }
 
     location @engine {
       rewrite                  ^${API_PREFIX}(/|$)(.*) /\$2 break;
@@ -184,9 +162,9 @@ EOB
 else
 
   cat <<EOB
-      proxy_set_header         'X-FunctionName' '${ENGINE_LAMBDA:-arn:aws:lambda:${AWS_REGION:-us-east-1}:${AWS_ACCOUNT_ID:-397853141546}:function:fusion-engine-\$\{environment\}-engine}';
+      proxy_set_header         'X-FunctionName' '${ENGINE_LAMBDA:-arn:aws:lambda:${AWS_REGION:-us-east-1}:${AWS_ACCOUNT_ID:-397853141546}:function:fusion-engine-\$\{environment\}-engine}:\${version}';
       proxy_set_header         'Content-Type' 'application/json';
-      proxy_pass               ${LAMBDA_PROXY:-http://0.0.0.0:${NODEJS_PORT:-8081}}\$uri\$is_args\$args;
+      proxy_pass               ${LAMBDA_PROXY:-http://0.0.0.0:${NODEJS_PORT:-8081}}\$uri\$query_params;
 EOB
 fi
 cat <<EOB
@@ -202,9 +180,9 @@ then
 EOB
 else
   cat <<EOB
-      proxy_set_header         'X-FunctionName' '${RESOLVER_LAMBDA:-arn:aws:lambda:${AWS_REGION:-us-east-1}:${AWS_ACCOUNT_ID:-397853141546}:function:fusion-resolver-\$\{environment\}-resolver}';
+      proxy_set_header         'X-FunctionName' '${RESOLVER_LAMBDA:-arn:aws:lambda:${AWS_REGION:-us-east-1}:${AWS_ACCOUNT_ID:-397853141546}:function:fusion-resolver-\${environment}-resolver}:\${version}';
       proxy_set_header         'Content-Type' 'application/json';
-      proxy_pass               ${LAMBDA_PROXY:-http://0.0.0.0:${NODEJS_PORT:-8081}}\$uri\$is_args\$args;
+      proxy_pass               ${LAMBDA_PROXY:-http://0.0.0.0:${NODEJS_PORT:-8081}}\$uri\$query_params;
 EOB
 fi
 cat <<EOB
@@ -214,38 +192,33 @@ cat <<EOB
       return 404;
     }
 
-    location ~ ^/${CONTEXT:-pb}/resources/(.*) {
-      proxy_intercept_errors   on;
-      error_page               400 403 404 418 = @resources;
-
-      set                      \$target http://${S3_BUCKET:-${NILE_NAMESPACE:-pagebuilder-fusion}}.s3.amazonaws.com/\${environment}/resources/\${version}/\$1;
-      proxy_pass               \$target;
-    }
-
-    # test paths for hitting the engine lambda
-    location ~ ^${API_PREFIX}/(compile|content|render|resources)(/.*|$) {
+    location ~ ^${API_PREFIX}/(content|environment|render)(/.*|$) {
       error_page               418 = @engine;
       return                   418;
     }
 
-    # test paths for hitting the resolver lambda
+    location ~ ^${API_PREFIX}/(resources|scripts)(/.*|$) {
+      proxy_intercept_errors   on;
+      error_page               400 403 404 418 = @engine;
+
+      set                      \$target http://${S3_BUCKET:-${NILE_NAMESPACE:-pagebuilder-fusion}}.s3.amazonaws.com/\${environment}/\${version}/\$1\$2;
+      proxy_pass               \$target;
+      # return 200 'http://${S3_BUCKET:-${NILE_NAMESPACE:-pagebuilder-fusion}}.s3.amazonaws.com/\${environment}/\${version}/\$1\$2';
+    }
+
     location ~ ^${API_PREFIX}/(resolve)(/.*|$) {
       error_page               418 = @resolver;
       return                   418;
     }
 
-    location ~ ^${API_PREFIX}/(scripts)(/.*|$) {
-      proxy_intercept_errors   on;
-      error_page               400 403 404 418 = @engine;
-
-      set                      \$target http://${S3_BUCKET:-${NILE_NAMESPACE:-pagebuilder-fusion}}.s3.amazonaws.com/staging/resources\$2;
-      proxy_pass               \$target;
-    }
-
-    location /health {
+    location ${API_PREFIX}/health {
       access_log               off;
       add_header               Content-Type text/html;
       return                   200 'OK';
+    }
+
+    location / {
+      rewrite                  (.*) ${API_PREFIX}/resolve\$1;
     }
   }
 }

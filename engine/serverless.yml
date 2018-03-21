@@ -22,6 +22,8 @@ provider:
 functions:
   engine:
     handler: src/index.serverless
+    # we don't want to include http events in production, as that will create API Gateway routes
+    # but, we do need http events in offline development
     events: ${file(./events.${self:provider.stage}.yml):events}
 
 package:

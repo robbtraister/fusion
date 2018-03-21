@@ -59,7 +59,7 @@ module.exports = {
   },
   output: {
     filename: `[name]`,
-    path: path.resolve(__dirname, 'resources', 'engine'),
+    path: path.resolve(__dirname, 'dist', 'engine'),
     library: 'react',
     libraryTarget: 'var'
   },

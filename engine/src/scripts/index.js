@@ -12,6 +12,7 @@ const s3 = require('aws-promises').s3('us-east-1')
 
 const STAGE = 'staging' // process.env.STAGE
 const API_PREFIX = `/${process.env.CONTEXT || 'pb'}/api/v3`
+const VERSION = process.env.AWS_LAMBDA_FUNCTION_VERSION || '$LATEST'
 
 const getApiPrefix = function getApiPrefix () {
   return API_PREFIX
@@ -21,36 +22,40 @@ const getStage = function getStage () {
   return STAGE
 }
 
+const getVersion = function getVersion () {
+  return VERSION
+}
+
 const getScriptBucket = function getScriptBucket () {
   return 'pagebuilder-fusion'
 }
 
 const getScriptPrefix = function getScriptPrefix () {
-  return `${getStage()}/resources/`
+  return `${getStage()}/${getVersion()}/scripts`
 }
 
 const getScriptKey = function getScriptKey (pt) {
   return (pt.uri)
-    ? `pages/${pt.uri.replace(/^\/*/, '').replace(/\/*$/, '')}.js`
-    : `templates/${pt._id.replace(/^\/*/, '').replace(/\/*$/, '')}.js`
+    ? `/page/${pt.uri.replace(/^\/*/, '').replace(/\/*$/, '')}.js`
+    : `/template/${pt._id.replace(/^\/*/, '').replace(/\/*$/, '')}.js`
 }
 
 const getScriptUri = function getScriptUri (pt) {
-  return `${getApiPrefix()}/scripts/${getScriptKey(pt)}`
+  return `${getApiPrefix()}/scripts${getScriptKey(pt)}`
 }
 
 const getScriptUrl = function getScriptUrl (pt) {
   return `https://${getScriptBucket()}.s3.amazonaws.com/${getScriptPrefix()}${getScriptKey(pt)}`
 }
 
-const uploadScript = function upload (pt, src) {
+const uploadScript = function upload (key, src) {
   return new Promise((resolve, reject) => {
     zlib.gzip(src, (err, buf) => {
       err ? reject(err) : resolve(buf)
     })
   }).then((buf) => s3.upload(
     getScriptBucket(),
-    `${getScriptPrefix()}${getScriptKey(pt)}`,
+    key,
     buf,
     {
       ACL: 'public-read',
@@ -69,7 +74,7 @@ const compile = function compile (pt, rendering, child) {
     : {
       rootRenderable: rendering,
       upload: (pt)
-        ? (src) => uploadScript(pt, src)
+        ? (src) => uploadScript(`${getScriptPrefix()}${getScriptKey(pt)}`, src)
         : () => null
     }
 
@@ -83,7 +88,9 @@ const compile = function compile (pt, rendering, child) {
 module.exports = {
   compile,
   getApiPrefix,
+  getScriptPrefix,
   getScriptUri,
   getScriptUrl,
+  getVersion,
   uploadScript
 }

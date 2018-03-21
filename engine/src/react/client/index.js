@@ -44,12 +44,12 @@ const render = () => {
         React.createElement(
           Provider,
           {
-            contentCache: Fusion.cache,
+            contentCache: Fusion.contentCache,
             requestUri: window.location.pathname + window.location.search
           },
           React.createElement(
-            Fusion.Template
-          // globalContent
+            Fusion.Template,
+            Fusion.globalContent || {}
           )
         ),
         window.document.getElementById('App')

@@ -2,7 +2,7 @@
 
 const express = require('express')
 
-const resolve = require('../resolve')
+const resolve = require('../controllers/resolve')
 
 const resolveRouter = express.Router()
 

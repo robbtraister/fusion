@@ -1,20 +1,15 @@
 'use strict'
 
 const express = require('express')
-const request = require('request-promise-native')
 
-const resolve = require('../resolve')
+const make = require('../controllers/make')
 
-const serveRouter = express.Router()
+const makeRouter = express.Router()
 
-serveRouter.get('*', (req, res, next) => {
-  resolve(req.url)
-    .then(data => request.post({
-      uri: `http://engine-server:8082/render/template/${data.template}`,
-      json: data
-    }))
+makeRouter.get('*', (req, res, next) => {
+  make(req.url)
     .then(data => { res.send(data) })
     .catch(next)
 })
 
-module.exports = serveRouter
+module.exports = makeRouter

@@ -2,7 +2,7 @@
 
 All endpoints described below will be handled as displayed by the lambda function. However, the lambda functions will be exposed publicly at `/pb/api/v3`, so each endpoint must be prefixed to be accessed.
 
-All requests that do not begin with `/pb/api/v3` will be handled as `/pb/api/v3/render/:request_uri`.
+All requests that do not begin with `/pb/api/v3` will be handled as `/pb/api/v3/serve/:request_uri`.
 
 
 ## Content
@@ -20,17 +20,16 @@ Render the specified page/rendering/template/chain/feature by id as HTML. If gen
 
 To render with global content, use a POST request with the global content supplied as the body of the request.
 
--   `/render?uri=:uri`
-
-Use the resolver (described below) to fetch the associated page/template and global content. Then pass this data to the rendering endpoint (described above) to generate fully-hydrated HTML.
-
 
 ## Resolver
 
 -   `/resolve/*`
--   `/resolve?uri=:uri`
 
-Resolve the provided URI (either the trailing segment of the URI, or the `uri` parameter) into a piece of global content and an associated page/template.
+Resolve the trailing URI segment into a piece of global content and an associated page/template.
+
+-   `/serve/*`
+
+Resolve the trailing URI segment into a piece of global content and an associated page/template, then render the content into the template and return the resultant HTML.
 
 
 ## Scripts
@@ -44,8 +43,8 @@ This is the primary client-side library that is shared and used for all pages/te
 -   `/scripts/(page|template)/:name`
 -   `/scripts/rendering/:id`
 
-This is the javascript function that is used by the fusion engine to generate a rendering. It is used by the client-side browser to update the template, if necessary, as well as hydrate script functionality in the browser.
+This returns the javascript function that is used by the fusion engine to generate a rendering. It is used by the client-side browser to update the template, if necessary, as well as hydrate script functionality in the browser.
 
-Pages and Templates are referenced by name so that you will always receive the current published version. If you need an unpublished script, you must request it by rendering id.
+Pages and Templates should be referenced by name so that you will always receive the current published version. If you need an unpublished script, you must request it by rendering id.
 
 Page and Template scripts should be re-generated and pushed to S3 on publish. If a request for a named page/template is not found in S3, it will be generated on-demand, returned to the caller, and pushed to S3.

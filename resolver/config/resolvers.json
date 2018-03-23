@@ -1,7 +1,7 @@
 [
   {
     "uri": "/homepage",
-    "template": "homepage",
+    "template": "article-template",
     "content": "homepage"
   },
   {
@@ -16,7 +16,7 @@
   },
   {
     "pattern": ".*",
-    "template": "article",
+    "template": "article-template",
     "content": "article"
   }
 ]

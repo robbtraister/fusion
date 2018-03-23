@@ -11,6 +11,7 @@ const express = require('express')
 
 const {
   getPageByName,
+  getRendering,
   getTemplateByName
 } = require('../renderings')
 
@@ -22,7 +23,8 @@ const {
 
 const scriptsRouter = express.Router()
 
-function getTypeRouter (fetchByName) {
+// support dynamic field name since the value is possibly read from POST'ed body
+function getTypeRouter (fetchRendering, field = 'name') {
   const typeRouter = express.Router()
 
   typeRouter.all(['/:name'],
@@ -31,12 +33,12 @@ function getTypeRouter (fetchByName) {
       // const tic = timer.tic()
       const payload = Object.assign(
         {
-          name: req.params.name.replace(/\.js$/, '')
+          [field]: req.params.name.replace(/\.js$/, '')
         },
         req.body
       )
 
-      fetchByName(payload.name)
+      fetchRendering(payload[field])
         .then(({pt, rendering}) => compile(pt, rendering))
         .then((src) => { res.send(src) })
         .catch(next)
@@ -46,7 +48,7 @@ function getTypeRouter (fetchByName) {
   return typeRouter
 }
 
-scriptsRouter.all('/engine/react.js', (req, res, next) => {
+scriptsRouter.all('/engine/*', (req, res, next) => {
   fs.readFile(`${__dirname}/../../dist${req.url}`, (err, src) => {
     err
       ? next(err)
@@ -61,6 +63,7 @@ scriptsRouter.all('/engine/react.js', (req, res, next) => {
 })
 
 scriptsRouter.use('/page', getTypeRouter(getPageByName))
+scriptsRouter.use('/rendering', getTypeRouter(getRendering, 'id'))
 scriptsRouter.use('/template', getTypeRouter(getTemplateByName))
 
 module.exports = scriptsRouter

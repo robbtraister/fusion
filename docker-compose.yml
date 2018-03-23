@@ -52,6 +52,8 @@ services:
       DEBUG: watcher:*
       WATCH: 'true'
     image: fusion-resolver
+    links:
+      - 'engine-server'
     ports:
       - '8083:8083'
     volumes:

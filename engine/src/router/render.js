@@ -47,8 +47,8 @@ function getTypeRouter (fetch) {
             ? compileRenderable(renderable)
             : compileOutputType(renderable, pt)
         })
-        .then(Component => render(Object.assign({}, payload, {Component, requestUri: req.originalUrl})))
-        .then(data => res.send(data))
+        .then(Component => render(Object.assign({}, payload, {Component})))
+        .then(data => { res.send(data) })
         .then(() => {
           debugTimer('complete response', tic.toc())
         })

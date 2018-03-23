@@ -44,7 +44,7 @@ ${config.features.map(renderableItem).filter(ri => ri).join('\n')}
   }
 
   function template (config) {
-    return config.layoutItems.map((item, i) => layout(item, rendering.layout && rendering.layout.sections[i])).join('\n')
+    return config.layoutItems.map((item, i) => layout(item, rendering.layout && rendering.layout.sections && rendering.layout.sections[i])).join('\n')
   }
 
   function layout (item, config) {

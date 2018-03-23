@@ -19,7 +19,7 @@ const {
   getVersion
 } = require('../../scripts')
 
-const render = function render ({requestUri, content, Component}) {
+const render = function render ({Component, requestUri, content}) {
   const renderHTML = () => new Promise((resolve, reject) => {
     try {
       const html = ReactDOM.renderToStaticMarkup(
@@ -39,7 +39,7 @@ const render = function render ({requestUri, content, Component}) {
 
   let tic = timer.tic()
   return renderHTML()
-    .then((element) => {
+    .then((html) => {
       debugTimer('first render', tic.toc())
       tic = timer.tic()
 
@@ -52,7 +52,7 @@ const render = function render ({requestUri, content, Component}) {
 
       return contentPromises.length === 0
         // if no feature content is requested, return original rendering
-        ? Promise.resolve(ReactDOM.renderToStaticMarkup(element))
+        ? Promise.resolve(html)
         // if feature content is requested, wait for it, then render again
         : Promise.all(contentPromises)
           .then(() => {

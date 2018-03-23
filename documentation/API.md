@@ -18,7 +18,7 @@ Fetch a specific piece of content, using the content source and key specified. O
 
 Render the specified page/rendering/template/chain/feature by id as HTML. If generating a page/rendering/template, the result will be wrapped in the appropriate output-type and is suitable as a complete webpage. If generating a chain/feature, the containing page/rendering/template must be specified, and the resultant HTML will be only the chain/feature requested, with no other wrapping.
 
-To render with global content, use a POST request with the global content supplied as the body of the request.
+To render with global content, use a POST request where the body of the request contains a JSON object with top-level `content` property.
 
 
 ## Resolver

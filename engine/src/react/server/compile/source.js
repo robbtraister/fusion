@@ -1,5 +1,6 @@
 'use strict'
 
+const fs = require('fs')
 const path = require('path')
 
 const componentRoot = path.resolve(process.env.COMPONENT_ROOT || `${__dirname}/../../../../dist/components`)
@@ -10,26 +11,36 @@ function expandProperties (obj) {
     .map(k => ` ${k}='${obj[k].toString().replace(/'/g, '&apos;')}'`).join('')
 }
 
+function getComponentFile (type, id) {
+  return `${componentRoot}/${type}/${id}.jsx`
+}
+
+function componentImport (fp, name) {
+  return `const ${name} = require('${fp}')`
+}
+
 function generateFile (rendering) {
   const components = {}
 
-  function componentImport (id, name) {
-    return `const ${name} = require('${componentRoot}/${id}.jsx')`
-  }
-
   function getComponentName (type, id) {
-    const key = `${type}/${id}`
-    components[key] = components[key] || id.replace(/^[a-z]/, (c) => c.toUpperCase()).replace(/-/g, '_').replace(/\//g, '__')
-    return components[key]
+    const key = getComponentFile(type, id)
+    try {
+      fs.accessSync(key, fs.constants.R_OK)
+      components[key] = components[key] || id.replace(/^[a-z]/, (c) => c.toUpperCase()).replace(/-/g, '_').replace(/\//g, '__')
+      return components[key]
+    } catch (e) {
+      // do nothing
+    }
   }
 
   function feature (config) {
     const componentName = getComponentName('features', config.featureConfig.id || config.featureConfig)
+    if (componentName) {
+      const contentConfigValues = (config.contentConfig && config.contentConfig.contentConfigValues) || {}
+      const customFields = config.customFields || {}
 
-    const contentConfigValues = (config.contentConfig && config.contentConfig.contentConfigValues) || {}
-    const customFields = config.customFields || {}
-
-    return `<${componentName}${expandProperties(Object.assign({featureId: config.id}, customFields, contentConfigValues))} />`
+      return `<${componentName}${expandProperties(Object.assign({featureId: config.id}, customFields, contentConfigValues))} />`
+    }
   }
 
   function chain (config) {

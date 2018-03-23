@@ -206,7 +206,7 @@ cat <<EOB
       # return 200 'http://${S3_BUCKET:-${NILE_NAMESPACE:-pagebuilder-fusion}}.s3.amazonaws.com/\${environment}/\${version}/\$1\$2';
     }
 
-    location ~ ^${API_PREFIX}/(resolve|serve)(/.*|$) {
+    location ~ ^${API_PREFIX}/(fuse|make|resolve)(/.*|$) {
       error_page               418 = @resolver;
       return                   418;
     }
@@ -218,7 +218,7 @@ cat <<EOB
     }
 
     location / {
-      rewrite                  (.*) ${API_PREFIX}/serve\$1;
+      rewrite                  (.*) ${API_PREFIX}/make\$1;
     }
   }
 }

@@ -2,7 +2,7 @@
 
 All endpoints described below will be handled as displayed by the lambda function. However, the lambda functions will be exposed publicly at `/pb/api/v3`, so each endpoint must be prefixed to be accessed.
 
-All requests that do not begin with `/pb/api/v3` will be handled as `/pb/api/v3/serve/:request_uri`.
+All requests that do not begin with `/pb/api/v3` will be handled as `/pb/api/v3/make/:request_uri`.
 
 
 ## Content
@@ -27,7 +27,7 @@ To render with global content, use a POST request where the body of the request 
 
 Resolve the trailing URI segment into a piece of global content and an associated page/template.
 
--   `/serve/*`
+-   `/make/*`
 
 Resolve the trailing URI segment into a piece of global content and an associated page/template, then render the content into the template and return the resultant HTML.
 

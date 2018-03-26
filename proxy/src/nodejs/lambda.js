@@ -93,7 +93,7 @@ const invoke = function invoke (options) {
     if (!req.header('x-FunctionName')) {
       res.status(400).send("Please provide an AWS Lambda function name in the form of a 'x-FunctionName' header.")
     } else {
-      var lambda = new AWS.Lambda(Object.assign({region: 'us-east-1'}, options, getOptions(req)))
+      const lambda = new AWS.Lambda(Object.assign({region: 'us-east-1'}, options, getOptions(req)))
       lambda.invoke(mapRequest(req), function (err, data) {
         mapResponse(err, data, res)
       })

@@ -8,6 +8,8 @@ services:
       NODE_ENV: development
       HTTP_ENGINE: http://0.0.0.0:8082
       HTTP_RESOLVER: http://0.0.0.0:8083
+      LAMBDA_ENGINE:
+      LAMBDA_RESOLVER:
       CONTENT_BASE:
       MONGO_URL:
     volumes:

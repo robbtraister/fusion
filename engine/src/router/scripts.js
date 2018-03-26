@@ -1,6 +1,7 @@
 'use strict'
 
 const fs = require('fs')
+const url = require('url')
 
 const bodyParser = require('body-parser')
 const express = require('express')
@@ -49,14 +50,15 @@ function getTypeRouter (fetchRendering, field = 'name') {
 }
 
 scriptsRouter.all('/engine/*', (req, res, next) => {
-  fs.readFile(`${__dirname}/../../dist${req.url}`, (err, src) => {
+  const pathname = url.parse(req.url).pathname
+  fs.readFile(`${__dirname}/../../dist${pathname}`, (err, src) => {
     err
       ? next(err)
       : Promise.all([
         // return the script source
         res.send(src),
         // but also upload to s3 so we don't have to use the lambda next time
-        uploadScript(`${getScriptPrefix()}${req.url}`, src)
+        uploadScript(`${getScriptPrefix()}${pathname}`, src)
       ])
         .catch(next)
   })

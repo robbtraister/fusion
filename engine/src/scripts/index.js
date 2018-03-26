@@ -10,7 +10,7 @@ const {
 
 const s3 = require('aws-promises').s3('us-east-1')
 
-const STAGE = 'staging' // process.env.STAGE
+const ENVIRONMENT = 'staging' // process.env.ENVIRONMENT
 const API_PREFIX = `/${process.env.CONTEXT || 'pb'}/api/v3`
 const VERSION = process.env.AWS_LAMBDA_FUNCTION_VERSION || '$LATEST'
 
@@ -18,8 +18,8 @@ const getApiPrefix = function getApiPrefix () {
   return API_PREFIX
 }
 
-const getStage = function getStage () {
-  return STAGE
+const getEnvironment = function getEnvironment () {
+  return ENVIRONMENT
 }
 
 const getVersion = function getVersion () {
@@ -31,7 +31,7 @@ const getScriptBucket = function getScriptBucket () {
 }
 
 const getScriptPrefix = function getScriptPrefix () {
-  return `${getStage()}/${getVersion()}/scripts`
+  return `${getEnvironment()}/${getVersion()}/scripts`
 }
 
 const getScriptKey = function getScriptKey (pt) {

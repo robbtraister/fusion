@@ -13,6 +13,26 @@ do
   fi
 done
 
+if [ "${LAMBDA_ENGINE}" ]
+then
+  HTTP_ENGINE=''
+else
+  if [ ! "${HTTP_ENGINE}" ]
+  then
+    LAMBDA_ENGINE="arn:aws:lambda:${AWS_REGION:-us-east-1}:${AWS_ACCOUNT_ID:-397853141546}:function:fusion-engine-\${environment}-engine"
+  fi
+fi
+
+if [ "${LAMBDA_RESOLVER}" ]
+then
+  HTTP_RESOLVER=''
+else
+  if [ ! "${HTTP_RESOLVER}" ]
+  then
+    LAMBDA_RESOLVER="arn:aws:lambda:${AWS_REGION:-us-east-1}:${AWS_ACCOUNT_ID:-397853141546}:function:fusion-resolver-\${environment}-resolver"
+  fi
+fi
+
 cat <<EOB
 daemon off;
 pid ./nginx.pid;
@@ -154,15 +174,15 @@ cat <<EOB
     location @engine {
       rewrite                  ^${API_PREFIX}(/|$)(.*) /\$2 break;
 EOB
-if [[ "${ENGINE_HANDLER}" ]]
+if [[ "${HTTP_ENGINE}" ]]
 then
   cat <<EOB
-      proxy_pass               ${ENGINE_HANDLER};
+      proxy_pass               ${HTTP_ENGINE};
 EOB
 else
 
   cat <<EOB
-      proxy_set_header         'X-FunctionName' '${ENGINE_LAMBDA:-arn:aws:lambda:${AWS_REGION:-us-east-1}:${AWS_ACCOUNT_ID:-397853141546}:function:fusion-engine-\$\{environment\}-engine}:\${version}';
+      proxy_set_header         'X-FunctionName' '${LAMBDA_ENGINE}:\${version}';
       proxy_set_header         'Content-Type' 'application/json';
       proxy_pass               ${LAMBDA_PROXY:-http://0.0.0.0:${NODEJS_PORT:-8081}}\$uri\$query_params;
 EOB
@@ -172,15 +192,17 @@ cat <<EOB
 
     location @resolver {
       rewrite                  ^${API_PREFIX}(/|$)(.*) /\$2 break;
+
+      proxy_set_header         'Fusion-Engine-Version' '\${version}';
 EOB
-if [[ "${RESOLVER_HANDLER}" ]]
+if [[ "${HTTP_RESOLVER}" ]]
 then
   cat <<EOB
-      proxy_pass               ${RESOLVER_HANDLER};
+      proxy_pass               ${HTTP_RESOLVER};
 EOB
 else
   cat <<EOB
-      proxy_set_header         'X-FunctionName' '${RESOLVER_LAMBDA:-arn:aws:lambda:${AWS_REGION:-us-east-1}:${AWS_ACCOUNT_ID:-397853141546}:function:fusion-resolver-\${environment}-resolver}:\${version}';
+      proxy_set_header         'X-FunctionName' '${LAMBDA_RESOLVER}';
       proxy_set_header         'Content-Type' 'application/json';
       proxy_pass               ${LAMBDA_PROXY:-http://0.0.0.0:${NODEJS_PORT:-8081}}\$uri\$query_params;
 EOB

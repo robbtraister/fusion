@@ -6,8 +6,8 @@ services:
       - "8080-8083:8080-8083"
     environment:
       NODE_ENV: development
-      ENGINE_HANDLER: http://0.0.0.0:8082
-      RESOLVER_HANDLER: http://0.0.0.0:8083
+      HTTP_ENGINE: http://0.0.0.0:8082
+      HTTP_RESOLVER: http://0.0.0.0:8083
       CONTENT_BASE:
       MONGO_URL:
     volumes:

@@ -6,10 +6,10 @@ services:
       PORT: '8080'
       NODEJS_PORT: '8081'
       WATCH: 'true'
-      ENGINE_HANDLER: http://engine-server:8082
-      ENGINE_LAMBDA:
-      RESOLVER_HANDLER: http://resolver-server:8083
-      RESOLVER_LAMBDA:
+      HTTP_ENGINE: http://engine-server:8082
+      HTTP_RESOLVER: http://resolver-server:8083
+      LAMBDA_ENGINE:
+      LAMBDA_RESOLVER:
     image: fusion-proxy
     links:
       - 'engine-server'
@@ -51,6 +51,8 @@ services:
       PORT: '8083'
       DEBUG: watcher:*
       WATCH: 'true'
+      HTTP_ENGINE: http://engine-server:8082
+      LAMBDA_ENGINE:
     image: fusion-resolver
     links:
       - 'engine-server'

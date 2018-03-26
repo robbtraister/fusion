@@ -16,7 +16,7 @@ provider:
       - subnet-ee718da7
   environment:
     NODE_ENV: ${env:NODE_ENV, 'production'}
-    STAGE: ${self:provider.stage}
+    ENVIRONMENT: ${self:provider.stage}
     ON_DEMAND: ${env:ON_DEMAND, 'true'}
 
 functions:

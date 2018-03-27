@@ -10,9 +10,11 @@ const {
 
 const s3 = require('aws-promises').s3('us-east-1')
 
-const ENVIRONMENT = 'staging' // process.env.ENVIRONMENT
+const ENVIRONMENT = process.env.ENVIRONMENT
 const API_PREFIX = `/${process.env.CONTEXT || 'pb'}/api/v3`
 const VERSION = process.env.AWS_LAMBDA_FUNCTION_VERSION || '$LATEST'
+
+const UPLOAD_SCRIPTS = process.env.UPLOAD_SCRIPTS !== 'false'
 
 const getApiPrefix = function getApiPrefix () {
   return API_PREFIX
@@ -48,7 +50,7 @@ const getScriptUrl = function getScriptUrl (pt) {
   return `https://${getScriptBucket()}.s3.amazonaws.com/${getScriptPrefix()}${getScriptKey(pt)}`
 }
 
-const uploadScript = function upload (key, src) {
+const uploadScript = function uploadScript (key, src) {
   return new Promise((resolve, reject) => {
     zlib.gzip(src, (err, buf) => {
       err ? reject(err) : resolve(buf)
@@ -73,7 +75,7 @@ const compile = function compile (pt, rendering, child) {
     }
     : {
       rootRenderable: rendering,
-      upload: (pt)
+      upload: (UPLOAD_SCRIPTS && pt)
         ? (src) => uploadScript(`${getScriptPrefix()}${getScriptKey(pt)}`, src)
         : () => null
     }

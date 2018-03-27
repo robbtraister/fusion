@@ -147,19 +147,24 @@ cat <<EOB
     default                    \$request_uri;
   }
 
+  map \$http_referer \$refererVersion {
+    ~(\?|&)v=([0-9]+)(&|$)     \$2;
+    default                    '\${dollar}LATEST';
+  }
+
   map \$cookie_version \$cookieVersion {
-    ''                         '\${dollar}LATEST';
     default                    \$cookie_version;
+    ''                         \$refererVersion;
   }
 
   map \$http_version \$headerVersion {
-    ''                         \$cookieVersion;
     default                    \$http_version;
+    ''                         \$cookieVersion;
   }
 
   map \$arg_v \$version {
-    ''                         \$headerVersion;
     default                    \$arg_v;
+    ''                         \$headerVersion;
   }
 
   map \$host \$environment {

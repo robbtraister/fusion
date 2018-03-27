@@ -18,7 +18,7 @@ const getTemplateResolver = function getTemplateResolver (resolver) {
 
 const getResolverHydrater = function getResolverHydrater (resolver) {
   const templateResolver = getTemplateResolver(resolver)
-  return (requestUri) => fetch(resolver.content, requestUri)
+  return (requestUri) => fetch(resolver.content, {uri: requestUri})
     .then(content => ({
       requestUri,
       content,

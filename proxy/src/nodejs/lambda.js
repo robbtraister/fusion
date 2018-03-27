@@ -1,5 +1,7 @@
 'use strict'
 
+const url = require('url')
+
 const AWS = require('aws-sdk')
 
 /**
@@ -14,6 +16,7 @@ const AWS = require('aws-sdk')
  * @returns {{FunctionName, Payload}}
  */
 const mapRequest = function mapRequest (req) {
+  const parts = url.parse(req.originalUrl, true)
   const LogType = req.header('x-LogType') || 'None'
   const payload = {
     FunctionName: req.header('x-FunctionName'),
@@ -24,11 +27,9 @@ const mapRequest = function mapRequest (req) {
       headers: req.headers,
       body: req.body,
       cookies: req.cookies,
-      url: req.originalUrl,
-      path: req.path.replace(/\/+$/, '').replace(/^\/*/, '/'),
+      path: parts.pathname,
       protocol: req.protocol,
-      query: req.query,
-      queryStringParameters: req.query
+      queryStringParameters: parts.query
     }),
     Qualifier: req.header('x-Qualifier')
   }

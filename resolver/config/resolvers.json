@@ -17,6 +17,6 @@
   {
     "pattern": ".*",
     "template": "article-template",
-    "content": "article"
+    "content": "content-api"
   }
 ]

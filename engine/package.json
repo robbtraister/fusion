@@ -14,7 +14,7 @@
     "deploy": "sls deploy",
     "prestart": "npm run watch:engine & npm run watch:components &",
     "start": "sls --stage=offline offline start",
-    "test": "node render ./rendering.json"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",

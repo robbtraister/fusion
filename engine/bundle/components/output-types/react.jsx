@@ -7,6 +7,7 @@ const Layout = (props) =>
     <head>
       <title>Fusion Rendering</title>
       {props.scripts}
+      <link rel='icon' type='image/x-icon' href='https://resources.arcpublishing.com/marketing/favicon.ico' />
     </head>
     <body>
       <div id='App'>

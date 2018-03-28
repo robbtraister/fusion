@@ -36,3 +36,4 @@ custom:
   serverless-offline:
     host: '0.0.0.0'
     port: ${env:PORT, '8080'}
+    dontPrintOutput: true

@@ -91,6 +91,7 @@ const compileOutputType = function compileOutputType (rendering, pt) {
         React.createElement(
           'script',
           {
+            key: 'engine',
             type: 'text/javascript',
             src: `${getApiPrefix()}/scripts/engine/react.js?v=${getVersion()}`
           }
@@ -98,6 +99,7 @@ const compileOutputType = function compileOutputType (rendering, pt) {
         React.createElement(
           'script',
           {
+            key: 'template',
             type: 'text/javascript',
             src: `${getScriptUri(pt)}?v=${getVersion()}`
           }

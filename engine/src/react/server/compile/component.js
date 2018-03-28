@@ -23,7 +23,7 @@ const TimedComponent = (Component) => (props) => {
 // When compiling container children, execute the functional Component to get the Element
 const renderAll = function renderAll (renderableItems) {
   return (renderableItems || [])
-    .map(ri => renderableItem(ri)())
+    .map((ri, i) => renderableItem(ri, i)())
     .filter(ri => ri)
 }
 
@@ -61,10 +61,10 @@ const chain = function chain (config) {
   )
 }
 
-const section = function section (config) {
+const section = function section (config, index) {
   return () => React.createElement(
     'section',
-    {},
+    {key: index},
     renderAll(config.renderableItems)
   )
 }
@@ -87,13 +87,13 @@ const template = function template (rendering) {
   )
 }
 
-const renderableItem = function renderableItem (config) {
+const renderableItem = function renderableItem (config, index) {
   const component = (config.featureConfig)
     ? feature(config)
     : (config.chainConfig)
       ? chain(config)
       : (config.renderableItems)
-        ? section(config)
+        ? section(config, index)
         : (config.layoutItems)
           ? template(config)
           : null

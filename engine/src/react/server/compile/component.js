@@ -28,12 +28,12 @@ const renderAll = function renderAll (renderableItems) {
 }
 
 const feature = function feature (config) {
-  const contentConfigValues = (config.contentConfig && config.contentConfig.contentConfigValues) || {}
+  const contentConfig = config.contentConfig || {}
   const customFields = config.customFields || {}
 
   try {
     const component = TimedComponent(require(`${componentRoot}/features/${config.featureConfig}.jsx`))
-    const props = Object.assign({key: config.id, id: config.id, type: config.featureConfig}, customFields, contentConfigValues)
+    const props = Object.assign({key: config.id, id: config.id, type: config.featureConfig}, customFields, contentConfig)
 
     return () => React.createElement(
       component,

@@ -51,10 +51,9 @@ class Provider extends React.Component {
           cached: undefined,
           filtered: undefined,
           promise: source.fetch(key)
-            .then(data => {
-              keyCache.cached = data
-              return data
-            })
+            .then(data => { keyCache.cached = data })
+            .catch(() => { keyCache.cached = null })
+            .then(() => keyCache.cached)
         }
 
         keyCache.promise = keyCache.promise

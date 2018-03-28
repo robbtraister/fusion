@@ -3,6 +3,8 @@
 const React = require('react')
 const Consumer = require('consumer')
 
+const Search = require('../utilities/search.jsx')
+
 const BurgerImage = (props) => {
   const hasMenuLabel = props.menuLabel.length > 0
   return <React.Fragment>
@@ -55,7 +57,7 @@ const DropdownDrawer = (props) => {
                             </li>
                           )}
                       </ul>
-                      : ''
+                      : null
                     }
                   </div>
                 </li>
@@ -82,7 +84,7 @@ const TopMenu = (props) => {
             </li>
           )}
       </ul>
-      : ''
+      : null
 }
 
 class HeaderNavV2 extends Consumer {
@@ -103,14 +105,8 @@ class HeaderNavV2 extends Consumer {
           <TopMenu {...this.props} items={items} />
         </div>
         <div className='search-box'>
-          <form className='search' action='/search/' method='GET'>
-            <button id='search-button' className='magnifying-button'>
-              <i className='fa fa-search' />
-            </button>
-            <input type='text-field' className='search-text-field' id='q' name='q' />
-          </form>
+          <Search />
         </div>
-
       </div>
 
       <div id='pushContent' data-run-function={this.props.pushContent} />

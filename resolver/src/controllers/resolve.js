@@ -5,7 +5,9 @@
 const fetch = require('./fetch')
 
 const getTemplateResolver = function getTemplateResolver (resolver) {
-  return (content) => resolver.template
+  return (resolver.page)
+    ? (content) => ({page: resolver.page})
+    : (content) => ({template: resolver.template})
 }
 
 // const getTemplate = function getTemplate (resolver, ...args) {
@@ -18,12 +20,18 @@ const getTemplateResolver = function getTemplateResolver (resolver) {
 
 const getResolverHydrater = function getResolverHydrater (resolver) {
   const templateResolver = getTemplateResolver(resolver)
-  return (requestUri) => fetch(resolver.content, {uri: requestUri})
-    .then(content => ({
-      requestUri,
-      content,
-      template: templateResolver(content)
-    }))
+  const contentResolver = (resolver.content)
+    ? (requestUri) => fetch(resolver.content, {uri: requestUri})
+    : (requestUri) => Promise.resolve(null)
+
+  return (requestUri) => contentResolver(requestUri)
+    .then(content => Object.assign(
+      {
+        requestUri,
+        content
+      },
+      templateResolver(content)
+    ))
 }
 
 // const hydrate = function hydrate (resolver, ...args) {

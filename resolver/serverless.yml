@@ -5,7 +5,7 @@ service: fusion-resolver
 provider:
   name: aws
   runtime: nodejs6.10
-  stage: staging
+  stage: ${opt:stage}
   region: us-east-1
   vpc:
     securityGroupIds:
@@ -15,6 +15,7 @@ provider:
       - subnet-c3ece0e9
       - subnet-ee718da7
   environment:
+    NODE_ENV: ${env:NODE_ENV, 'production'}
     ENVIRONMENT: ${self:provider.stage}
 
 functions:

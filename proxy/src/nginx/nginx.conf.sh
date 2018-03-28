@@ -227,10 +227,21 @@ cat <<EOB
     location ~ ^${API_PREFIX}/(resources|scripts)(/.*|$) {
       proxy_intercept_errors   on;
       error_page               400 403 404 418 = @engine;
+EOB
 
+if [[ "${DISABLE_SCRIPT_CACHE}" == 'true' ]]
+then
+  cat <<EOB
+      return                   418;
+EOB
+else
+  cat <<EOB
       set                      \$target http://${S3_BUCKET:-${NILE_NAMESPACE:-pagebuilder-fusion}}.s3.amazonaws.com/\${environment}/\${version}/\$1\$2;
       proxy_pass               \$target;
       # return 200 'http://${S3_BUCKET:-${NILE_NAMESPACE:-pagebuilder-fusion}}.s3.amazonaws.com/\${environment}/\${version}/\$1\$2';
+EOB
+fi
+cat <<EOB
     }
 
     location ~ ^${API_PREFIX}/(fuse|make|resolve)(/.*|$) {

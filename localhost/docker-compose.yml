@@ -6,7 +6,7 @@ services:
       - "8080-8083:8080-8083"
     environment:
       NODE_ENV: development
-      UPLOAD_SCRIPTS: 'false'
+      DISABLE_SCRIPT_CACHE: 'true'
       HTTP_ENGINE: http://0.0.0.0:8082
       HTTP_RESOLVER: http://0.0.0.0:8083
       LAMBDA_ENGINE:

@@ -6,6 +6,7 @@ services:
       PORT: '8080'
       NODEJS_PORT: '8081'
       WATCH: 'true'
+      DISABLE_SCRIPT_CACHE:
       HTTP_ENGINE: http://engine-server:8082
       HTTP_RESOLVER: http://resolver-server:8083
       LAMBDA_ENGINE:
@@ -29,9 +30,9 @@ services:
     environment:
       NODE_ENV: development
       PORT: '8082'
-      DEBUG: watcher:*,fusion:*
+      DEBUG: fusion:*
       WATCH: 'true'
-      UPLOAD_SCRIPTS: 'false'
+      DISABLE_SCRIPT_CACHE:
       ON_DEMAND:
       CONTENT_BASE:
       MONGO_URL:
@@ -50,7 +51,6 @@ services:
         LAMBDA: resolver
     environment:
       PORT: '8083'
-      DEBUG: watcher:*
       WATCH: 'true'
       HTTP_ENGINE: http://engine-server:8082
       LAMBDA_ENGINE:

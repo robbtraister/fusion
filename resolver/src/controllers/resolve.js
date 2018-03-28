@@ -6,6 +6,9 @@ const url = require('url')
 
 const fetch = require('./fetch')
 
+const resolverConfig = require('../../config/resolvers.json')
+
+// returns the pageID or template ID that matches
 const getTemplateResolver = function getTemplateResolver (resolver) {
   return (resolver.page)
     ? (content) => ({
@@ -18,19 +21,11 @@ const getTemplateResolver = function getTemplateResolver (resolver) {
     })
 }
 
-// const getTemplate = function getTemplate (resolver, ...args) {
-//   const templateResolver = getTemplateResolver(resolver)
-//
-//   return (args.length === 0)
-//     ? templateResolver
-//     : templateResolver(...args)
-// }
-
 const getResolverHydrater = function getResolverHydrater (resolver) {
   const templateResolver = getTemplateResolver(resolver)
   const contentResolver = (resolver.content)
-    ? (requestUri) => fetch(resolver.content, {uri: requestUri})
-    : (requestUri) => Promise.resolve(null)
+    ? (requestUri) => fetch(resolver.content, {uri: encodeURIComponent(requestUri + '/')})
+    : (requestUri) => Promise.resolve({requestUri, undefined, page: resolver._id})
 
   return (requestUri) => contentResolver(requestUri)
     .then(content => Object.assign(
@@ -64,22 +59,27 @@ const getResolverMatcher = function getResolverMatcher (resolver) {
   return () => null
 }
 
-// const match = function match (resolver, ...args) {
-//   const matcher = getResolverMatcher(resolver)
-//
-//   return (args.length === 0)
-//     ? matcher
-//     : matcher(...args)
-// }
-
-const resolvers = require('../../config/resolvers.json')
-  .map(resolver => Object.assign(resolver,
+// create page resolvers
+const pageResolvers = resolverConfig
+  .pages.map(resolver => Object.assign(resolver,
     {
-      // getTemplate: getTemplateResolver(resolver),
       hydrate: getResolverHydrater(resolver),
-      match: getResolverMatcher(resolver)
+      match: getResolverMatcher(resolver),
+      type: 'page'
     }
   ))
+
+// create template resolvers
+const templateResolvers = resolverConfig
+  .resolvers.map(resolver => Object.assign(resolver,
+    {
+      hydrate: getResolverHydrater(resolver),
+      match: getResolverMatcher(resolver),
+      type: 'template'
+    }
+  ))
+
+const resolvers = pageResolvers.concat(templateResolvers)
 
 const resolve = function resolve (requestUri) {
   const resolver = resolvers.find(resolver => resolver.match(requestUri))

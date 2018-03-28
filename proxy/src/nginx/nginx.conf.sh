@@ -1,6 +1,12 @@
 #!/bin/sh
 
-API_PREFIX="/${CONTEXT:-pb}/api/v3"
+CONTEXT="${CONTEXT:-pb}"
+# strip trailing slash
+CONTEXT="${CONTEXT%%/}"
+# enforce leading slash
+CONTEXT="/${CONTEXT##/}"
+
+API_PREFIX="${CONTEXT}/api/v3"
 
 DNS_SERVER=''
 for word in $(cat '/etc/resolv.conf')
@@ -143,7 +149,7 @@ cat <<EOB
   }
 
   map \$request_uri \$context_free_uri {
-    ~^/${CONTEXT:-pb}/(.*)     /\$1;
+    ~^${CONTEXT}/(.*)          /\$1;
     default                    \$request_uri;
   }
 
@@ -178,6 +184,7 @@ cat <<EOB
 
     location @engine {
       rewrite                  ^${API_PREFIX}(/|$)(.*) /\$2 break;
+      rewrite                  ^${CONTEXT}(/|$)(.*) /\$2 break;
 EOB
 if [[ "${HTTP_ENGINE}" ]]
 then
@@ -224,7 +231,7 @@ cat <<EOB
       return                   418;
     }
 
-    location ~ ^${API_PREFIX}/(resources|scripts)(/.*|$) {
+    location ~ ^(${CONTEXT}|${API_PREFIX})/(resources|scripts)(/.*|$) {
       proxy_intercept_errors   on;
       error_page               400 403 404 418 = @engine;
 EOB
@@ -236,9 +243,9 @@ then
 EOB
 else
   cat <<EOB
-      set                      \$target http://${S3_BUCKET:-${NILE_NAMESPACE:-pagebuilder-fusion}}.s3.amazonaws.com/\${environment}/\${version}/\$1\$2;
+      set                      \$target http://${S3_BUCKET:-${NILE_NAMESPACE:-pagebuilder-fusion}}.s3.amazonaws.com/\${environment}/\${version}/\$2\$3;
       proxy_pass               \$target;
-      # return 200 'http://${S3_BUCKET:-${NILE_NAMESPACE:-pagebuilder-fusion}}.s3.amazonaws.com/\${environment}/\${version}/\$1\$2';
+      # return 200 'http://${S3_BUCKET:-${NILE_NAMESPACE:-pagebuilder-fusion}}.s3.amazonaws.com/\${environment}/\${version}/\$2\$3';
 EOB
 fi
 cat <<EOB
@@ -256,7 +263,7 @@ cat <<EOB
     }
 
     location / {
-      rewrite                  (.*) ${API_PREFIX}/make\$1;
+      rewrite                  ^(${CONTEXT})?(.*) ${API_PREFIX}/make\$2;
     }
   }
 }

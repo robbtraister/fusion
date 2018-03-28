@@ -2,7 +2,6 @@
 
 const path = require('path')
 
-const UglifyWebpackPlugin = require('uglifyjs-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
 
 const VENDOR_PACKAGES = ['react']
@@ -22,18 +21,12 @@ try {
   }
 } catch (e) {}
 
-const minimizer = (process.env.NODE_ENV === 'production')
-  ? [new UglifyWebpackPlugin({
-    test: /\.jsx?$/i
-  })]
-  : []
-
 module.exports = (entry) =>
   (Object.keys(entry).length)
     ? {
       entry,
       externals,
-      mode: 'production',
+      mode: 'production', // /^dev/i.test(process.env.NODE_ENV) ? 'development' : 'production',
       module: {
         rules: [
           {
@@ -57,9 +50,6 @@ module.exports = (entry) =>
             ]
           }
         ]
-      },
-      optimization: {
-        minimizer
       },
       output: {
         filename: `[name]`,

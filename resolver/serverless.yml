@@ -5,7 +5,7 @@ service: fusion-resolver
 provider:
   name: aws
   runtime: nodejs6.10
-  stage: ${opt:stage}
+  stage: ${opt:stage, 'offline'}
   region: us-east-1
   vpc:
     securityGroupIds:

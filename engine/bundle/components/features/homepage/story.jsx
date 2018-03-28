@@ -18,13 +18,20 @@ const StoryItem = (props) => {
 class Story extends Consumer {
   constructor (props, context) {
     super(props, context)
-    this.setContent({
-      story: this.getContent(props.contentService, props.contentConfigValues)
-    })
+
+    if (props.contentService && props.contentConfigValues) {
+      this.setContent({
+        story: this.getContent(props.contentService, props.contentConfigValues)
+      })
+    } else {
+      this.state = {story: null}
+    }
   }
 
   render () {
-    return <StoryItem {...this.state.story} />
+    return (this.state.story)
+      ? <StoryItem {...this.state.story} />
+      : null
   }
 }
 

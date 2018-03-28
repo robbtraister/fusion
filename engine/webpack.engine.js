@@ -2,7 +2,6 @@
 
 const path = require('path')
 
-const UglifyWebpackPlugin = require('uglifyjs-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
 
 // const VENDOR_PACKAGES = []
@@ -14,22 +13,12 @@ const ManifestPlugin = require('webpack-manifest-plugin')
 //   callback()
 // }
 
-// const minimizer = (process.env.NODE_ENV === 'production')
-//   ? [new UglifyWebpackPlugin({
-//     test: /\.jsx?$/i
-//   })]
-//   : []
-
-const minimizer = [new UglifyWebpackPlugin({
-  test: /\.jsx?$/i
-})]
-
 module.exports = {
   entry: {
     'react.js': require.resolve('./src/react/client')
   },
   // externals,
-  mode: 'production',
+  mode: /^dev/i.test(process.env.NODE_ENV) ? 'development' : 'production',
   module: {
     rules: [
       {
@@ -53,9 +42,6 @@ module.exports = {
         ]
       }
     ]
-  },
-  optimization: {
-    minimizer
   },
   output: {
     filename: `[name]`,

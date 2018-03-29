@@ -11,7 +11,7 @@ const filter = function filter (schemaName, ...args) {
 
   const filterData = (schema)
     ? (query, data) => {
-      return (query)
+      return (query && data)
         ? graphql(schema, query, data)
           .then(result => {
             if (result.errors) {

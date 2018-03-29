@@ -33,7 +33,7 @@ const feature = function feature (config) {
 
   try {
     const component = TimedComponent(require(`${componentRoot}/features/${config.featureConfig}.jsx`))
-    const props = Object.assign({key: config.id, id: config.id, type: config.featureConfig}, customFields, contentConfig)
+    const props = Object.assign({key: config.id, id: config.id, type: config.featureConfig}, customFields, contentConfig, {contentConfigValues: JSON.stringify(contentConfig.contentConfigValues)})
 
     return () => React.createElement(
       component,

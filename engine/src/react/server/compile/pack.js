@@ -5,7 +5,7 @@ const path = require('path')
 
 const MemoryFS = require('memory-fs')
 const webpack = require('webpack')
-// const UglifyWebpackPlugin = require('uglifyjs-webpack-plugin')
+const UglifyWebpackPlugin = require('uglifyjs-webpack-plugin')
 
 const debugTimer = require('debug')('fusion:timer:react:compile:pack')
 
@@ -16,9 +16,14 @@ const getConfigs = require('../../../../webpack-jsx-configs.js')
 const sourceFile = path.resolve(`${__dirname}/../../../../bundle/components/templates/Template.jsx`)
 const destFile = path.resolve(`${__dirname}/../../../../dist/components/templates/Template.jsx`)
 
-// const minimizer = [new UglifyWebpackPlugin({
-//   test: /\.jsx?$/i
-// })]
+// I don't know why mode doesn't set optimization properly here, but setting it manually works fine
+const optimization = (!/^dev/i.test(process.env.NODE_ENV))
+  ? {
+    minimizer: [new UglifyWebpackPlugin({
+      test: /\.jsx?$/i
+    })]
+  }
+  : {}
 
 const getMemoryFS = function getMemoryFS () {
   const memFs = new MemoryFS()
@@ -65,7 +70,7 @@ const pack = function pack (rendering) {
         const configs = getConfigs({
           'templates/Template.jsx': sourceFile
         })
-        // configs.optimization = {minimizer}
+        configs.optimization = optimization
         configs.output.library = 'window.Fusion=window.Fusion||{};Fusion.Template'
         configs.output.libraryTarget = 'assign'
 

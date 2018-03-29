@@ -26,7 +26,7 @@ module.exports = (entry) =>
     ? {
       entry,
       externals,
-      mode: 'production', // /^dev/i.test(process.env.NODE_ENV) ? 'development' : 'production',
+      mode: /^dev/i.test(process.env.NODE_ENV) ? 'development' : 'production',
       module: {
         rules: [
           {

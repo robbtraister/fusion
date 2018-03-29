@@ -36,10 +36,10 @@ function generateFile (rendering) {
   function feature (config) {
     const componentName = getComponentName('features', config.featureConfig.id || config.featureConfig)
     if (componentName) {
-      const contentConfigValues = (config.contentConfig && config.contentConfig.contentConfigValues) || {}
+      const contentConfig = config.contentConfig || {}
       const customFields = config.customFields || {}
 
-      return `<${componentName}${expandProperties(Object.assign({featureId: config.id}, customFields, contentConfigValues))} />`
+      return `<${componentName}${expandProperties(Object.assign({featureId: config.id}, customFields, contentConfig, {contentConfigValues: JSON.stringify(contentConfig.contentConfigValues)}))} />`
     }
   }
 

@@ -62,7 +62,7 @@ const mapResponse = function mapResponse (err, data, res) {
       res.redirect(statusCode, payload.redirect)
     } else {
       const payloadOut = (payload && payload.body)
-        ? payload.body
+        ? (payload.isBase64Encoded ? Buffer.from(payload.body, 'base64') : payload.body)
         : (payload || null)
 
       res.send(payloadOut)

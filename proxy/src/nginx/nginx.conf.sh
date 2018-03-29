@@ -245,7 +245,6 @@ else
   cat <<EOB
       set                      \$target http://${S3_BUCKET:-${NILE_NAMESPACE:-pagebuilder-fusion}}.s3.amazonaws.com/\${environment}/\${version}/\$2\$3;
       proxy_pass               \$target;
-      # return 200 'http://${S3_BUCKET:-${NILE_NAMESPACE:-pagebuilder-fusion}}.s3.amazonaws.com/\${environment}/\${version}/\$2\$3';
 EOB
 fi
 cat <<EOB

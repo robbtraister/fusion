@@ -176,7 +176,7 @@ cat <<EOB
   }
 
   map \$host \$environment {
-    default                    'staging';
+    default                    'offline';
     # ~^(?<env>[^.]+)            \$env;
   }
 

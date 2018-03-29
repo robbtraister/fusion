@@ -42,7 +42,7 @@ watch() {
 
 mkdir -p "./tmp/$(hostname)"
 
-if [ "${WATCH}" == 'true' ]
+if [ "$(echo "${NODE_ENV}" | grep -i "^dev")" ]
 then
   watch &
 fi

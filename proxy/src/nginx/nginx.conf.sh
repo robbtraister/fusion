@@ -262,8 +262,12 @@ cat <<EOB
       return                   200 'OK';
     }
 
-    location /favicon.ico {
+    location = /favicon.ico {
       rewrite                  (.*) ${API_PREFIX}/resources/favicon.ico;
+    }
+
+    location = / {
+      rewrite                  (.*) /homepage;
     }
 
     location / {

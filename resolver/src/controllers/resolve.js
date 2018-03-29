@@ -8,24 +8,18 @@ const fetch = require('./fetch')
 
 const resolverConfig = require('../../config/resolvers.json')
 
-// returns the pageID or template ID that matches
 const getTemplateResolver = function getTemplateResolver (resolver) {
-  return (resolver.page)
-    ? (content) => ({
-      type: 'page',
-      id: resolver.page
-    })
-    : (content) => ({
-      type: 'template',
-      id: resolver.template
-    })
+  return (resolver.type === 'page')
+    ? (content) => ({page: resolver._id})
+    : (content) => ({template: resolver.page})
 }
 
 const getResolverHydrater = function getResolverHydrater (resolver) {
   const templateResolver = getTemplateResolver(resolver)
-  const contentResolver = (resolver.content)
-    ? (requestUri) => fetch(resolver.content, {uri: encodeURIComponent(requestUri + '/')})
-    : (requestUri) => Promise.resolve({requestUri, undefined, page: resolver._id})
+
+  const contentResolver = (resolver.contentSourceId)
+    ? (requestUri) => fetch(resolver.contentSourceId, {uri: encodeURIComponent(requestUri + '/')})
+    : (requestUri) => Promise.resolve(null)
 
   return (requestUri) => contentResolver(requestUri)
     .then(content => Object.assign(
@@ -34,7 +28,8 @@ const getResolverHydrater = function getResolverHydrater (resolver) {
         content
       },
       templateResolver(content)
-    ))
+    )
+    )
 }
 
 // const hydrate = function hydrate (resolver, ...args) {
@@ -61,23 +56,27 @@ const getResolverMatcher = function getResolverMatcher (resolver) {
 
 // create page resolvers
 const pageResolvers = resolverConfig
-  .pages.map(resolver => Object.assign(resolver,
-    {
-      hydrate: getResolverHydrater(resolver),
-      match: getResolverMatcher(resolver),
-      type: 'page'
-    }
-  ))
+  .pages.map(resolver => {
+    Object.assign(resolver, {type: 'page'})
+    return Object.assign(resolver,
+      {
+        hydrate: getResolverHydrater(resolver),
+        match: getResolverMatcher(resolver)
+      }
+    )
+  })
 
 // create template resolvers
 const templateResolvers = resolverConfig
-  .resolvers.map(resolver => Object.assign(resolver,
-    {
-      hydrate: getResolverHydrater(resolver),
-      match: getResolverMatcher(resolver),
-      type: 'template'
-    }
-  ))
+  .resolvers.map(resolver => {
+    Object.assign(resolver, {type: 'template'})
+    return Object.assign(resolver,
+      {
+        hydrate: getResolverHydrater(resolver),
+        match: getResolverMatcher(resolver)
+      }
+    )
+  })
 
 const resolvers = pageResolvers.concat(templateResolvers)
 

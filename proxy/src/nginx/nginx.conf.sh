@@ -91,7 +91,7 @@ http {
   gzip_comp_level              2;
   gzip_min_length              1400;
   gzip_proxied                 expired no-cache no-store private auth;
-  gzip_types                   text/plain application/x-javascript application/json text/css;
+  gzip_types                   text/plain application/x-javascript application/json text/css text/javascript application/javascript application/octet-stream;
 
   server_names_hash_bucket_size 128;
 

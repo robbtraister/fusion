@@ -61,7 +61,7 @@ const uploadScript = function uploadScript (key, src) {
     buf,
     {
       ACL: 'public-read',
-      ContentType: 'text/javascript',
+      ContentType: 'application/javascript',
       ContentEncoding: 'gzip'
     }
   ))

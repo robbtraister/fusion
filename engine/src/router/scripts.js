@@ -41,7 +41,7 @@ function getTypeRouter (fetchRendering, field = 'name') {
 
       fetchRendering(payload[field])
         .then(({pt, rendering}) => compile(pt, rendering))
-        .then((src) => { res.send(src) })
+        .then((src) => { res.set('Content-Type', 'application/javascript').send(src) })
         .catch(next)
     }
   )
@@ -56,7 +56,7 @@ scriptsRouter.all('/engine/*', (req, res, next) => {
       ? next(err)
       : Promise.all([
         // return the script source
-        res.send(src),
+        res.set('Content-Type', 'application/javascript').send(src),
         // but also upload to s3 so we don't have to use the lambda next time
         uploadScript(`${getScriptPrefix()}${pathname}`, src)
       ])

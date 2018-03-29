@@ -12,6 +12,7 @@ services:
       LAMBDA_RESOLVER:
       CONTENT_BASE:
       MONGO_URL:
+      ON_DEMAND:
     volumes:
       - '~/.aws:/home/nginx/.aws:ro'
       - '${BUNDLE_DIR}:/workdir/engine/bundle:ro'

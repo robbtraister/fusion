@@ -39,6 +39,8 @@ else
   fi
 fi
 
+S3_HOST="http://${S3_BUCKET:-${NILE_NAMESPACE:-pagebuilder-fusion}}.s3.amazonaws.com"
+
 cat <<EOB
 daemon off;
 pid ./nginx.pid;
@@ -204,6 +206,7 @@ cat <<EOB
 
     location @resolver {
       rewrite                  ^${API_PREFIX}(/|$)(.*) /\$2 break;
+      rewrite                  ^${CONTEXT}(/|$)(.*) /\$2 break;
 
       proxy_set_header         'Fusion-Engine-Version' '\${version}';
 EOB
@@ -234,25 +237,46 @@ cat <<EOB
     location ~ ^(${CONTEXT}|${API_PREFIX})/(resources|scripts)(/.*|$) {
       proxy_intercept_errors   on;
       error_page               400 403 404 418 = @engine;
+
 EOB
 
-if [[ "${DISABLE_SCRIPT_CACHE}" == 'true' ]]
+if [[ "$(echo "${NODE_ENV}" | grep -i "^dev")" ]]
 then
   cat <<EOB
       return                   418;
 EOB
 else
   cat <<EOB
-      set                      \$target http://${S3_BUCKET:-${NILE_NAMESPACE:-pagebuilder-fusion}}.s3.amazonaws.com/\${environment}/\${version}/\$2\$3;
+      set                      \$target ${S3_HOST}/\${environment}/\${version}/\$2\$3;
       proxy_pass               \$target;
 EOB
 fi
 cat <<EOB
     }
 
-    location ~ ^${API_PREFIX}/(fuse|make|resolve)(/.*|$) {
+    # keep 'resolve' as a group, since the pattern is re-used elsewhere and the trailing endpoint is referenced as $2
+    location ~ ^${API_PREFIX}/(resolve)(/.*|$) {
       error_page               418 = @resolver;
       return                   418;
+    }
+
+    location ~ ^${API_PREFIX}/(fuse|make)(/.*|$) {
+      error_page               400 403 404 418 = @resolver;
+      proxy_intercept_errors   on;
+
+EOB
+if [[ "$(echo "${NODE_ENV}" | grep -i "^dev")" || "${ON_DEMAND}" == 'true' ]]
+then
+  cat <<EOB
+      return                   418;
+EOB
+else
+  cat <<EOB
+      set                      \$target ${S3_HOST}/\${environment}/\${version}/html\$2.html;
+      proxy_pass               \$target;
+EOB
+fi
+cat <<EOB
     }
 
     location ${API_PREFIX}/health {
@@ -269,6 +293,7 @@ cat <<EOB
       rewrite                  (.*) /homepage;
     }
 
+    # all other requests should be treated as a new page to render
     location / {
       rewrite                  ^(${CONTEXT})?(.*) ${API_PREFIX}/make\$2;
     }

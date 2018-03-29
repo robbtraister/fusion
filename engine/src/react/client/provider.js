@@ -14,13 +14,15 @@ class Provider extends React.Component {
     const fetchCache = {}
 
     const getContent = function getContent (source, ...args) {
+      const localSourceCache = contentCache[source] || {}
+
       const fetchContent = (source, keyString, filter) =>
         window.fetch(`${Fusion.context || '/'}/api/v3/content/${source}?key=${keyString}` + (filter ? `&filter=${filter.replace(/\s+/g, ' ').trim()}` : ''))
           .then(resp => resp.json())
 
       const getSourceContent = (key, filter) => {
         const keyString = JSONNormalize.stringify(key)
-        const cached = contentCache[source][keyString] || undefined
+        const cached = localSourceCache[keyString] || undefined
 
         const sourceCache = fetchCache[source] = fetchCache[source] || {}
         const keyCache = sourceCache[keyString] = sourceCache[keyString] || {}

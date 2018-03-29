@@ -3,7 +3,7 @@
 const fs = require('fs')
 const path = require('path')
 
-const componentRoot = path.resolve(process.env.COMPONENT_ROOT || `${__dirname}/../../../../dist/components`)
+const componentRoot = path.resolve(process.env.COMPONENT_ROOT || `${__dirname}/../../../../bundle/components`)
 
 function expandProperties (obj) {
   return Object.keys(obj)

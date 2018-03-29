@@ -14,7 +14,7 @@ const ENVIRONMENT = process.env.ENVIRONMENT
 const API_PREFIX = `/${process.env.CONTEXT || 'pb'}/api/v3`
 const VERSION = process.env.AWS_LAMBDA_FUNCTION_VERSION || '$LATEST'
 
-const USE_SCRIPT_CACHE = process.env.DISABLE_SCRIPT_CACHE !== 'true'
+const UPLOAD_SCRIPTS = !/^dev/i.test(process.env.NODE_ENV)
 
 const getApiPrefix = function getApiPrefix () {
   return API_PREFIX
@@ -71,12 +71,14 @@ const compile = function compile (pt, rendering, child) {
   const {rootRenderable, upload} = (child)
     ? {
       rootRenderable: findRenderableItem(rendering)(child),
+      // if this is a child feature, do not upload script
       upload: () => Promise.resolve()
     }
     : {
       rootRenderable: rendering,
-      upload: (USE_SCRIPT_CACHE && pt)
+      upload: (UPLOAD_SCRIPTS && pt)
         ? (src) => uploadScript(`${getScriptPrefix()}${getScriptKey(pt)}`, src)
+        // if in dev mode, do not upload script
         : () => Promise.resolve()
     }
 

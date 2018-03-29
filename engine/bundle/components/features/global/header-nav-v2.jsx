@@ -41,7 +41,7 @@ const DropdownDrawer = (props) => {
                           <i className='fa fa-custom-content' aria-hidden='true' />
                         </label>
                         : <a href={item.site.site_url}>
-                          <div className='nav-menu-item'>{item.name}&nbsp;</div>
+                          <div className='nav-menu-item'>{item.name}</div>
                         </a>
                       }
                     </div>

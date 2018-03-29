@@ -3,6 +3,7 @@
 const path = require('path')
 
 const ManifestPlugin = require('webpack-manifest-plugin')
+const UglifyWebpackPlugin = require('uglifyjs-webpack-plugin')
 
 const VENDOR_PACKAGES = ['react']
 
@@ -20,6 +21,14 @@ try {
     'consumer': require.resolve('./src/react/shared/consumer.js')
   }
 } catch (e) {}
+
+const optimization = (/^dev/.test(process.env.NODE_ENV))
+  ? {}
+  : {
+    minimizer: [new UglifyWebpackPlugin({
+      test: /\.jsx?$/i
+    })]
+  }
 
 module.exports = (entry) =>
   (Object.keys(entry).length)
@@ -51,6 +60,7 @@ module.exports = (entry) =>
           }
         ]
       },
+      optimization,
       output: {
         filename: `[name]`,
         path: path.resolve(__dirname, 'dist', 'components'),

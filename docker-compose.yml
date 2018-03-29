@@ -5,12 +5,13 @@ services:
     environment:
       PORT: '8080'
       NODEJS_PORT: '8081'
+      NODE_ENV:
       WATCH: 'true'
-      DISABLE_SCRIPT_CACHE:
       HTTP_ENGINE: http://engine-server:8082
       HTTP_RESOLVER: http://resolver-server:8083
       LAMBDA_ENGINE:
       LAMBDA_RESOLVER:
+      ON_DEMAND:
     image: fusion-proxy
     links:
       - 'engine-server'
@@ -28,11 +29,10 @@ services:
       args:
         LAMBDA: engine
     environment:
-      NODE_ENV: development
+      NODE_ENV:
       PORT: '8082'
       DEBUG: fusion:*
       WATCH: 'true'
-      DISABLE_SCRIPT_CACHE:
       ON_DEMAND:
       CONTENT_BASE:
       MONGO_URL:
@@ -52,6 +52,7 @@ services:
     environment:
       PORT: '8083'
       WATCH: 'true'
+      NODE_ENV:
       HTTP_ENGINE: http://engine-server:8082
       LAMBDA_ENGINE:
     image: fusion-resolver

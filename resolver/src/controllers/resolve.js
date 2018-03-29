@@ -2,6 +2,8 @@
 
 'use strict'
 
+const url = require('url')
+
 const fetch = require('./fetch')
 
 const getTemplateResolver = function getTemplateResolver (resolver) {
@@ -42,12 +44,16 @@ const getResolverHydrater = function getResolverHydrater (resolver) {
 //     : hydrater(...args)
 // }
 
+const getUriPathname = function getUriPathname (requestUri) {
+  return url.parse(requestUri).pathname
+}
+
 const getResolverMatcher = function getResolverMatcher (resolver) {
   if (resolver.uri) {
-    return (requestUri) => resolver.uri === requestUri
+    return (requestUri) => resolver.uri === getUriPathname(requestUri)
   } else if (resolver.pattern) {
     const pattern = new RegExp(resolver.pattern)
-    return (requestUri) => pattern.test(requestUri)
+    return (requestUri) => pattern.test(getUriPathname(requestUri))
   }
   return () => null
 }

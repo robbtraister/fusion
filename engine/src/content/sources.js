@@ -13,6 +13,15 @@ const getSchemaFilter = require('./filter')
 const getSourceFetcher = function getSourceFetcher (source) {
   return (key) => request(url.resolve(contentBase, source.resolve(key)))
     .then(data => JSON.parse(data))
+    .catch((err) => {
+      // console.log(err.response)
+      if (err.response) {
+        const responseError = new Error(err.response.body)
+        responseError.statusCode = err.response.statusCode
+        throw responseError
+      }
+      throw err
+    })
 }
 
 const expandProperties = function expandProperties (string, properties) {

@@ -16,7 +16,7 @@ if (module === require.main) {
     render: require('./react/server/render'),
     router: require('./router'),
     schemas: require('./content/schemas'),
-    serverless: serverless(app, {binary: ['image/png']}),
+    serverless: serverless(app, {binary: ['image/png', 'image/x-icon']}),
     sources: require('./content/sources')
   }
 }

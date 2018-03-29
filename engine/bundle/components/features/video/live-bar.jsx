@@ -3,24 +3,24 @@
 const React = require('react')
 const Consumer = require('consumer')
 
-const headlineQuery = '{headlines{basic}}'
+// const headlineQuery = '{headlines{basic}}'
 
 class LiveBar extends React.Component {
   constructor (props, context) {
     super(props, context)
     this.onButtonClick = this.onButtonClick.bind(this)
   }
-  componentWillMount () {
-    this.setContent({
-      redskins: this.getContent('content-api', {uri: '/sports/redskins/football-insider/aoeu-7'}, headlineQuery)
-    })
-  }
+  // componentWillMount () {
+  //   this.setContent({
+  //     redskins: this.getContent('content-api', {uri: '/sports/redskins/football-insider/aoeu-7'}, headlineQuery)
+  //   })
+  // }
 
-  componentDidMount () {
-    this.setContent({
-      mlb: this.getContent('content-api', {uri: '/sports/mlb/new-blockquote-test'}, headlineQuery)
-    })
-  }
+  // componentDidMount () {
+  //   this.setContent({
+  //     mlb: this.getContent('content-api', {uri: '/sports/mlb/new-blockquote-test'}, headlineQuery)
+  //   })
+  // }
 
   onButtonClick () {
     console.log('clicked')

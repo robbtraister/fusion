@@ -50,7 +50,7 @@ class Story extends Consumer {
 
   render () {
     return (this.state.story)
-      ? <StoryItem {...this.state.story} />
+      ? <StoryItem id={this.props.id} {...this.state.story} />
       : null
   }
 }

@@ -54,7 +54,7 @@ const Masthead = (props) => {
     small: 100
   }[props.mastheadSize]
 
-  return <div className={`masthead-row-wrapper${showDate ? ' min-height-158' : ''}${navOnTop ? ' lower-masthead' : ' upper-masthead'} ${mastheadSize}`}>
+  return <div id={props.id} className={`masthead-row-wrapper${showDate ? ' min-height-158' : ''}${navOnTop ? ' lower-masthead' : ' upper-masthead'} ${mastheadSize}`}>
     <div className='masthead-wrapper pb-f-homepage-masthead'>
       <div id='mastnav-wrapper' className={wrapperClasses} data-nav-position={`${isBelowNav ? 'nav-above' : 'nav-below'}`}>
         <div id='mastnav-container'>

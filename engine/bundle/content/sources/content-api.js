@@ -1,7 +1,7 @@
 'use strict'
 
 const resolve = function resolve (key) {
-  const requestUri = `/content/v3/stories/?canonical_url=${key.uri || key.canonical_url || key}`
+  const requestUri = `/content/v3/stories/?canonical_url=${key.canonical_url || key.uri || key}`
 
   return (key.hasOwnProperty('published'))
     ? `${requestUri}&published=${key.published}`

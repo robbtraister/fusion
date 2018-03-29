@@ -93,7 +93,8 @@ const compileOutputType = function compileOutputType (rendering, pt) {
           {
             key: 'engine',
             type: 'text/javascript',
-            src: `${getApiPrefix()}/scripts/engine/react.js?v=${getVersion()}`
+            src: `${getApiPrefix()}/scripts/engine/react.js?v=${getVersion()}`,
+            defer: true
           }
         ),
         React.createElement(
@@ -101,7 +102,8 @@ const compileOutputType = function compileOutputType (rendering, pt) {
           {
             key: 'template',
             type: 'text/javascript',
-            src: `${getScriptUri(pt)}?v=${getVersion()}`
+            src: `${getScriptUri(pt)}?v=${getVersion()}`,
+            defer: true
           }
         )
       ]

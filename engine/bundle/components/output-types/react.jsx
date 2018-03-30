@@ -12,6 +12,7 @@ const Layout = (props) =>
     <body>
       <div id='App'>
         {props.children}
+        {props.fusion}
       </div>
     </body>
   </html>

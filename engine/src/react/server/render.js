@@ -19,6 +19,27 @@ const {
   getVersion
 } = require('../../scripts')
 
+const CONTEXT = (process.env.CONTEXT || 'pb').replace(/^\/*/, '/')
+const ON_DEMAND = process.env.ON_DEMAND === 'true'
+
+function getFusionScript (globalContent, cacheMap) {
+  const condensedMap = {}
+  Object.keys(cacheMap)
+    .forEach(sourceName => {
+      condensedMap[sourceName] = {}
+      Object.keys(cacheMap[sourceName])
+        .forEach(key => {
+          condensedMap[sourceName][key] = cacheMap[sourceName][key].filtered
+        })
+    })
+
+  return `window.Fusion=window.Fusion||{};` +
+    `Fusion.context='${CONTEXT}';` +
+    `Fusion.isFresh=${ON_DEMAND ? 'true' : 'false'};` +
+    `Fusion.globalContent=${JSON.stringify(globalContent || {})};` +
+    `Fusion.contentCache=${JSON.stringify(condensedMap, (key, value) => value == null ? undefined : value)}`
+}
+
 const render = function render ({Component, requestUri, content}) {
   const renderHTML = () => new Promise((resolve, reject) => {
     try {
@@ -92,7 +113,7 @@ const compileOutputType = function compileOutputType (rendering, pt) {
           'script',
           {
             key: 'engine',
-            type: 'text/javascript',
+            type: 'application/javascript',
             src: `${getApiPrefix()}/scripts/engine/react.js?v=${getVersion()}`,
             defer: true
           }
@@ -101,7 +122,7 @@ const compileOutputType = function compileOutputType (rendering, pt) {
           'script',
           {
             key: 'template',
-            type: 'text/javascript',
+            type: 'application/javascript',
             src: `${getScriptUri(pt)}?v=${getVersion()}`,
             defer: true
           }
@@ -110,7 +131,16 @@ const compileOutputType = function compileOutputType (rendering, pt) {
 
       const Component = (props) => React.createElement(
         OutputType,
-        { scripts },
+        {
+          scripts,
+          fusion: React.createElement(
+            'script',
+            {
+              type: 'application/javascript',
+              dangerouslySetInnerHTML: { __html: getFusionScript(props.globalContent, Feature.cacheMap) }
+            }
+          )
+        },
         React.createElement(
           Feature,
           // pass down the original props

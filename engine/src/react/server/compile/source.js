@@ -5,10 +5,17 @@ const path = require('path')
 
 const componentRoot = path.resolve(process.env.COMPONENT_ROOT || `${__dirname}/../../../../bundle/components`)
 
+function getProperty (key, value) {
+  const valueString = typeof value === 'object'
+    ? `{${JSON.stringify(value)}}`
+    : `'${value.toString().replace(/'/g, '&apos;')}'`
+  return ` ${key}=${valueString}`
+}
+
 function expandProperties (obj) {
   return Object.keys(obj)
     .filter(k => obj[k])
-    .map(k => ` ${k}='${obj[k].toString().replace(/'/g, '&apos;')}'`).join('')
+    .map(k => getProperty(k, obj[k])).join('')
 }
 
 function getComponentFile (type, id) {
@@ -39,7 +46,7 @@ function generateFile (rendering) {
       const contentConfig = config.contentConfig || {}
       const customFields = config.customFields || {}
 
-      return `<${componentName}${expandProperties(Object.assign({featureId: config.id}, customFields, contentConfig, {contentConfigValues: JSON.stringify(contentConfig.contentConfigValues)}))} />`
+      return `<${componentName}${expandProperties(Object.assign({featureId: config.id}, customFields, contentConfig, {contentConfigValues: contentConfig.contentConfigValues}))} />`
     }
   }
 

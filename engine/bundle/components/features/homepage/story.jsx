@@ -41,7 +41,7 @@ class Story extends Consumer {
 
     if (props.contentService && props.contentConfigValues) {
       this.setContent({
-        story: this.getContent(props.contentService, JSON.parse(props.contentConfigValues), query)
+        story: this.getContent(props.contentService, props.contentConfigValues, query)
       })
     } else {
       this.state = {story: null}

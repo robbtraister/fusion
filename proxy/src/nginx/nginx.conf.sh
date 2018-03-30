@@ -62,7 +62,7 @@ http {
   underscores_in_headers       on;
 
 
-  log_format simple '\$status \$request_method \$uri\$query_params \$latency';
+  log_format simple '\$status \$request_method \$uri\$query_params \$bytes_sent \$latency';
 
   access_log                   ./logs/access.log simple;
   error_log                    ./logs/error.log;

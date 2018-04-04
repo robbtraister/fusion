@@ -39,8 +39,10 @@ function getTypeRouter (fetchRendering, field = 'name') {
         req.body
       )
 
+      const isAdmin = req.query.isAdmin === 'true'
+
       fetchRendering(payload[field])
-        .then(({pt, rendering}) => compile(pt, rendering))
+        .then(({pt, rendering}) => compile({pt, rendering, isAdmin}))
         .then((src) => { res.set('Content-Type', 'application/javascript').send(src) })
         .catch(next)
     }
@@ -49,7 +51,11 @@ function getTypeRouter (fetchRendering, field = 'name') {
   return typeRouter
 }
 
-scriptsRouter.all('/engine/*', (req, res, next) => {
+scriptsRouter.use('/page', getTypeRouter(getPageByName))
+scriptsRouter.use('/rendering', getTypeRouter(getRendering, 'id'))
+scriptsRouter.use('/template', getTypeRouter(getTemplateByName))
+
+scriptsRouter.all('*', (req, res, next) => {
   const pathname = url.parse(req.url).pathname
   fs.readFile(`${__dirname}/../../dist${pathname}`, (err, src) => {
     err
@@ -63,9 +69,5 @@ scriptsRouter.all('/engine/*', (req, res, next) => {
         .catch(next)
   })
 })
-
-scriptsRouter.use('/page', getTypeRouter(getPageByName))
-scriptsRouter.use('/rendering', getTypeRouter(getRendering, 'id'))
-scriptsRouter.use('/template', getTypeRouter(getTemplateByName))
 
 module.exports = scriptsRouter

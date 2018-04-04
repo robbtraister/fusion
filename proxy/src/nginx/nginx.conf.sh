@@ -247,6 +247,10 @@ then
 EOB
 else
   cat <<EOB
+      if (\$http_isAdmin = 'true') {
+        return                 418;
+      }
+
       set                      \$target ${S3_HOST}/\${environment}/\${version}/\$2\$3;
       proxy_pass               \$target;
 EOB

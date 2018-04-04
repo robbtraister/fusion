@@ -22,6 +22,25 @@ const {
 const CONTEXT = (process.env.CONTEXT || 'pb').replace(/^\/*/, '/')
 const ON_DEMAND = process.env.ON_DEMAND === 'true'
 
+const engineScript = React.createElement(
+  'script',
+  {
+    key: 'engine',
+    type: 'application/javascript',
+    src: `${getApiPrefix()}/scripts/engine/react.js?v=${getVersion()}`,
+    defer: true
+  }
+)
+const componentsScript = React.createElement(
+  'script',
+  {
+    key: 'components',
+    type: 'application/javascript',
+    src: `${getApiPrefix()}/scripts/components/all.js?v=${getVersion()}`,
+    defer: true
+  }
+)
+
 function getFusionScript (globalContent, cacheMap) {
   const condensedMap = {}
   Object.keys(cacheMap)
@@ -37,7 +56,7 @@ function getFusionScript (globalContent, cacheMap) {
     `Fusion.context='${CONTEXT}';` +
     `Fusion.isFresh=${ON_DEMAND ? 'true' : 'false'};` +
     `Fusion.globalContent=${JSON.stringify(globalContent || {})};` +
-    `Fusion.contentCache=${JSON.stringify(condensedMap, (key, value) => value == null ? undefined : value)}`
+    `Fusion.contentCache=${JSON.stringify(condensedMap)}`
 }
 
 const render = function render ({Component, requestUri, content}) {
@@ -108,31 +127,22 @@ const compileOutputType = function compileOutputType (rendering, pt) {
     .then((Feature) => {
       tic = timer.tic()
 
-      const scripts = [
-        React.createElement(
-          'script',
-          {
-            key: 'engine',
-            type: 'application/javascript',
-            src: `${getApiPrefix()}/scripts/engine/react.js?v=${getVersion()}`,
-            defer: true
-          }
-        ),
-        React.createElement(
-          'script',
-          {
-            key: 'template',
-            type: 'application/javascript',
-            src: `${getScriptUri(pt)}?v=${getVersion()}`,
-            defer: true
-          }
-        )
-      ]
-
       const Component = (props) => React.createElement(
         OutputType,
         {
-          scripts,
+          scripts: [
+            engineScript,
+            componentsScript,
+            React.createElement(
+              'script',
+              {
+                key: 'template',
+                type: 'application/javascript',
+                src: `${getScriptUri(pt)}?v=${getVersion()}&isAdmin=true`,
+                defer: true
+              }
+            )
+          ],
           fusion: React.createElement(
             'script',
             {

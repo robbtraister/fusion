@@ -21,7 +21,7 @@ const query = `
       basic
     }
   }
-`.replace(/[ \t\n]+/g, ' ')
+`
 
 const StoryItem = (props) => {
   const promoItems = props.promo_items && props.promo_items.basic
@@ -50,7 +50,7 @@ class Story extends Consumer {
 
   render () {
     return (this.state.story)
-      ? <StoryItem id={this.props.id} {...this.state.story} />
+      ? <StoryItem {...this.state.story} {...this.props} />
       : null
   }
 }

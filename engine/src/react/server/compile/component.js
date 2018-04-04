@@ -82,7 +82,10 @@ const template = function template (rendering) {
 
   return () => React.createElement(
     component,
-    {},
+    {
+      key: rendering.id,
+      id: rendering.id
+    },
     children
   )
 }

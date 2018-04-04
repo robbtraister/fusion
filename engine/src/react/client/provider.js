@@ -22,12 +22,12 @@ class Provider extends React.Component {
 
       const getSourceContent = (key, filter) => {
         const keyString = JSONNormalize.stringify(key)
-        const cached = localSourceCache[keyString] || undefined
+        const cached = localSourceCache[keyString]
 
         const sourceCache = fetchCache[source] = fetchCache[source] || {}
         const keyCache = sourceCache[keyString] = sourceCache[keyString] || {}
         const promise = keyCache[filter] = keyCache[filter] || (
-          (Fusion.isFresh && cached)
+          (Fusion.isFresh && cached !== undefined)
             ? Promise.resolve(cached)
             : fetchContent(source, keyString, filter)
         )

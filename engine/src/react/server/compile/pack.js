@@ -40,49 +40,53 @@ const getMemoryFS = function getMemoryFS () {
   return memFs
 }
 
-const pack = function pack (rendering) {
+const pack = function pack (rendering, isAdmin) {
   let tic = timer.tic()
-  return compileSource(rendering)
+  return compileSource(rendering, isAdmin)
     .then((source) => new Promise((resolve, reject) => {
-      try {
-        debugTimer('compile source', tic.toc())
-        tic = timer.tic()
+      debugTimer('generate source', tic.toc())
+      if (isAdmin) {
+        return resolve(source)
+      } else {
+        try {
+          tic = timer.tic()
 
-        const mfs = getMemoryFS()
+          const mfs = getMemoryFS()
 
-        mfs.mkdirpSync(path.dirname(sourceFile))
-        mfs.mkdirpSync(path.dirname(destFile))
-        mfs.writeFileSync(sourceFile, source)
+          mfs.mkdirpSync(path.dirname(sourceFile))
+          mfs.mkdirpSync(path.dirname(destFile))
+          mfs.writeFileSync(sourceFile, source)
 
-        debugTimer('wrote source to memory fs', tic.toc())
-        tic = timer.tic()
+          debugTimer('write source to memory fs', tic.toc())
+          tic = timer.tic()
 
-        const configs = getConfigs({
-          'templates/Template.jsx': sourceFile
-        })
-        configs.output.library = `window.Fusion=window.Fusion||{};Fusion.Template`
-        configs.output.libraryTarget = 'assign'
+          const configs = getConfigs({
+            'templates/Template.jsx': sourceFile
+          })
+          configs.output.library = `window.Fusion=window.Fusion||{};Fusion.Template`
+          configs.output.libraryTarget = 'assign'
 
-        debugTimer('webpack configs', tic.toc())
-        tic = timer.tic()
+          debugTimer('webpack configs', tic.toc())
+          tic = timer.tic()
 
-        const compiler = webpack(configs)
-        compiler.inputFileSystem = mfs
-        compiler.outputFileSystem = mfs
+          const compiler = webpack(configs)
+          compiler.inputFileSystem = mfs
+          compiler.outputFileSystem = mfs
 
-        debugTimer('webpack setup', tic.toc())
-        tic = timer.tic()
+          debugTimer('webpack setup', tic.toc())
+          tic = timer.tic()
 
-        compiler.run((err, data) => {
-          debugTimer('webpack compilation', tic.toc())
-          ;(err)
-            ? reject(err)
-            : (data.hasErrors())
-              ? reject(data.toJson().errors)
-              : resolve(mfs.readFileSync(destFile).toString())
-        })
-      } catch (e) {
-        reject(e)
+          compiler.run((err, data) => {
+            debugTimer('webpack compilation', tic.toc())
+            ;(err)
+              ? reject(err)
+              : (data.hasErrors())
+                ? reject(data.toJson().errors)
+                : resolve(mfs.readFileSync(destFile).toString())
+          })
+        } catch (e) {
+          reject(e)
+        }
       }
     }))
 }

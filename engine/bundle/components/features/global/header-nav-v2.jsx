@@ -37,7 +37,7 @@ const DropdownDrawer = (props) => {
                     <div className='subnav-present'>
                       {(item.children && item.children.length > 0)
                         ? <label htmlFor={`toggle-${i}`} className='nav-menu-item nav-menu-item-with-children'>
-                          <a href={item.site.site_url}>{item.name}&nbsp;</a>
+                          <a href={item.site.site_url}>{item.name}</a>
                           <i className='fa fa-custom-content' aria-hidden='true' />
                         </label>
                         : <a href={item.site.site_url}>

@@ -5,35 +5,22 @@ const path = require('path')
 
 const componentRoot = path.resolve(process.env.COMPONENT_ROOT || `${__dirname}/../../../../bundle/components`)
 
-function getProperty (key, value) {
-  const valueString = typeof value === 'object'
-    ? `{${JSON.stringify(value)}}`
-    : `'${value.toString().replace(/'/g, '&apos;')}'`
-  return ` ${key}=${valueString}`
-}
-
-function expandProperties (obj) {
-  return Object.keys(obj)
-    .filter(k => obj[k])
-    .map(k => getProperty(k, obj[k])).join('')
-}
-
 function getComponentFile (type, id) {
   return `${componentRoot}/${type}/${id}.jsx`
 }
 
 function componentImport (fp, name) {
-  return `const ${name} = require('${fp}')`
+  return `Fusion.Components${name} = require('${fp}')`
 }
 
-function generateFile (rendering) {
+function generateFile (rendering, isAdmin) {
   const components = {}
 
   function getComponentName (type, id) {
     const key = getComponentFile(type, id)
     try {
       fs.accessSync(key, fs.constants.R_OK)
-      components[key] = components[key] || id.replace(/^[a-z]/, (c) => c.toUpperCase()).replace(/-/g, '_').replace(/\//g, '__')
+      components[key] = components[key] || `['${type}']['${id}']`
       return components[key]
     } catch (e) {
       // do nothing
@@ -46,35 +33,54 @@ function generateFile (rendering) {
       const contentConfig = config.contentConfig || {}
       const customFields = config.customFields || {}
 
-      return `<${componentName}${expandProperties(Object.assign({featureId: config.id}, customFields, contentConfig, {contentConfigValues: contentConfig.contentConfigValues}))} />`
+      const props = Object.assign({key: config.id, id: config.id, type: config.featureConfig.id || config.featureConfig}, customFields, contentConfig, {contentConfigValues: contentConfig.contentConfigValues})
+
+      return `React.createElement(Fusion.Components${componentName}, ${JSON.stringify(props)})`
     }
   }
 
   function chain (config) {
-    return `<div id="${config.chainConfig.id || config.chainConfig}">
-${config.features.map(renderableItem).filter(ri => ri).join('\n')}
-</div>
-`
+    const componentName = getComponentName('chains', config.chainConfig.id || config.chainConfig)
+    const component = (componentName)
+      ? `Fusion.Components${componentName}`
+      : `'div'`
+    return `React.createElement(${component}, { key: '${config.id}', id: '${config.id}', type: '${config.chainConfig.id || config.chainConfig}' }, [${config.features.map(renderableItem).filter(ri => ri).join(',')}])`
   }
 
-  function section (config) {
-    return config.renderableItems.map(renderableItem).filter(ri => ri).join('\n')
+  function section (config, index) {
+    return `React.createElement('section', { key: ${index} }, [${config.renderableItems.map(renderableItem).filter(ri => ri).join(',')}])`
   }
+
+  // function template (config) {
+  //   return `[${config.layoutItems.map((item, i) => layout(item, rendering.layout && rendering.layout.sections && rendering.layout.sections[i])).join(',')}]`
+  // }
 
   function template (config) {
-    return config.layoutItems.map((item, i) => layout(item, rendering.layout && rendering.layout.sections && rendering.layout.sections[i])).join('\n')
+    const componentName = getComponentName('layouts', config.layout)
+    const componentRef = (componentName)
+      ? `Fusion.Components${componentName}`
+      : 'div'
+
+    return `React.createElement(${componentRef}, {key: '${config.id || config._id}', id: '${config.id || config._id}'}, [${config.layoutItems.map(renderableItem).join(',')}])`
   }
 
-  function layout (item, config) {
-    return `<div${config && config.id ? ` id='${config.id}'` : ''}${config && config.cssClass ? ` className='${config.cssClass}'` : ''}>
-  ${renderableItem(item)}
-</div>`
-  }
+  // function layout (item, config) {
+  //   return `
+  //     React.createElement(
+  //       'div',
+  //       {
+  //         id: ${config && config.id},
+  //         className: ${config && config.cssClass}
+  //       },
+  //       ${renderableItem(item)}
+  //     )
+  //   `
+  // }
 
-  function renderableItem (config) {
+  function renderableItem (config, index) {
     return (config.featureConfig) ? feature(config)
       : (config.chainConfig) ? chain(config)
-        : (config.renderableItems) ? section(config)
+        : (config.renderableItems) ? section(config, index)
           : (config.layoutItems) ? template(config)
             : ''
   }
@@ -82,16 +88,27 @@ ${config.features.map(renderableItem).filter(ri => ri).join('\n')}
   const Template = renderableItem(rendering)
 
   const contents = `'use strict'
+window.Fusion = window.Fusion || {}
+Fusion.Components = Fusion.Components || {}
+Fusion.Components.chains = Fusion.Components.chains || {}
+Fusion.Components.features = Fusion.Components.features || {}
+${(isAdmin)
+    ? 'var React = React || window.react'
+    : `
 const React = require('react')
 ${Object.keys(components).map(k => componentImport(k, components[k])).join('\n')}
-class Template extends React.Component {
-  render () {
-    return <React.Fragment>
-      ${Template}
-    </React.Fragment>
-  }
+`
 }
-module.exports = Template`
+Fusion.Template = function (props) {
+  return React.createElement(React.Fragment, {}, ${Template})
+}
+${(isAdmin)
+    ? ''
+    : `
+module.exports = Fusion.Template
+`
+}
+`
 
   return Promise.resolve(contents)
 }

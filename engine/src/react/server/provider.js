@@ -35,7 +35,7 @@ class Provider extends React.Component {
             : data
           )
           .then(filtered => {
-            keyCache.filtered = _.merge(keyCache.filtered, filtered)
+            keyCache.filtered = keyCache.cached ? _.merge(keyCache.filtered, filtered) : null
             return keyCache.cached
           })
 

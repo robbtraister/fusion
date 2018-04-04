@@ -247,7 +247,7 @@ then
 EOB
 else
   cat <<EOB
-      if (\$http_isAdmin = 'true') {
+      if (\$arg_isAdmin = 'true') {
         return                 418;
       }
 

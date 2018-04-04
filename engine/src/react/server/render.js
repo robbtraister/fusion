@@ -31,15 +31,15 @@ const engineScript = React.createElement(
     defer: true
   }
 )
-const componentsScript = React.createElement(
-  'script',
-  {
-    key: 'components',
-    type: 'application/javascript',
-    src: `${getApiPrefix()}/scripts/components/all.js?v=${getVersion()}`,
-    defer: true
-  }
-)
+// const componentsScript = React.createElement(
+//   'script',
+//   {
+//     key: 'components',
+//     type: 'application/javascript',
+//     src: `${getApiPrefix()}/scripts/components/all.js?v=${getVersion()}`,
+//     defer: true
+//   }
+// )
 
 function getFusionScript (globalContent, cacheMap) {
   const condensedMap = {}
@@ -132,13 +132,13 @@ const compileOutputType = function compileOutputType (rendering, pt) {
         {
           scripts: [
             engineScript,
-            componentsScript,
+            // componentsScript,
             React.createElement(
               'script',
               {
                 key: 'template',
                 type: 'application/javascript',
-                src: `${getScriptUri(pt)}?v=${getVersion()}&isAdmin=true`,
+                src: `${getScriptUri(pt)}?v=${getVersion()}`, // &isAdmin=true
                 defer: true
               }
             )

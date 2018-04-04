@@ -76,7 +76,7 @@ const compile = function compile ({pt, rendering, child, isAdmin}) {
     }
     : {
       rootRenderable: rendering,
-      upload: (UPLOAD_SCRIPTS && pt)
+      upload: (UPLOAD_SCRIPTS && pt && !isAdmin)
         ? (src) => uploadScript(`${getScriptPrefix()}${getScriptKey(pt)}`, src)
         // if in dev mode, do not upload script
         : () => Promise.resolve()

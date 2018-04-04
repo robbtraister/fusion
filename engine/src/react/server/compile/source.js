@@ -15,11 +15,13 @@ function componentImport (fp, name) {
 
 function generateFile (rendering, isAdmin) {
   const components = {}
+  const types = {}
 
   function getComponentName (type, id) {
     const key = getComponentFile(type, id)
     try {
       fs.accessSync(key, fs.constants.R_OK)
+      types[type] = true
       components[key] = components[key] || `['${type}']['${id}']`
       return components[key]
     } catch (e) {
@@ -88,14 +90,13 @@ function generateFile (rendering, isAdmin) {
   const Template = renderableItem(rendering)
 
   const contents = `'use strict'
-window.Fusion = window.Fusion || {}
-Fusion.Components = Fusion.Components || {}
-Fusion.Components.chains = Fusion.Components.chains || {}
-Fusion.Components.features = Fusion.Components.features || {}
 ${(isAdmin)
     ? 'var React = React || window.react'
     : `
 const React = require('react')
+window.Fusion = window.Fusion || {}
+Fusion.Components = Fusion.Components || {}
+${Object.keys(types).map(t => `Fusion.Components.${t} = Fusion.Components.${t} || {}`)}
 ${Object.keys(components).map(k => componentImport(k, components[k])).join('\n')}
 `
 }

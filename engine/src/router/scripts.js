@@ -39,10 +39,10 @@ function getTypeRouter (fetchRendering, field = 'name') {
         req.body
       )
 
-      const isAdmin = req.query.isAdmin === 'true'
+      const useComponentLib = req.query.useComponentLib === 'true'
 
       fetchRendering(payload[field])
-        .then(({pt, rendering}) => compile({pt, rendering, isAdmin}))
+        .then(({pt, rendering}) => compile({pt, rendering, useComponentLib}))
         .then((src) => { res.set('Content-Type', 'application/javascript').send(src) })
         .catch(next)
     }

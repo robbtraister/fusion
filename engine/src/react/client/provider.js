@@ -27,9 +27,9 @@ class Provider extends React.Component {
         const sourceCache = fetchCache[source] = fetchCache[source] || {}
         const keyCache = sourceCache[keyString] = sourceCache[keyString] || {}
         const promise = keyCache[filter] = keyCache[filter] || (
-          (Fusion.isFresh && cached !== undefined)
-            ? Promise.resolve(cached)
-            : fetchContent(source, keyString, filter)
+          (Fusion.refreshContent || cached === undefined)
+            ? fetchContent(source, keyString, filter)
+            : Promise.resolve(cached)
         )
 
         try {

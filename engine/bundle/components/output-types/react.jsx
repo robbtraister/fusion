@@ -6,7 +6,7 @@ const Layout = (props) =>
   <html>
     <head>
       <title>Fusion Rendering</title>
-      {props.scripts}
+      {props.libs}
       <link rel='icon' type='image/x-icon' href='/pb/resources/favicon.ico' />
     </head>
     <body>

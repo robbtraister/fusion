@@ -40,7 +40,7 @@ const render = () => {
         templateStyle.href = `/_assets/templates/${Fusion.Template.cssFile}`
       }
 
-      const method = Fusion.isFresh ? 'hydrate' : 'render'
+      const method = 'render' // Fusion.isFresh ? 'hydrate' : 'render'
       ReactDOM[method](
         React.createElement(
           Provider,

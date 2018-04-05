@@ -13,7 +13,7 @@ function componentImport (fp, name) {
   return `Fusion.Components${name} = require('${fp}')`
 }
 
-function generateFile (rendering, isAdmin) {
+function generateFile (rendering, useComponentLib) {
   const components = {}
   const types = {}
 
@@ -90,7 +90,7 @@ function generateFile (rendering, isAdmin) {
   const Template = renderableItem(rendering)
 
   const contents = `'use strict'
-${(isAdmin)
+${(useComponentLib)
     ? 'var React = React || window.react'
     : `
 const React = require('react')
@@ -103,7 +103,7 @@ ${Object.keys(components).map(k => componentImport(k, components[k])).join('\n')
 Fusion.Template = function (props) {
   return React.createElement(React.Fragment, {}, ${Template})
 }
-${(isAdmin)
+${(useComponentLib)
     ? ''
     : `
 module.exports = Fusion.Template

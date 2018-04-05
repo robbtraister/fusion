@@ -22,6 +22,28 @@ const {
 const CONTEXT = (process.env.CONTEXT || 'pb').replace(/^\/*/, '/')
 const ON_DEMAND = process.env.ON_DEMAND === 'true'
 
+// this wrapper allows a function to be used in JSX without parentheses
+// use `{props.scripts}` to execute the function with the defaults
+// use `{props.scripts(true)}` to execute the function with custom inputs
+function propFunction (fn) {
+  fn[Symbol.iterator] = function () {
+    let done = false
+    return {
+      next () {
+        const result = (done)
+          ? {done}
+          : {
+            value: fn(),
+            done: false
+          }
+        done = true
+        return result
+      }
+    }
+  }
+  return fn
+}
+
 const engineScript = React.createElement(
   'script',
   {
@@ -31,17 +53,17 @@ const engineScript = React.createElement(
     defer: true
   }
 )
-// const componentsScript = React.createElement(
-//   'script',
-//   {
-//     key: 'components',
-//     type: 'application/javascript',
-//     src: `${getApiPrefix()}/scripts/components/all.js?v=${getVersion()}`,
-//     defer: true
-//   }
-// )
+const componentsScript = React.createElement(
+  'script',
+  {
+    key: 'components',
+    type: 'application/javascript',
+    src: `${getApiPrefix()}/scripts/components/all.js?v=${getVersion()}`,
+    defer: true
+  }
+)
 
-function getFusionScript (globalContent, cacheMap) {
+function getFusionScript (globalContent, cacheMap, refreshContent) {
   const condensedMap = {}
   Object.keys(cacheMap)
     .forEach(sourceName => {
@@ -54,7 +76,7 @@ function getFusionScript (globalContent, cacheMap) {
 
   return `window.Fusion=window.Fusion||{};` +
     `Fusion.context='${CONTEXT}';` +
-    `Fusion.isFresh=${ON_DEMAND ? 'true' : 'false'};` +
+    `Fusion.refreshContent=${ON_DEMAND ? 'false' : !!refreshContent};` +
     `Fusion.globalContent=${JSON.stringify(globalContent || {})};` +
     `Fusion.contentCache=${JSON.stringify(condensedMap)}`
 }
@@ -127,36 +149,81 @@ const compileOutputType = function compileOutputType (rendering, pt) {
     .then((Feature) => {
       tic = timer.tic()
 
-      const Component = (props) => React.createElement(
-        OutputType,
-        {
-          scripts: [
-            engineScript,
-            // componentsScript,
-            React.createElement(
-              'script',
-              {
-                key: 'template',
-                type: 'application/javascript',
-                src: `${getScriptUri(pt)}?v=${getVersion()}`, // &isAdmin=true
-                defer: true
+      const Component = (props) => {
+        return React.createElement(
+          OutputType,
+          {
+            /*
+             * Each of the following are equivalent in JSX
+             *   {props.libs}
+             *   {props.libs()}
+             *   {props.libs(false)}
+             *   {props.libs({useComponentLib: false})}
+             *
+             * To use the complete component library
+             * (faster compilation, but larger payload; suitable for faster changes in admin)
+             *   {props.libs(true)}
+             *   {props.libs({useComponentLib: true})}
+             */
+            libs: propFunction(function (useComponentLib) {
+              if (typeof useComponentLib === 'object') {
+                useComponentLib = useComponentLib.useComponentLib
               }
-            )
-          ],
-          fusion: React.createElement(
-            'script',
-            {
-              type: 'application/javascript',
-              dangerouslySetInnerHTML: { __html: getFusionScript(props.globalContent, Feature.cacheMap) }
-            }
+              useComponentLib = (useComponentLib === undefined) ? false : !!useComponentLib
+
+              const templateScript = React.createElement(
+                'script',
+                {
+                  key: 'template',
+                  type: 'application/javascript',
+                  src: `${getScriptUri(pt)}?v=${getVersion()}${useComponentLib ? '&useComponentLib=true' : ''}`,
+                  defer: true
+                }
+              )
+
+              return (useComponentLib)
+                ? [
+                  engineScript,
+                  componentsScript,
+                  templateScript
+                ]
+                : [
+                  engineScript,
+                  templateScript
+                ]
+            }),
+            /*
+             * Each of the following are equivalent in JSX
+             *   {props.fusion}
+             *   {props.fusion()}
+             *   {props.fusion(true)}
+             *   {props.fusion({refreshContent: true})}
+             *
+             * To disable client-side content refresh
+             *   {props.fusion(false)}
+             *   {props.fusion({refreshContent: false})}
+             */
+            fusion: propFunction(function (refreshContent) {
+              if (typeof refreshContent === 'object') {
+                refreshContent = refreshContent.refreshContent
+              }
+              refreshContent = refreshContent === undefined ? true : !!refreshContent
+              return React.createElement(
+                'script',
+                {
+                  type: 'application/javascript',
+                  dangerouslySetInnerHTML: { __html: getFusionScript(props.globalContent, Feature.cacheMap, refreshContent) }
+                }
+              )
+            })
+          },
+          React.createElement(
+            Feature,
+            // pass down the original props
+            props
           )
-        },
-        React.createElement(
-          Feature,
-          // pass down the original props
-          props
         )
-      )
+      }
 
       // bubble up the Provider cacheMap
       Component.cacheMap = Feature.cacheMap

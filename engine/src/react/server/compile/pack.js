@@ -40,12 +40,12 @@ const getMemoryFS = function getMemoryFS () {
   return memFs
 }
 
-const pack = function pack (rendering, isAdmin) {
+const pack = function pack (rendering, useComponentLib) {
   let tic = timer.tic()
-  return compileSource(rendering, isAdmin)
+  return compileSource(rendering, useComponentLib)
     .then((source) => new Promise((resolve, reject) => {
       debugTimer('generate source', tic.toc())
-      if (isAdmin) {
+      if (useComponentLib) {
         return resolve(source)
       } else {
         try {

@@ -14,7 +14,7 @@ The first thing that you need to do is designate your component as a consumer of
 const React = require('react')
 const Consumer = require('consumer')
 
-const MyComponent = (props, context) => <div>{context.globalContent.version}</div>
+const MyComponent = (props) => <div>{props.globalContent.version}</div>
 
 module.exports = Consumer(MyComponent)
 ```
@@ -27,7 +27,7 @@ const Consumer = require('consumer')
 
 class MyComponent extends Consumer {
   render () {
-    return <div>{this.context.globalContent.version}</div>
+    return <div>{this.props.globalContent.version}</div>
   }
 }
 
@@ -42,16 +42,16 @@ const Consumer = require('consumer')
 
 class MyComponent extends React.Component {
   render () {
-    return <div>{this.context.globalContent.version}</div>
+    return <div>{this.props.globalContent.version}</div>
   }
 }
 
 module.exports = Consumer(MyComponent)
 ```
 
-Once you have designated (annotated, but not necessarily using official javascript annotations?) your component as a consumer, it will have access to the following context properties and, if a class, instance methods. Context is accessed using the second input parameter for functional components, or `this.context` for class components. Instance methods are only available for class components and will be accessed directly on `this` (e.g., `this.getContent()`)
+Once you have designated (annotated, but not necessarily using official javascript annotations?) your component as a consumer, it will have access to the following properties and, if a class, instance methods. Instance methods are only available for class components and will be accessed directly on `this` (e.g., `this.getContent()`)
 
-### Context Properties
+### Properties
 
 -   globalContent
 

@@ -13,7 +13,7 @@ response:
 <pre className='response'>No response. Try refreshing the page.</pre>
 `
 
-const Dfp = (props, context) => {
+const Dfp = (props) => {
   // Metas
   const dfpMetaPath = 'dfp_path'
   const dfpPageType = 'dfpPageType'

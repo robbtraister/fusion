@@ -4,61 +4,55 @@
 
 const React = require('react')
 
-const contextTypes = require('../shared/context-types')
-
 const JSONNormalize = require('../../utils/normalize')
 
-class Provider extends React.Component {
-  getChildContext () {
-    const contentCache = this.props.contentCache || {}
-    const fetchCache = {}
+const getContentGenerator = function getContentGenerator (contentCache) {
+  return function getContent (source, ...args) {
+    const sourceCache = contentCache[source] || {}
 
-    const getContent = function getContent (source, ...args) {
-      const localSourceCache = contentCache[source] || {}
+    const fetchContent = (source, keyString, filter, cached) =>
+      window.fetch(`${(Fusion.prefix || '').replace(/^\/+/, '/').replace(/\/+$/, '')}/api/v3/content/${source}?key=${keyString}` + (filter ? `&filter=${filter}` : ''))
+        .then(resp => resp.json())
+        .catch(() => cached)
 
-      const fetchContent = (source, keyString, filter) =>
-        window.fetch(`${Fusion.context || '/'}/api/v3/content/${source}?key=${keyString}` + (filter ? `&filter=${filter.replace(/\s+/g, ' ').trim()}` : ''))
-          .then(resp => resp.json())
+    const getSourceContent = (key, filter) => {
+      filter = filter ? filter.replace(/\s+/g, ' ').trim() : null
 
-      const getSourceContent = (key, filter) => {
-        const keyString = JSONNormalize.stringify(key)
-        const cached = localSourceCache[keyString]
+      const keyString = JSONNormalize.stringify(key)
+      const keyCache = sourceCache[keyString] = sourceCache[keyString] || {}
+      const cached = keyCache.cached
 
-        const sourceCache = fetchCache[source] = fetchCache[source] || {}
-        const keyCache = sourceCache[keyString] = sourceCache[keyString] || {}
-        const promise = keyCache[filter] = keyCache[filter] || (
-          (Fusion.refreshContent || cached === undefined)
-            ? fetchContent(source, keyString, filter)
-            : Promise.resolve(cached)
-        )
+      keyCache.fetched = keyCache.fetched || {}
+      const fetched = keyCache.fetched[filter] = keyCache.fetched[filter] || (
+        (Fusion.refreshContent || cached === undefined)
+          ? fetchContent(source, keyString, filter, cached)
+          : Promise.resolve(cached)
+      )
 
-        try {
-          return {
-            cached,
-            promise
-          }
-        } catch (e) {
-          return null
+      try {
+        return {
+          cached,
+          fetched
         }
+      } catch (e) {
+        return null
       }
-
-      return (args.length === 0)
-        ? getSourceContent
-        : getSourceContent.apply(this, args)
     }
 
-    return {
-      getContent,
-      globalContent: this.props.globalContent,
-      requestUri: this.props.requestUri
-    }
-  }
-
-  render () {
-    return this.props.children
+    return (args.length === 0)
+      ? getSourceContent
+      : getSourceContent.apply(this, args)
   }
 }
 
-Provider.childContextTypes = contextTypes
-
-module.exports = Provider
+module.exports = (props) => React.createElement(
+  Fusion.context.Provider,
+  {
+    value: {
+      getContent: getContentGenerator(Fusion.contentCache),
+      globalContent: Fusion.globalContent,
+      requestUri: window.location.pathname + window.location.search
+    }
+  },
+  props.children
+)

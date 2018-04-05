@@ -87,9 +87,9 @@ const TopMenu = (props) => {
       : null
 }
 
-class HeaderNavV2 extends Consumer {
-  constructor (props, context) {
-    super(props, context)
+class HeaderNavV2 extends React.Component {
+  constructor (props) {
+    super(props)
 
     this.setContent({
       items: this.getContent('site-menu', '/', '{children{name,site{site_url},children{name,site{site_url}}}}')
@@ -97,7 +97,7 @@ class HeaderNavV2 extends Consumer {
   }
 
   render () {
-    const items = this.state.items && this.state.items.children
+    const items = this.state && this.state.items && this.state.items.children
     return <React.Fragment>
       <div className={`amp-feature-wrapper ${this.props.makeNavigationBarSticky ? 'min-height-45' : 'non-sticky-nav'}`}>
         <DropdownDrawer {...this.props} items={items} />
@@ -116,4 +116,4 @@ class HeaderNavV2 extends Consumer {
   }
 }
 
-module.exports = HeaderNavV2
+module.exports = Consumer(HeaderNavV2)

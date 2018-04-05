@@ -63,22 +63,22 @@ const componentsScript = React.createElement(
   }
 )
 
-function getFusionScript (globalContent, cacheMap, refreshContent) {
-  const condensedMap = {}
-  Object.keys(cacheMap)
+function getFusionScript (globalContent, contentCache, refreshContent) {
+  const condensedCache = {}
+  Object.keys(contentCache)
     .forEach(sourceName => {
-      condensedMap[sourceName] = {}
-      Object.keys(cacheMap[sourceName])
+      condensedCache[sourceName] = {}
+      Object.keys(contentCache[sourceName])
         .forEach(key => {
-          condensedMap[sourceName][key] = cacheMap[sourceName][key].filtered
+          condensedCache[sourceName][key] = {cached: contentCache[sourceName][key].filtered}
         })
     })
 
   return `window.Fusion=window.Fusion||{};` +
-    `Fusion.context='${CONTEXT}';` +
+    `Fusion.prefix='${CONTEXT}';` +
     `Fusion.refreshContent=${ON_DEMAND ? 'false' : !!refreshContent};` +
     `Fusion.globalContent=${JSON.stringify(globalContent || {})};` +
-    `Fusion.contentCache=${JSON.stringify(condensedMap)}`
+    `Fusion.contentCache=${JSON.stringify(condensedCache)}`
 }
 
 const render = function render ({Component, requestUri, content}) {
@@ -106,9 +106,9 @@ const render = function render ({Component, requestUri, content}) {
       tic = timer.tic()
 
       // collect content cache into Promise array
-      const cacheMap = Component.cacheMap || {}
-      const contentPromises = [].concat(...Object.keys(cacheMap).map(source => {
-        const sourceCache = cacheMap[source]
+      const contentCache = Component.contentCache || {}
+      const contentPromises = [].concat(...Object.keys(contentCache).map(source => {
+        const sourceCache = contentCache[source]
         return Object.keys(sourceCache).map(key => sourceCache[key].promise)
       }))
 
@@ -146,7 +146,7 @@ const compileRenderable = function compileRenderable (rendering) {
 const compileOutputType = function compileOutputType (rendering, pt) {
   let tic
   return compileRenderable(rendering)
-    .then((Feature) => {
+    .then((Template) => {
       tic = timer.tic()
 
       const Component = (props) => {
@@ -212,21 +212,21 @@ const compileOutputType = function compileOutputType (rendering, pt) {
                 'script',
                 {
                   type: 'application/javascript',
-                  dangerouslySetInnerHTML: { __html: getFusionScript(props.globalContent, Feature.cacheMap, refreshContent) }
+                  dangerouslySetInnerHTML: { __html: getFusionScript(props.globalContent, Template.contentCache, refreshContent) }
                 }
               )
             })
           },
           React.createElement(
-            Feature,
+            Template,
             // pass down the original props
             props
           )
         )
       }
 
-      // bubble up the Provider cacheMap
-      Component.cacheMap = Feature.cacheMap
+      // bubble up the Provider contentCache
+      Component.contentCache = Template.contentCache
       return Component
     })
     .then((Component) => {

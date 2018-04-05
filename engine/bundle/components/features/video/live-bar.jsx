@@ -6,8 +6,8 @@ const Consumer = require('consumer')
 // const headlineQuery = '{headlines{basic}}'
 
 class LiveBar extends React.Component {
-  constructor (props, context) {
-    super(props, context)
+  constructor (props) {
+    super(props)
     this.onButtonClick = this.onButtonClick.bind(this)
   }
   // componentWillMount () {

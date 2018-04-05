@@ -6,6 +6,8 @@ window.Fusion = window.Fusion || {}
 
 const React = require('react')
 
+Fusion.context = React.createContext('fusion')
+
 // support fragments in preact
 React.Fragment = React.Fragment || 'div'
 const ReactDOM = require('react-dom')
@@ -44,10 +46,7 @@ const render = () => {
       ReactDOM[method](
         React.createElement(
           Provider,
-          {
-            contentCache: Fusion.contentCache,
-            requestUri: window.location.pathname + window.location.search
-          },
+          {},
           React.createElement(
             Fusion.Template,
             Fusion.globalContent || {}

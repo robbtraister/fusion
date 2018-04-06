@@ -247,7 +247,7 @@ then
 EOB
 else
   cat <<EOB
-      if (\$arg_isAdmin = 'true') {
+      if (\$arg_useComponentLib = 'true') {
         return                 418;
       }
 

@@ -7,7 +7,9 @@ const { graphql } = require('graphql')
 const getSchema = require('./schemas')
 
 const filter = function filter (schemaName, ...args) {
-  const schema = getSchema(schemaName)
+  const schema = schemaName
+    ? getSchema(schemaName)
+    : null
 
   const filterData = (schema)
     ? (query, data) => {

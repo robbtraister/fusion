@@ -5,14 +5,24 @@ const url = require('url')
 
 const request = require('request-promise-native')
 
+const debugFetch = require('debug')('fusion:content:sources:fetch')
+
 const contentBase = process.env.CONTENT_BASE || ''
 const sourcesRoot = path.resolve(process.env.SOURCES_ROOT || `${__dirname}/../../bundle/content/sources`)
 
 const getSchemaFilter = require('./filter')
 
+const {
+  getSourceConfig
+} = require('../models/sources')
+
 const getSourceFetcher = function getSourceFetcher (source) {
-  return (key) => request(url.resolve(contentBase, source.resolve(key)))
-    .then(data => JSON.parse(data))
+  return (key) => Promise.resolve(url.resolve(contentBase, source.resolve(key)))
+    .then((uri) => {
+      debugFetch(uri)
+      return request(uri)
+    })
+    .then((data) => JSON.parse(data))
     .catch((err) => {
       // console.log(err.response)
       if (err.response) {
@@ -41,12 +51,47 @@ const getSourceResolver = function getSourceResolver (source) {
       : () => source.uri
 }
 
+const getBundleSource = function getBundleSource (sourceName) {
+  try {
+    return Promise.resolve(require(`${sourcesRoot}/${sourceName}`))
+  } catch (e) {
+    return Promise.resolve(null)
+  }
+}
+
+const getDbSource = function getDbSource (sourceName) {
+  return getSourceConfig(sourceName)
+    .then((config) => {
+      return {
+        resolve (key) {
+          const path = config.pattern.replace(/\{[^}]+\}/, (match, prop) => key[prop] || match)
+
+          const query = config.params
+            .map((param) => {
+              return (param.dropWhenEmpty && !(param.name in key))
+                ? null
+                : `${param.name}=${key[param.name]}`
+            })
+            .filter(v => v)
+            .join('&')
+
+          return `${path}${query ? `?${query}` : ''}`
+        }
+      }
+    })
+}
+
 const sourceCache = {}
 const getSource = function getSource (sourceName) {
-  if (!(sourceName in sourceCache)) {
-    try {
-      const source = require(`${sourcesRoot}/${sourceName}`)
-      sourceCache[sourceName] = Object.assign(
+  sourceCache[sourceName] = sourceCache[sourceName] || getBundleSource(sourceName)
+    .then((bundleSource) => bundleSource || getDbSource(sourceName))
+    .then((source) => {
+      if (!source) {
+        delete sourceCache[sourceName]
+        throw new Error(`Could not find source: ${sourceName}`)
+      }
+
+      return Object.assign(
         source,
         {
           fetch: getSourceFetcher(source),
@@ -54,12 +99,9 @@ const getSource = function getSource (sourceName) {
           resolve: getSourceResolver(source)
         }
       )
-    } catch (err) {
-      console.error(err)
-      throw err
-    }
-  }
-  return Promise.resolve(sourceCache[sourceName])
+    })
+
+  return sourceCache[sourceName]
 }
 
 module.exports = getSource

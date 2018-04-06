@@ -16,7 +16,7 @@ const BurgerImage = (props) => {
 }
 
 const DropdownDrawer = (props) => {
-  const menuLabel = (props.menuLabel || '').trim()
+  const menuLabel = (props.customFields.menuLabel || '').trim()
   const hasMenuLabel = menuLabel.length > 0
 
   return <div className='dropdown-navigation'>
@@ -27,7 +27,7 @@ const DropdownDrawer = (props) => {
           <label className={`burger-label ${hasMenuLabel ? 'with-text' : ''}`} htmlFor='toggle-drawer'>
             <BurgerImage menuLabel={menuLabel} />
           </label>
-          <ul className={`menu-guts ${props.pushContent === 'true' ? 'push-content' : ''}`}>
+          <ul className={`menu-guts ${props.customFields.pushContent === 'true' ? 'push-content' : ''}`}>
             {props.items && props.items
               .filter(item => item.site && item.site.site_url)
               .map((item, i) =>
@@ -73,8 +73,8 @@ const TopMenu = (props) => {
   const items = (props.items || [])
     .filter(item => item.site && item.site.siteUrl)
 
-  return (props.logo)
-    ? <img className='logo hidden-sm hidden-xs' src={props.logo} />
+  return (props.customFields.logo)
+    ? <img className='logo hidden-sm hidden-xs' src={props.customFields.logo} />
     : (props.items && props.items.length)
       ? <ul className='top-nav-list hidden-sm hidden-xs'>
         {items
@@ -99,7 +99,7 @@ class HeaderNavV2 extends React.Component {
   render () {
     const items = this.state && this.state.items && this.state.items.children
     return <React.Fragment>
-      <div className={`amp-feature-wrapper ${this.props.makeNavigationBarSticky ? 'min-height-45' : 'non-sticky-nav'}`}>
+      <div className={`amp-feature-wrapper ${this.props.customFields.makeNavigationBarSticky ? 'min-height-45' : 'non-sticky-nav'}`}>
         <DropdownDrawer {...this.props} items={items} />
         <div className='center-nav'>
           <TopMenu {...this.props} items={items} />
@@ -109,9 +109,9 @@ class HeaderNavV2 extends React.Component {
         </div>
       </div>
 
-      <div id='pushContent' data-run-function={this.props.pushContent} />
+      <div id='pushContent' data-run-function={this.props.customFields.pushContent} />
 
-      {this.props.makeNavigationBarSticky && <div className='min-height-45' />}
+      {this.props.customFields.makeNavigationBarSticky && <div className='min-height-45' />}
     </React.Fragment>
   }
 }

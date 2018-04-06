@@ -24,27 +24,27 @@ const fullDate = () => {
 }
 
 const Masthead = (props) => {
-  const numberOfEditions = props.numberOfEditions || 0
+  const numberOfEditions = props.customFields.numberOfEditions || 0
   // const orderOfEditions = props.orderOfEditions || false
 
   const navOnTop = false
-  const showDate = props.showDate || false
-  const socialPosition = props.socialPosition || 'socialRight'
-  const includeWeather = props.includeWeather || false
-  const sticky = props.sticky
-  const isBelowNav = props.isBelowNav
+  const showDate = props.customFields.showDate || false
+  const socialPosition = props.customFields.socialPosition || 'socialRight'
+  const includeWeather = props.customFields.includeWeather || false
+  const sticky = props.customFields.sticky
+  const isBelowNav = props.customFields.isBelowNav
 
-  const mastheadSize = props.mastheadSize || 'large'
+  const mastheadSize = props.customFields.mastheadSize || 'large'
 
-  const borderBottomStyle = props.borderBottomStyle
-  const borderBottomWidth = props.borderBottomWidth
+  const borderBottomStyle = props.customFields.borderBottomStyle
+  const borderBottomWidth = props.customFields.borderBottomWidth
 
-  const weatherService = props.weatherService
+  const weatherService = props.customFields.weatherService
   // const weatherServiceUsable = weatherService.toLowerCase()
-  // const weatherDefaultLocation = props.weatherDefaultLocation
+  // const weatherDefaultLocation = props.customFields.weatherDefaultLocation
 
-  const secondaryImage = props.secondaryImage
-  const secondaryImageURL = props.secondaryImageURL
+  const secondaryImage = props.customFields.secondaryImage
+  const secondaryImageURL = props.customFields.secondaryImageURL
 
   const wrapperClasses = `mastnav ${sticky ? 'sticky' : 'free-float'} ${mastheadSize}`
 
@@ -52,7 +52,7 @@ const Masthead = (props) => {
     large: 200,
     medium: 150,
     small: 100
-  }[props.mastheadSize]
+  }[props.customFields.mastheadSize]
 
   return <div id={props.id} className={`masthead-row-wrapper${showDate ? ' min-height-158' : ''}${navOnTop ? ' lower-masthead' : ' upper-masthead'} ${mastheadSize}`}>
     <div className='masthead-wrapper pb-f-homepage-masthead'>
@@ -62,16 +62,16 @@ const Masthead = (props) => {
             <div className='home-masthead-image'>
 
               <div className='organization-logo'>
-                <a href={props.mastLogoUrl} className='logo' title={props.siteTitle}>
-                  {(props.mastLogo)
+                <a href={props.customFields.mastLogoUrl} className='logo' title={props.customFields.siteTitle}>
+                  {(props.customFields.mastLogo)
                     ? (
-                      (props.mastLogo.test(/.svg$/))
-                        ? <img className='wplogo' src={props.mastLogo} alt={props.siteTitle} height={logoSize} />
+                      (props.customFields.mastLogo.test(/.svg$/))
+                        ? <img className='wplogo' src={props.customFields.mastLogo} alt={props.customFields.siteTitle} height={logoSize} />
                         : <React.Fragment>
-                          <ImageFormat src={props.mastLogo} className='wplogo' alt={props.siteTitle} height={logoSize} />
+                          <ImageFormat src={props.customFields.mastLogo} className='wplogo' alt={props.customFields.siteTitle} height={logoSize} />
                         </React.Fragment>
                     )
-                    : <img className='orgLogo' src='/pb/resources/assets/img/thenews.png' alt={props.siteTitle} height={logoSize} />
+                    : <img className='orgLogo' src='/pb/resources/assets/img/thenews.png' alt={props.customFields.siteTitle} height={logoSize} />
                   }
                 </a>
               </div>
@@ -103,9 +103,9 @@ const Masthead = (props) => {
               {(includeWeather)
                 ? <React.Fragment>
                   {(weatherService === 'openweathermap')
-                    ? <div /> // <pb:fetch-content var='altContent' service={weatherServiceUsable}>{{latitude: props.weatherLatitude, longitude: props.weatherLongitude, units: props.degreeUnits}}</pb:fetch-content>
+                    ? <div /> // <pb:fetch-content var='altContent' service={weatherServiceUsable}>{{latitude: props.customFields.weatherLatitude, longitude: props.customFields.weatherLongitude, units: props.customFields.degreeUnits}}</pb:fetch-content>
                     : (weatherService === 'darksky')
-                      ? <div /> // <pb:fetch-content var='altContent' service={weatherServiceUsable}>{{latitudeAndLongitude: `${props.weatherLatitude},${custom.weatherLongitude}`, units:''}}</pb:fetch-content>
+                      ? <div /> // <pb:fetch-content var='altContent' service={weatherServiceUsable}>{{latitudeAndLongitude: `${props.customFields.weatherLatitude},${props.customFields.weatherLongitude}`, units:''}}</pb:fetch-content>
                       : null
                   }
                   <div className='weatherInfo'>
@@ -135,8 +135,8 @@ const Masthead = (props) => {
             </div>
 
             {(secondaryImage)
-              ? <a href={secondaryImageURL} className='logo secondary-logo' title={props.siteTitle} >
-                <ImageFormat src={secondaryImage} className='wplogo' alt={props.siteTitle} height='65' width='90' />
+              ? <a href={secondaryImageURL} className='logo secondary-logo' title={props.customFields.siteTitle} >
+                <ImageFormat src={secondaryImage} className='wplogo' alt={props.customFields.siteTitle} height='65' width='90' />
               </a>
               : null
             }

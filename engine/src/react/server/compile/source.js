@@ -32,12 +32,21 @@ function generateFile (rendering, useComponentLib) {
   function feature (config) {
     const componentName = getComponentName('features', config.featureConfig.id || config.featureConfig)
     if (componentName) {
+      const component = `Fusion.Components${componentName}`
       const contentConfig = config.contentConfig || {}
       const customFields = config.customFields || {}
+      const localEdits = config.localEdits || {}
 
-      const props = Object.assign({key: config.id, id: config.id, type: config.featureConfig.id || config.featureConfig}, customFields, contentConfig, {contentConfigValues: contentConfig.contentConfigValues})
+      const props = {
+        key: config.id,
+        id: config.id,
+        type: config.featureConfig,
+        customFields,
+        contentConfig,
+        localEdits
+      }
 
-      return `React.createElement(Fusion.Components${componentName}, ${JSON.stringify(props)})`
+      return `React.createElement(${component}, ${JSON.stringify(props)})`
     }
   }
 
@@ -46,11 +55,22 @@ function generateFile (rendering, useComponentLib) {
     const component = (componentName)
       ? `Fusion.Components${componentName}`
       : `'div'`
-    return `React.createElement(${component}, { key: '${config.id}', id: '${config.id}', type: '${config.chainConfig.id || config.chainConfig}' }, [${config.features.map(renderableItem).filter(ri => ri).join(',')}])`
+
+    const props = {
+      key: config.id,
+      id: config.id,
+      type: config.chainConfig
+    }
+
+    return `React.createElement(${component}, ${JSON.stringify(props)}, [${config.features.map(renderableItem).filter(ri => ri).join(',')}])`
   }
 
   function section (config, index) {
-    return `React.createElement('section', { key: ${index} }, [${config.renderableItems.map(renderableItem).filter(ri => ri).join(',')}])`
+    const component = `'section'`
+    const props = {
+      key: index
+    }
+    return `React.createElement(${component}, ${JSON.stringify(props)}, [${config.renderableItems.map(renderableItem).filter(ri => ri).join(',')}])`
   }
 
   // function template (config) {
@@ -59,11 +79,16 @@ function generateFile (rendering, useComponentLib) {
 
   function template (config) {
     const componentName = getComponentName('layouts', config.layout)
-    const componentRef = (componentName)
+    const component = (componentName)
       ? `Fusion.Components${componentName}`
       : `'div'`
 
-    return `React.createElement(${componentRef}, {key: '${config.id || config._id}', id: '${config.id || config._id}'}, [${config.layoutItems.map(renderableItem).join(',')}])`
+    const props = {
+      key: config.id || config._id,
+      id: config.id || config._id
+    }
+
+    return `React.createElement(${component}, ${JSON.stringify(props)}, [${config.layoutItems.map(renderableItem).join(',')}])`
   }
 
   // function layout (item, config) {

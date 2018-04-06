@@ -28,7 +28,7 @@ class LiveBar extends React.Component {
 
   render () {
     return <div className={this.props.type} id={this.props.id}>
-      {this.props.headline}
+      {this.props.customFields.headline}
       <p>
         {this.state && this.state.mlb && this.state.mlb.headlines.basic}
         <br />

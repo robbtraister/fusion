@@ -19,13 +19,13 @@ const Dfp = (props) => {
   const dfpPageType = 'dfpPageType'
   // End Metas
 
-  const borderBottomStyle = props.borderBottomStyle
-  const mobile = props.mobileDisplay
-  const desktop = props.desktopDisplay
-  const positionName = props.positionName
-  const dfpCode = props.dfp
+  const borderBottomStyle = props.customFields.borderBottomStyle
+  const mobile = props.customFields.mobileDisplay
+  const desktop = props.customFields.desktopDisplay
+  const positionName = props.customFields.positionName
+  const dfpCode = props.customFields.dfp
 
-  const slotTypeArray = (props.dimensions || '').split('-')
+  const slotTypeArray = (props.customFields.dimensions || '').split('-')
   const dimensions = slotTypeArray[0]
   const slotType = slotTypeArray[1] || null
 
@@ -48,7 +48,7 @@ const Dfp = (props) => {
         ? [[800, 600], [300, 416]]
         : [width, height]
 
-  const showAds = props.no_ads !== 'true'
+  const showAds = props.customFields.no_ads !== 'true'
 
   const rand = Math.round(Math.random() * 200)
   const debugSlotName = parsedSlotName || rand

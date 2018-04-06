@@ -20,7 +20,7 @@ const getContentGenerator = function getContentGenerator (contentCache) {
       const keyCache = sourceCache[keyString] = sourceCache[keyString] || {
         cached: undefined,
         filtered: undefined,
-        promise: sourcePromise
+        fetched: sourcePromise
           .then(source => {
             keyCache.source = source
             return source.fetch(key)
@@ -31,7 +31,7 @@ const getContentGenerator = function getContentGenerator (contentCache) {
         source: undefined
       }
 
-      keyCache.promise = keyCache.promise
+      keyCache.fetched = keyCache.fetched
         .then(data => (query && keyCache.source && keyCache.source.schemaName)
           ? keyCache.source.filter(query, data)
           : data
@@ -43,7 +43,7 @@ const getContentGenerator = function getContentGenerator (contentCache) {
 
       // Server-side, we never need to worry about the Promise or async content
       // we will re-render using the cached content if necessary
-      return keyCache // || keyCache.promise
+      return keyCache // || keyCache.fetched
     }
 
     return (args.length === 0)

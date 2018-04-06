@@ -24,14 +24,14 @@ const query = `
 `
 
 const StoryItem = (props) => {
-  const promoItems = props.promo_items && props.promo_items.basic
+  const promoItems = props.story.promo_items && props.story.promo_items.basic
   return <React.Fragment>
     {
       (promoItems && promoItems.url && promoItems.type === 'image') &&
         <img src={promoItems.url} />
     }
-    <div>{props.headlines && props.headlines.basic}</div>
-    <div className={`blurb ${props.blurbStyle || ''}`} data-pb-field='description.basic' data-pb-field-type='text' data-pb-placeholder='Write blurb here.'>{(props.subheadlines && props.subheadlines.basic) || (props.description && props.description.basic)}</div>
+    <div>{props.story.headlines && props.story.headlines.basic}</div>
+    <div className={`blurb ${props.story.blurbStyle || ''}`} data-pb-field='description.basic' data-pb-field-type='text' data-pb-placeholder='Write blurb here.'>{(props.story.subheadlines && props.story.subheadlines.basic) || (props.story.description && props.story.description.basic)}</div>
   </React.Fragment>
 }
 
@@ -40,9 +40,9 @@ class Story extends React.Component {
   constructor (props, context) {
     super(props, context)
 
-    if (props.contentService && props.contentConfigValues) {
+    if (props.contentConfig && props.contentConfig.contentService && props.contentConfig.contentConfigValues) {
       this.setContent({
-        story: this.getContent(props.contentService, props.contentConfigValues, query)
+        story: this.getContent(props.contentConfig.contentService, props.contentConfig.contentConfigValues, query)
       })
     } else {
       this.state = {story: null}
@@ -51,7 +51,7 @@ class Story extends React.Component {
 
   render () {
     return (this.state && this.state.story)
-      ? <StoryItem {...this.state.story} {...this.props} />
+      ? <StoryItem story={this.state.story} {...this.props} />
       : null
   }
 }

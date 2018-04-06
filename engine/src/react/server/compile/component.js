@@ -30,10 +30,18 @@ const renderAll = function renderAll (renderableItems) {
 const feature = function feature (config) {
   const contentConfig = config.contentConfig || {}
   const customFields = config.customFields || {}
+  const localEdits = config.localEdits || {}
 
   try {
     const component = TimedComponent(require(`${componentRoot}/features/${config.featureConfig}.jsx`))
-    const props = Object.assign({key: config.id, id: config.id, type: config.featureConfig}, customFields, contentConfig, {contentConfigValues: contentConfig.contentConfigValues})
+    const props = {
+      key: config.id,
+      id: config.id,
+      type: config.featureConfig,
+      customFields,
+      contentConfig,
+      localEdits
+    }
 
     return () => React.createElement(
       component,
@@ -56,7 +64,11 @@ const chain = function chain (config) {
 
   return () => React.createElement(
     component,
-    {key: config.id, id: config.id, type: config.chainConfig},
+    {
+      key: config.id,
+      id: config.id,
+      type: config.chainConfig
+    },
     renderAll(config.features)
   )
 }
@@ -64,7 +76,9 @@ const chain = function chain (config) {
 const section = function section (config, index) {
   return () => React.createElement(
     'section',
-    {key: index},
+    {
+      key: index
+    },
     renderAll(config.renderableItems)
   )
 }

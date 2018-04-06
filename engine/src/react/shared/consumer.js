@@ -6,6 +6,29 @@ const React = require('react')
 
 const isClient = typeof window !== 'undefined'
 
+function assign (target, keys, value) {
+  const k = keys.shift()
+  if (keys.length > 0) {
+    target[k] = target[k] || {}
+    assign(target[k], keys, value)
+  } else {
+    target[k] = value
+  }
+  return target
+}
+
+function merge (base, ...args) {
+  const result = Object.assign({}, base)
+  args
+    .filter((edits) => edits)
+    .forEach((edits) => {
+      Object.keys(edits).forEach((key) => {
+        assign(result, key.split(/[.．]/g), edits[key])
+      })
+    })
+  return result
+}
+
 function HOC (Component) {
   const createElement = (Comp, props, context) => {
     const combinedProps = Object.assign({}, props, context)
@@ -21,10 +44,44 @@ function HOC (Component) {
     ? (props) => (context) => {
       class ComponentConsumer extends Component {
         getContent (...args) {
-          return context.getContent(...args)
+          const localEdits = Object.assign({}, this.props.localEdits || {})
+          const localEditItems = localEdits.items || {}
+          delete localEdits.items
+
+          const appendLocalEdits = (content) => {
+            return merge(
+              content,
+              localEdits,
+              localEditItems[(content && (content.id || content._id)) || null]
+            )
+          }
+
+          const content = context.getContent(...args)
+
+          return {
+            cached: appendLocalEdits(content.cached),
+            fetched: content.fetched
+              .then(appendLocalEdits)
+          }
         }
-        setContent (...args) {
-          Consumer.prototype.setContent.call(this, ...args)
+
+        setContent (contents) {
+          this.state = this.state || {}
+          Object.keys(contents).forEach(key => {
+            const content = contents[key]
+            if (isClient) {
+              if (Fusion.refreshContent || content.cached === undefined) {
+                // this case is only necessary on the client
+                // on the server, we will wait for the content to hydrate and manually re-render
+                content.fetched.then(data => { this.setState({[key]: data}) })
+              }
+            }
+
+            // this case is only possible if content was fetched server-side
+            // content can only be fetched server-side if requested prior to mounting (.e.g, constructor or componentWillMount)
+            // prior to mounting, we should set state directly, not using the `setState` method
+            this.state[key] = content.cached
+          })
         }
       }
 
@@ -49,38 +106,6 @@ function Consumer (propsOrComponent) {
     }
     return HOC(propsOrComponent)
   }
-}
-
-// Configure Consumer as an extension of React.Component
-Consumer.prototype = Object.create(React.Component.prototype)
-Consumer.prototype.constructor = Consumer
-Consumer.parent = React.Component.prototype
-
-// TODO: this does not work; don't use it
-Consumer.prototype.getContent = function () {
-  return {
-    cached: null,
-    fetched: Promise.resolve()
-  }
-}
-
-Consumer.prototype.setContent = function (contents) {
-  this.state = this.state || {}
-  Object.keys(contents).forEach(key => {
-    const content = contents[key]
-    if (isClient) {
-      if (Fusion.refreshContent || content.cached === undefined) {
-        // this case is only necessary on the client
-        // on the server, we will wait for the content to hydrate and manually re-render
-        content.fetched.then(data => { this.setState({[key]: data}) })
-      }
-    }
-
-    // this case is only possible if content was fetched server-side
-    // content can only be fetched server-side if requested prior to mounting (.e.g, constructor or componentWillMount)
-    // prior to mounting, we should set state directly, not using the `setState` method
-    this.state[key] = content.cached
-  })
 }
 
 module.exports = Consumer

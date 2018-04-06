@@ -108,7 +108,7 @@ const render = function render ({Component, requestUri, content}) {
       const contentCache = Component.contentCache || {}
       const contentPromises = [].concat(...Object.keys(contentCache).map(source => {
         const sourceCache = contentCache[source]
-        return Object.keys(sourceCache).map(key => sourceCache[key].promise)
+        return Object.keys(sourceCache).map(key => sourceCache[key].fetched)
       }))
 
       return contentPromises.length === 0

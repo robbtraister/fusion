@@ -3,31 +3,31 @@
 const React = require('react')
 
 const BreakingAlertV2 = (props) => {
-  const parentPage = (props.autoLink || '').split(',')[1]
-  const parentFeatureName = (props.autoLink || '').split(',')[0]
+  const parentPage = (props.customFields.autoLink || '').split(',')[1]
+  const parentFeatureName = (props.customFields.autoLink || '').split(',')[0]
 
   const validFeature = parentPage !== 'no-value' && parentFeatureName !== 'no-value'
   const linkEditableAttributes = {
-    'data-pb-url-field': props.barLink
+    'data-pb-url-field': props.customFields.barLink
   }
   const contentEditableAttributes = {
-    'data-pb-field': props.barText,
+    'data-pb-field': props.customFields.barText,
     'data-pb-placeholder': 'Default Title',
     'data-pb-field-type': 'text'
   }
 
   return <div id='event-alert' className={`bar-wrapper ${props.isAdmin ? '' : 'hidden'}`}
     data-href={`/pb/api/v2/render/feature?name=${parentFeatureName}&uri=${parentPage}`}
-    data-has-news={!!props.barText}
+    data-has-news={!!props.customFields.barText}
     data-reload={validFeature && !props.isAdmin}
-    style={{backgroundColor: props.backgroundColor, color: props.textColor}}
+    style={{backgroundColor: props.customFields.backgroundColor, color: props.customFields.textColor}}
   >
     <div className='render-wrapper rendered-alert'>
       <div className='bar-text'>
-        {(props.isAdmin || props.barText) &&
-          (props.barLink
-            ? <a className='event-item' href={props.barLink} {...linkEditableAttributes} {...contentEditableAttributes}>{props.barText}</a>
-            : <div className='event-item' {...contentEditableAttributes}>{props.barText}</div>
+        {(props.isAdmin || props.customFields.barText) &&
+          (props.customFields.barLink
+            ? <a className='event-item' href={props.barLink} {...linkEditableAttributes} {...contentEditableAttributes}>{props.customFields.barText}</a>
+            : <div className='event-item' {...contentEditableAttributes}>{props.customFields.barText}</div>
           )
         }
       </div>

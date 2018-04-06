@@ -6,6 +6,8 @@ const { graphql } = require('graphql')
 
 const getSchema = require('./schemas')
 
+const KEEP_FIELDS = ['id', '_id']
+
 const filter = function filter (schemaName, ...args) {
   const schema = schemaName
     ? getSchema(schemaName)
@@ -19,6 +21,13 @@ const filter = function filter (schemaName, ...args) {
             if (result.errors) {
               throw result.errors[0]
             }
+
+            KEEP_FIELDS.forEach((field) => {
+              if (data[field]) {
+                result.data[field] = data[field]
+              }
+            })
+
             return result.data
           })
         : Promise.resolve(data)

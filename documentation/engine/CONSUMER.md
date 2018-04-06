@@ -6,9 +6,9 @@ If you want to know more about React context: [https://reactjs.org/docs/context.
 
 ## Consumer
 
-The first thing that you need to do is designate your component as a consumer of the data you need. There is a single consumer wrapper that includes all of the globally provided data and can be accessed simply by requiring in `consumer`. It can be used as either a base class or an HOC, as follows:
+The first thing that you need to do is designate your component as a consumer of the data you need. There is a single consumer wrapper that includes all of the globally provided data and can be accessed simply by requiring in `consumer`. It should be used as a higher-order component (HOC), as follows:
 
--   HOC:
+-   Functional Component:
 
 ```jsx
 const React = require('react')
@@ -19,22 +19,7 @@ const MyComponent = (props) => <div>{props.globalContent.version}</div>
 module.exports = Consumer(MyComponent)
 ```
 
--   Base class:
-
-```jsx
-const React = require('react')
-const Consumer = require('consumer')
-
-class MyComponent extends Consumer {
-  render () {
-    return <div>{this.props.globalContent.version}</div>
-  }
-}
-
-module.exports = MyComponent
-```
-
--   Or you can even mix-and-match:
+-   Or with a React class component:
 
 ```jsx
 const React = require('react')
@@ -49,7 +34,23 @@ class MyComponent extends React.Component {
 module.exports = Consumer(MyComponent)
 ```
 
-Once you have designated (annotated, but not necessarily using official javascript annotations?) your component as a consumer, it will have access to the following properties and, if a class, instance methods. Instance methods are only available for class components and will be accessed directly on `this` (e.g., `this.getContent()`)
+-   Or with an annotation:
+
+```jsx
+const React = require('react')
+const Consumer = require('consumer')
+
+@Consumer
+class MyComponent extends React.Component {
+  render () {
+    return <div>{this.props.globalContent.version}</div>
+  }
+}
+
+module.exports = MyComponent
+```
+
+Once you have annotated your component as a consumer, it will have access to the following properties and, if a class, instance methods. Instance methods are only available for class components and will be accessed directly on `this` (e.g., `this.getContent()`)
 
 ### Properties
 
@@ -76,19 +77,21 @@ The optional third input parameter, `query`, is a GraphQL query that will be app
 If you are using this for server-rendered content, you should make sure to fetch the content from within the constructor (or componentWillMount, which is also executed during server-side-rendering), as well as set state using the return value.
 
 ```jsx
-class MyComponent extends Consumer {
-  constructor (props, context) {
-    super(props, context)
+const MyComponent = Consumer(
+  class extends React.Component {
+    constructor (props) {
+      super(props)
 
-    const {cached, promise} = this.getContent('content-api', {uri: '/some/data'}, '{type version}')
-    this.state = cached || {}
-    promise.then(data => this.setState(data))
-  }
+      const {cached, promise} = this.getContent('content-api', {uri: '/some/data'}, '{type version}')
+      this.state = cached || {}
+      promise.then(data => this.setState(data))
+    }
 
-  render () {
-    return <div>{this.state && this.state.content && this.state.content.type}</div>
+    render () {
+      return <div>{this.state && this.state.content && this.state.content.type}</div>
+    }
   }
-}
+)
 ```
 
 If you are fetching content asynchronously from the client only, you should either make the call from `componentDidMount` (which is not called during server-side-rendering), or wrap it in a `window` check.
@@ -96,7 +99,8 @@ If you are fetching content asynchronously from the client only, you should eith
 Also, if using only asynchronous client-side fetching, there is no need to set `this.state` on initial call as the client-side cache will not be pre-populated with any server-rendered data. In this case, you can just access the promise directly.
 
 ```jsx
-class MyComponent extends Consumer {
+@Consumer
+class MyComponent extends React.Component {
   componentDidMount () {
     this.getContent('content-api', {uri: '/some/data'}, '{type version}')
       .promise
@@ -112,9 +116,10 @@ class MyComponent extends Consumer {
 or
 
 ```jsx
-class MyComponent extends Consumer {
-  constructor (props, context) {
-    super(props, context)
+@Consumer
+class MyComponent extends React.Component {
+  constructor (props) {
+    super(props)
 
     if (typeof window !== 'undefined') {
       this.getContent('content-api', {uri: '/some/data'}, '{type version}')
@@ -132,9 +137,10 @@ class MyComponent extends Consumer {
 You can fetch multiple pieces of content by making multiple calls to getContent.
 
 ```jsx
-class MyComponent extends Consumer {
-  constructor (props, context) {
-    super(props, context)
+@Consumer
+class MyComponent extends React.Component {
+  constructor (props) {
+    super(props)
 
     const content1 = this.getContent('content-api', {uri: '/some/data'}, '{type version}')
     content1.promise.then(content1 => this.setState({content1}))
@@ -159,9 +165,10 @@ class MyComponent extends Consumer {
 The `setContent` method is syntactic sugar for setting both the cached data to the initial state property and calling setState on the resolved Promise. It is used as follows:
 
 ```jsx
-class MyComponent extends Consumer {
-  constructor (props, context) {
-    super(props, context)
+@Consumer
+class MyComponent extends React.Component {
+  constructor (props) {
+    super(props)
 
     this.setContent({
       content1: this.getContent('content-api', {uri: '/some/data'}, '{type version}'),

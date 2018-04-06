@@ -35,6 +35,7 @@ const StoryItem = (props) => {
   </React.Fragment>
 }
 
+@Consumer
 class Story extends React.Component {
   constructor (props, context) {
     super(props, context)
@@ -55,4 +56,4 @@ class Story extends React.Component {
   }
 }
 
-module.exports = Consumer(Story)
+module.exports = Story

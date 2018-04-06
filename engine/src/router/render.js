@@ -18,7 +18,7 @@ const {
   getPageHead,
   getRendering,
   getTemplateHead
-} = require('../renderings')
+} = require('../models/renderings')
 
 const renderRouter = express.Router()
 

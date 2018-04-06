@@ -12,7 +12,7 @@ const getContentGenerator = function getContentGenerator (contentCache) {
 
   return function getContent (sourceName, ...args) {
     const sourceCache = contentCache[sourceName] = contentCache[sourceName] || {}
-    const source = getSource(sourceName)
+    const sourcePromise = getSource(sourceName)
 
     const getSourceContent = (key, query) => {
       // alphabetize object keys to ensure proper cacheing
@@ -20,15 +20,20 @@ const getContentGenerator = function getContentGenerator (contentCache) {
       const keyCache = sourceCache[keyString] = sourceCache[keyString] || {
         cached: undefined,
         filtered: undefined,
-        promise: source.fetch(key)
+        promise: sourcePromise
+          .then(source => {
+            keyCache.source = source
+            return source.fetch(key)
+          })
           .then(data => { keyCache.cached = data })
           .catch(() => { keyCache.cached = null })
-          .then(() => keyCache.cached)
+          .then(() => keyCache.cached),
+        source: undefined
       }
 
       keyCache.promise = keyCache.promise
-        .then(data => (query && source && source.schemaName)
-          ? source.filter(query, data)
+        .then(data => (query && keyCache.source && keyCache.source.schemaName)
+          ? keyCache.source.filter(query, data)
           : data
         )
         .then(filtered => {

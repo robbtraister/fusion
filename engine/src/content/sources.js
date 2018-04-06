@@ -59,7 +59,7 @@ const getSource = function getSource (sourceName) {
       throw err
     }
   }
-  return sourceCache[sourceName]
+  return Promise.resolve(sourceCache[sourceName])
 }
 
 module.exports = getSource

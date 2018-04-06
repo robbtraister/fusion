@@ -14,7 +14,7 @@ const {
   getPageByName,
   getRendering,
   getTemplateByName
-} = require('../renderings')
+} = require('../models/renderings')
 
 const {
   compile,

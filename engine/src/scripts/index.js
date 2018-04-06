@@ -7,7 +7,7 @@ const pack = require('../react/server/compile/pack')
 
 const {
   findRenderableItem
-} = require('../renderings')
+} = require('../models/renderings')
 
 const s3 = new S3({region: 'us-east-1'})
 

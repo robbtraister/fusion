@@ -9,7 +9,6 @@ const ReactDOM = require('react-dom/server')
 
 const compile = require('./compile/component')
 const Provider = require('./provider')
-const OutputType = require('../../../dist/components/output-types/react.jsx')
 
 const timer = require('../../timer')
 
@@ -143,11 +142,21 @@ const compileRenderable = function compileRenderable (rendering) {
     })
 }
 
-const compileOutputType = function compileOutputType (rendering, pt) {
+const compileOutputType = function compileOutputType (rendering, pt, outputType) {
   let tic
   return compileRenderable(rendering)
     .then((Template) => {
       tic = timer.tic()
+
+      const OutputType = (() => {
+        try {
+          return require(`../../../dist/components/output-types/${outputType || 'react'}.jsx`)
+        } catch (e) {
+          const err = new Error(`Could not find output-type: ${outputType}`)
+          err.statusCode = 400
+          throw err
+        }
+      })()
 
       const Component = (props) => {
         return React.createElement(

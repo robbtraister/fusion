@@ -61,7 +61,7 @@ function generateFile (rendering, useComponentLib) {
     const componentName = getComponentName('layouts', config.layout)
     const componentRef = (componentName)
       ? `Fusion.Components${componentName}`
-      : 'div'
+      : `'div'`
 
     return `React.createElement(${componentRef}, {key: '${config.id || config._id}', id: '${config.id || config._id}'}, [${config.layoutItems.map(renderableItem).join(',')}])`
   }

@@ -37,15 +37,19 @@ function getTypeRouter (fetch) {
         req.body
       )
 
+      const outputType = /^(false|none|off|0)$/i.test(req.query.outputType)
+        ? null
+        : req.query.outputType || undefined
+
       fetch(payload.id)
         .then(({pt, rendering}) => {
           const renderable = (payload.child)
             ? findRenderableItem(rendering)(payload.child)
             : rendering
 
-          return (payload.child)
+          return (payload.child || outputType === null)
             ? compileRenderable(renderable)
-            : compileOutputType(renderable, pt)
+            : compileOutputType(renderable, pt, outputType)
         })
         .then(Component => render(Object.assign({}, payload, {Component})))
         .then(data => { res.send(data) })

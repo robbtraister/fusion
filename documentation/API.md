@@ -14,9 +14,9 @@ Fetch a specific piece of content, using the content source and key specified. O
 
 ## Rendering
 
--   `/render/(page|rendering|template)/:id[/:child-id]`
+-   `/render/(page|rendering|template)/:id[/:child-id][?outputType=:outputType]`
 
-Render the specified page/rendering/template/chain/feature by id as HTML. If generating a page/rendering/template, the result will be wrapped in the appropriate output-type and is suitable as a complete webpage. If generating a chain/feature, the containing page/rendering/template must be specified, and the resultant HTML will be only the chain/feature requested, with no other wrapping.
+Render the specified page/rendering/template/chain/feature by id as HTML. If generating a page/rendering/template, the result will be wrapped in the appropriate output-type (either as specified, or the default) and is suitable as a complete webpage. If generating a chain/feature, the containing page/rendering/template must be specified, and the resultant HTML will be only the chain/feature requested, with no output-type wrapping. A page/rendering/template may be rendered without an output-type wrapping by specifying `outputType=false`.
 
 To render with global content, use a POST request where the body of the request contains a JSON object with top-level `content` property.
 
@@ -40,7 +40,7 @@ Scripts are read significantly more frequently than they are written, so they wi
 
 This is the primary client-side library that is shared and used for all pages/templates. It is specific to a fusion release, and can be cached very aggressively.
 
--   `/scripts/(page|template)/:name`
+-   `/scripts/(page|template)/:name[?useComponentLib=true]`
 -   `/scripts/rendering/:id`
 
 This returns the javascript function that is used by the fusion engine to generate a rendering. It is used by the client-side browser to update the template, if necessary, as well as hydrate script functionality in the browser.

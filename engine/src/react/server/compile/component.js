@@ -36,8 +36,8 @@ const feature = function feature (config) {
       key: config.id,
       id: config.id,
       type: config.featureConfig,
-      customFields: config.contentConfig || {},
-      contentConfig: config.customFields || {}
+      contentConfig: config.contentConfig || {},
+      customFields: config.customFields || {}
     }
 
     // we only need local edits for content consumers, which must be stateful

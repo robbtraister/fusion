@@ -1,5 +1,17 @@
 version: "2"
 services:
+  data:
+    build:
+      context: ./data
+    image: quay.io/washpost/mongo-localhost
+    ports:
+      - "27017:27017"
+    environment:
+      WATCH: "true"
+    volumes:
+      - "fusion-data-volume:/data/db:rw"
+      - "./data/restore:/data/restore:rw"
+
   fusion:
     image: quay.io/washpost/fusion-localhost
     ports:
@@ -8,11 +20,13 @@ services:
       # 8082 is the rendering engine
       # 8083 is the resolver
       - "8080-8083:8080-8083"
+    links:
+      - "data"
     environment:
       NODE_ENV: development
       HTTP_ENGINE: http://0.0.0.0:8082
       HTTP_RESOLVER: http://0.0.0.0:8083
-      MONGO_URL:
+      MONGO_URL: mongodb://data:27017/fusion
       CONTENT_BASE:
       LAMBDA_ENGINE:
       LAMBDA_RESOLVER:
@@ -21,3 +35,6 @@ services:
       - '~/.aws:/home/nginx/.aws:ro'
       - '${BUNDLE_DIR}:/workdir/engine/bundle:ro'
       - '${RESOLVER_DIR}:/workdir/resolver/config:ro'
+
+volumes:
+  fusion-data-volume: {}

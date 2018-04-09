@@ -29,7 +29,7 @@ const Dfp = (props) => {
   const dimensions = slotTypeArray[0]
   const slotType = slotTypeArray[1] || null
 
-  const globalDfpSection = null // context.globalContent.taxonomy.sites[0].additional_properties.original.DFP.dfp_path
+  const globalDfpSection = null // props.globalContent.taxonomy.sites[0].additional_properties.original.DFP.dfp_path
 
   const dfpSection = globalDfpSection || dfpMetaPath
 

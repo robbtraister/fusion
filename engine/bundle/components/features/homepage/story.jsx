@@ -37,8 +37,8 @@ const StoryItem = (props) => {
 
 @Consumer
 class Story extends React.Component {
-  constructor (props, context) {
-    super(props, context)
+  constructor (props) {
+    super(props)
 
     if (props.contentConfig && props.contentConfig.contentService && props.contentConfig.contentConfigValues) {
       this.setContent({

@@ -28,23 +28,25 @@ const renderAll = function renderAll (renderableItems) {
 }
 
 const feature = function feature (config) {
-  const contentConfig = config.contentConfig || {}
-  const customFields = config.customFields || {}
-  const localEdits = config.localEdits || {}
-
   try {
-    const component = TimedComponent(require(`${componentRoot}/features/${config.featureConfig}.jsx`))
+    const Feature = require(`${componentRoot}/features/${config.featureConfig}.jsx`)
+    const Component = TimedComponent(Feature)
+
     const props = {
       key: config.id,
       id: config.id,
       type: config.featureConfig,
-      customFields,
-      contentConfig,
-      localEdits
+      customFields: config.contentConfig || {},
+      contentConfig: config.customFields || {}
+    }
+
+    // we only need local edits for content consumers, which must be stateful
+    if (Feature instanceof React.Component) {
+      props.localEdits = config.localEdits || {}
     }
 
     return () => React.createElement(
-      component,
+      Component,
       props
     )
   } catch (e) {
@@ -54,7 +56,7 @@ const feature = function feature (config) {
 }
 
 const chain = function chain (config) {
-  const component = (() => {
+  const Component = (() => {
     try {
       return TimedComponent(require(`${componentRoot}/chains/${config.chainConfig}.jsx`))
     } catch (e) {
@@ -63,7 +65,7 @@ const chain = function chain (config) {
   })()
 
   return () => React.createElement(
-    component,
+    Component,
     {
       key: config.id,
       id: config.id,
@@ -84,7 +86,7 @@ const section = function section (config, index) {
 }
 
 const template = function template (rendering) {
-  const component = (() => {
+  const Component = (() => {
     try {
       return require(`${componentRoot}/layouts/${rendering.layout}.jsx`)
     } catch (e) {
@@ -95,7 +97,7 @@ const template = function template (rendering) {
   const children = renderAll(rendering.layoutItems)
 
   return () => React.createElement(
-    component,
+    Component,
     {
       key: rendering.id,
       id: rendering.id
@@ -105,7 +107,7 @@ const template = function template (rendering) {
 }
 
 const renderableItem = function renderableItem (config, index) {
-  const component = (config.featureConfig)
+  const Component = (config.featureConfig)
     ? feature(config)
     : (config.chainConfig)
       ? chain(config)
@@ -114,7 +116,7 @@ const renderableItem = function renderableItem (config, index) {
         : (config.layoutItems)
           ? template(config)
           : null
-  return component || (() => null)
+  return Component || (() => null)
 }
 
 module.exports = renderableItem

@@ -64,7 +64,7 @@ const getDbSource = function getDbSource (sourceName) {
     .then((config) => {
       return {
         resolve (key) {
-          const path = config.pattern.replace(/\{[^}]+\}/, (match, prop) => key[prop] || match)
+          const path = config.pattern.replace(/\{([^}]+)\}/g, (match, prop) => key[prop] || match)
 
           const query = config.params
             .map((param) => {

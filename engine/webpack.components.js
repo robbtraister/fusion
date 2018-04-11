@@ -1,19 +1,17 @@
 'use strict'
 
 const fs = require('fs')
-const path = require('path')
 const glob = require('glob')
 
 const sharedConfigs = require('./webpack-jsx-configs')
 
-const bundleRoot = process.env.BUNDLE_ROOT || `${__dirname}/bundle`
-const componentDir = path.resolve(`${bundleRoot}/components`)
+const { componentSrcRoot } = require('./src/environment')
 
 const entry = {}
 const types = {}
-glob.sync(`${componentDir}/**/*.{hbs,js,jsx,vue}`)
+glob.sync(`${componentSrcRoot}/**/*.{hbs,js,jsx,vue}`)
   .forEach(f => {
-    const name = f.substr(componentDir.length + 1)
+    const name = f.substr(componentSrcRoot.length + 1)
     const type = name.split('/')[0]
     types[type] = true
     entry[name] = f

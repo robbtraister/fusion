@@ -4,6 +4,8 @@ const url = require('url')
 
 const debugTimer = require('debug')('fusion:timer:renderings:schemaless')
 
+const { mongoUrl } = require('../environment')
+
 const timer = require('../timer')
 
 const MongoClient = require('mongodb').MongoClient
@@ -163,4 +165,4 @@ function Mongo (mongoUrl) {
   }
 }
 
-module.exports = Mongo(process.env.MONGO_URL).getModel
+module.exports = Mongo(mongoUrl).getModel

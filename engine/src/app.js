@@ -2,6 +2,8 @@
 
 const express = require('express')
 
+const { isDev } = require('./environment')
+
 const app = express()
 
 app.disable('x-powered-by')
@@ -9,7 +11,7 @@ app.disable('x-powered-by')
 app.use(require('./router'))
 
 app.use(
-  /^dev/i.test(process.env.NODE_ENV)
+  (isDev)
     ? (err, req, res, next) => {
       console.error(err)
       res.status(err.statusCode || 500).send(err.message || err)

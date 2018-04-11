@@ -4,6 +4,7 @@ const mongoose = require('mongoose')
 
 const debugTimer = require('debug')('fusion:timer:renderings:schemaless')
 
+const { mongoUrl } = require('../environment')
 const timer = require('../timer')
 
 const schema = new mongoose.Schema({_id: String})
@@ -100,4 +101,4 @@ function Mongoose (mongoUrl) {
   }
 }
 
-module.exports = Mongoose(process.env.MONGO_URL).getModel
+module.exports = Mongoose(mongoUrl).getModel

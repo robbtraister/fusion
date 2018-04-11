@@ -1,12 +1,11 @@
 'use strict'
 
 const fs = require('fs')
-const path = require('path')
 
-const componentRoot = path.resolve(process.env.COMPONENT_ROOT || `${__dirname}/../../../../bundle/components`)
+const { componentSrcRoot } = require('../../../environment')
 
 function getComponentFile (type, id) {
-  return `${componentRoot}/${type}/${id}.jsx`
+  return `${componentSrcRoot}/${type}/${id}.jsx`
 }
 
 function componentImport (fp, name) {

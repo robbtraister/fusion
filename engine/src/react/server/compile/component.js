@@ -1,14 +1,11 @@
 'use strict'
 
-const path = require('path')
-
 const debugTimer = require('debug')('fusion:timer:react:component')
 
 const React = require('react')
 
+const { componentDistRoot } = require('../../../environment')
 const timer = require('../../../timer')
-
-const componentRoot = path.resolve(process.env.COMPONENT_ROOT || `${__dirname}/../../../../dist/components`)
 
 const TimedComponent = (Component) => (props) => {
   const tic = timer.tic()
@@ -29,7 +26,7 @@ const renderAll = function renderAll (renderableItems) {
 
 const feature = function feature (config) {
   try {
-    const Feature = require(`${componentRoot}/features/${config.featureConfig}.jsx`)
+    const Feature = require(`${componentDistRoot}/features/${config.featureConfig}.jsx`)
     const Component = TimedComponent(Feature)
 
     const props = {
@@ -58,7 +55,7 @@ const feature = function feature (config) {
 const chain = function chain (config) {
   const Component = (() => {
     try {
-      return TimedComponent(require(`${componentRoot}/chains/${config.chainConfig}.jsx`))
+      return TimedComponent(require(`${componentDistRoot}/chains/${config.chainConfig}.jsx`))
     } catch (e) {
       return 'div'
     }
@@ -88,7 +85,7 @@ const section = function section (config, index) {
 const template = function template (rendering) {
   const Component = (() => {
     try {
-      return require(`${componentRoot}/layouts/${rendering.layout}.jsx`)
+      return require(`${componentDistRoot}/layouts/${rendering.layout}.jsx`)
     } catch (e) {
       return 'div'
     }

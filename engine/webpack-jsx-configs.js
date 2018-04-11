@@ -5,6 +5,8 @@ const path = require('path')
 const ManifestPlugin = require('webpack-manifest-plugin')
 const UglifyWebpackPlugin = require('uglifyjs-webpack-plugin')
 
+const { isDev } = require('./src/environment')
+
 const VENDOR_PACKAGES = ['react']
 
 function externals (context, request, callback) {
@@ -22,7 +24,7 @@ try {
   }
 } catch (e) {}
 
-const optimization = (/^dev/.test(process.env.NODE_ENV))
+const optimization = (isDev)
   ? {}
   : {
     minimizer: [new UglifyWebpackPlugin({
@@ -35,7 +37,7 @@ module.exports = (entry) =>
     ? {
       entry,
       externals,
-      mode: /^dev/i.test(process.env.NODE_ENV) ? 'development' : 'production',
+      mode: (isDev) ? 'development' : 'production',
       module: {
         rules: [
           {

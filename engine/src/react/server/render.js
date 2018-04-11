@@ -18,8 +18,10 @@ const {
   getVersion
 } = require('../../scripts')
 
-const CONTEXT = (process.env.CONTEXT || 'pb').replace(/^\/*/, '/')
-const ON_DEMAND = process.env.ON_DEMAND === 'true'
+const {
+  context,
+  onDemand
+} = require('../../environment')
 
 // this wrapper allows a function to be used in JSX without parentheses
 // use `{props.scripts}` to execute the function with the defaults
@@ -74,8 +76,8 @@ function getFusionScript (globalContent, contentCache, refreshContent) {
     })
 
   return `window.Fusion=window.Fusion||{};` +
-    `Fusion.prefix='${CONTEXT}';` +
-    `Fusion.refreshContent=${ON_DEMAND ? 'false' : !!refreshContent};` +
+    `Fusion.prefix='${context}';` +
+    `Fusion.refreshContent=${onDemand ? 'false' : !!refreshContent};` +
     `Fusion.globalContent=${JSON.stringify(globalContent || {})};` +
     `Fusion.contentCache=${JSON.stringify(condensedCache)}`
 }

@@ -1,14 +1,15 @@
 'use strict'
 
-const path = require('path')
 const url = require('url')
 
 const request = require('request-promise-native')
 
 const debugFetch = require('debug')('fusion:content:sources:fetch')
 
-const contentBase = process.env.CONTENT_BASE || ''
-const sourcesRoot = path.resolve(process.env.SOURCES_ROOT || `${__dirname}/../../bundle/content/sources`)
+const {
+  contentBase,
+  sourcesRoot
+} = require('../environment')
 
 const getSchemaFilter = require('./filter')
 

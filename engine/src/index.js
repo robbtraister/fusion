@@ -1,9 +1,10 @@
 'use strict'
 
+const { port } = require('./environment')
+
 const app = require('./app')
 
 if (module === require.main) {
-  const port = process.env.PORT || 8080
   app.listen(port, (err) => {
     err ? console.error(err) : console.log(`Listening on port: ${port}`)
   })

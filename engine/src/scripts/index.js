@@ -11,22 +11,25 @@ const {
 
 const s3 = new S3({region: 'us-east-1'})
 
-const ENVIRONMENT = process.env.ENVIRONMENT
-const API_PREFIX = `/${process.env.CONTEXT || 'pb'}/api/v3`
-const VERSION = process.env.AWS_LAMBDA_FUNCTION_VERSION || '$LATEST'
+const {
+  apiPrefix,
+  environment,
+  isDev,
+  version
+} = require('../environment')
 
-const UPLOAD_SCRIPTS = !/^dev/i.test(process.env.NODE_ENV)
+const UPLOAD_SCRIPTS = !isDev
 
 const getApiPrefix = function getApiPrefix () {
-  return API_PREFIX
+  return apiPrefix
 }
 
 const getEnvironment = function getEnvironment () {
-  return ENVIRONMENT
+  return environment
 }
 
 const getVersion = function getVersion () {
-  return VERSION
+  return version
 }
 
 const getScriptBucket = function getScriptBucket () {

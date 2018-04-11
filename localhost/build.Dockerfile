@@ -79,7 +79,7 @@ RUN \
           /workdir/engine \
           /workdir/resolver
 
-COPY ./proxy/package*.json ./
+COPY ./origin/package*.json ./
 RUN npm install
 
 
@@ -94,7 +94,7 @@ RUN npm install
 
 
 WORKDIR /etc/nginx
-COPY ./proxy/src ./src/
+COPY ./origin/src ./src/
 RUN chown -R ${USER}:${USER} ./src
 
 COPY ./engine/ /workdir/engine/

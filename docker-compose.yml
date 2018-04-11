@@ -1,27 +1,27 @@
 version: '2'
 services:
-  entry-proxy:
-    build: ./proxy
+  origin:
+    build: ./origin
     environment:
       PORT: '8080'
       NODEJS_PORT: '8081'
       NODE_ENV:
-      HTTP_ENGINE: http://engine-server:8082
-      HTTP_RESOLVER: http://resolver-server:8083
+      HTTP_ENGINE: http://engine:8082
+      HTTP_RESOLVER: http://resolver:8083
       LAMBDA_ENGINE:
       LAMBDA_RESOLVER:
       ON_DEMAND:
-    image: fusion-proxy
+    image: fusion-origin
     links:
-      - 'engine-server'
-      - 'resolver-server'
+      - 'engine'
+      - 'resolver'
     ports:
       - "8080-8081:8080-8081"
     volumes:
       - '~/.aws:/home/nginx/.aws:ro'
-      - './proxy/src:/etc/nginx/src:ro'
+      - './origin/src:/etc/nginx/src:ro'
 
-  engine-server:
+  engine:
     build:
       context: .
       dockerfile: serverless.Dockerfile
@@ -41,7 +41,7 @@ services:
       - './engine/bundle:/workdir/engine/bundle:ro'
       - './engine/src:/workdir/engine/src:ro'
 
-  resolver-server:
+  resolver:
     build:
       context: .
       dockerfile: serverless.Dockerfile
@@ -50,11 +50,11 @@ services:
     environment:
       PORT: '8083'
       NODE_ENV:
-      HTTP_ENGINE: http://engine-server:8082
+      HTTP_ENGINE: http://engine:8082
       LAMBDA_ENGINE:
     image: fusion-resolver
     links:
-      - 'engine-server'
+      - 'engine'
     ports:
       - '8083:8083'
     volumes:

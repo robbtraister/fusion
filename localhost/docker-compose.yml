@@ -3,7 +3,7 @@ services:
   fusion:
     image: quay.io/washpost/fusion-localhost
     ports:
-      # 8080 is the public nginx proxy
+      # 8080 is the public origin proxy
       # 8081 is the private nodejs lambda proxy (provides a way for nginx to proxy to lambda)
       # 8082 is the rendering engine
       # 8083 is the resolver

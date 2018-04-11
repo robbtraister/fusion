@@ -1,6 +1,6 @@
 version: "2"
 services:
-  entry-proxy:
+  origin:
     build: .
     ports:
       - '8080'

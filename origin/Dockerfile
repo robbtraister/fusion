@@ -38,8 +38,8 @@ RUN \
                 --user=${USER} \
                 --group=${USER} \
                 --with-http_realip_module \
-                --add-module=modules/nginx-let \
-                --add-module=modules/nginx-statsd \
+                # --add-module=modules/nginx-let \
+                # --add-module=modules/nginx-statsd \
                 && \
     make -j2 && \
     make install && \

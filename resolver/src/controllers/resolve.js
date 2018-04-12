@@ -14,11 +14,36 @@ const getTemplateResolver = function getTemplateResolver (resolver) {
     : (content) => ({template: resolver.page})
 }
 
+const parseContentSourceParameters = function parseContentSourceParameters (resolver, requestUri) {
+  const contentParams = {}
+  Object.keys(resolver.contentConfigMapping).map(key => {
+    const param = resolver.contentConfigMapping[key]
+    if (param.type === 'pattern') {
+      // TODO optimize for multiple pattern params so we don't regex match each time
+      const pattern = new RegExp(resolver.pattern)
+      let groups = getUriPathname(requestUri).match(pattern)
+      contentParams[key] = groups[param.index] + '/'
+    } else if (param.type === 'static') {
+      contentParams[key] = param.value
+    } else if (param.type === 'parameter') {
+      var queryParams = url.parse(requestUri, true).query
+      contentParams[key] = queryParams[param.name]
+    }
+  })
+  console.log(contentParams)
+  return contentParams
+}
+
 const getResolverHydrater = function getResolverHydrater (resolver) {
   const templateResolver = getTemplateResolver(resolver)
 
+  // given contentSourceId, fetch content with JSON object of parameters
+
   const contentResolver = (resolver.contentSourceId)
-    ? (requestUri) => fetch(resolver.contentSourceId, {uri: encodeURIComponent(requestUri + '/')})
+    ? (requestUri) => {
+      const contentSourceParams = parseContentSourceParameters(resolver, requestUri)
+      return fetch(resolver.contentSourceId, Object.assign({'uri': requestUri + '/'}, contentSourceParams))
+    }
     : (requestUri) => Promise.resolve(null)
 
   return (requestUri) => contentResolver(requestUri)
@@ -49,7 +74,10 @@ const getResolverMatcher = function getResolverMatcher (resolver) {
     return (requestUri) => resolver.uri === getUriPathname(requestUri)
   } else if (resolver.pattern) {
     const pattern = new RegExp(resolver.pattern)
-    return (requestUri) => pattern.test(getUriPathname(requestUri))
+    return (requestUri) => {
+      console.log(requestUri + ' against ' + resolver._id + ' ' + pattern.test(getUriPathname(requestUri)))
+      return pattern.test(getUriPathname(requestUri))
+    }
   }
   return () => null
 }
@@ -82,7 +110,6 @@ const resolvers = pageResolvers.concat(templateResolvers)
 
 const resolve = function resolve (requestUri) {
   const resolver = resolvers.find(resolver => resolver.match(requestUri))
-
   return resolver
     ? resolver.hydrate(requestUri)
     : Promise.resolve(null)

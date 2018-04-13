@@ -22,7 +22,7 @@ const parseContentSourceParameters = function parseContentSourceParameters (reso
       // TODO optimize for multiple pattern params so we don't regex match each time
       const pattern = new RegExp(resolver.pattern)
       let groups = getUriPathname(requestUri).match(pattern)
-      contentParams[key] = groups[param.index] + '/'
+      contentParams[key] = groups[param.index].replace(/\/*$/, '/') // force trailing slash
     } else if (param.type === 'static') {
       contentParams[key] = param.value
     } else if (param.type === 'parameter') {
@@ -30,7 +30,7 @@ const parseContentSourceParameters = function parseContentSourceParameters (reso
       contentParams[key] = queryParams[param.name]
     }
   })
-  console.log(contentParams)
+  console.log(JSON.stringify(contentParams))
   return contentParams
 }
 
@@ -75,7 +75,6 @@ const getResolverMatcher = function getResolverMatcher (resolver) {
   } else if (resolver.pattern) {
     const pattern = new RegExp(resolver.pattern)
     return (requestUri) => {
-      console.log(requestUri + ' against ' + resolver._id + ' ' + pattern.test(getUriPathname(requestUri)))
       return pattern.test(getUriPathname(requestUri))
     }
   }

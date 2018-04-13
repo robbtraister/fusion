@@ -19,6 +19,6 @@
     "serverless-http": "^1.5.3"
   },
   "devDependencies": {
-    "serverless-offline": "^3.18.0"
+    "serverless-offline": "robbtraister/serverless-offline#preserve-trailing-slash-option"
   }
 }

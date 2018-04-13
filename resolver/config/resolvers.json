@@ -112,7 +112,7 @@
     {
       "_id" : "article",
       "priority" : 10,
-      "pattern" : "^(/[\\w\\-\\/]+/[0-9]{4}/[0-9]{1,2}/[0-9]{1,2}/[\\w\\-]+)",
+      "pattern" : "^(/[\\w\\-\\/]+/[0-9]{4}/[0-9]{1,2}/[0-9]{1,2}/[\\w\\-]+/)",
       "params" : [],
       "page" : "article-template",
       "contentSourceId" : "content-api",

@@ -3,6 +3,4 @@ services:
   dao:
     build: .
     environment:
-      PORT:
-      NODEJS_PORT:
-      NODE_ENV:
+      NODE_ENV: production

@@ -35,16 +35,16 @@ restore() {
       done
     fi
 
-    if [ "$flush" ]
-    then
-      echo 'flushing cache...'
-      for p in `seq 7000 7007`
-      do
-        echo flushall | nc cache $p
-      done
-      echo flush_all | nc cache 11211
-      echo 'done.'
-    fi
+    # if [ "$flush" ]
+    # then
+    #   echo 'flushing cache...'
+    #   for p in `seq 7000 7007`
+    #   do
+    #     echo flushall | nc cache $p
+    #   done
+    #   echo flush_all | nc cache 11211
+    #   echo 'done.'
+    # fi
   )
 }
 

@@ -240,7 +240,7 @@ cat <<EOB
 
 EOB
 
-if [[ "$(echo "${NODE_ENV}" | grep -i "^dev")" ]]
+if [ ! "$(echo "${NODE_ENV}" | grep -i "^prod")" ]
 then
   cat <<EOB
       return                   418;
@@ -269,7 +269,7 @@ cat <<EOB
       proxy_intercept_errors   on;
 
 EOB
-if [[ "$(echo "${NODE_ENV}" | grep -i "^dev")" || "${ON_DEMAND}" == 'true' ]]
+if [ ! "$(echo "${NODE_ENV}" | grep -i "^prod")" ] || [ "${ON_DEMAND}" == 'true' ]]
 then
   cat <<EOB
       return                   418;

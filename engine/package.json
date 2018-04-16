@@ -13,7 +13,7 @@
     "predeploy": "npm install && npm run build:engine:production && npm run build:components:production",
     "deploy": "sls deploy",
     "prestart": "npm run watch:engine & npm run watch:components &",
-    "start": "sls --stage=offline offline start",
+    "start": "sls --stage=localhost offline start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

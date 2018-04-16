@@ -7,7 +7,7 @@ const context = (process.env.CONTEXT || 'pb').replace(/^\/+/, '').replace(/\/+$/
 const apiPrefix = `/${context}/api/v3`
 const daoUrl = process.env.DAO_URL
 const environment = process.env.ENVIRONMENT
-const isDev = /^dev/i.test(process.env.NODE_ENV)
+const isDev = !/^prod/i.test(process.env.NODE_ENV)
 const mongoUrl = process.env.MONGO_URL
 const onDemand = process.env.ON_DEMAND === 'true'
 const port = process.env.PORT || 8080

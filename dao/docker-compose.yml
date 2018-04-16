@@ -1,0 +1,8 @@
+version: "2"
+services:
+  dao:
+    build: .
+    environment:
+      PORT:
+      NODEJS_PORT:
+      NODE_ENV:

@@ -2,12 +2,6 @@
 
 const url = require('url')
 
-const debugTimer = require('debug')('fusion:timer:renderings:schemaless')
-
-const { mongoUrl } = require('../environment')
-
-const timer = require('../timer')
-
 const MongoClient = require('mongodb').MongoClient
 
 function getNewConnection (mongoUrl) {
@@ -61,44 +55,24 @@ function Mongo (mongoUrl) {
       models[modelName] = models[modelName] || {
         name: modelName,
 
-        find (query) {
-          let tic
+        find (query, limit) {
           return getCollection(modelName)
-            .then((collection) => {
-              tic = timer.tic()
-              return collection.find(query)
-            })
+            .then((collection) => collection.find(query))
+            .then((cursor) => (limit)
+              ? cursor.limit(limit)
+              : cursor
+            )
             .then((cursor) => cursor.toArray())
-            .then((data) => {
-              debugTimer(`${modelName}.find()`, tic.toc())
-              return data
-            })
         },
 
         findById (_id) {
-          let tic
           return getCollection(modelName)
-            .then((collection) => {
-              tic = timer.tic()
-              return collection.findOne({_id})
-            })
-            .then((data) => {
-              debugTimer(`${modelName}.findById(${_id})`, tic.toc())
-              return data
-            })
+            .then((collection) => collection.findOne({_id}))
         },
 
         findOne (query) {
-          let tic
           return getCollection(modelName)
-            .then((collection) => {
-              tic = timer.tic()
-              return collection.findOne(query)
-            })
-            .then((data) => {
-              debugTimer(`${modelName}.findOne()`, tic.toc())
-              return data
-            })
+            .then((collection) => collection.findOne(query))
         }
       }
 
@@ -107,4 +81,9 @@ function Mongo (mongoUrl) {
   }
 }
 
-module.exports = Mongo(mongoUrl).getModel
+const mongos = {}
+function getMongo (environment) {
+  mongos[environment] = mongos[environment] || Mongo(process.env[`${environment}_MONGOURL`])
+  return mongos[environment]
+}
+module.exports = getMongo

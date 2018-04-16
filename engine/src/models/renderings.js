@@ -1,6 +1,6 @@
 'use strict'
 
-const model = require('./schemaless')
+const model = require('./dao')
 const Pages = model('page')
 const Renderings = model('rendering')
 const Templates = model('template')

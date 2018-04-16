@@ -1,0 +1,67 @@
+name: fusion-dao
+type: ecs
+
+
+_environment: &_environment
+  PORT: "8080"
+
+_fusion_dao: &_fusion_dao
+  image: quay.io/washpost/fusion-dao:{{.DeploymentId}}
+  ports:
+  - "8080"
+  log_driver: awslogs
+  environment:
+    <<: *_environment
+
+_healthcheck: &_healthcheck
+  healthcheck:
+    interval: 30
+    path: '/healthcheck'
+    protocol: HTTP
+    timeout: 10
+    healthy_threshold_count: 2
+    unhealthy_threshold_count: 4
+
+_resource: &_resource
+  vendor: aws
+  resource: simple
+
+_services: &_services
+  services:
+  - deploymentConfiguration:
+      maximumPercent: 200
+      minimumHealthyPercent: 50
+    desiredCount: 2
+    loadBalancers:
+    - containerName: dao
+      containerPort: 8080
+
+_task: &_task
+  task:
+    taskRoleArn: arn:aws:iam::397853141546:role/fusion-dao
+
+
+environments:
+- name: staging
+  <<: *_services
+  <<: *_task
+  labels:
+  - all
+  namespace: pagebuilder-arc2
+  override:
+    dao:
+      <<: *_fusion_dao
+      log_opt:
+        awslogs-group: /nile/fusion-dao/staging
+        awslogs-region: us-east-1
+      environment:
+        <<: *_environment
+      # volumes:
+      # - "/var/fusion-origin/staging/uploads:/uploads"
+  resources:
+  - <<: *_resource
+    settings:
+      <<: *_healthcheck
+      domain: staging.dao.fusion.arc.pub
+      parent_domain: fusion.arc.pub
+      scheme: internal

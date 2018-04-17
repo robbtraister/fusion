@@ -10,8 +10,18 @@ const resolverConfig = require('../../config/resolvers.json')
 
 const getTemplateResolver = function getTemplateResolver (resolver) {
   return (resolver.type === 'page')
-    ? (content) => ({page: resolver._id})
-    : (content) => ({template: resolver.page})
+    ? (content) => ({page: resolver._id}) // Pages
+    : (content) => { // Templates
+      console.log('content2pageMapping: ' + JSON.stringify(resolver.content2pageMapping))
+      const contentPageMapping = resolver.content2pageMapping
+      if (typeof contentPageMapping === 'undefined') {
+        return {template: resolver.page}
+      } else {
+        const contentValue = content[contentPageMapping.field]
+        let template = contentPageMapping.mapping[contentValue] || resolver.page
+        return {template: template}
+      }
+    }
 }
 
 const parseContentSourceParameters = function parseContentSourceParameters (resolver, requestUri) {
@@ -30,14 +40,11 @@ const parseContentSourceParameters = function parseContentSourceParameters (reso
       contentParams[key] = queryParams[param.name]
     }
   })
-  console.log(JSON.stringify(contentParams))
   return contentParams
 }
 
 const getResolverHydrater = function getResolverHydrater (resolver) {
   const templateResolver = getTemplateResolver(resolver)
-
-  // given contentSourceId, fetch content with JSON object of parameters
 
   const contentResolver = (resolver.contentSourceId)
     ? (requestUri) => {

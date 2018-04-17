@@ -96,7 +96,6 @@
   "resolvers": [
     {
       "_id" : "video",
-      "priority" : 9,
       "pattern" : "^/video/.*",
       "params" : [],
       "page" : "video-leaf-template",
@@ -110,8 +109,30 @@
       "testUri" : []
     },
     {
+      "_id" : "content-mapped-template-article",
+      "pattern" : "^/content-mapped-template(/[\\w\\-\\/]+/[0-9]{4}/[0-9]{1,2}/[0-9]{1,2}/[\\w\\-]+/)",
+      "params" : [],
+      "page" : "article-template",
+      "contentSourceId" : "content-api",
+      "contentConfigMapping" : {
+          "canonical_url" : {
+              "type" : "pattern",
+              "index" : 1
+          },
+          "published" : {
+              "type" : "static",
+              "value" : "true"
+          }
+      },
+      "content2pageMapping" : {
+          "field" : "foo",
+          "mapping" : {
+            "bar" : "other-article-template"
+          }
+      }
+    },
+    {
       "_id" : "article",
-      "priority" : 10,
       "pattern" : "^(/[\\w\\-\\/]+/[0-9]{4}/[0-9]{1,2}/[0-9]{1,2}/[\\w\\-]+/)",
       "params" : [],
       "page" : "article-template",

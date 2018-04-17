@@ -188,7 +188,7 @@ const compileDocument = function compileDocument (rendering, outputType, pt) {
                 {
                   key: 'template',
                   type: 'application/javascript',
-                  src: `${getScriptUri(pt)}?v=${getVersion()}${useComponentLib ? '&useComponentLib=true' : ''}`,
+                  src: `${getScriptUri(pt)}?v=${getVersion()}${outputType ? `&outputType=${outputType}` : ''}${useComponentLib ? '&useComponentLib=true' : ''}`,
                   defer: true
                 }
               )

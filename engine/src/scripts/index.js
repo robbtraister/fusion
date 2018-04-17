@@ -75,7 +75,7 @@ const uploadScript = function uploadScript (key, src) {
     : Promise.resolve()
 }
 
-const compile = function compile ({pt, rendering, child, useComponentLib}) {
+const compile = function compile ({pt, rendering, outputType, child, useComponentLib}) {
   const {rootRenderable, upload} = (child)
     ? {
       rootRenderable: findRenderableItem(rendering)(child),
@@ -90,7 +90,7 @@ const compile = function compile ({pt, rendering, child, useComponentLib}) {
         : () => Promise.resolve()
     }
 
-  return pack(rootRenderable, useComponentLib)
+  return pack(rootRenderable, outputType, useComponentLib)
     .then(src => {
       return upload(src)
         .then(() => src)

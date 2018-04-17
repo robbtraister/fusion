@@ -4,27 +4,38 @@ const fs = require('fs')
 
 const { componentSrcRoot } = require('../../../environment')
 
-function getComponentFile (type, id) {
-  return `${componentSrcRoot}/${type}/${id}.jsx`
-}
-
 function componentImport (fp, name) {
   return `Fusion.Components${name} = require('${fp}')`
 }
 
-function generateFile (rendering, useComponentLib) {
+const componentFiles = [
+  (componentName, outputType) => outputType ? `${componentName}/${outputType}.jsx` : null,
+  (componentName, outputType) => `${componentName}/default.jsx`,
+  (componentName, outputType) => `${componentName}/index.jsx`,
+  (componentName, outputType) => `${componentName}.jsx`
+]
+
+const getComponentFile = function getComponentFile (type, id, outputType) {
+  for (let i = 0; i < componentFiles.length; i++) {
+    try {
+      const key = componentFiles[i](`${componentSrcRoot}/${type}/${id}`, outputType)
+      fs.accessSync(key, fs.constants.R_OK)
+      return key
+    } catch (e) {}
+  }
+  return null
+}
+
+function generateFile (rendering, outputType, useComponentLib) {
   const components = {}
   const types = {}
 
   function getComponentName (type, id) {
-    const key = getComponentFile(type, id)
-    try {
-      fs.accessSync(key, fs.constants.R_OK)
+    const key = getComponentFile(type, id, outputType)
+    if (key) {
       types[type] = true
       components[key] = components[key] || `['${type}']['${id}']`
       return components[key]
-    } catch (e) {
-      // do nothing
     }
   }
 

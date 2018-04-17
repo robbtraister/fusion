@@ -28,7 +28,6 @@ function getTypeRouter (fetch) {
   typeRouter.all(['/', '/:id', '/:id/:child'],
     bodyParser.json(),
     (req, res, next) => {
-      console.log('uri', req.originalUrl)
       const tic = timer.tic()
       const payload = Object.assign(
         {

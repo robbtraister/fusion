@@ -24,9 +24,25 @@ const renderAll = function renderAll (renderableItems) {
     .filter(ri => ri)
 }
 
-const feature = function feature (config) {
-  try {
-    const Feature = require(`${componentDistRoot}/features/${config.featureConfig}.jsx`)
+const componentFiles = [
+  (componentName, outputType) => outputType ? `${componentName}/${outputType}.jsx` : null,
+  (componentName, outputType) => `${componentName}/default.jsx`,
+  (componentName, outputType) => `${componentName}/index.jsx`,
+  (componentName, outputType) => `${componentName}.jsx`
+]
+
+const loadComponent = function loadComponent (componentName, outputType) {
+  for (let i = 0; i < componentFiles.length; i++) {
+    try {
+      return require(componentFiles[i](componentName, outputType))
+    } catch (e) {}
+  }
+  return null
+}
+
+const feature = function feature (config, outputType) {
+  const Feature = loadComponent(`${componentDistRoot}/features/${config.featureConfig}`, outputType)
+  if (Feature) {
     const Component = TimedComponent(Feature)
 
     const props = {
@@ -46,20 +62,12 @@ const feature = function feature (config) {
       Component,
       props
     )
-  } catch (e) {
-    // console.error(e)
-    return null
   }
 }
 
-const chain = function chain (config) {
-  const Component = (() => {
-    try {
-      return TimedComponent(require(`${componentDistRoot}/chains/${config.chainConfig}.jsx`))
-    } catch (e) {
-      return 'div'
-    }
-  })()
+const chain = function chain (config, outputType) {
+  const Chain = loadComponent(`${componentDistRoot}/chains/${config.chainConfig}`, outputType)
+  const Component = Chain ? TimedComponent(Chain) : 'div'
 
   return () => React.createElement(
     Component,
@@ -72,46 +80,42 @@ const chain = function chain (config) {
   )
 }
 
-const section = function section (config, index) {
+const section = function section (config, outputType, index) {
   return () => React.createElement(
     'section',
     {
-      key: index
+      key: index,
+      id: index,
+      type: 'section'
     },
     renderAll(config.renderableItems)
   )
 }
 
-const template = function template (rendering) {
-  const Component = (() => {
-    try {
-      return require(`${componentDistRoot}/layouts/${rendering.layout}.jsx`)
-    } catch (e) {
-      return 'div'
-    }
-  })()
-
-  const children = renderAll(rendering.layoutItems)
+const layout = function layout (rendering, outputType) {
+  const Layout = loadComponent(`${componentDistRoot}/layouts/${rendering.layout}`, outputType)
+  const Component = Layout ? TimedComponent(Layout) : 'div'
 
   return () => React.createElement(
     Component,
     {
-      key: rendering.id,
-      id: rendering.id
+      key: rendering.id || rendering._id,
+      id: rendering.id || rendering._id,
+      type: 'rendering'
     },
-    children
+    renderAll(rendering.layoutItems)
   )
 }
 
-const renderableItem = function renderableItem (config, index) {
+const renderableItem = function renderableItem (config, outputType, index) {
   const Component = (config.featureConfig)
-    ? feature(config)
+    ? feature(config, outputType)
     : (config.chainConfig)
-      ? chain(config)
+      ? chain(config, outputType)
       : (config.renderableItems)
-        ? section(config, index)
+        ? section(config, outputType, index)
         : (config.layoutItems)
-          ? template(config)
+          ? layout(config, outputType)
           : null
   return Component || (() => null)
 }

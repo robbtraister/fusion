@@ -19,6 +19,7 @@ const {
 } = require('../../scripts')
 
 const {
+  componentDistRoot,
   context,
   onDemand
 } = require('../../environment')
@@ -130,9 +131,9 @@ const render = function render ({Component, requestUri, content}) {
     })
 }
 
-const compileRenderable = function compileRenderable (rendering) {
+const compileRenderable = function compileRenderable (rendering, outputType) {
   let tic = timer.tic()
-  return Promise.resolve(compile(rendering))
+  return Promise.resolve(compile(rendering, outputType))
     .then(Feature => {
       debugTimer(`compile(${rendering._id})`, tic.toc())
       tic = timer.tic()
@@ -144,15 +145,15 @@ const compileRenderable = function compileRenderable (rendering) {
     })
 }
 
-const compileOutputType = function compileOutputType (rendering, pt, outputType) {
+const compileDocument = function compileDocument (rendering, outputType, pt) {
   let tic
-  return compileRenderable(rendering)
+  return compileRenderable(rendering, outputType)
     .then((Template) => {
       tic = timer.tic()
 
       const OutputType = (() => {
         try {
-          return require(`../../../dist/components/output-types/${outputType || 'react'}.jsx`)
+          return require(`${componentDistRoot}/output-types/${outputType || 'react'}.jsx`)
         } catch (e) {
           const err = new Error(`Could not find output-type: ${outputType}`)
           err.statusCode = 400
@@ -247,7 +248,7 @@ const compileOutputType = function compileOutputType (rendering, pt, outputType)
 }
 
 module.exports = {
-  compileOutputType,
+  compileDocument,
   compileRenderable,
   render
 }

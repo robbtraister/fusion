@@ -10,9 +10,7 @@ const OutputType = (props) =>
       <link rel='icon' type='image/x-icon' href='/pb/resources/favicon.ico' />
     </head>
     <body>
-      <div id='App'>
-        {props.children}
-      </div>
+      <div id='App' />
       {props.fusion}
     </body>
   </html>

@@ -6,7 +6,7 @@ const express = require('express')
 const debugTimer = require('debug')('fusion:timer:router')
 
 const {
-  compileOutputType,
+  compileDocument,
   compileRenderable,
   render
 } = require('../react/server/render')
@@ -28,6 +28,7 @@ function getTypeRouter (fetch) {
   typeRouter.all(['/', '/:id', '/:id/:child'],
     bodyParser.json(),
     (req, res, next) => {
+      console.log('uri', req.originalUrl)
       const tic = timer.tic()
       const payload = Object.assign(
         {
@@ -48,8 +49,8 @@ function getTypeRouter (fetch) {
             : rendering
 
           return (payload.child || outputType === null)
-            ? compileRenderable(renderable)
-            : compileOutputType(renderable, pt, outputType)
+            ? compileRenderable(renderable, outputType)
+            : compileDocument(renderable, outputType, pt)
         })
         .then(Component => render(Object.assign({}, payload, {Component})))
         .then(data => { res.send(data) })

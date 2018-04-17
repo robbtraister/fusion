@@ -14,8 +14,9 @@ const port = process.env.PORT || 8080
 const version = process.env.AWS_LAMBDA_FUNCTION_VERSION || '$LATEST'
 
 const bundleRoot = path.resolve(process.env.BUNDLE_ROOT || `${__dirname}/../bundle`)
-const componentDistRoot = path.resolve(process.env.COMPONENT_ROOT || `${__dirname}/../dist/components`)
-const componentSrcRoot = path.resolve(process.env.COMPONENT_ROOT || `${bundleRoot}/components`)
+const distRoot = path.resolve(`${bundleRoot}/../dist`)
+const componentDistRoot = path.resolve(`${distRoot}/components`)
+const componentSrcRoot = path.resolve(`${bundleRoot}/components`)
 const schemasRoot = path.resolve(process.env.SCHEMAS_ROOT || `${bundleRoot}/content/schemas`)
 const sourcesRoot = path.resolve(process.env.SOURCES_ROOT || `${bundleRoot}/content/sources`)
 
@@ -27,6 +28,7 @@ module.exports = {
   contentBase,
   context,
   daoUrl,
+  distRoot,
   environment,
   isDev,
   mongoUrl,

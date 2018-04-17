@@ -67,7 +67,9 @@ function generateFile (rendering, useComponentLib) {
   function section (config, index) {
     const component = `'section'`
     const props = {
-      key: index
+      key: index,
+      id: index,
+      type: 'section'
     }
     return `React.createElement(${component}, ${JSON.stringify(props)}, [${config.renderableItems.map(renderableItem).filter(ri => ri).join(',')}])`
   }
@@ -76,7 +78,7 @@ function generateFile (rendering, useComponentLib) {
   //   return `[${config.layoutItems.map((item, i) => layout(item, rendering.layout && rendering.layout.sections && rendering.layout.sections[i])).join(',')}]`
   // }
 
-  function template (config) {
+  function layout (config) {
     const componentName = getComponentName('layouts', config.layout)
     const component = (componentName)
       ? `Fusion.Components${componentName}`
@@ -84,7 +86,8 @@ function generateFile (rendering, useComponentLib) {
 
     const props = {
       key: config.id || config._id,
-      id: config.id || config._id
+      id: config.id || config._id,
+      type: 'rendering'
     }
 
     return `React.createElement(${component}, ${JSON.stringify(props)}, [${config.layoutItems.map(renderableItem).join(',')}])`
@@ -107,7 +110,7 @@ function generateFile (rendering, useComponentLib) {
     return (config.featureConfig) ? feature(config)
       : (config.chainConfig) ? chain(config)
         : (config.renderableItems) ? section(config, index)
-          : (config.layoutItems) ? template(config)
+          : (config.layoutItems) ? layout(config)
             : ''
   }
 

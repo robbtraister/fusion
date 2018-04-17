@@ -8,6 +8,7 @@ const express = require('express')
 
 // const debugTimer = require('debug')('fusion:timer:router')
 
+const { distRoot } = require('../environment')
 // const timer = require('../timer')
 
 const {
@@ -57,7 +58,7 @@ scriptsRouter.use('/template', getTypeRouter(getTemplateByName))
 
 scriptsRouter.all('*', (req, res, next) => {
   const pathname = url.parse(req.url).pathname
-  fs.readFile(`${__dirname}/../../dist${pathname}`, (err, src) => {
+  fs.readFile(`${distRoot}${pathname}`, (err, src) => {
     err
       ? next(err)
       : Promise.all([

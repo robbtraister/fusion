@@ -1,6 +1,6 @@
 {
-  "name": "dao",
-  "version": "1.0.0",
+  "name": "fusion-dao",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {

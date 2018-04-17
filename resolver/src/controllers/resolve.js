@@ -49,7 +49,7 @@ const getResolverHydrater = function getResolverHydrater (resolver) {
   const contentResolver = (resolver.contentSourceId)
     ? (requestUri) => {
       const contentSourceParams = parseContentSourceParameters(resolver, requestUri)
-      return fetch(resolver.contentSourceId, Object.assign({'uri': requestUri + '/'}, contentSourceParams))
+      return fetch(resolver.contentSourceId, Object.assign({'uri': requestUri.replace(/\/*$/, '/')}, contentSourceParams))
     }
     : (requestUri) => Promise.resolve(null)
 
@@ -63,14 +63,6 @@ const getResolverHydrater = function getResolverHydrater (resolver) {
     )
     )
 }
-
-// const hydrate = function hydrate (resolver, ...args) {
-//   const hydrater = getResolverHydrater(resolver)
-//
-//   return (args.length === 0)
-//     ? hydrater
-//     : hydrater(...args)
-// }
 
 const getUriPathname = function getUriPathname (requestUri) {
   return url.parse(requestUri).pathname

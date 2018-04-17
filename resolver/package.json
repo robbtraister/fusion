@@ -6,7 +6,7 @@
   "scripts": {
     "predeploy": "npm install",
     "deploy": "sls deploy",
-    "start": "sls --stage=offline offline start"
+    "start": "sls --stage=localhost offline start"
   },
   "keywords": [],
   "author": "",

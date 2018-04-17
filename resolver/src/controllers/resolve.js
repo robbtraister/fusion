@@ -8,6 +8,18 @@ const fetch = require('./fetch')
 
 const resolverConfig = require('../../config/resolvers.json')
 
+const getNestedValue = function getNestedValue (target, keys) {
+  target = target || {}
+  if (!(keys instanceof Array)) {
+    keys = (keys || '').split('.')
+  }
+  const key = keys.shift()
+  const value = target[key]
+  return (keys.length > 0)
+    ? getNestedValue(value, keys)
+    : value
+}
+
 const getTemplateResolver = function getTemplateResolver (resolver) {
   return (resolver.type === 'page')
     ? (content) => ({page: resolver._id}) // Pages
@@ -17,7 +29,7 @@ const getTemplateResolver = function getTemplateResolver (resolver) {
       if (typeof contentPageMapping === 'undefined') {
         return {template: resolver.page}
       } else {
-        const contentValue = content[contentPageMapping.field]
+        const contentValue = getNestedValue(content, contentPageMapping.field)
         let template = contentPageMapping.mapping[contentValue] || resolver.page
         return {template: template}
       }

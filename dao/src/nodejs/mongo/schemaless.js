@@ -2,6 +2,8 @@
 
 const url = require('url')
 
+const mongoUrls = require('./urls')
+
 const MongoClient = require('mongodb').MongoClient
 
 function getNewConnection (mongoUrl) {
@@ -83,7 +85,7 @@ function Mongo (mongoUrl) {
 
 const mongos = {}
 function getMongo (environment) {
-  mongos[environment] = mongos[environment] || Mongo(process.env[`${environment}_MONGOURL`])
+  mongos[environment] = mongos[environment] || Mongo(mongoUrls[environment])
   return mongos[environment]
 }
 module.exports = getMongo

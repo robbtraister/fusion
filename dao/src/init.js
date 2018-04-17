@@ -7,28 +7,29 @@ const fs = require('fs')
 
 const md5 = require('apache-md5')
 
-const envVarMatch = /^([A-Z_]+)_CREDENTIALS$/
-
-function formatCredentials (credentialString) {
-  return credentialString
-    .split(/\s/)
-    .filter(c => c)
-    .map(credentials => {
-      const credPieces = credentials.split(':', 2)
-      return `${credPieces[0]}:${md5(credPieces[1])}`
-    })
+function formatCredentials (credentialsMap) {
+  return Object.keys(credentialsMap)
+    .map(user => `${user}:${md5(credentialsMap[user])}`)
     .join('\n')
 }
 
 childProcess.execSync(`mkdir -p "./conf/credentials"`)
 
-Object.keys(process.env)
-  .map(key => envVarMatch.exec(key))
-  .filter(match => match)
-  .map(match => match[1])
+const envs = {}
+process.env.DAO_CREDENTIALS
+  .split(/\s/)
+  .map(c => c.trim())
+  .filter(c => c)
+  .map(c => c.split('|'))
+  .forEach(([env, user, password]) => {
+    envs[env] = envs[env] || {}
+    envs[env][user] = password
+  })
+
+Object.keys(envs)
   .forEach(env => {
     fs.writeFileSync(
       `./conf/credentials/${env}.passwords`,
-      formatCredentials(process.env[`${env}_CREDENTIALS`])
+      formatCredentials(envs[env])
     )
   })

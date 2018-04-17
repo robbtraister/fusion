@@ -74,18 +74,17 @@ then
 EOB
 fi
 
-for environment in $(set | egrep '^([A-Z_]+)_CREDENTIALS=' | sed -e 's/^\([A-Z]*\)_CREDENTIALS=.*/\1/')
+for environment in $(cd ./conf/credentials && ls *.passwords | sed -e 's/\.passwords$//')
 do
-  if [ "$(eval "echo \$${environment}_MONGOURL")" ]
-  then
-    subdomain=$(echo "${environment}" | awk '{ print tolower($0); }' | sed -e 's/_/-/')
-    cat <<EOB
+  subdomain=$(echo "${environment}" | awk '{ print tolower($0); }' | sed -e 's/_/-/')
+  cat <<EOB
 
   server {
     listen                     ${PORT:-8080};
     server_name                ${subdomain}.*;
 
     auth_basic 'Fusion DAO Service';
+    # this file reference is apparently relative to the config file, not the nginx pwd
     auth_basic_user_file ./credentials/${environment}.passwords;
 
     location /health {
@@ -103,7 +102,6 @@ do
     }
   }
 EOB
-  fi
 done
 
 cat <<EOB

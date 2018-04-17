@@ -3,12 +3,12 @@ type: ecs
 
 
 _environment: &_environment
-  PORT: "8080"
+  PORT: '8080'
 
 _fusion_dao: &_fusion_dao
   image: quay.io/washpost/fusion-dao:{{.DeploymentId}}
   ports:
-  - "8080"
+    - '8080'
   log_driver: awslogs
   environment:
     <<: *_environment
@@ -28,13 +28,13 @@ _resource: &_resource
 
 _services: &_services
   services:
-  - deploymentConfiguration:
-      maximumPercent: 200
-      minimumHealthyPercent: 50
-    desiredCount: 2
-    loadBalancers:
-    - containerName: dao
-      containerPort: 8080
+    - deploymentConfiguration:
+        maximumPercent: 200
+        minimumHealthyPercent: 50
+      desiredCount: 2
+      loadBalancers:
+        - containerName: dao
+          containerPort: 8080
 
 _task: &_task
   task:
@@ -42,26 +42,26 @@ _task: &_task
 
 
 environments:
-- name: staging
-  <<: *_services
-  <<: *_task
-  labels:
-  - all
-  namespace: pagebuilder-arc2
-  override:
-    dao:
-      <<: *_fusion_dao
-      log_opt:
-        awslogs-group: /nile/fusion-dao/staging
-        awslogs-region: us-east-1
-      environment:
-        <<: *_environment
-      # volumes:
-      # - "/var/fusion-origin/staging/uploads:/uploads"
-  resources:
-  - <<: *_resource
-    settings:
-      <<: *_healthcheck
-      domain: staging.dao.fusion.arc.pub
-      parent_domain: fusion.arc.pub
-      scheme: internal
+  - name: staging
+    <<: *_services
+    <<: *_task
+    labels:
+      - all
+    namespace: pagebuilder-arc2
+    override:
+      dao:
+        <<: *_fusion_dao
+        log_opt:
+          awslogs-group: /nile/fusion-dao/staging
+          awslogs-region: us-east-1
+        environment:
+          <<: *_environment
+        # volumes:
+        # - '/var/fusion-origin/staging/uploads:/uploads'
+    resources:
+      - <<: *_resource
+        settings:
+          <<: *_healthcheck
+          domain: staging.dao.fusion.arc.pub
+          parent_domain: fusion.arc.pub
+          scheme: internal

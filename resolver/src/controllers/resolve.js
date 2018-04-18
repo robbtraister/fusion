@@ -8,16 +8,15 @@ const fetch = require('./fetch')
 
 const resolverConfig = require('../../config/resolvers.json')
 
-const getNestedValue = function getNestedValue (target, keys) {
-  target = target || {}
-  if (!(keys instanceof Array)) {
-    keys = (keys || '').split('.')
+const getNestedValue = function getNestedValue (target, field) {
+  const keys = (field || '').split('.')
+  let value = target
+  while (keys.length) {
+    target = value || {}
+    const key = keys.shift()
+    value = target[key]
   }
-  const key = keys.shift()
-  const value = target[key]
-  return (keys.length > 0)
-    ? getNestedValue(value, keys)
-    : value
+  return value
 }
 
 const getTemplateResolver = function getTemplateResolver (resolver) {

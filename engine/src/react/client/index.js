@@ -37,9 +37,11 @@ const render = () => {
       console.error('404')
       notFound()
     } else {
-      const templateStyle = window.document.getElementById('template-style')
       if (Fusion.Template.cssFile) {
-        templateStyle.href = `/_assets/templates/${Fusion.Template.cssFile}`
+        const templateStyle = window.document.getElementById('template-style')
+        if (templateStyle) {
+          templateStyle.href = `/${Fusion.prefix}/resources/${Fusion.Template.cssFile}`
+        }
       }
 
       const method = 'render' // Fusion.isFresh ? 'hydrate' : 'render'

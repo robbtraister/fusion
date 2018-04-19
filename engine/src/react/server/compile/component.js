@@ -18,17 +18,17 @@ const TimedComponent = (Component) => (props) => {
 // For simplification, create each element as a functional component
 // This allows any feature to be exported for rendering
 // When compiling container children, execute the functional Component to get the Element
-const renderAll = function renderAll (renderableItems) {
+const renderAll = function renderAll (renderableItems, outputType) {
   return (renderableItems || [])
-    .map((ri, i) => renderableItem(ri, i)())
+    .map((ri, i) => renderableItem(ri, outputType, i)())
     .filter(ri => ri)
 }
 
 const componentFiles = [
-  (componentName, outputType) => outputType ? `${componentName}/${outputType}.jsx` : null,
-  (componentName, outputType) => `${componentName}/default.jsx`,
-  (componentName, outputType) => `${componentName}/index.jsx`,
-  (componentName, outputType) => `${componentName}.jsx`
+  (componentName, outputType) => outputType ? `${componentName}/${outputType}.js` : null,
+  (componentName, outputType) => `${componentName}/default.js`,
+  (componentName, outputType) => `${componentName}/index.js`,
+  (componentName, outputType) => `${componentName}.js`
 ]
 
 const loadComponent = function loadComponent (componentName, outputType) {
@@ -76,7 +76,7 @@ const chain = function chain (config, outputType) {
       id: config.id,
       type: config.chainConfig
     },
-    renderAll(config.features)
+    renderAll(config.features, outputType)
   )
 }
 
@@ -88,7 +88,7 @@ const section = function section (config, outputType, index) {
       id: index,
       type: 'section'
     },
-    renderAll(config.renderableItems)
+    renderAll(config.renderableItems, outputType)
   )
 }
 
@@ -103,7 +103,7 @@ const layout = function layout (rendering, outputType) {
       id: rendering.id || rendering._id,
       type: 'rendering'
     },
-    renderAll(rendering.layoutItems)
+    renderAll(rendering.layoutItems, outputType)
   )
 }
 

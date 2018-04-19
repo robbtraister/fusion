@@ -1,36 +1,15 @@
 'use strict'
 
-const path = require('path')
-
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
-const UglifyWebpackPlugin = require('uglifyjs-webpack-plugin')
 
-const { isDev } = require('./src/environment')
+const { isDev } = require('../src/environment')
 
-const VENDOR_PACKAGES = ['react']
+const alias = require('./alias')
+const externals = require('./externals')
+const optimization = require('./optimization')
 
-function externals (context, request, callback) {
-  if (VENDOR_PACKAGES.includes(request)) {
-    return callback(null, request)
-  }
-  callback()
-}
-
-// if consumer is not found, attempt to build without it
-let alias = {}
-try {
-  alias = {
-    'consumer': require.resolve('./src/react/shared/consumer.js')
-  }
-} catch (e) {}
-
-const optimization = (isDev)
-  ? {}
-  : {
-    minimizer: [new UglifyWebpackPlugin({
-      test: /\.jsx?$/i
-    })]
-  }
+const cssExtractor = new MiniCssExtractPlugin({filename: '[name].[contenthash].css'})
 
 module.exports = (entry) =>
   (Object.keys(entry).length)
@@ -59,17 +38,28 @@ module.exports = (entry) =>
                 }
               }
             ]
+          },
+          {
+            test: /\.css$/,
+            use: [
+              MiniCssExtractPlugin.loader,
+              'css-loader'
+            ]
+          },
+          {
+            test: /\.s[ac]ss$/,
+            use: [
+              MiniCssExtractPlugin.loader,
+              'css-loader',
+              'sass-loader'
+            ]
           }
         ]
       },
       optimization,
-      output: {
-        filename: `[name]`,
-        path: path.resolve(__dirname, 'dist', 'components'),
-        libraryTarget: 'commonjs2'
-      },
       plugins: [
-        new ManifestPlugin()
+        new ManifestPlugin(),
+        cssExtractor
       ],
       resolve: {
         alias,

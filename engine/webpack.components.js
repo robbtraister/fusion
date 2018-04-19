@@ -1,20 +1,37 @@
 'use strict'
 
 const fs = require('fs')
+const path = require('path')
+
 const glob = require('glob')
 
-const sharedConfigs = require('./webpack-jsx-configs')
-
 const { componentSrcRoot } = require('./src/environment')
+
+const components = require('./webpack/components')
+
+const sharedConfigs = (entry) =>
+  (Object.keys(entry).length)
+    ? Object.assign(
+      components(entry),
+      {
+        output: {
+          filename: `[name].js`,
+          path: path.resolve(__dirname, 'dist', 'components'),
+          libraryTarget: 'commonjs2'
+        }
+      }
+    )
+    : null
 
 const entry = {}
 const types = {}
 glob.sync(`${componentSrcRoot}/**/*.{hbs,js,jsx,vue}`)
   .forEach(f => {
     const name = f.substr(componentSrcRoot.length + 1)
-    const type = name.split('/')[0]
+    const type = name.split('/').shift()
     types[type] = true
-    entry[name] = f
+    const parts = path.parse(name)
+    entry[path.join(parts.dir, parts.name)] = f
   })
 
 const componentConfigs = sharedConfigs(entry)
@@ -35,7 +52,8 @@ ${Object.keys(entry).map(name => {
 module.exports = Components
     `
   )
-  const allConfig = sharedConfigs({ 'all.js': './all.jsx' })
+  const allConfig = sharedConfigs({ all: './all.jsx' })
+  allConfig.plugins.shift() // remove ManifestPlugin
   allConfig.output.library = `window.Fusion=window.Fusion||{};Fusion.Components`
   allConfig.output.libraryTarget = 'assign'
   otherConfigs.push(allConfig)

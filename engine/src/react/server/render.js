@@ -7,6 +7,8 @@ const debugTimer = require('debug')('fusion:timer:react:render')
 const React = require('react')
 const ReactDOM = require('react-dom/server')
 
+const request = require('request-promise-native')
+
 const compile = require('./compile/component')
 const Provider = require('./provider')
 
@@ -108,11 +110,17 @@ const render = function render ({Component, requestUri, content}) {
       tic = timer.tic()
 
       // collect content cache into Promise array
+      const inlines = Component.inlines || {}
       const contentCache = Component.contentCache || {}
-      const contentPromises = [].concat(...Object.keys(contentCache).map(source => {
-        const sourceCache = contentCache[source]
-        return Object.keys(sourceCache).map(key => sourceCache[key].fetched)
-      }))
+      const contentPromises = [].concat(
+        Object.keys(inlines)
+          .map(inline => inlines[inline].fetched),
+        ...Object.keys(contentCache)
+          .map(source => {
+            const sourceCache = contentCache[source]
+            return Object.keys(sourceCache).map(key => sourceCache[key].fetched)
+          })
+      )
 
       return contentPromises.length === 0
         // if no feature content is requested, return original rendering
@@ -153,7 +161,7 @@ const compileDocument = function compileDocument (rendering, outputType, pt) {
 
       const OutputType = (() => {
         try {
-          return require(`${componentDistRoot}/output-types/${outputType || 'react'}.jsx`)
+          return require(`${componentDistRoot}/output-types/${outputType || 'react'}.js`)
         } catch (e) {
           const err = new Error(`Could not find output-type: ${outputType}`)
           err.statusCode = 400
@@ -206,6 +214,54 @@ const compileDocument = function compileDocument (rendering, outputType, pt) {
             }),
             /*
              * Each of the following are equivalent in JSX
+             *   {props.css}
+             *   {props.css()}
+             *   {props.css(false)}
+             *   {props.css({inline: false})}
+             *
+             * To inline the css
+             * (larger payload, bad for cache; suitable for AMP)
+             *   {props.css(true)}
+             *   {props.css({inline: true})}
+             */
+            css: propFunction(function (inline) {
+              if (typeof inline === 'object') {
+                inline = inline.inline
+              }
+              inline = (inline === undefined) ? false : !!inline
+
+              const href = Template.cssFile
+
+              return (inline && href)
+                ? (() => {
+                  Component.inlines.styles = Component.inlines.styles || {
+                    cached: undefined,
+                    fetched: request(href)
+                      .then((data) => {
+                        Component.inlines.styles.cached = data
+                      })
+                  }
+                  return (Component.inlines.styles.cached)
+                    ? React.createElement(
+                      'style',
+                      {},
+                      Component.inlines.styles.cached
+                    )
+                    : null
+                })()
+                : React.createElement(
+                  'link',
+                  {
+                    key: 'template-style',
+                    id: 'template-style',
+                    rel: 'stylesheet',
+                    type: 'text/css',
+                    href
+                  }
+                )
+            }),
+            /*
+             * Each of the following are equivalent in JSX
              *   {props.fusion}
              *   {props.fusion()}
              *   {props.fusion(true)}
@@ -237,6 +293,7 @@ const compileDocument = function compileDocument (rendering, outputType, pt) {
         )
       }
 
+      Component.inlines = Template.inlines
       // bubble up the Provider contentCache
       Component.contentCache = Template.contentCache
       return Component

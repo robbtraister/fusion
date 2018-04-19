@@ -20,8 +20,6 @@ const {
   version
 } = require('../environment')
 
-const UPLOAD_SCRIPTS = !isDev
-
 const getApiPrefix = function getApiPrefix () {
   return apiPrefix
 }
@@ -42,6 +40,10 @@ const getScriptPrefix = function getScriptPrefix () {
   return `${getEnvironment()}/${getVersion()}/scripts`
 }
 
+const getStylePrefix = function getStylePrefix () {
+  return `${getEnvironment()}/${getVersion()}/styles`
+}
+
 const getScriptKey = function getScriptKey (pt) {
   return (pt.uri)
     ? `page/${pt.uri.replace(/^\/*/, '').replace(/\/*$/, '')}.js`
@@ -57,8 +59,9 @@ const getScriptUrl = function getScriptUrl (pt) {
 }
 
 const uploadScript = function uploadScript (key, src) {
-  return (UPLOAD_SCRIPTS)
-    ? new Promise((resolve, reject) => {
+  return (isDev)
+    ? Promise.resolve()
+    : new Promise((resolve, reject) => {
       zlib.gzip(src, (err, buf) => {
         err ? reject(err) : resolve(buf)
       })
@@ -74,25 +77,24 @@ const uploadScript = function uploadScript (key, src) {
         err ? reject(err) : resolve(data)
       })
     }))
-    : Promise.resolve()
 }
 
 const compile = function compile ({pt, rendering, outputType, child, useComponentLib}) {
-  const {rootRenderable, uploadCss, uploadJs} = (child)
+  const {renderable, uploadCss, uploadJs} = (child)
     ? {
-      rootRenderable: findRenderableItem(rendering)(child),
+      renderable: findRenderableItem(rendering)(child),
       // if this is a child feature, do not upload
       uploadCss: () => Promise.resolve(),
       uploadJs: () => Promise.resolve()
     }
     : (pt && !useComponentLib)
       ? {
-        rootRenderable: rendering,
-        uploadCss: (name, src) => uploadScript(`${getScriptPrefix()}/${name}`, src),
+        renderable: rendering,
+        uploadCss: (name, src) => uploadScript(`${getStylePrefix()}/${name}`, src),
         uploadJs: (name, src) => uploadScript(`${getScriptPrefix()}/${name}`, src)
       }
       : {
-        rootRenderable: rendering,
+        renderable: rendering,
         // if in dev mode, do not upload
         uploadCss: () => Promise.resolve(),
         uploadJs: () => Promise.resolve()
@@ -101,8 +103,11 @@ const compile = function compile ({pt, rendering, outputType, child, useComponen
   const parts = path.parse(getScriptKey(pt))
   const name = path.join(parts.dir, parts.name)
 
-  return pack({name, rendering: rootRenderable, outputType, useComponentLib})
+  return pack({name, renderable, outputType, useComponentLib})
     .then(({src, css, cssFile}) => {
+      if (isDev && !useComponentLib) {
+        src += `;Fusion.Template.css=\`${css.replace('`', '\\`')}\``
+      }
       return Promise.all([
         uploadCss(cssFile, css),
         uploadJs(`${name}.js`, src)

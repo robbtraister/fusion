@@ -37,9 +37,11 @@ const render = () => {
       console.error('404')
       notFound()
     } else {
-      if (Fusion.Template.cssFile) {
-        const templateStyle = window.document.getElementById('template-style')
-        if (templateStyle) {
+      const templateStyle = window.document.getElementById('template-style')
+      if (templateStyle) {
+        if (Fusion.Template.css) {
+          templateStyle.innerHTML = Fusion.Template.css
+        } else if (Fusion.Template.cssFile) {
           templateStyle.href = `/${Fusion.prefix}/resources/${Fusion.Template.cssFile}`
         }
       }

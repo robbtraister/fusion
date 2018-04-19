@@ -26,7 +26,7 @@ const getComponentFile = function getComponentFile (type, id, outputType) {
   return null
 }
 
-function generateFile (rendering, outputType, useComponentLib) {
+function generateFile (renderable, outputType, useComponentLib) {
   const components = {}
   const types = {}
 
@@ -125,7 +125,7 @@ function generateFile (rendering, outputType, useComponentLib) {
             : ''
   }
 
-  const Template = renderableItem(rendering)
+  const Template = renderableItem(renderable)
 
   const contents = `'use strict'
 ${(useComponentLib)

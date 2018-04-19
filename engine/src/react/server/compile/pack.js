@@ -44,9 +44,9 @@ const getMemoryFS = function getMemoryFS () {
   return memFs
 }
 
-const pack = function pack ({name, rendering, outputType, useComponentLib}) {
+const pack = function pack ({name, renderable, outputType, useComponentLib}) {
   let tic = timer.tic()
-  return compileSource(rendering, outputType, useComponentLib)
+  return compileSource(renderable, outputType, useComponentLib)
     .then((source) => new Promise((resolve, reject) => {
       debugTimer('generate source', tic.toc())
       if (useComponentLib) {

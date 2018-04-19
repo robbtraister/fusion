@@ -12,6 +12,8 @@ const request = require('request-promise-native')
 const compile = require('./compile/component')
 const Provider = require('./provider')
 
+const { isDev } = require('../../environment')
+
 const timer = require('../../timer')
 
 const {
@@ -249,16 +251,24 @@ const compileDocument = function compileDocument (rendering, outputType, pt) {
                     )
                     : null
                 })()
-                : React.createElement(
-                  'link',
-                  {
-                    key: 'template-style',
-                    id: 'template-style',
-                    rel: 'stylesheet',
-                    type: 'text/css',
-                    href
-                  }
-                )
+                : (isDev)
+                  ? React.createElement(
+                    'style',
+                    {
+                      key: 'template-style',
+                      id: 'template-style'
+                    }
+                  )
+                  : React.createElement(
+                    'link',
+                    {
+                      key: 'template-style',
+                      id: 'template-style',
+                      rel: 'stylesheet',
+                      type: 'text/css',
+                      href
+                    }
+                  )
             }),
             /*
              * Each of the following are equivalent in JSX

@@ -19,23 +19,22 @@ const {
 
 const {
   compile,
-  getScriptPrefix,
   uploadScript
 } = require('../scripts')
 
-const scriptsRouter = express.Router()
+const distRouter = express.Router()
 
 // support dynamic field name since the value is possibly read from POST'ed body
 function getTypeRouter (fetchRendering, field = 'name') {
   const typeRouter = express.Router()
 
-  typeRouter.all(['/:name'],
+  typeRouter.get(['/:name.js'],
     bodyParser.json(),
     (req, res, next) => {
       // const tic = timer.tic()
       const payload = Object.assign(
         {
-          [field]: req.params.name.replace(/\.js$/, '')
+          [field]: req.params.name
         },
         req.body
       )
@@ -53,11 +52,11 @@ function getTypeRouter (fetchRendering, field = 'name') {
   return typeRouter
 }
 
-scriptsRouter.use('/page', getTypeRouter(getPageByName))
-scriptsRouter.use('/rendering', getTypeRouter(getRendering, 'id'))
-scriptsRouter.use('/template', getTypeRouter(getTemplateByName))
+distRouter.use('/page', getTypeRouter(getPageByName))
+distRouter.use('/rendering', getTypeRouter(getRendering, 'id'))
+distRouter.use('/template', getTypeRouter(getTemplateByName))
 
-scriptsRouter.all('*', (req, res, next) => {
+distRouter.get('*', (req, res, next) => {
   const pathname = url.parse(req.url).pathname
   fs.readFile(`${distRoot}${pathname}`, (err, src) => {
     err
@@ -66,10 +65,10 @@ scriptsRouter.all('*', (req, res, next) => {
         // return the script source
         res.set('Content-Type', 'application/javascript').send(src),
         // but also upload to s3 so we don't have to use the lambda next time
-        uploadScript(`${getScriptPrefix()}${pathname}`, src)
+        uploadScript(pathname, src)
       ])
         .catch(next)
   })
 })
 
-module.exports = scriptsRouter
+module.exports = distRouter

@@ -1,5 +1,7 @@
 'use strict'
 
+const childProcess = require('child_process')
+const fs = require('fs')
 const path = require('path')
 
 const S3 = require('aws-sdk').S3
@@ -14,15 +16,11 @@ const {
 const s3 = new S3({region: 'us-east-1'})
 
 const {
-  apiPrefix,
+  context,
   environment,
   isDev,
   version
 } = require('../environment')
-
-const getApiPrefix = function getApiPrefix () {
-  return apiPrefix
-}
 
 const getEnvironment = function getEnvironment () {
   return environment
@@ -36,14 +34,6 @@ const getScriptBucket = function getScriptBucket () {
   return 'pagebuilder-fusion'
 }
 
-const getScriptPrefix = function getScriptPrefix () {
-  return `${getEnvironment()}/${getVersion()}/scripts`
-}
-
-const getStylePrefix = function getStylePrefix () {
-  return `${getEnvironment()}/${getVersion()}/styles`
-}
-
 const getScriptKey = function getScriptKey (pt) {
   return (pt.uri)
     ? `page/${pt.uri.replace(/^\/*/, '').replace(/\/*$/, '')}.js`
@@ -51,16 +41,28 @@ const getScriptKey = function getScriptKey (pt) {
 }
 
 const getScriptUri = function getScriptUri (pt) {
-  return `${getApiPrefix()}/scripts/${getScriptKey(pt)}`
+  return `${context}/dist/${getScriptKey(pt)}`
 }
 
 const getScriptUrl = function getScriptUrl (pt) {
-  return `https://${getScriptBucket()}.s3.amazonaws.com/${getScriptPrefix()}/${getScriptKey(pt)}`
+  return `https://${getScriptBucket()}.s3.amazonaws.com/${getEnvironment()}/${getVersion()}/dist/${getScriptKey(pt)}`
 }
 
 const uploadScript = function uploadScript (key, src) {
   return (isDev)
-    ? Promise.resolve()
+    ? (() => {
+      const filePath = path.resolve(`${__dirname}/../../dist/${key}`)
+      return new Promise((resolve, reject) => {
+        childProcess.exec(`mkdir -p ${path.dirname(filePath)}`, (err) => {
+          err ? reject(err) : resolve()
+        })
+      })
+        .then(() => new Promise((resolve, reject) => {
+          fs.writeFile(`${__dirname}/../../dist/${key}`, src, (err) => {
+            err ? reject(err) : resolve()
+          })
+        }))
+    })()
     : new Promise((resolve, reject) => {
       zlib.gzip(src, (err, buf) => {
         err ? reject(err) : resolve(buf)
@@ -68,7 +70,7 @@ const uploadScript = function uploadScript (key, src) {
     }).then((buf) => new Promise((resolve, reject) => {
       s3.upload({
         Bucket: getScriptBucket(),
-        Key: key,
+        Key: `${getEnvironment()}/${getVersion()}/dist/${key}`,
         Body: buf,
         ACL: 'public-read',
         ContentType: 'application/javascript',
@@ -90,12 +92,12 @@ const compile = function compile ({pt, rendering, outputType, child, useComponen
     : (pt && !useComponentLib)
       ? {
         renderable: rendering,
-        uploadCss: (name, src) => uploadScript(`${getStylePrefix()}/${name}`, src),
-        uploadJs: (name, src) => uploadScript(`${getScriptPrefix()}/${name}`, src)
+        uploadCss: (name, src) => uploadScript(name, src),
+        uploadJs: (name, src) => uploadScript(name, src)
       }
       : {
         renderable: rendering,
-        // if in dev mode, do not upload
+        // admin request, do not upload
         uploadCss: () => Promise.resolve(),
         uploadJs: () => Promise.resolve()
       }
@@ -118,8 +120,6 @@ const compile = function compile ({pt, rendering, outputType, child, useComponen
 
 module.exports = {
   compile,
-  getApiPrefix,
-  getScriptPrefix,
   getScriptUri,
   getScriptUrl,
   getVersion,

@@ -6,15 +6,14 @@
   "scripts": {
     "build:components": "webpack --config ./webpack.components.js",
     "build:components:production": "NODE_ENV=production npm run build:components -- --mode production -p",
-    "watch:components": "npm run build:components -- --watch",
     "build:engine": "webpack --config ./webpack.engine.js",
     "build:engine:production": "NODE_ENV=production npm run build:engine -- --mode production -p",
-    "watch:engine": "npm run build:engine -- --watch",
-    "predeploy": "npm install && npm run build:engine:production && npm run build:components:production",
     "deploy": "sls deploy",
+    "predeploy": "npm install && npm run build:engine:production && npm run build:components:production",
     "prestart": "npm run watch:engine & npm run watch:components &",
     "start": "sls --stage=localhost offline start",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "watch:components": "npm run build:components -- --watch",
+    "watch:engine": "npm run build:engine -- --watch"
   },
   "keywords": [],
   "author": "",

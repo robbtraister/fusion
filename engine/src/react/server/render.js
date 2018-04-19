@@ -12,12 +12,9 @@ const request = require('request-promise-native')
 const compile = require('./compile/component')
 const Provider = require('./provider')
 
-const { isDev } = require('../../environment')
-
 const timer = require('../../timer')
 
 const {
-  getApiPrefix,
   getScriptUri,
   getVersion
 } = require('../../scripts')
@@ -55,7 +52,7 @@ const engineScript = React.createElement(
   {
     key: 'engine',
     type: 'application/javascript',
-    src: `${getApiPrefix()}/scripts/engine/react.js?v=${getVersion()}`,
+    src: `${context}/dist/engine/react.js?v=${getVersion()}`,
     defer: true
   }
 )
@@ -64,7 +61,7 @@ const componentsScript = React.createElement(
   {
     key: 'components',
     type: 'application/javascript',
-    src: `${getApiPrefix()}/scripts/components/all.js?v=${getVersion()}`,
+    src: `${context}/dist/components/all.js?v=${getVersion()}`,
     defer: true
   }
 )
@@ -251,24 +248,16 @@ const compileDocument = function compileDocument (rendering, outputType, pt) {
                     )
                     : null
                 })()
-                : (isDev)
-                  ? React.createElement(
-                    'style',
-                    {
-                      key: 'template-style',
-                      id: 'template-style'
-                    }
-                  )
-                  : React.createElement(
-                    'link',
-                    {
-                      key: 'template-style',
-                      id: 'template-style',
-                      rel: 'stylesheet',
-                      type: 'text/css',
-                      href
-                    }
-                  )
+                : React.createElement(
+                  'link',
+                  {
+                    key: 'template-style',
+                    id: 'template-style',
+                    rel: 'stylesheet',
+                    type: 'text/css',
+                    href
+                  }
+                )
             }),
             /*
              * Each of the following are equivalent in JSX

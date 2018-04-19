@@ -234,7 +234,28 @@ cat <<EOB
       return                   418;
     }
 
-    location ~ ^(${CONTEXT}|${API_PREFIX})/(resources|scripts)(/.*|$) {
+#     location ~ ^(${CONTEXT}|${API_PREFIX})/(resources)(/.*|$) {
+# EOB
+#
+# if [ ! "$(echo "${NODE_ENV}" | grep -i "^prod")" ]
+# then
+#   cat <<EOB
+#       root                     /dist;
+#       try_files                /\$2/\$3 @engine;
+# EOB
+# else
+#   cat <<EOB
+#       proxy_intercept_errors   on;
+#       error_page               400 403 404 418 = @engine;
+#
+#       set                      \$target ${S3_HOST}/\${environment}/\${version}/\$2\$3;
+#       proxy_pass               \$target;
+# EOB
+# fi
+# cat <<EOB
+#     }
+
+    location ~ ^(${CONTEXT}|${API_PREFIX})/(dist|resources)(/.*|$) {
       proxy_intercept_errors   on;
       error_page               400 403 404 418 = @engine;
 

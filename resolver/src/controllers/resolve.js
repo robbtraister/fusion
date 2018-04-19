@@ -8,6 +8,8 @@ const fetch = require('./fetch')
 
 const resolverConfig = require('../../config/resolvers.json')
 
+const { forceTrailingSlash } = require('../environment')
+
 const getNestedValue = function getNestedValue (target, field) {
   const keys = (field || '').split('.')
   let value = target
@@ -20,37 +22,36 @@ const getNestedValue = function getNestedValue (target, field) {
 }
 
 const getTemplateResolver = function getTemplateResolver (resolver) {
-  return (resolver.type === 'page')
-    ? (content) => ({page: resolver._id}) // Pages
+  return (resolver.type === 'page') ? (content) => ({page: resolver._id}) // Pages
     : (content) => { // Templates
-      console.log('content2pageMapping: ' + JSON.stringify(resolver.content2pageMapping))
       const contentPageMapping = resolver.content2pageMapping
-      if (typeof contentPageMapping === 'undefined') {
-        return {template: resolver.page}
-      } else {
+      if (contentPageMapping) {
         const contentValue = getNestedValue(content, contentPageMapping.field)
         let template = contentPageMapping.mapping[contentValue] || resolver.page
-        return {template: template}
+        return {template}
+      } else {
+        return {template: resolver.page}
       }
     }
 }
 
 const parseContentSourceParameters = function parseContentSourceParameters (resolver, requestUri) {
-  const contentParams = {}
-  Object.keys(resolver.contentConfigMapping).map(key => {
+  const contentParams = Object.assign(...Object.keys(resolver.contentConfigMapping).map(key => {
     const param = resolver.contentConfigMapping[key]
-    if (param.type === 'pattern') {
-      // TODO optimize for multiple pattern params so we don't regex match each time
-      const pattern = new RegExp(resolver.pattern)
-      let groups = getUriPathname(requestUri).match(pattern)
-      contentParams[key] = groups[param.index].replace(/\/*$/, '/') // force trailing slash
-    } else if (param.type === 'static') {
-      contentParams[key] = param.value
-    } else if (param.type === 'parameter') {
-      var queryParams = url.parse(requestUri, true).query
-      contentParams[key] = queryParams[param.name]
-    }
-  })
+    return {
+      parameter: (requestUri) => {
+        const queryParams = url.parse(requestUri, true).query
+        return {[key]: queryParams[param.name]}
+      },
+      pattern: (requestUri) => {
+        // TODO optimize for multiple pattern params so we don't regex match each time
+        const pattern = new RegExp(resolver.pattern)
+        let groups = getUriPathname(requestUri).match(pattern)
+        return {[key]: groups[param.index].replace(/\/*$/, '/')} // force trailing slash
+      },
+      static: () => ({[key]: param.value})
+    }[param.type](requestUri)
+  }))
   return contentParams
 }
 
@@ -60,7 +61,8 @@ const getResolverHydrater = function getResolverHydrater (resolver) {
   const contentResolver = (resolver.contentSourceId)
     ? (requestUri) => {
       const contentSourceParams = parseContentSourceParameters(resolver, requestUri)
-      return fetch(resolver.contentSourceId, Object.assign({'uri': requestUri.replace(/\/*$/, '/')}, contentSourceParams))
+      requestUri = forceTrailingSlash ? requestUri.replace(/\/*$/, '/') : requestUri
+      return fetch(resolver.contentSourceId, Object.assign({'uri': requestUri}, contentSourceParams))
     }
     : (requestUri) => Promise.resolve(null)
 
@@ -84,9 +86,7 @@ const getResolverMatcher = function getResolverMatcher (resolver) {
     return (requestUri) => resolver.uri === getUriPathname(requestUri)
   } else if (resolver.pattern) {
     const pattern = new RegExp(resolver.pattern)
-    return (requestUri) => {
-      return pattern.test(getUriPathname(requestUri))
-    }
+    return (requestUri) => pattern.test(getUriPathname(requestUri))
   }
   return () => null
 }

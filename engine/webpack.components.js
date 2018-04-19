@@ -7,20 +7,22 @@ const glob = require('glob')
 
 const { componentSrcRoot } = require('./src/environment')
 
-const components = require('./webpack/components')
-
+const templateConfigs = require('./webpack.template.js')
 const sharedConfigs = (entry) =>
   (Object.keys(entry).length)
-    ? Object.assign(
-      components(entry),
-      {
-        output: {
-          filename: `[name].js`,
-          path: path.resolve(__dirname, 'dist', 'components'),
-          libraryTarget: 'commonjs2'
+    // return an array so 'all' can be appended onto the components
+    ? [
+      Object.assign(
+        templateConfigs(entry),
+        {
+          output: {
+            filename: `[name].js`,
+            path: path.resolve(__dirname, 'dist', 'components'),
+            libraryTarget: 'commonjs2'
+          }
         }
-      }
-    )
+      )
+    ]
     : null
 
 const entry = {}
@@ -35,8 +37,6 @@ glob.sync(`${componentSrcRoot}/**/*.{hbs,js,jsx,vue}`)
   })
 
 const componentConfigs = sharedConfigs(entry)
-
-const otherConfigs = []
 if (componentConfigs) {
   fs.writeFileSync(`./all.jsx`,
     `
@@ -52,11 +52,11 @@ ${Object.keys(entry).map(name => {
 module.exports = Components
     `
   )
-  const allConfig = sharedConfigs({ all: './all.jsx' })
-  allConfig.plugins.shift() // remove ManifestPlugin
+  // shift the only element out of the array
+  const allConfig = sharedConfigs({ all: './all.jsx' }).shift()
   allConfig.output.library = `window.Fusion=window.Fusion||{};Fusion.Components`
   allConfig.output.libraryTarget = 'assign'
-  otherConfigs.push(allConfig)
+  componentConfigs.push(allConfig)
 }
 
-module.exports = [componentConfigs].concat(otherConfigs)
+module.exports = componentConfigs

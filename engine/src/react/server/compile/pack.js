@@ -90,7 +90,6 @@ const pack = function pack ({name, rendering, outputType, useComponentLib}) {
             }
 
             const manifest = JSON.parse(mfs.readFileSync(manifestFile).toString())
-            console.log(manifest)
             const cssName = `${name}.css`
             const cssFile = manifest[cssName]
             const css = mfs.readFileSync(`${componentDistRoot}/${cssFile}`).toString()

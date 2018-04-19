@@ -8,4 +8,7 @@ try {
   }
 } catch (e) {}
 
-module.exports = alias
+module.exports = {
+  alias,
+  extensions: ['.js', '.jsx']
+}

@@ -94,7 +94,7 @@ const getResolverMatcher = function getResolverMatcher (resolver) {
 // create page resolvers
 const pageResolvers = resolverConfig
   .pages.map(resolver => {
-    Object.assign(resolver, {type: 'page'})
+    resolver.type = 'page'
     return Object.assign(resolver,
       {
         hydrate: getResolverHydrater(resolver),
@@ -106,7 +106,7 @@ const pageResolvers = resolverConfig
 // create template resolvers
 const templateResolvers = resolverConfig
   .resolvers.map(resolver => {
-    Object.assign(resolver, {type: 'template'})
+    resolver.type = 'template'
     return Object.assign(resolver,
       {
         hydrate: getResolverHydrater(resolver),

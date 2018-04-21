@@ -17,6 +17,7 @@ const timer = require('../../../timer')
 const getConfigs = require('../../../../webpack.template.js')
 
 const sourceFile = path.resolve(`${componentSrcRoot}/templates/Template.jsx`)
+const destFile = path.resolve(`${componentDistRoot}/template.js`)
 const manifestFile = path.resolve(`${componentDistRoot}/manifest.json`)
 
 const getMemoryFS = function getMemoryFS () {
@@ -44,7 +45,7 @@ const getMemoryFS = function getMemoryFS () {
   return memFs
 }
 
-const pack = function pack ({name, renderable, outputType, useComponentLib}) {
+const pack = function pack ({renderable, outputType, useComponentLib}) {
   let tic = timer.tic()
   return compileSource(renderable, outputType, useComponentLib)
     .then((source) => new Promise((resolve, reject) => {
@@ -57,7 +58,6 @@ const pack = function pack ({name, renderable, outputType, useComponentLib}) {
 
           const mfs = getMemoryFS()
 
-          const destFile = path.resolve(`${componentDistRoot}/${name}.js`)
           mfs.mkdirpSync(path.dirname(sourceFile))
           mfs.mkdirpSync(path.dirname(destFile))
           mfs.writeFileSync(sourceFile, source)
@@ -66,7 +66,7 @@ const pack = function pack ({name, renderable, outputType, useComponentLib}) {
           tic = timer.tic()
 
           const configs = getConfigs({
-            [`${name}`]: sourceFile
+            template: sourceFile
           })
 
           debugTimer('webpack configs', tic.toc())
@@ -90,10 +90,10 @@ const pack = function pack ({name, renderable, outputType, useComponentLib}) {
             }
 
             const manifest = JSON.parse(mfs.readFileSync(manifestFile).toString())
-            const cssName = `${name}.css`
+            const cssName = 'template.css'
             const cssFile = manifest[cssName]
             const css = mfs.readFileSync(`${componentDistRoot}/${cssFile}`).toString()
-            const src = mfs.readFileSync(destFile).toString() + `;Fusion.Template.cssFile='${cssFile}'`
+            const src = mfs.readFileSync(destFile).toString()
 
             resolve({src, cssFile, css})
           })

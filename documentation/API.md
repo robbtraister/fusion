@@ -14,11 +14,11 @@ Fetch a specific piece of content, using the content source and key specified. O
 
 ## Rendering
 
--   `/render/(page|rendering|template)/:id[/:child-id][?outputType=:outputType]`
+-   `/render/(page|rendering|template)[/:id[/:child-id]][?outputType=:outputType]`
 
 Render the specified page/rendering/template/chain/feature by id as HTML. If generating a page/rendering/template, the result will be wrapped in the appropriate output-type (either as specified, or the default) and is suitable as a complete webpage. If generating a chain/feature, the containing page/rendering/template must be specified, and the resultant HTML will be only the chain/feature requested, with no output-type wrapping. A page/rendering/template may be rendered without an output-type wrapping by specifying `outputType=false`.
 
-To render with global content, use a POST request where the body of the request contains a JSON object with top-level `content` property.
+To render with global content, use a POST request where the body of the request contains a JSON object with top-level `content` property. The body may also contain the id. When POSTing, pages may be identified by either id or uri.
 
 
 ## Resolver
@@ -36,15 +36,22 @@ Resolve the trailing URI segment into a piece of global content and an associate
 
 Scripts are read significantly more frequently than they are written, so they will be stored in and served statically from S3.
 
--   `/scripts/engine/react.js`
+-   `/dist/engine/react.js`
 
 This is the primary client-side library that is shared and used for all pages/templates. It is specific to a fusion release, and can be cached very aggressively.
 
--   `/scripts/(page|template)/:name[?useComponentLib=true]`
--   `/scripts/rendering/:id`
+-   `/dist/page/:uri.js[?outputType=:outputType][&useComponentLib=true]`
+-   `/dist/rendering/:id.js[?outputType=:outputType]`
+-   `/dist/template/:name.js[?outputType=:outputType][?useComponentLib=true]`
 
 This returns the javascript function that is used by the fusion engine to generate a rendering. It is used by the client-side browser to update the template, if necessary, as well as hydrate script functionality in the browser.
 
-Pages and Templates should be referenced by name so that you will always receive the current published version. If you need an unpublished script, you must request it by rendering id.
+Pages and Templates should be referenced by name/uri so that you will always receive the current published version. If you need an unpublished script, you must request it by rendering id.
 
 Page and Template scripts should be re-generated and pushed to S3 on publish. If a request for a named page/template is not found in S3, it will be generated on-demand, returned to the caller, and pushed to S3.
+
+
+## Styles
+
+-   `/dist/page/:uri.:hash.css[?outputType=:outputType]`
+-   `/dist/template/:name.:hash.css[?outputType=:outputType]`

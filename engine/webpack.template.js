@@ -24,13 +24,13 @@ module.exports = (entry) =>
       output: {
         filename: `[name].js`,
         path: path.resolve(__dirname, 'dist', 'components'),
-        library: `window.Fusion=window.Fusion||{};Fusion.Template`,
+        library: `var Fusion=Fusion||{};Fusion.Template`,
         libraryTarget: 'assign'
       },
       plugins: [
         new ManifestPlugin(),
         new MiniCssExtractPlugin({
-          filename: '[name].[contenthash].css'
+          filename: '[contenthash].css'
         })
       ],
       resolve

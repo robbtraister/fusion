@@ -5,9 +5,7 @@ const engine = require('./engine')
 
 const endpoint = function endpoint (data, outputType) {
   const query = outputType ? `?outputType=${outputType}` : ''
-  return (data.page)
-    ? `/render/page/${data.page}${query}`
-    : `/render/template/${data.template}${query}`
+  return `/render/${data.type}${query}`
 }
 
 const make = function make (uri, outputType, version) {

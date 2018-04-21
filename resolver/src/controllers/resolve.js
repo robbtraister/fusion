@@ -8,8 +8,14 @@ const fetch = require('./fetch')
 
 const getTemplateResolver = function getTemplateResolver (resolver) {
   return (resolver.page)
-    ? (content) => ({page: resolver.page})
-    : (content) => ({template: resolver.template})
+    ? (content) => ({
+      type: 'page',
+      uri: resolver.page
+    })
+    : (content) => ({
+      type: 'template',
+      id: resolver.template
+    })
 }
 
 // const getTemplate = function getTemplate (resolver, ...args) {

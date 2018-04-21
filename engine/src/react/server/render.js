@@ -15,14 +15,14 @@ const Provider = require('./provider')
 const timer = require('../../timer')
 
 const {
-  getScriptUri,
-  getVersion
-} = require('../../scripts')
+  getOutputType
+} = require('../../scripts/info')
 
 const {
   componentDistRoot,
-  context,
-  onDemand
+  prefix,
+  onDemand,
+  version
 } = require('../../environment')
 
 // this wrapper allows a function to be used in JSX without parentheses
@@ -52,7 +52,7 @@ const engineScript = React.createElement(
   {
     key: 'engine',
     type: 'application/javascript',
-    src: `${context}/dist/engine/react.js?v=${getVersion()}`,
+    src: `/${prefix}/dist/engine/react.js?v=${version}`,
     defer: true
   }
 )
@@ -61,7 +61,7 @@ const componentsScript = React.createElement(
   {
     key: 'components',
     type: 'application/javascript',
-    src: `${context}/dist/components/all.js?v=${getVersion()}`,
+    src: `/${prefix}/dist/components/all.js?v=${version}`,
     defer: true
   }
 )
@@ -78,7 +78,7 @@ function getFusionScript (globalContent, contentCache, refreshContent) {
     })
 
   return `window.Fusion=window.Fusion||{};` +
-    `Fusion.prefix='${context}';` +
+    `Fusion.prefix='${prefix}';` +
     `Fusion.refreshContent=${onDemand ? 'false' : !!refreshContent};` +
     `Fusion.globalContent=${JSON.stringify(globalContent || {})};` +
     `Fusion.contentCache=${JSON.stringify(condensedCache)}`
@@ -138,11 +138,11 @@ const render = function render ({Component, requestUri, content}) {
     })
 }
 
-const compileRenderable = function compileRenderable (rendering, outputType) {
+const compileRenderable = function compileRenderable ({renderable, outputType}) {
   let tic = timer.tic()
-  return Promise.resolve(compile(rendering, outputType))
+  return Promise.resolve(compile(renderable, outputType))
     .then(Feature => {
-      debugTimer(`compile(${rendering._id})`, tic.toc())
+      debugTimer(`compile(${renderable._id || renderable.id})`, tic.toc())
       tic = timer.tic()
       return Provider(Feature)
     })
@@ -152,9 +152,9 @@ const compileRenderable = function compileRenderable (rendering, outputType) {
     })
 }
 
-const compileDocument = function compileDocument (rendering, outputType, pt) {
+const compileDocument = function compileDocument ({renderable, outputType, name}) {
   let tic
-  return compileRenderable(rendering, outputType)
+  return compileRenderable({renderable, outputType})
     .then((Template) => {
       tic = timer.tic()
 
@@ -195,7 +195,7 @@ const compileDocument = function compileDocument (rendering, outputType, pt) {
                 {
                   key: 'template',
                   type: 'application/javascript',
-                  src: `${getScriptUri(pt)}?v=${getVersion()}${outputType ? `&outputType=${outputType}` : ''}${useComponentLib ? '&useComponentLib=true' : ''}`,
+                  src: `/${prefix}/dist/${name}.js?v=${version}&outputType=${getOutputType(outputType)}${useComponentLib ? '&useComponentLib=true' : ''}`,
                   defer: true
                 }
               )
@@ -229,7 +229,7 @@ const compileDocument = function compileDocument (rendering, outputType, pt) {
               }
               inline = (inline === undefined) ? false : !!inline
 
-              const href = Template.cssFile
+              const href = renderable.cssFile ? `/${prefix}/dist/${renderable.cssFile}` : null
 
               return (inline && href)
                 ? (() => {

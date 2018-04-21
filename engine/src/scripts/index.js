@@ -10,55 +10,83 @@ const zlib = require('zlib')
 const pack = require('../react/server/compile/pack')
 
 const {
-  findRenderableItem
+  getBucket,
+  getOutputType,
+  getScriptKey
+} = require('./info')
+
+const { isDev } = require('../environment')
+
+const {
+  findRenderableItem,
+  getPage,
+  getRendering,
+  getTemplate
 } = require('../models/renderings')
+
+const {
+  compileDocument,
+  compileRenderable
+} = require('../react/server/render')
 
 const s3 = new S3({region: 'us-east-1'})
 
-const {
-  context,
-  environment,
-  isDev,
-  version
-} = require('../environment')
+const fetchRendering = (componentType) => {
+  const {fetchJson, field} = {
+    page: {
+      fetchJson: getPage,
+      field: 'uri'
+    },
+    rendering: {
+      fetchJson: getRendering,
+      field: 'id'
+    },
+    template: {
+      fetchJson: getTemplate,
+      field: 'id'
+    }
+  }[componentType]
 
-const getEnvironment = function getEnvironment () {
-  return environment
+  return (payload) => {
+    const id = payload[field].replace(/^\/*/, '').replace(/\/*$/, '')
+    const outputType = getOutputType(payload.outputType)
+
+    return new Promise((resolve, reject) => {
+      fs.readFile(`${__dirname}/../../dist/${componentType}/${id}/${outputType}.json`, (err, data) => {
+        err ? reject(err) : resolve({id, rendering: JSON.parse(data.toString())})
+      })
+    })
+      .catch(() => fetchJson({[field]: id}).then(({rendering}) => ({id, rendering})))
+      .catch(() => { throw new Error('Did not recognize componentType') })
+  }
 }
 
-const getVersion = function getVersion () {
-  return version
+const getComponent = (componentType) => {
+  const fetch = fetchRendering(componentType)
+
+  return (payload) => fetch(payload)
+    .then(({rendering, id}) => {
+      const renderable = (payload.child)
+        ? findRenderableItem(rendering)(payload.child)
+        : rendering
+
+      return (payload.child)
+        ? compileRenderable({renderable, outputType: payload.outputType})
+        : compileDocument({renderable, outputType: payload.outputType, name: `${componentType}/${id}`})
+    })
 }
 
-const getScriptBucket = function getScriptBucket () {
-  return 'pagebuilder-fusion'
-}
-
-const getScriptKey = function getScriptKey (pt) {
-  return (pt.uri)
-    ? `page/${pt.uri.replace(/^\/*/, '').replace(/\/*$/, '')}.js`
-    : `template/${pt._id.replace(/^\/*/, '').replace(/\/*$/, '')}.js`
-}
-
-const getScriptUri = function getScriptUri (pt) {
-  return `${context}/dist/${getScriptKey(pt)}`
-}
-
-const getScriptUrl = function getScriptUrl (pt) {
-  return `https://${getScriptBucket()}.s3.amazonaws.com/${getEnvironment()}/${getVersion()}/dist/${getScriptKey(pt)}`
-}
-
-const uploadScript = function uploadScript (key, src) {
+const uploadScript = function uploadScript (name, src) {
   return (isDev)
     ? (() => {
-      const filePath = path.resolve(`${__dirname}/../../dist/${key}`)
+      const filePath = path.resolve(`${__dirname}/../../dist/${name}`)
       return new Promise((resolve, reject) => {
         childProcess.exec(`mkdir -p ${path.dirname(filePath)}`, (err) => {
           err ? reject(err) : resolve()
         })
       })
         .then(() => new Promise((resolve, reject) => {
-          fs.writeFile(`${__dirname}/../../dist/${key}`, src, (err) => {
+          fs.writeFile(`${__dirname}/../../dist/${name}`, src, (err) => {
             err ? reject(err) : resolve()
           })
         }))
@@ -69,8 +97,8 @@ const uploadScript = function uploadScript (key, src) {
       })
     }).then((buf) => new Promise((resolve, reject) => {
       s3.upload({
-        Bucket: getScriptBucket(),
-        Key: `${getEnvironment()}/${getVersion()}/dist/${key}`,
+        Bucket: getBucket(),
+        Key: `${getScriptKey(name)}`,
         Body: buf,
         ACL: 'public-read',
         ContentType: 'application/javascript',
@@ -81,38 +109,31 @@ const uploadScript = function uploadScript (key, src) {
     }))
 }
 
-const compile = function compile ({pt, rendering, outputType, child, useComponentLib}) {
-  const {renderable, uploadCss, uploadJs} = (child)
+const compile = function compile ({name, rendering, outputType, child, useComponentLib}) {
+  const {renderable, upload} = (child)
     ? {
       renderable: findRenderableItem(rendering)(child),
       // if this is a child feature, do not upload
-      uploadCss: () => Promise.resolve(),
-      uploadJs: () => Promise.resolve()
+      upload: () => Promise.resolve()
     }
-    : (pt && !useComponentLib)
+    : (name && !useComponentLib)
       ? {
         renderable: rendering,
-        uploadCss: (name, src) => uploadScript(name, src),
-        uploadJs: (name, src) => uploadScript(name, src)
+        upload: uploadScript
       }
       : {
         renderable: rendering,
         // admin request, do not upload
-        uploadCss: () => Promise.resolve(),
-        uploadJs: () => Promise.resolve()
+        upload: () => Promise.resolve()
       }
 
-  const parts = path.parse(getScriptKey(pt))
-  const name = path.join(parts.dir, parts.name)
-
-  return pack({name, renderable, outputType, useComponentLib})
+  return pack({renderable, outputType, useComponentLib})
     .then(({src, css, cssFile}) => {
-      if (isDev && !useComponentLib) {
-        src += `;Fusion.Template.css=\`${css.replace('`', '\\`')}\``
-      }
+      src = src.replace(/;*$/, `;Fusion.Template.cssFile='${name}/${cssFile}'`)
       return Promise.all([
-        uploadCss(cssFile, css),
-        uploadJs(`${name}.js`, src)
+        upload(`${name}/${cssFile}`, css),
+        upload(`${name}/${getOutputType(outputType)}.js`, src),
+        upload(`${name}/${getOutputType(outputType)}.json`, JSON.stringify(Object.assign({}, rendering, {cssFile: `${name}/${cssFile}`})))
       ])
         .then(() => src)
     })
@@ -120,8 +141,7 @@ const compile = function compile ({pt, rendering, outputType, child, useComponen
 
 module.exports = {
   compile,
-  getScriptUri,
-  getScriptUrl,
-  getVersion,
+  fetchRendering,
+  getComponent,
   uploadScript
 }

@@ -180,6 +180,11 @@ cat <<EOB
     # ~^(?<env>[^.]+)            \$env;
   }
 
+  map \$arg_outputType \$outputType {
+    default                    \$arg_outputType;
+    ''                         'default';
+  }
+
   server {
     listen                     ${PORT:-8080};
     server_name                _;
@@ -229,33 +234,7 @@ cat <<EOB
       return 404;
     }
 
-    location ~ ^${API_PREFIX}/(content|environment|render)(/.*|$) {
-      error_page               418 = @engine;
-      return                   418;
-    }
-
-#     location ~ ^(${CONTEXT}|${API_PREFIX})/(resources)(/.*|$) {
-# EOB
-#
-# if [ ! "$(echo "${NODE_ENV}" | grep -i "^prod")" ]
-# then
-#   cat <<EOB
-#       root                     /dist;
-#       try_files                /\$2/\$3 @engine;
-# EOB
-# else
-#   cat <<EOB
-#       proxy_intercept_errors   on;
-#       error_page               400 403 404 418 = @engine;
-#
-#       set                      \$target ${S3_HOST}/\${environment}/\${version}/\$2\$3;
-#       proxy_pass               \$target;
-# EOB
-# fi
-# cat <<EOB
-#     }
-
-    location ~ ^(${CONTEXT}|${API_PREFIX})/(dist|resources)(/.*|$) {
+    location ~ ^(${CONTEXT}|${API_PREFIX})/(resources)(/.*|$) {
       proxy_intercept_errors   on;
       error_page               400 403 404 418 = @engine;
 
@@ -268,15 +247,43 @@ then
 EOB
 else
   cat <<EOB
-      if (\$arg_useComponentLib = 'true') {
-        return                 418;
-      }
-
       set                      \$target ${S3_HOST}/\${environment}/\${version}/\$2\$3;
       proxy_pass               \$target;
 EOB
 fi
 cat <<EOB
+    }
+
+    location ~ ^(${CONTEXT}|${API_PREFIX})/(dist)(/.*|$) {
+      proxy_intercept_errors   on;
+      error_page               400 403 404 418 = @engine;
+
+EOB
+
+if [ ! "$(echo "${NODE_ENV}" | grep -i "^prod")" ]
+then
+  cat <<EOB
+      return                   418;
+EOB
+else
+  cat <<EOB
+      if (\$request_method = 'POST' ) {
+        return                 418;
+      }
+      if (\$arg_useComponentLib = 'true') {
+        return                 418;
+      }
+
+      set                      \$target ${S3_HOST}/\${environment}/\${version}/${outputType}/\$2\$3;
+      proxy_pass               \$target;
+EOB
+fi
+cat <<EOB
+    }
+
+    location ~ ^${API_PREFIX}/(content|generate|render)(/.*|$) {
+      error_page               418 = @engine;
+      return                   418;
     }
 
     # keep 'resolve' as a group, since the pattern is re-used elsewhere and the trailing endpoint is referenced as $2

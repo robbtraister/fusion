@@ -50,13 +50,16 @@ const fetchFromS3 = ({componentType, id, outputType}) => {
       err ? reject(err) : resolve(data)
     })
   })
+    .then((src) => new Promise((resolve, reject) => {
+      zlib.gunzip(src, (err, buf) => {
+        err ? reject(err) : resolve({id, rendering: JSON.parse(buf.toString())})
+      })
+    }))
 }
 
-const fetchRendering = (componentType) => {
-  const fetchFile = (isDev)
-    ? fetchFromFS
-    : fetchFromS3
+const fetchFile = (isDev) ? fetchFromFS : fetchFromS3
 
+const fetchRendering = (componentType) => {
   const fetchRecord = {
     page: getPage,
     rendering: getRendering,
@@ -74,9 +77,9 @@ const fetchRendering = (componentType) => {
 }
 
 const getComponent = (componentType) => {
-  const fetch = fetchRendering(componentType)
+  const fetchType = fetchRendering(componentType)
 
-  return (payload) => fetch(payload)
+  return (payload) => fetchType(payload)
     .then(({rendering, id}) => {
       const renderable = (payload.child)
         ? findRenderableItem(rendering)(payload.child)
@@ -96,7 +99,7 @@ const uploadToFs = function uploadToFs (name, src) {
     })
   })
     .then(() => new Promise((resolve, reject) => {
-      fs.writeFile(`${__dirname}/../../dist/${name}`, src, (err) => {
+      fs.writeFile(filePath, src, (err) => {
         err ? reject(err) : resolve()
       })
     }))

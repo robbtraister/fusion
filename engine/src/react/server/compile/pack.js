@@ -22,6 +22,8 @@ const manifestFile = path.resolve(`${componentDistRoot}/manifest.json`)
 
 const getMemoryFS = function getMemoryFS () {
   const memFs = new MemoryFS()
+  // enable read-through access
+  // this is necessary for node modules
   const statOrig = memFs.stat.bind(memFs)
   const readFileOrig = memFs.readFile.bind(memFs)
   memFs.stat = function (_path, cb) {

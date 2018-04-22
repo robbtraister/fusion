@@ -12,7 +12,7 @@ const OutputType = (props) =>
     </head>
     <body>
       <div id='App'>
-        {/* {props.children} */}
+        {props.children}
       </div>
       {props.fusion}
     </body>

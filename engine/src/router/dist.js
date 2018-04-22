@@ -1,8 +1,6 @@
 'use strict'
 
 const fs = require('fs')
-const path = require('path')
-const url = require('url')
 
 const bodyParser = require('body-parser')
 const express = require('express')
@@ -27,9 +25,7 @@ distRouter.use('/engine', express.static(`${__dirname}/../../dist/engine`))
 
 // if POSTed, we will re-generate
 distRouter.get(/\.js$/, (req, res, next) => {
-  const pathname = url.parse(req.url).pathname
-  const parts = path.parse(pathname)
-  fs.readFile(`${distRoot}${parts.dir}/${parts.name}/${getOutputType(req.query.outputType)}.js`, (err, src) => {
+  fs.readFile(`${distRoot}${req.path.replace(/\.js$/, '')}/${getOutputType(req.query.outputType)}.js`, (err, src) => {
     err
       ? next()
       : res.set('Content-Type', 'application/javascript').send(src)
@@ -37,8 +33,7 @@ distRouter.get(/\.js$/, (req, res, next) => {
 })
 
 distRouter.all(/\.css$/, (req, res, next) => {
-  const pathname = url.parse(req.url).pathname
-  fs.readFile(`${distRoot}${pathname}`, (err, src) => {
+  fs.readFile(`${distRoot}${req.path}`, (err, src) => {
     err
       ? next()
       : res.set('Content-Type', 'text/css').send(src)
@@ -46,20 +41,18 @@ distRouter.all(/\.css$/, (req, res, next) => {
 })
 
 // support dynamic field name since the value is possibly read from POST'ed body
-function getTypeRouter (type, field = 'id') {
+function getTypeRouter (type) {
   const fetchType = fetchRendering(type)
 
   const typeRouter = express.Router()
 
-  typeRouter.all(/\.js$/,
+  typeRouter.all('/:id.js',
     bodyParser.json(),
     (req, res, next) => {
-      const id = req.path.replace(/^\/+/, '').replace(/\.js$/, '')
+      const id = req.params.id
       // const tic = timer.tic()
       const payload = Object.assign(
-        {
-          [field]: id
-        },
+        {id},
         req.body
       )
 
@@ -81,7 +74,7 @@ function getTypeRouter (type, field = 'id') {
   return typeRouter
 }
 
-distRouter.use('/page', getTypeRouter('page', 'uri'))
+distRouter.use('/page', getTypeRouter('page'))
 distRouter.use('/rendering', getTypeRouter('rendering'))
 distRouter.use('/template', getTypeRouter('template'))
 

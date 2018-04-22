@@ -11,7 +11,7 @@ const getContentGenerator = function getContentGenerator (contentCache) {
     const sourceCache = contentCache[source] || {}
 
     const fetchContent = (source, keyString, filter, cached) =>
-      window.fetch(`${(Fusion.prefix || '').replace(/^\/+/, '/').replace(/\/+$/, '')}/api/v3/content/${source}?key=${keyString}` + (filter ? `&query=${filter}` : ''))
+      window.fetch(`/${(Fusion.prefix || '').replace(/^\/+/, '/').replace(/\/+$/, '')}/api/v3/content/${source}?key=${keyString}` + (filter ? `&query=${filter}` : ''))
         .then(resp => resp.json())
         .catch(() => cached)
 

@@ -35,10 +35,10 @@ const getRenderingFromPageOrTemplate = function getRenderingFromPageOrTemplate (
         pt,
         rendering
       }))
-    : {
+    : Promise.resolve({
       pt: null,
       rendering: null
-    }
+    })
 }
 
 const getPage = function getPage (query) {

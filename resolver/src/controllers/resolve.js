@@ -10,7 +10,7 @@ const getTemplateResolver = function getTemplateResolver (resolver) {
   return (resolver.page)
     ? (content) => ({
       type: 'page',
-      uri: resolver.page
+      id: resolver.page
     })
     : (content) => ({
       type: 'template',

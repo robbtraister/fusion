@@ -16,7 +16,7 @@ const {
 const timer = require('../../../timer')
 const getConfigs = require('../../../../webpack.template.js')
 
-const sourceFile = path.resolve(`${componentSrcRoot}/templates/Template.jsx`)
+const sourceFile = path.resolve(`${componentSrcRoot}/template.jsx`)
 const destFile = path.resolve(`${componentDistRoot}/template.js`)
 const manifestFile = path.resolve(`${componentDistRoot}/manifest.json`)
 
@@ -92,7 +92,7 @@ const pack = function pack ({renderable, outputType, useComponentLib}) {
             const manifest = JSON.parse(mfs.readFileSync(manifestFile).toString())
             const cssName = 'template.css'
             const cssFile = manifest[cssName]
-            const css = mfs.readFileSync(`${componentDistRoot}/${cssFile}`).toString()
+            const css = cssFile ? mfs.readFileSync(`${componentDistRoot}/${cssFile}`).toString() : null
             const src = mfs.readFileSync(destFile).toString()
 
             resolve({src, cssFile, css})

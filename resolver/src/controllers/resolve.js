@@ -28,47 +28,58 @@ const enforceTrailingSlashRule = {
 }[trailingSlashRule]
 
 const getTemplateResolver = function getTemplateResolver (resolver) {
-  return (resolver.type === 'page')
-    ? (content) => ({page: resolver._id}) // Pages
+  const getId = (resolver.type === 'page')
+    ? (content) => resolver._id // Pages
     : (content) => { // Templates
       const contentPageMapping = resolver.content2pageMapping
       if (contentPageMapping) {
         const contentValue = getNestedValue(content, contentPageMapping.field)
         let template = contentPageMapping.mapping[contentValue] || resolver.page
-        return {template}
+        return template
       } else {
-        return {template: resolver.page}
+        return resolver.page
       }
     }
+
+  return (content) => ({
+    type: resolver.type,
+    id: getId(content)
+  })
 }
 
-const parseContentSourceParameters = function parseContentSourceParameters (resolver, requestUri) {
-  const contentParams = Object.assign(...Object.keys(resolver.contentConfigMapping).map(key => {
-    const param = resolver.contentConfigMapping[key]
-    return {
-      parameter: (requestUri) => {
-        const queryParams = url.parse(requestUri, true).query
-        return {[key]: queryParams[param.name]}
-      },
-      pattern: (requestUri) => {
-        // TODO optimize for multiple pattern params so we don't regex match each time
-        const pattern = new RegExp(resolver.pattern)
-        const groups = getUriPathname(requestUri).match(pattern)
-        const uri = enforceTrailingSlashRule(groups[param.index])
-        return {[key]: uri} // force trailing slash
-      },
-      static: () => ({[key]: param.value})
-    }[param.type](requestUri)
-  }))
-  return contentParams
+const parseContentSourceParameters = function parseContentSourceParameters (resolver) {
+  if (resolver.contentConfigMapping) {
+    const mappers = Object.keys(resolver.contentConfigMapping).map(key => {
+      const param = resolver.contentConfigMapping[key]
+      return {
+        parameter: (requestUri) => {
+          const queryParams = url.parse(requestUri, true).query
+          return {[key]: queryParams[param.name]}
+        },
+        pattern: (requestUri) => {
+          // TODO optimize for multiple pattern params so we don't regex match each time
+          const pattern = new RegExp(resolver.pattern)
+          const groups = getUriPathname(requestUri).match(pattern)
+          const uri = enforceTrailingSlashRule(groups[param.index])
+          return {[key]: uri} // force trailing slash
+        },
+        static: () => ({[key]: param.value})
+      }[param.type]
+    })
+
+    return (requestUri) => Object.assign(...mappers.map(mapper => mapper(requestUri)))
+  }
+  return () => null
 }
 
 const getResolverHydrater = function getResolverHydrater (resolver) {
   const templateResolver = getTemplateResolver(resolver)
 
+  const contentSourceParser = parseContentSourceParameters(resolver)
+
   const contentResolver = (resolver.contentSourceId)
     ? (requestUri) => {
-      const contentSourceParams = parseContentSourceParameters(resolver, requestUri)
+      const contentSourceParams = contentSourceParser(requestUri)
       requestUri = enforceTrailingSlashRule(requestUri)
       return fetch(resolver.contentSourceId, Object.assign({'uri': requestUri}, contentSourceParams))
     }

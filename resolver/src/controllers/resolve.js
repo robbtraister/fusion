@@ -8,7 +8,7 @@ const fetch = require('./fetch')
 
 const resolverConfig = require('../../config/resolvers.json')
 
-const { forceTrailingSlash } = require('../environment')
+const { trailingSlashRule } = require('../environment')
 
 const getNestedValue = function getNestedValue (target, field) {
   const keys = (field || '').split('.')
@@ -20,6 +20,20 @@ const getNestedValue = function getNestedValue (target, field) {
   }
   return value
 }
+
+const enforceTrailingSlashRule =  {
+  NOOP: (uri) => {
+    return uri
+  },
+  FORCE: (uri) => {
+    const lastSeparator = uri.lastIndexOf('/')
+    const extensionPosition = uri.lastIndexOf('.')
+    return lastSeparator > extensionPosition ? uri.replace(/\/*$/, '/') : uri
+  },
+  DROP: (uri) => {
+    return uri.replace(/\/*$/, '')
+  }
+}[trailingSlashRule]
 
 const getTemplateResolver = function getTemplateResolver (resolver) {
   return (resolver.type === 'page') ? (content) => ({page: resolver._id}) // Pages
@@ -46,8 +60,9 @@ const parseContentSourceParameters = function parseContentSourceParameters (reso
       pattern: (requestUri) => {
         // TODO optimize for multiple pattern params so we don't regex match each time
         const pattern = new RegExp(resolver.pattern)
-        let groups = getUriPathname(requestUri).match(pattern)
-        return {[key]: groups[param.index].replace(/\/*$/, '/')} // force trailing slash
+        const groups = getUriPathname(requestUri).match(pattern)
+        const uri = enforceTrailingSlashRule(groups[param.index])
+        return {[key]: uri} // force trailing slash
       },
       static: () => ({[key]: param.value})
     }[param.type](requestUri)
@@ -61,7 +76,7 @@ const getResolverHydrater = function getResolverHydrater (resolver) {
   const contentResolver = (resolver.contentSourceId)
     ? (requestUri) => {
       const contentSourceParams = parseContentSourceParameters(resolver, requestUri)
-      requestUri = forceTrailingSlash ? requestUri.replace(/\/*$/, '/') : requestUri
+      requestUri = enforceTrailingSlashRule(requestUri)
       return fetch(resolver.contentSourceId, Object.assign({'uri': requestUri}, contentSourceParams))
     }
     : (requestUri) => Promise.resolve(null)

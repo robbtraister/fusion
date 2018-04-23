@@ -72,7 +72,7 @@ services:
       ENVIRONMENT: localhost
       HTTP_ENGINE: http://engine.fusion:8080
       LAMBDA_ENGINE:
-      FORCE_TRAILING_SLASH:
+      TRAILING_SLASH_RULE: # Options are FORCE, DROP, or NOOP
     links:
       - 'engine:engine.fusion'
     ports:

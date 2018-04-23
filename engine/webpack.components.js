@@ -5,6 +5,8 @@ const path = require('path')
 
 const glob = require('glob')
 
+const CleanWebpackPlugin = require('clean-webpack-plugin')
+
 const { componentSrcRoot } = require('./src/environment')
 
 const templateConfigs = require('./webpack.template.js')
@@ -58,7 +60,18 @@ module.exports = Components
   allConfig.output.libraryTarget = 'assign'
 
   // clear local compilations for developers
-  // allConfig.plugins.push()
+  allConfig.plugins.push(
+    new CleanWebpackPlugin(
+      [
+        'page',
+        'template'
+      ],
+      {
+        root: path.resolve(__dirname, 'dist'),
+        watch: true
+      }
+    )
+  )
 
   componentConfigs.push(allConfig)
 }

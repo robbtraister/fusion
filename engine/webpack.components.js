@@ -56,6 +56,10 @@ module.exports = Components
   const allConfig = sharedConfigs({ all: './all.jsx' }).shift()
   allConfig.output.library = `window.Fusion=window.Fusion||{};Fusion.Components`
   allConfig.output.libraryTarget = 'assign'
+
+  // clear local compilations for developers
+  // allConfig.plugins.push()
+
   componentConfigs.push(allConfig)
 }
 

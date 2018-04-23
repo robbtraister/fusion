@@ -3,13 +3,11 @@
 const childProcess = require('child_process')
 const fs = require('fs')
 const path = require('path')
-
-const S3 = require('aws-sdk').S3
 const zlib = require('zlib')
 
-const pack = require('../react/server/compile/pack')
+const S3 = require('aws-sdk').S3
 
-const distDir = path.resolve(`${__dirname}/../../dist`)
+const s3 = new S3({region: 'us-east-1'})
 
 const {
   getBucket,
@@ -17,27 +15,22 @@ const {
   getS3Key
 } = require('./info')
 
-const { isDev } = require('../environment')
+const {
+  distRoot,
+  isDev
+} = require('../environment')
 
 const {
-  findRenderableItem,
   getPage,
   getRendering,
   getTemplate
 } = require('../models/renderings')
 
-const {
-  compileDocument,
-  compileRenderable
-} = require('../react/server/render')
-
-const s3 = new S3({region: 'us-east-1'})
-
 const fetchFromFS = (name) => {
-  const fp = path.resolve(`${distDir}/${name}`)
+  const fp = path.resolve(`${distRoot}/${name}`)
   return new Promise((resolve, reject) => {
     fs.readFile(fp, (err, data) => {
-      err ? reject(err) : resolve({rendering: JSON.parse(data.toString())})
+      err ? reject(err) : resolve(data.toString())
     })
   })
 }
@@ -53,7 +46,7 @@ const fetchFromS3 = (name) => {
   })
     .then((src) => new Promise((resolve, reject) => {
       zlib.gunzip(src, (err, buf) => {
-        err ? reject(err) : resolve({rendering: JSON.parse(buf.toString())})
+        err ? reject(err) : resolve(buf.toString())
       })
     }))
 }
@@ -72,29 +65,15 @@ const fetchRendering = (componentType) => {
     const outputType = getOutputType(payload.outputType)
 
     return fetchFile(`${componentType}/${id}/${getOutputType(outputType)}.json`)
+      .then((source) => ({rendering: JSON.parse(source)}))
       .catch(() => fetchRecord({id}))
       .then(({rendering}) => ({id, rendering}))
       .catch(() => { throw new Error(`Did not recognize component type: ${componentType}`) })
   }
 }
 
-const getComponent = (componentType) => {
-  const fetchType = fetchRendering(componentType)
-
-  return (payload) => fetchType(payload)
-    .then(({rendering, id}) => {
-      const renderable = (payload.child)
-        ? findRenderableItem(rendering)(payload.child)
-        : rendering
-
-      return (payload.child)
-        ? compileRenderable({renderable, outputType: payload.outputType})
-        : compileDocument({renderable, outputType: payload.outputType, name: `${componentType}/${id}`})
-    })
-}
-
-const uploadToFs = function uploadToFs (name, src) {
-  const filePath = path.resolve(`${distDir}/${name}`)
+const pushToFs = function pushToFs (name, src) {
+  const filePath = path.resolve(`${distRoot}/${name}`)
   return new Promise((resolve, reject) => {
     childProcess.exec(`mkdir -p ${path.dirname(filePath)}`, (err) => {
       err ? reject(err) : resolve()
@@ -107,7 +86,7 @@ const uploadToFs = function uploadToFs (name, src) {
     }))
 }
 
-const uploadToS3 = function uploadToS3 (name, src, ContentType) {
+const pushToS3 = function pushToS3 (name, src, ContentType) {
   return new Promise((resolve, reject) => {
     zlib.gzip(src, (err, buf) => {
       err ? reject(err) : resolve(buf)
@@ -127,31 +106,10 @@ const uploadToS3 = function uploadToS3 (name, src, ContentType) {
     }))
 }
 
-const upload = (isDev) ? uploadToFs : uploadToS3
-
-const compile = function compile ({name, rendering, outputType, child, useComponentLib}) {
-  const renderable = (child)
-    ? findRenderableItem(rendering)(child)
-    : rendering
-
-  return pack({renderable, outputType, useComponentLib})
-    .then(({src, css, cssFile}) => {
-      src = src.replace(/;*$/, `;Fusion.Template.cssFile='${name}/${cssFile}'`)
-      return (
-        (name && !child && !useComponentLib)
-          ? Promise.all([
-            upload(`${name}/${cssFile}`, css, 'text/css'),
-            upload(`${name}/${getOutputType(outputType)}.js`, src, 'application/javascript'),
-            upload(`${name}/${getOutputType(outputType)}.json`, JSON.stringify(Object.assign({}, rendering, {cssFile: `${name}/${cssFile}`})), 'application/json')
-          ])
-          : Promise.resolve()
-      )
-        .then(() => src)
-    })
-}
+const pushFile = (isDev) ? pushToFs : pushToS3
 
 module.exports = {
-  compile,
+  fetchFile,
   fetchRendering,
-  getComponent
+  pushFile
 }

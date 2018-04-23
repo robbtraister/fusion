@@ -9,7 +9,7 @@ const {
   render
 } = require('../react/server/render')
 
-const { getComponent } = require('../scripts')
+const { getComponent } = require('../scripts/component')
 
 const timer = require('../timer')
 

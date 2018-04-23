@@ -7,12 +7,18 @@ const debugTimer = require('debug')('fusion:timer:react:render')
 const React = require('react')
 const ReactDOM = require('react-dom/server')
 
-const request = require('request-promise-native')
-
-const compile = require('./compile/component')
+const compileComponent = require('./compile/component')
 const Provider = require('./provider')
 
 const timer = require('../../timer')
+
+const {
+  compileScript
+} = require('../../scripts/compile')
+
+const {
+  fetchFile
+} = require('../../scripts/io')
 
 const {
   getOutputType
@@ -140,7 +146,7 @@ const render = function render ({Component, requestUri, content}) {
 
 const compileRenderable = function compileRenderable ({renderable, outputType}) {
   let tic = timer.tic()
-  return Promise.resolve(compile(renderable, outputType))
+  return Promise.resolve(compileComponent(renderable, outputType))
     .then(Feature => {
       debugTimer(`compile(${renderable._id || renderable.id})`, tic.toc())
       tic = timer.tic()
@@ -229,35 +235,40 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
               }
               inline = (inline === undefined) ? false : !!inline
 
-              const href = renderable.cssFile ? `/${prefix}/dist/${renderable.cssFile}` : null
-
-              return (inline && href)
-                ? (() => {
-                  Component.inlines.styles = Component.inlines.styles || {
-                    cached: undefined,
-                    fetched: request(href)
-                      .then((data) => {
-                        Component.inlines.styles.cached = data
-                      })
-                  }
-                  return (Component.inlines.styles.cached)
-                    ? React.createElement(
-                      'style',
-                      {},
-                      Component.inlines.styles.cached
-                    )
-                    : null
-                })()
-                : React.createElement(
+              return (!inline)
+                ? React.createElement(
                   'link',
                   {
                     key: 'template-style',
                     id: 'template-style',
                     rel: 'stylesheet',
                     type: 'text/css',
-                    href
+                    href: renderable.cssFile ? `/${prefix}/dist/${renderable.cssFile}` : null
                   }
                 )
+                : (renderable.cssFile === null)
+                  ? null
+                  : (() => {
+                    Component.inlines.styles = Component.inlines.styles || {
+                      cached: undefined,
+                      fetched: (
+                        (renderable.cssFile)
+                          ? fetchFile(renderable.cssFile)
+                          : compileScript({name, rendering: renderable, outputType})
+                            .then(({css}) => css)
+                      )
+                        .then((data) => {
+                          Component.inlines.styles.cached = data
+                        })
+                    }
+                    return (Component.inlines.styles.cached)
+                      ? React.createElement(
+                        'style',
+                        {},
+                        Component.inlines.styles.cached
+                      )
+                      : null
+                  })()
             }),
             /*
              * Each of the following are equivalent in JSX

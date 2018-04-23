@@ -10,10 +10,13 @@ const {
 } = require('../environment')
 
 const {
-  compile,
-  fetchFromS3,
+  compileScript
+} = require('../scripts/compile')
+
+const {
+  fetchFile,
   fetchRendering
-} = require('../scripts')
+} = require('../scripts/io')
 
 const distRouter = express.Router()
 
@@ -21,7 +24,7 @@ const staticHandler = (isDev)
   ? (location) => express.static(`${distRoot}${location || ''}`)
   // should be handled by nginx
   : (location) => (req, res, next) => {
-    fetchFromS3(`${location || ''}${req.path}`)
+    fetchFile(`${location || ''}${req.path}`)
       .then(src => { res.send(src) })
   }
 
@@ -52,11 +55,11 @@ function getTypeRouter (type) {
       const name = type === 'rendering' ? null : `${type}/${id}`
 
       fetchType(payload)
-        .then(({rendering}) => compile({name, rendering, outputType, useComponentLib}))
+        .then(({rendering}) => compileScript({name, rendering, outputType, useComponentLib}))
         // if (isDev && !useComponentLib) {
         //   src += `;Fusion.Template.css=\`${css.replace('`', '\\`')}\``
         // }
-        .then((src) => { res.set('Content-Type', 'application/javascript').send(src) })
+        .then(({src}) => { res.set('Content-Type', 'application/javascript').send(src) })
         .catch(next)
     }
   )
@@ -74,7 +77,7 @@ function getTypeRouter (type) {
         const name = `${type}/${id}`
 
         fetchType(payload)
-          .then(({rendering}) => Promise.all(outputTypes.map((outputType) => compile({name, rendering, outputType}))))
+          .then(({rendering}) => Promise.all(outputTypes.map((outputType) => compileScript({name, rendering, outputType}))))
           .then(() => { res.sendStatus(200) })
           .catch(next)
       }

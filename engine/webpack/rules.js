@@ -2,6 +2,8 @@
 
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
+const { isDev } = require('../src/environment')
+
 module.exports = [
   {
     test: /\.jsx?$/i,
@@ -27,14 +29,24 @@ module.exports = [
     test: /\.css$/,
     use: [
       MiniCssExtractPlugin.loader,
-      'css-loader'
+      {
+        loader: 'css-loader',
+        options: {
+          minimize: !isDev
+        }
+      }
     ]
   },
   {
     test: /\.s[ac]ss$/,
     use: [
       MiniCssExtractPlugin.loader,
-      'css-loader',
+      {
+        loader: 'css-loader',
+        options: {
+          minimize: !isDev
+        }
+      },
       'sass-loader'
     ]
   }

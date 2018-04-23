@@ -6,13 +6,13 @@ const OutputType = (props) =>
   <html>
     <head>
       <title>Fusion Rendering</title>
-      {props.libs}
-      {props.css}
+      {props.css({inline: true})}
       <link rel='icon' type='image/x-icon' href='/pb/resources/favicon.ico' />
     </head>
     <body>
-      <div id='App' />
-      {props.fusion}
+      <div id='App'>
+        {props.children}
+      </div>
     </body>
   </html>
 

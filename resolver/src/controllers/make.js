@@ -3,17 +3,16 @@
 const resolve = require('./resolve')
 const engine = require('./engine')
 
-const endpoint = function endpoint (data) {
-  return (data.page)
-    ? `/render/page/${data.page}`
-    : `/render/template/${data.template}`
+const endpoint = function endpoint (data, outputType) {
+  const query = outputType ? `?outputType=${outputType}` : ''
+  return `/render/${data.type}${query}`
 }
 
-const make = function make (uri, version) {
+const make = function make (uri, outputType, version) {
   return resolve(uri)
     .then((data) => engine({
       method: 'POST',
-      uri: endpoint(data),
+      uri: endpoint(data, outputType),
       data,
       version
     }))

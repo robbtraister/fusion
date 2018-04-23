@@ -1,25 +1,44 @@
 'use strict'
 
 const fs = require('fs')
+const path = require('path')
+
 const glob = require('glob')
 
-const sharedConfigs = require('./webpack-jsx-configs')
+const CleanWebpackPlugin = require('clean-webpack-plugin')
 
 const { componentSrcRoot } = require('./src/environment')
+
+const templateConfigs = require('./webpack.template.js')
+const sharedConfigs = (entry) =>
+  (Object.keys(entry).length)
+    // return an array so 'all' can be appended onto the components
+    ? [
+      Object.assign(
+        templateConfigs(entry),
+        {
+          output: {
+            filename: `[name].js`,
+            path: path.resolve(__dirname, 'dist', 'components'),
+            libraryTarget: 'commonjs2'
+          }
+        }
+      )
+    ]
+    : null
 
 const entry = {}
 const types = {}
 glob.sync(`${componentSrcRoot}/**/*.{hbs,js,jsx,vue}`)
   .forEach(f => {
     const name = f.substr(componentSrcRoot.length + 1)
-    const type = name.split('/')[0]
+    const type = name.split('/').shift()
     types[type] = true
-    entry[name] = f
+    const parts = path.parse(name)
+    entry[path.join(parts.dir, parts.name)] = f
   })
 
 const componentConfigs = sharedConfigs(entry)
-
-const otherConfigs = []
 if (componentConfigs) {
   fs.writeFileSync(`./all.jsx`,
     `
@@ -35,10 +54,26 @@ ${Object.keys(entry).map(name => {
 module.exports = Components
     `
   )
-  const allConfig = sharedConfigs({ 'all.js': './all.jsx' })
+  // shift the only element out of the array
+  const allConfig = sharedConfigs({ all: './all.jsx' }).shift()
   allConfig.output.library = `window.Fusion=window.Fusion||{};Fusion.Components`
   allConfig.output.libraryTarget = 'assign'
-  otherConfigs.push(allConfig)
+
+  // clear local compilations for developers
+  allConfig.plugins.push(
+    new CleanWebpackPlugin(
+      [
+        'page',
+        'template'
+      ],
+      {
+        root: path.resolve(__dirname, 'dist'),
+        watch: true
+      }
+    )
+  )
+
+  componentConfigs.push(allConfig)
 }
 
-module.exports = [componentConfigs].concat(otherConfigs)
+module.exports = componentConfigs

@@ -7,20 +7,28 @@ const debugTimer = require('debug')('fusion:timer:react:render')
 const React = require('react')
 const ReactDOM = require('react-dom/server')
 
-const compile = require('./compile/component')
+const compileComponent = require('./compile/component')
 const Provider = require('./provider')
 
 const timer = require('../../timer')
 
 const {
-  getApiPrefix,
-  getScriptUri,
-  getVersion
-} = require('../../scripts')
+  compileScript
+} = require('../../scripts/compile')
 
 const {
-  context,
-  onDemand
+  fetchFile
+} = require('../../scripts/io')
+
+const {
+  getOutputType
+} = require('../../scripts/info')
+
+const {
+  componentDistRoot,
+  prefix,
+  onDemand,
+  version
 } = require('../../environment')
 
 // this wrapper allows a function to be used in JSX without parentheses
@@ -50,7 +58,7 @@ const engineScript = React.createElement(
   {
     key: 'engine',
     type: 'application/javascript',
-    src: `${getApiPrefix()}/scripts/engine/react.js?v=${getVersion()}`,
+    src: `/${prefix}/dist/engine/react.js?v=${version}`,
     defer: true
   }
 )
@@ -59,7 +67,7 @@ const componentsScript = React.createElement(
   {
     key: 'components',
     type: 'application/javascript',
-    src: `${getApiPrefix()}/scripts/components/all.js?v=${getVersion()}`,
+    src: `/${prefix}/dist/components/all.js?v=${version}`,
     defer: true
   }
 )
@@ -76,7 +84,7 @@ function getFusionScript (globalContent, contentCache, refreshContent) {
     })
 
   return `window.Fusion=window.Fusion||{};` +
-    `Fusion.prefix='${context}';` +
+    `Fusion.prefix='${prefix}';` +
     `Fusion.refreshContent=${onDemand ? 'false' : !!refreshContent};` +
     `Fusion.globalContent=${JSON.stringify(globalContent || {})};` +
     `Fusion.contentCache=${JSON.stringify(condensedCache)}`
@@ -107,11 +115,17 @@ const render = function render ({Component, requestUri, content}) {
       tic = timer.tic()
 
       // collect content cache into Promise array
+      const inlines = Component.inlines || {}
       const contentCache = Component.contentCache || {}
-      const contentPromises = [].concat(...Object.keys(contentCache).map(source => {
-        const sourceCache = contentCache[source]
-        return Object.keys(sourceCache).map(key => sourceCache[key].fetched)
-      }))
+      const contentPromises = [].concat(
+        Object.keys(inlines)
+          .map(inline => inlines[inline].fetched),
+        ...Object.keys(contentCache)
+          .map(source => {
+            const sourceCache = contentCache[source]
+            return Object.keys(sourceCache).map(key => sourceCache[key].fetched)
+          })
+      )
 
       return contentPromises.length === 0
         // if no feature content is requested, return original rendering
@@ -130,11 +144,11 @@ const render = function render ({Component, requestUri, content}) {
     })
 }
 
-const compileRenderable = function compileRenderable (rendering) {
+const compileRenderable = function compileRenderable ({renderable, outputType}) {
   let tic = timer.tic()
-  return Promise.resolve(compile(rendering))
+  return Promise.resolve(compileComponent(renderable, outputType))
     .then(Feature => {
-      debugTimer(`compile(${rendering._id})`, tic.toc())
+      debugTimer(`compile(${renderable._id || renderable.id})`, tic.toc())
       tic = timer.tic()
       return Provider(Feature)
     })
@@ -144,15 +158,15 @@ const compileRenderable = function compileRenderable (rendering) {
     })
 }
 
-const compileOutputType = function compileOutputType (rendering, pt, outputType) {
+const compileDocument = function compileDocument ({renderable, outputType, name}) {
   let tic
-  return compileRenderable(rendering)
+  return compileRenderable({renderable, outputType})
     .then((Template) => {
       tic = timer.tic()
 
       const OutputType = (() => {
         try {
-          return require(`../../../dist/components/output-types/${outputType || 'react'}.jsx`)
+          return require(`${componentDistRoot}/output-types/${getOutputType(outputType)}.js`)
         } catch (e) {
           const err = new Error(`Could not find output-type: ${outputType}`)
           err.statusCode = 400
@@ -187,7 +201,7 @@ const compileOutputType = function compileOutputType (rendering, pt, outputType)
                 {
                   key: 'template',
                   type: 'application/javascript',
-                  src: `${getScriptUri(pt)}?v=${getVersion()}${useComponentLib ? '&useComponentLib=true' : ''}`,
+                  src: `/${prefix}/dist/${name}/${getOutputType(outputType)}.js?v=${version}${useComponentLib ? '&useComponentLib=true' : ''}`,
                   defer: true
                 }
               )
@@ -202,6 +216,59 @@ const compileOutputType = function compileOutputType (rendering, pt, outputType)
                   engineScript,
                   templateScript
                 ]
+            }),
+            /*
+             * Each of the following are equivalent in JSX
+             *   {props.css}
+             *   {props.css()}
+             *   {props.css(false)}
+             *   {props.css({inline: false})}
+             *
+             * To inline the css
+             * (larger payload, bad for cache; suitable for AMP)
+             *   {props.css(true)}
+             *   {props.css({inline: true})}
+             */
+            css: propFunction(function (inline) {
+              if (typeof inline === 'object') {
+                inline = inline.inline
+              }
+              inline = (inline === undefined) ? false : !!inline
+
+              return (!inline)
+                ? React.createElement(
+                  'link',
+                  {
+                    key: 'template-style',
+                    id: 'template-style',
+                    rel: 'stylesheet',
+                    type: 'text/css',
+                    href: renderable.cssFile ? `/${prefix}/dist/${renderable.cssFile}` : null
+                  }
+                )
+                : (renderable.cssFile === null)
+                  ? null
+                  : (() => {
+                    Component.inlines.styles = Component.inlines.styles || {
+                      cached: undefined,
+                      fetched: (
+                        (renderable.cssFile)
+                          ? fetchFile(renderable.cssFile)
+                          : compileScript({name, rendering: renderable, outputType})
+                            .then(({css}) => css)
+                      )
+                        .then((data) => {
+                          Component.inlines.styles.cached = data
+                        })
+                    }
+                    return (Component.inlines.styles.cached)
+                      ? React.createElement(
+                        'style',
+                        {},
+                        Component.inlines.styles.cached
+                      )
+                      : null
+                  })()
             }),
             /*
              * Each of the following are equivalent in JSX
@@ -236,6 +303,7 @@ const compileOutputType = function compileOutputType (rendering, pt, outputType)
         )
       }
 
+      Component.inlines = Template.inlines
       // bubble up the Provider contentCache
       Component.contentCache = Template.contentCache
       return Component
@@ -247,7 +315,7 @@ const compileOutputType = function compileOutputType (rendering, pt, outputType)
 }
 
 module.exports = {
-  compileOutputType,
+  compileDocument,
   compileRenderable,
   render
 }

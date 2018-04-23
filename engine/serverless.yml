@@ -15,7 +15,7 @@ provider:
       - subnet-c3ece0e9
       - subnet-ee718da7
   environment:
-    NODE_ENV: ${env:NODE_ENV, 'production'}
+    NODE_ENV: ${env:NODE_ENV, 'development'}
     ENVIRONMENT: ${self:provider.stage}
     ON_DEMAND: ${env:ON_DEMAND, 'true'}
 

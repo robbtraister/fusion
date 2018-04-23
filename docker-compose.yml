@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 services:
   origin:
     image: quay.io/washpost/fusion-origin
@@ -28,7 +28,7 @@ services:
       DAO_CREDENTIALS: |
         localhost|abc|def
       MONGO_URLS: |
-        localhost|mongodb://data:27017/fusion_dev
+        localhost|mongodb://data:27017/${DB_NAME:-fusion_dev}
     links:
       - 'data'
     ports:

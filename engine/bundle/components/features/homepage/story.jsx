@@ -3,6 +3,9 @@
 const React = require('react')
 const Consumer = require('consumer')
 
+require('./style.scss')
+require('./style2.scss')
+
 const query = `
   {
     description {

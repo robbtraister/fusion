@@ -59,7 +59,7 @@ function HOC (Component) {
           const content = context.getContent(...args)
 
           return {
-            cached: appendLocalEdits(content.cached),
+            cached: content.cached && appendLocalEdits(content.cached),
             fetched: content.fetched
               .then(appendLocalEdits)
           }

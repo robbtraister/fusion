@@ -8,87 +8,113 @@ const webpack = require('webpack')
 
 const debugTimer = require('debug')('fusion:timer:react:compile:pack')
 
-const compileSource = require('./source')
-const timer = require('../../../timer')
-const getConfigs = require('../../../../webpack-jsx-configs.js')
+const promisify = require('../../../utils/promisify')
 
-const sourceFile = path.resolve(`${__dirname}/../../../../bundle/components/templates/Template.jsx`)
-const destFile = path.resolve(`${__dirname}/../../../../dist/components/templates/Template.jsx`)
+const generateSource = require('./source')
+const {
+  componentDistRoot,
+  componentSrcRoot
+} = require('../../../environment')
+const timer = require('../../../timer')
+const getConfigs = require('../../../../webpack.template.js')
+
+const sourceFile = path.resolve(`${componentSrcRoot}/template.jsx`)
+const destFile = path.resolve(`${componentDistRoot}/template.js`)
+const manifestFile = path.resolve(`${componentDistRoot}/manifest.json`)
 
 const getMemoryFS = function getMemoryFS () {
   const memFs = new MemoryFS()
+  // enable read-through access
+  // this is necessary for node modules
   const statOrig = memFs.stat.bind(memFs)
   const readFileOrig = memFs.readFile.bind(memFs)
   memFs.stat = function (_path, cb) {
     statOrig(_path, function (err, result) {
-      if (err) {
-        return fs.stat(_path, cb)
-      } else {
-        return cb(err, result)
-      }
+      return (err)
+        ? fs.stat(_path, cb)
+        : cb(err, result)
     })
   }
-  memFs.readFile = function (path, cb) {
-    readFileOrig(path, function (err, result) {
-      if (err) {
-        return fs.readFile(path, cb)
-      } else {
-        return cb(err, result)
-      }
+  memFs.readFile = function (_path, cb) {
+    readFileOrig(_path, function (err, result) {
+      return (err)
+        ? fs.readFile(_path, cb)
+        : cb(err, result)
     })
   }
+
+  memFs.mkdirpPromise = promisify(memFs.mkdirp.bind(memFs))
+  memFs.readFilePromise = promisify(memFs.readFile.bind(memFs))
+  memFs.writeFilePromise = promisify(memFs.writeFile.bind(memFs))
+
   return memFs
 }
 
-const pack = function pack (rendering, useComponentLib) {
+const compile = function compile (src) {
   let tic = timer.tic()
-  return compileSource(rendering, useComponentLib)
-    .then((source) => new Promise((resolve, reject) => {
-      debugTimer('generate source', tic.toc())
-      if (useComponentLib) {
-        return resolve(source)
-      } else {
-        try {
-          tic = timer.tic()
 
-          const mfs = getMemoryFS()
+  const mfs = getMemoryFS()
 
-          mfs.mkdirpSync(path.dirname(sourceFile))
-          mfs.mkdirpSync(path.dirname(destFile))
-          mfs.writeFileSync(sourceFile, source)
+  return Promise.all([
+    Promise.resolve({template: sourceFile})
+      .then(getConfigs)
+      .then(webpack)
+      .then((compiler) => {
+        compiler.inputFileSystem = mfs
+        compiler.outputFileSystem = mfs
 
-          debugTimer('write source to memory fs', tic.toc())
-          tic = timer.tic()
+        debugTimer('webpack setup', tic.toc())
 
-          const configs = getConfigs({
-            'templates/Template.jsx': sourceFile
-          })
-          configs.output.library = `window.Fusion=window.Fusion||{};Fusion.Template`
-          configs.output.libraryTarget = 'assign'
+        return compiler
+      }),
+    mfs.mkdirpPromise(path.dirname(sourceFile))
+      .then(() => mfs.writeFilePromise(sourceFile, src))
+      .then(() => {
+        debugTimer('write source to memory fs', tic.toc())
+      }),
+    mfs.mkdirpPromise(path.dirname(destFile))
+  ])
+    .then(([compiler]) => {
+      tic = timer.tic()
+      return promisify(compiler.run.bind(compiler))()
+    })
+    .then((data) => {
+      debugTimer('webpack compilation', tic.toc())
 
-          debugTimer('webpack configs', tic.toc())
-          tic = timer.tic()
-
-          const compiler = webpack(configs)
-          compiler.inputFileSystem = mfs
-          compiler.outputFileSystem = mfs
-
-          debugTimer('webpack setup', tic.toc())
-          tic = timer.tic()
-
-          compiler.run((err, data) => {
-            debugTimer('webpack compilation', tic.toc())
-            ;(err)
-              ? reject(err)
-              : (data.hasErrors())
-                ? reject(data.toJson().errors)
-                : resolve(mfs.readFileSync(destFile).toString())
-          })
-        } catch (e) {
-          reject(e)
-        }
+      if (data.hasErrors()) {
+        return Promise.reject(data.toJson().errors)
       }
-    }))
+    })
+    .then(() => Promise.all([
+      mfs.readFilePromise(destFile)
+        .then((srcBuf) => srcBuf.toString()),
+      mfs.readFilePromise(manifestFile)
+        .then((manifestJson) => {
+          const manifest = JSON.parse(manifestJson.toString())
+          const cssFile = manifest['template.css']
+          return cssFile
+            ? mfs.readFilePromise(`${componentDistRoot}/${cssFile}`)
+              .then((cssBuf) => cssBuf.toString())
+              .then((css) => ({cssFile, css}))
+            : {
+              cssFile: null,
+              css: null
+            }
+        })
+    ]))
+    .then(([src, {cssFile, css}]) => ({src, cssFile, css}))
+}
+
+const pack = function pack ({renderable, outputType, useComponentLib}) {
+  let tic = timer.tic()
+  return generateSource(renderable, outputType, useComponentLib)
+    .then((src) => {
+      debugTimer('generate source', tic.toc())
+
+      return (useComponentLib)
+        ? {src}
+        : compile(src)
+    })
 }
 
 module.exports = pack

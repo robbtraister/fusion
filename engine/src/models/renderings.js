@@ -5,12 +5,12 @@ const Pages = model('page')
 const Renderings = model('rendering')
 const Templates = model('template')
 
-const getRenderingById = function getRenderingById (id) {
-  return Renderings.findById(id)
-}
-
 const getRendering = function getRendering (id) {
-  return getRenderingById(id)
+  if (typeof id === 'object') {
+    id = id.id
+  }
+
+  return Renderings.findById(id)
     .then((rendering) => {
       return (rendering)
         ? Promise.all([
@@ -30,30 +30,39 @@ const getRendering = function getRendering (id) {
 
 const getRenderingFromPageOrTemplate = function getRenderingFromPageOrTemplate (pt) {
   return (pt)
-    ? getRenderingById(pt.versions[pt.published].head)
+    ? Renderings.findById(pt.versions[pt.published].head)
       .then((rendering) => ({
         pt,
         rendering
       }))
-    : {
+    : Promise.resolve({
       pt: null,
       rendering: null
-    }
+    })
 }
 
-const getPageOrTemplateHead = (Collection) => (id) => {
-  return Collection.findById(id)
+const getPage = function getPage (query) {
+  if (typeof query !== 'object') {
+    query = {id: query}
+  }
+  if (query.uri) {
+    query.uri = query.uri.replace(/^\/*/, '/').replace(/\/*$/, '/')
+  }
+
+  return (
+    (query.id)
+      ? Pages.findById(query.id)
+      : Pages.findOne(query)
+  )
     .then(getRenderingFromPageOrTemplate)
 }
 
-const getPageByName = function getPageByName (name) {
-  const uri = name.replace(/^\/*/, '/').replace(/\/*$/, '/')
-  return Pages.findOne({uri})
-    .then(getRenderingFromPageOrTemplate)
-}
+const getTemplate = function getTemplate (id) {
+  if (typeof id === 'object') {
+    id = id.id
+  }
 
-const getTemplateByName = function getTemplateByName (name) {
-  return Templates.findById(name)
+  return Templates.findById(id)
     .then(getRenderingFromPageOrTemplate)
 }
 
@@ -73,14 +82,9 @@ const findRenderableItem = (rendering) => (childId) => {
   return getAllRenderables(rendering).find(renderableItem => renderableItem.id === childId)
 }
 
-const getPageHead = getPageOrTemplateHead(Pages)
-const getTemplateHead = getPageOrTemplateHead(Templates)
-
 module.exports = {
   findRenderableItem,
-  getPageByName,
-  getPageHead,
+  getPage,
   getRendering,
-  getTemplateByName,
-  getTemplateHead
+  getTemplate
 }

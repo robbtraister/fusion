@@ -18,15 +18,31 @@ const TimedComponent = (Component) => (props) => {
 // For simplification, create each element as a functional component
 // This allows any feature to be exported for rendering
 // When compiling container children, execute the functional Component to get the Element
-const renderAll = function renderAll (renderableItems) {
+const renderAll = function renderAll (renderableItems, outputType) {
   return (renderableItems || [])
-    .map((ri, i) => renderableItem(ri, i)())
+    .map((ri, i) => renderableItem(ri, outputType, i)())
     .filter(ri => ri)
 }
 
-const feature = function feature (config) {
-  try {
-    const Feature = require(`${componentDistRoot}/features/${config.featureConfig}.jsx`)
+const componentFiles = [
+  (componentName, outputType) => outputType ? `${componentName}/${outputType}.js` : null,
+  (componentName, outputType) => `${componentName}/default.js`,
+  (componentName, outputType) => `${componentName}/index.js`,
+  (componentName, outputType) => `${componentName}.js`
+]
+
+const loadComponent = function loadComponent (componentName, outputType) {
+  for (let i = 0; i < componentFiles.length; i++) {
+    try {
+      return require(componentFiles[i](componentName, outputType))
+    } catch (e) {}
+  }
+  return null
+}
+
+const feature = function feature (config, outputType) {
+  const Feature = loadComponent(`${componentDistRoot}/features/${config.featureConfig}`, outputType)
+  if (Feature) {
     const Component = TimedComponent(Feature)
 
     const props = {
@@ -46,20 +62,12 @@ const feature = function feature (config) {
       Component,
       props
     )
-  } catch (e) {
-    // console.error(e)
-    return null
   }
 }
 
-const chain = function chain (config) {
-  const Component = (() => {
-    try {
-      return TimedComponent(require(`${componentDistRoot}/chains/${config.chainConfig}.jsx`))
-    } catch (e) {
-      return 'div'
-    }
-  })()
+const chain = function chain (config, outputType) {
+  const Chain = loadComponent(`${componentDistRoot}/chains/${config.chainConfig}`, outputType)
+  const Component = Chain ? TimedComponent(Chain) : 'div'
 
   return () => React.createElement(
     Component,
@@ -68,50 +76,46 @@ const chain = function chain (config) {
       id: config.id,
       type: config.chainConfig
     },
-    renderAll(config.features)
+    renderAll(config.features, outputType)
   )
 }
 
-const section = function section (config, index) {
+const section = function section (config, outputType, index) {
   return () => React.createElement(
     'section',
     {
-      key: index
+      key: index,
+      id: index,
+      type: 'section'
     },
-    renderAll(config.renderableItems)
+    renderAll(config.renderableItems, outputType)
   )
 }
 
-const template = function template (rendering) {
-  const Component = (() => {
-    try {
-      return require(`${componentDistRoot}/layouts/${rendering.layout}.jsx`)
-    } catch (e) {
-      return 'div'
-    }
-  })()
-
-  const children = renderAll(rendering.layoutItems)
+const layout = function layout (rendering, outputType) {
+  const Layout = loadComponent(`${componentDistRoot}/layouts/${rendering.layout}`, outputType)
+  const Component = Layout ? TimedComponent(Layout) : 'div'
 
   return () => React.createElement(
     Component,
     {
-      key: rendering.id,
-      id: rendering.id
+      key: rendering.id || rendering._id,
+      id: rendering.id || rendering._id,
+      type: 'rendering'
     },
-    children
+    renderAll(rendering.layoutItems, outputType)
   )
 }
 
-const renderableItem = function renderableItem (config, index) {
+const renderableItem = function renderableItem (config, outputType, index) {
   const Component = (config.featureConfig)
-    ? feature(config)
+    ? feature(config, outputType)
     : (config.chainConfig)
-      ? chain(config)
+      ? chain(config, outputType)
       : (config.renderableItems)
-        ? section(config, index)
+        ? section(config, outputType, index)
         : (config.layoutItems)
-          ? template(config)
+          ? layout(config, outputType)
           : null
   return Component || (() => null)
 }

@@ -4,27 +4,38 @@ const fs = require('fs')
 
 const { componentSrcRoot } = require('../../../environment')
 
-function getComponentFile (type, id) {
-  return `${componentSrcRoot}/${type}/${id}.jsx`
-}
-
 function componentImport (fp, name) {
   return `Fusion.Components${name} = require('${fp}')`
 }
 
-function generateFile (rendering, useComponentLib) {
+const componentFiles = [
+  (componentName, outputType) => outputType ? `${componentName}/${outputType}.jsx` : null,
+  (componentName, outputType) => `${componentName}/default.jsx`,
+  (componentName, outputType) => `${componentName}/index.jsx`,
+  (componentName, outputType) => `${componentName}.jsx`
+]
+
+const getComponentFile = function getComponentFile (type, id, outputType) {
+  for (let i = 0; i < componentFiles.length; i++) {
+    try {
+      const key = componentFiles[i](`${componentSrcRoot}/${type}/${id}`, outputType)
+      fs.accessSync(key, fs.constants.R_OK)
+      return key
+    } catch (e) {}
+  }
+  return null
+}
+
+function generateFile (renderable, outputType, useComponentLib) {
   const components = {}
   const types = {}
 
   function getComponentName (type, id) {
-    const key = getComponentFile(type, id)
-    try {
-      fs.accessSync(key, fs.constants.R_OK)
+    const key = getComponentFile(type, id, outputType)
+    if (key) {
       types[type] = true
       components[key] = components[key] || `['${type}']['${id}']`
       return components[key]
-    } catch (e) {
-      // do nothing
     }
   }
 
@@ -67,7 +78,9 @@ function generateFile (rendering, useComponentLib) {
   function section (config, index) {
     const component = `'section'`
     const props = {
-      key: index
+      key: index,
+      id: index,
+      type: 'section'
     }
     return `React.createElement(${component}, ${JSON.stringify(props)}, [${config.renderableItems.map(renderableItem).filter(ri => ri).join(',')}])`
   }
@@ -76,7 +89,7 @@ function generateFile (rendering, useComponentLib) {
   //   return `[${config.layoutItems.map((item, i) => layout(item, rendering.layout && rendering.layout.sections && rendering.layout.sections[i])).join(',')}]`
   // }
 
-  function template (config) {
+  function layout (config) {
     const componentName = getComponentName('layouts', config.layout)
     const component = (componentName)
       ? `Fusion.Components${componentName}`
@@ -84,7 +97,8 @@ function generateFile (rendering, useComponentLib) {
 
     const props = {
       key: config.id || config._id,
-      id: config.id || config._id
+      id: config.id || config._id,
+      type: 'rendering'
     }
 
     return `React.createElement(${component}, ${JSON.stringify(props)}, [${config.layoutItems.map(renderableItem).join(',')}])`
@@ -107,11 +121,11 @@ function generateFile (rendering, useComponentLib) {
     return (config.featureConfig) ? feature(config)
       : (config.chainConfig) ? chain(config)
         : (config.renderableItems) ? section(config, index)
-          : (config.layoutItems) ? template(config)
+          : (config.layoutItems) ? layout(config)
             : ''
   }
 
-  const Template = renderableItem(rendering)
+  const Template = renderableItem(renderable)
 
   const contents = `'use strict'
 ${(useComponentLib)

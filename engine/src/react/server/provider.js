@@ -75,5 +75,6 @@ module.exports = (Template) => {
     React.createElement(Template)
   )
   wrapper.contentCache = contentCache
+  wrapper.inlines = {}
   return wrapper
 }

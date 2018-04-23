@@ -2,6 +2,8 @@
 
 const path = require('path')
 
+const glob = require('glob')
+
 const contentBase = process.env.CONTENT_BASE || ''
 const prefix = (process.env.CONTEXT || 'pb').replace(/^\/+/, '').replace(/\/+$/, '')
 const apiPrefix = `/${prefix}/api/v3`
@@ -20,6 +22,9 @@ const componentSrcRoot = path.resolve(`${bundleRoot}/components`)
 const schemasRoot = path.resolve(process.env.SCHEMAS_ROOT || `${bundleRoot}/content/schemas`)
 const sourcesRoot = path.resolve(process.env.SOURCES_ROOT || `${bundleRoot}/content/sources`)
 
+const outputTypes = glob.sync(`${componentSrcRoot}/output-types/*`)
+  .map((fp) => path.parse(fp).name)
+
 module.exports = {
   apiPrefix,
   bundleRoot,
@@ -32,6 +37,7 @@ module.exports = {
   isDev,
   mongoUrl,
   onDemand,
+  outputTypes,
   port,
   prefix,
   schemasRoot,

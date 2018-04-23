@@ -48,7 +48,11 @@ This returns the javascript function that is used by the fusion engine to genera
 
 Pages and Templates should be referenced by id so that you will always receive the current published version. If you need an unpublished script, you must request it by rendering id.
 
-Page and Template scripts should be re-generated and pushed to S3 on publish; this can be accomplished by sending a POST request, as it will force a new script to be generated and uploaded to S3. If a request for a page/template is not found in S3, it will be generated on-demand, returned to the caller, and pushed to S3.
+If a request for a page/template is not found in S3, it will be generated on-demand, returned to the caller, and pushed to S3.
+
+-   `POST /dist/(page|rendering|template)/:id`
+
+Page and Template scripts should be re-generated and pushed to S3 on publish; this can be accomplished by sending a POST request, as it will force a new script to be generated and uploaded to S3. These publish requests should not specify an outputType in the request since all output types will be re-generated.
 
 ### Styles
 

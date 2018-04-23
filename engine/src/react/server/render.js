@@ -160,7 +160,7 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
 
       const OutputType = (() => {
         try {
-          return require(`${componentDistRoot}/output-types/${outputType || 'react'}.js`)
+          return require(`${componentDistRoot}/output-types/${getOutputType(outputType)}.js`)
         } catch (e) {
           const err = new Error(`Could not find output-type: ${outputType}`)
           err.statusCode = 400

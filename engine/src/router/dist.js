@@ -5,7 +5,8 @@ const express = require('express')
 
 const {
   distRoot,
-  isDev
+  isDev,
+  outputTypes
 } = require('../environment')
 
 const {
@@ -59,6 +60,26 @@ function getTypeRouter (type) {
         .catch(next)
     }
   )
+
+  if (type !== 'rendering') {
+    typeRouter.post(['/', '/:id'],
+      bodyParser.json(),
+      (req, res, next) => {
+        const id = req.params.id
+        const payload = Object.assign(
+          {id},
+          req.body
+        )
+
+        const name = `${type}/${id}`
+
+        fetchType(payload)
+          .then(({rendering}) => Promise.all(outputTypes.map((outputType) => compile({name, rendering, outputType}))))
+          .then(() => { res.sendStatus(200) })
+          .catch(next)
+      }
+    )
+  }
 
   return typeRouter
 }

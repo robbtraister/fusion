@@ -195,7 +195,7 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
                 {
                   key: 'template',
                   type: 'application/javascript',
-                  src: `/${prefix}/dist/${name}.js?v=${version}&outputType=${getOutputType(outputType)}${useComponentLib ? '&useComponentLib=true' : ''}`,
+                  src: `/${prefix}/dist/${name}/${getOutputType(outputType)}.js?v=${version}${useComponentLib ? '&useComponentLib=true' : ''}`,
                   defer: true
                 }
               )

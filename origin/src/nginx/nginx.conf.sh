@@ -180,10 +180,10 @@ cat <<EOB
     # ~^(?<env>[^.]+)            \$env;
   }
 
-  map \$arg_outputType \$outputType {
-    default                    \$arg_outputType;
-    ''                         'default';
-  }
+  # map \$arg_outputType \$outputType {
+  #   default                    \$arg_outputType;
+  #   ''                         'default';
+  # }
 
   server {
     listen                     ${PORT:-8080};
@@ -274,7 +274,7 @@ else
         return                 418;
       }
 
-      set                      \$target ${S3_HOST}/\${environment}/\${version}/${outputType}/\$2\$3;
+      set                      \$target ${S3_HOST}/\${environment}/\${version}/\$2\$3;
       proxy_pass               \$target;
 EOB
 fi

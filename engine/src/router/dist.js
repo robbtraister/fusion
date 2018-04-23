@@ -1,71 +1,60 @@
 'use strict'
 
-const fs = require('fs')
-
 const bodyParser = require('body-parser')
 const express = require('express')
 
-// const debugTimer = require('debug')('fusion:timer:router')
-
-const { distRoot } = require('../environment')
-// const timer = require('../timer')
+const {
+  distRoot,
+  isDev
+} = require('../environment')
 
 const {
   compile,
+  fetchFromS3,
   fetchRendering
 } = require('../scripts')
 
-const {
-  getOutputType
-} = require('../scripts/info')
-
 const distRouter = express.Router()
 
-distRouter.use('/engine', express.static(`${__dirname}/../../dist/engine`))
+const staticHandler = (isDev)
+  ? (location) => express.static(`${distRoot}${location || ''}`)
+  // should be handled by nginx
+  : (location) => (req, res, next) => {
+    fetchFromS3(`${location || ''}${req.path}`)
+      .then(src => { res.send(src) })
+  }
+
+distRouter.use('/engine', staticHandler('/engine'))
+distRouter.all(/\.css$/, staticHandler())
 
 // if POSTed, we will re-generate
-distRouter.get(/\.js$/, (req, res, next) => {
-  fs.readFile(`${distRoot}${req.path.replace(/\.js$/, '')}/${getOutputType(req.query.outputType)}.js`, (err, src) => {
-    err
-      ? next()
-      : res.set('Content-Type', 'application/javascript').send(src)
-  })
-})
+distRouter.get(/\.js$/, staticHandler())
 
-distRouter.all(/\.css$/, (req, res, next) => {
-  fs.readFile(`${distRoot}${req.path}`, (err, src) => {
-    err
-      ? next()
-      : res.set('Content-Type', 'text/css').send(src)
-  })
-})
-
-// support dynamic field name since the value is possibly read from POST'ed body
 function getTypeRouter (type) {
   const fetchType = fetchRendering(type)
 
   const typeRouter = express.Router()
 
-  typeRouter.all('/:id.js',
+  typeRouter.all('/:id/:outputType.js',
     bodyParser.json(),
     (req, res, next) => {
       const id = req.params.id
-      // const tic = timer.tic()
       const payload = Object.assign(
         {id},
         req.body
       )
 
-      const outputType = req.query.outputType
+      const outputType = req.params.outputType
       const useComponentLib = req.query.useComponentLib === 'true'
 
-      // if (isDev && !useComponentLib) {
-      //   src += `;Fusion.Template.css=\`${css.replace('`', '\\`')}\``
-      // }
+      // if a raw rendering, don't give a name so it won't be saved
       const name = type === 'rendering' ? null : `${type}/${id}`
 
       fetchType(payload)
         .then(({rendering}) => compile({name, rendering, outputType, useComponentLib}))
+        // if (isDev && !useComponentLib) {
+        //   src += `;Fusion.Template.css=\`${css.replace('`', '\\`')}\``
+        // }
         .then((src) => { res.set('Content-Type', 'application/javascript').send(src) })
         .catch(next)
     }

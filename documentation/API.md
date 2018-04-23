@@ -2,7 +2,7 @@
 
 All endpoints described below will be handled as displayed by the lambda function. However, the lambda functions will be exposed publicly at `/pb/api/v3`, so each endpoint must be prefixed to be accessed.
 
-All requests that do not begin with `/pb/api/v3` will be handled as `/pb/api/v3/make/:request_uri`.
+All requests that begin with `/pb/dist` will be handled as if prefixed with `/pb/api/v3/dist`. All other requests that do not begin with `/pb/api/v3` will be handled as `/pb/api/v3/make/:request_uri`.
 
 
 ## Content
@@ -32,26 +32,24 @@ Resolve the trailing URI segment into a piece of global content and an associate
 Resolve the trailing URI segment into a piece of global content and an associated page/template, then render the content into the template and return the resultant HTML.
 
 
-## Scripts
+## Assets
 
-Scripts are read significantly more frequently than they are written, so they will be stored in and served statically from S3.
+Assets are read significantly more frequently than they are written, so they will be stored in and served statically from S3.
+
+### Scripts
 
 -   `/dist/engine/react.js`
 
 This is the primary client-side library that is shared and used for all pages/templates. It is specific to a fusion release, and can be cached very aggressively.
 
--   `/dist/page/:uri.js[?outputType=:outputType][&useComponentLib=true]`
--   `/dist/rendering/:id.js[?outputType=:outputType]`
--   `/dist/template/:name.js[?outputType=:outputType][?useComponentLib=true]`
+-   `/dist/(page|rendering|template)/:id/:outputType.js[?useComponentLib=true]`
 
 This returns the javascript function that is used by the fusion engine to generate a rendering. It is used by the client-side browser to update the template, if necessary, as well as hydrate script functionality in the browser.
 
-Pages and Templates should be referenced by name/uri so that you will always receive the current published version. If you need an unpublished script, you must request it by rendering id.
+Pages and Templates should be referenced by id so that you will always receive the current published version. If you need an unpublished script, you must request it by rendering id.
 
-Page and Template scripts should be re-generated and pushed to S3 on publish. If a request for a named page/template is not found in S3, it will be generated on-demand, returned to the caller, and pushed to S3.
+Page and Template scripts should be re-generated and pushed to S3 on publish; this can be accomplished by sending a POST request, as it will force a new script to be generated and uploaded to S3. If a request for a page/template is not found in S3, it will be generated on-demand, returned to the caller, and pushed to S3.
 
+### Styles
 
-## Styles
-
--   `/dist/page/:uri.:hash.css[?outputType=:outputType]`
--   `/dist/template/:name.:hash.css[?outputType=:outputType]`
+-   `/dist/(page|tempate)/:id.:hash.css`

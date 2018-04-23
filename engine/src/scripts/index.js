@@ -9,10 +9,11 @@ const zlib = require('zlib')
 
 const pack = require('../react/server/compile/pack')
 
+const distDir = path.resolve(`${__dirname}/../../dist`)
+
 const {
   getBucket,
   getOutputType,
-  getScriptKey,
   getS3Key
 } = require('./info')
 
@@ -32,27 +33,27 @@ const {
 
 const s3 = new S3({region: 'us-east-1'})
 
-const fetchFromFS = ({componentType, id, outputType}) => {
-  const fp = path.resolve(`${__dirname}/../../dist/${componentType}/${id}/${getOutputType(outputType)}.json`)
+const fetchFromFS = (name) => {
+  const fp = path.resolve(`${distDir}/${name}`)
   return new Promise((resolve, reject) => {
     fs.readFile(fp, (err, data) => {
-      err ? reject(err) : resolve({id, rendering: JSON.parse(data.toString())})
+      err ? reject(err) : resolve({rendering: JSON.parse(data.toString())})
     })
   })
 }
 
-const fetchFromS3 = ({componentType, id, outputType}) => {
+const fetchFromS3 = (name) => {
   return new Promise((resolve, reject) => {
     s3.getObject({
       Bucket: getBucket(),
-      Key: `${getS3Key({componentType, id, outputType})}`
+      Key: `${getS3Key(name)}`
     }, (err, data) => {
       err ? reject(err) : resolve(data)
     })
   })
     .then((src) => new Promise((resolve, reject) => {
       zlib.gunzip(src, (err, buf) => {
-        err ? reject(err) : resolve({id, rendering: JSON.parse(buf.toString())})
+        err ? reject(err) : resolve({rendering: JSON.parse(buf.toString())})
       })
     }))
 }
@@ -70,9 +71,10 @@ const fetchRendering = (componentType) => {
     const id = payload.id
     const outputType = getOutputType(payload.outputType)
 
-    return fetchFile({componentType, id, outputType})
-      .catch(() => fetchRecord({id}).then(({rendering}) => ({id, rendering})))
-      .catch(() => { throw new Error('Did not recognize componentType') })
+    return fetchFile(`${componentType}/${id}/${getOutputType(outputType)}.json`)
+      .catch(() => fetchRecord({id}))
+      .then(({rendering}) => ({id, rendering}))
+      .catch(() => { throw new Error(`Did not recognize component type: ${componentType}`) })
   }
 }
 
@@ -92,7 +94,7 @@ const getComponent = (componentType) => {
 }
 
 const uploadToFs = function uploadToFs (name, src) {
-  const filePath = path.resolve(`${__dirname}/../../dist/${name}`)
+  const filePath = path.resolve(`${distDir}/${name}`)
   return new Promise((resolve, reject) => {
     childProcess.exec(`mkdir -p ${path.dirname(filePath)}`, (err) => {
       err ? reject(err) : resolve()
@@ -105,7 +107,7 @@ const uploadToFs = function uploadToFs (name, src) {
     }))
 }
 
-const uploadToS3 = function uploadToS3 (name, src) {
+const uploadToS3 = function uploadToS3 (name, src, ContentType) {
   return new Promise((resolve, reject) => {
     zlib.gzip(src, (err, buf) => {
       err ? reject(err) : resolve(buf)
@@ -114,10 +116,10 @@ const uploadToS3 = function uploadToS3 (name, src) {
     .then((buf) => new Promise((resolve, reject) => {
       s3.upload({
         Bucket: getBucket(),
-        Key: `${getScriptKey(name)}`,
+        Key: `${getS3Key(name)}`,
         Body: buf,
         ACL: 'public-read',
-        ContentType: 'application/javascript',
+        ContentType,
         ContentEncoding: 'gzip'
       }, (err, data) => {
         err ? reject(err) : resolve(data)
@@ -138,9 +140,9 @@ const compile = function compile ({name, rendering, outputType, child, useCompon
       return (
         (name && !child && !useComponentLib)
           ? Promise.all([
-            upload(`${name}/${cssFile}`, css),
-            upload(`${name}/${getOutputType(outputType)}.js`, src),
-            upload(`${name}/${getOutputType(outputType)}.json`, JSON.stringify(Object.assign({}, rendering, {cssFile: `${name}/${cssFile}`})))
+            upload(`${name}/${cssFile}`, css, 'text/css'),
+            upload(`${name}/${getOutputType(outputType)}.js`, src, 'application/javascript'),
+            upload(`${name}/${getOutputType(outputType)}.json`, JSON.stringify(Object.assign({}, rendering, {cssFile: `${name}/${cssFile}`})), 'application/json')
           ])
           : Promise.resolve()
       )

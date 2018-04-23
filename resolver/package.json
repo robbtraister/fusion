@@ -6,8 +6,7 @@
   "scripts": {
     "predeploy": "npm install",
     "deploy": "sls deploy",
-    "start": "sls --stage=localhost offline start",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "sls --stage=localhost offline start"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +19,6 @@
     "serverless-http": "^1.5.3"
   },
   "devDependencies": {
-    "serverless-offline": "^3.18.0"
+    "serverless-offline": "robbtraister/serverless-offline#preserve-trailing-slash-option"
   }
 }

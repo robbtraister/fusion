@@ -6,30 +6,83 @@ const url = require('url')
 
 const fetch = require('./fetch')
 
-const getTemplateResolver = function getTemplateResolver (resolver) {
-  return (resolver.page)
-    ? (content) => ({
-      type: 'page',
-      id: resolver.page
-    })
-    : (content) => ({
-      type: 'template',
-      id: resolver.template
-    })
+const resolverConfig = require('../../config/resolvers.json')
+
+const { trailingSlashRule } = require('../environment')
+
+const getNestedValue = function getNestedValue (target, field) {
+  const keys = (field || '').split('.')
+  let value = target
+  while (keys.length) {
+    target = value || {}
+    const key = keys.shift()
+    value = target[key]
+  }
+  return value
 }
 
-// const getTemplate = function getTemplate (resolver, ...args) {
-//   const templateResolver = getTemplateResolver(resolver)
-//
-//   return (args.length === 0)
-//     ? templateResolver
-//     : templateResolver(...args)
-// }
+const enforceTrailingSlashRule = {
+  NOOP: (uri) => uri,
+  FORCE: (uri) => uri.replace(/\/[^./]+$/, (match) => `${match}/`),
+  DROP: (uri) => uri.replace(/\/*$/, '')
+}[trailingSlashRule]
+
+const getTemplateResolver = function getTemplateResolver (resolver) {
+  const getId = (resolver.type === 'page')
+    ? (content) => resolver._id // Pages
+    : (content) => { // Templates
+      const contentPageMapping = resolver.content2pageMapping
+      if (contentPageMapping) {
+        const contentValue = getNestedValue(content, contentPageMapping.field)
+        let template = contentPageMapping.mapping[contentValue] || resolver.page
+        return template
+      } else {
+        return resolver.page
+      }
+    }
+
+  return (content) => ({
+    type: resolver.type,
+    id: getId(content)
+  })
+}
+
+const parseContentSourceParameters = function parseContentSourceParameters (resolver) {
+  if (resolver.contentConfigMapping) {
+    const mappers = Object.keys(resolver.contentConfigMapping).map(key => {
+      const param = resolver.contentConfigMapping[key]
+      return {
+        parameter: (requestUri) => {
+          const queryParams = url.parse(requestUri, true).query
+          return {[key]: queryParams[param.name]}
+        },
+        pattern: (requestUri) => {
+          // TODO optimize for multiple pattern params so we don't regex match each time
+          const pattern = new RegExp(resolver.pattern)
+          const groups = getUriPathname(requestUri).match(pattern)
+          const uri = enforceTrailingSlashRule(groups[param.index])
+          return {[key]: uri} // force trailing slash
+        },
+        static: () => ({[key]: param.value})
+      }[param.type]
+    })
+
+    return (requestUri) => Object.assign(...mappers.map(mapper => mapper(requestUri)))
+  }
+  return () => null
+}
 
 const getResolverHydrater = function getResolverHydrater (resolver) {
   const templateResolver = getTemplateResolver(resolver)
-  const contentResolver = (resolver.content)
-    ? (requestUri) => fetch(resolver.content, {uri: requestUri})
+
+  const contentSourceParser = parseContentSourceParameters(resolver)
+
+  const contentResolver = (resolver.contentSourceId)
+    ? (requestUri) => {
+      const contentSourceParams = contentSourceParser(requestUri)
+      requestUri = enforceTrailingSlashRule(requestUri)
+      return fetch(resolver.contentSourceId, Object.assign({'uri': requestUri}, contentSourceParams))
+    }
     : (requestUri) => Promise.resolve(null)
 
   return (requestUri) => contentResolver(requestUri)
@@ -39,16 +92,9 @@ const getResolverHydrater = function getResolverHydrater (resolver) {
         content
       },
       templateResolver(content)
-    ))
+    )
+    )
 }
-
-// const hydrate = function hydrate (resolver, ...args) {
-//   const hydrater = getResolverHydrater(resolver)
-//
-//   return (args.length === 0)
-//     ? hydrater
-//     : hydrater(...args)
-// }
 
 const getUriPathname = function getUriPathname (requestUri) {
   return url.parse(requestUri).pathname
@@ -64,26 +110,36 @@ const getResolverMatcher = function getResolverMatcher (resolver) {
   return () => null
 }
 
-// const match = function match (resolver, ...args) {
-//   const matcher = getResolverMatcher(resolver)
-//
-//   return (args.length === 0)
-//     ? matcher
-//     : matcher(...args)
-// }
+// create page resolvers
+const pageResolvers = resolverConfig
+  .pages.map(resolver => {
+    // resolver type needs to be set outside of Object.assign because the type value needs to be accessible when evaluating getResolverHydrater
+    resolver.type = 'page'
+    return Object.assign(resolver,
+      {
+        hydrate: getResolverHydrater(resolver),
+        match: getResolverMatcher(resolver)
+      }
+    )
+  })
 
-const resolvers = require('../../config/resolvers.json')
-  .map(resolver => Object.assign(resolver,
-    {
-      // getTemplate: getTemplateResolver(resolver),
-      hydrate: getResolverHydrater(resolver),
-      match: getResolverMatcher(resolver)
-    }
-  ))
+// create template resolvers
+const templateResolvers = resolverConfig
+  .resolvers.map(resolver => {
+    // resolver type needs to be set outside of Object.assign because the type value needs to be accessible when evaluating getResolverHydrater
+    resolver.type = 'template'
+    return Object.assign(resolver,
+      {
+        hydrate: getResolverHydrater(resolver),
+        match: getResolverMatcher(resolver)
+      }
+    )
+  })
+
+const resolvers = pageResolvers.concat(templateResolvers)
 
 const resolve = function resolve (requestUri) {
   const resolver = resolvers.find(resolver => resolver.match(requestUri))
-
   return resolver
     ? resolver.hydrate(requestUri)
     : Promise.resolve(null)

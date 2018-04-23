@@ -21,22 +21,15 @@ const getNestedValue = function getNestedValue (target, field) {
   return value
 }
 
-const enforceTrailingSlashRule =  {
-  NOOP: (uri) => {
-    return uri
-  },
-  FORCE: (uri) => {
-    const lastSeparator = uri.lastIndexOf('/')
-    const extensionPosition = uri.lastIndexOf('.')
-    return lastSeparator > extensionPosition ? uri.replace(/\/*$/, '/') : uri
-  },
-  DROP: (uri) => {
-    return uri.replace(/\/*$/, '')
-  }
+const enforceTrailingSlashRule = {
+  NOOP: (uri) => uri,
+  FORCE: (uri) => uri.replace(/\/[^./]+$/, (match) => `${match}/`),
+  DROP: (uri) => uri.replace(/\/*$/, '')
 }[trailingSlashRule]
 
 const getTemplateResolver = function getTemplateResolver (resolver) {
-  return (resolver.type === 'page') ? (content) => ({page: resolver._id}) // Pages
+  return (resolver.type === 'page')
+    ? (content) => ({page: resolver._id}) // Pages
     : (content) => { // Templates
       const contentPageMapping = resolver.content2pageMapping
       if (contentPageMapping) {
@@ -109,6 +102,7 @@ const getResolverMatcher = function getResolverMatcher (resolver) {
 // create page resolvers
 const pageResolvers = resolverConfig
   .pages.map(resolver => {
+    // resolver type needs to be set outside of Object.assign because the type value needs to be accessible when evaluating getResolverHydrater
     resolver.type = 'page'
     return Object.assign(resolver,
       {
@@ -121,6 +115,7 @@ const pageResolvers = resolverConfig
 // create template resolvers
 const templateResolvers = resolverConfig
   .resolvers.map(resolver => {
+    // resolver type needs to be set outside of Object.assign because the type value needs to be accessible when evaluating getResolverHydrater
     resolver.type = 'template'
     return Object.assign(resolver,
       {

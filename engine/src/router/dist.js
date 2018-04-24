@@ -5,12 +5,12 @@ const express = require('express')
 
 const {
   distRoot,
-  isDev,
-  outputTypes
+  isDev
 } = require('../environment')
 
 const {
-  compileScript
+  compileAll,
+  compileOne
 } = require('../scripts/compile')
 
 const {
@@ -55,7 +55,7 @@ function getTypeRouter (type) {
       const name = type === 'rendering' ? null : `${type}/${id}`
 
       fetchType(payload)
-        .then(({rendering}) => compileScript({name, rendering, outputType, useComponentLib}))
+        .then(({rendering}) => compileOne({name, rendering, outputType, useComponentLib}))
         // if (isDev && !useComponentLib) {
         //   src += `;Fusion.Template.css=\`${css.replace('`', '\\`')}\``
         // }
@@ -77,7 +77,7 @@ function getTypeRouter (type) {
         const name = `${type}/${id}`
 
         fetchType(payload)
-          .then(({rendering}) => Promise.all(outputTypes.map((outputType) => compileScript({name, rendering, outputType}))))
+          .then(({rendering}) => compileAll({name, rendering}))
           .then(() => { res.sendStatus(200) })
           .catch(next)
       }

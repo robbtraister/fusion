@@ -13,7 +13,7 @@ const Provider = require('./provider')
 const timer = require('../../timer')
 
 const {
-  compileScript
+  compileOne
 } = require('../../scripts/compile')
 
 const {
@@ -159,6 +159,7 @@ const compileRenderable = function compileRenderable ({renderable, outputType}) 
 }
 
 const compileDocument = function compileDocument ({renderable, outputType, name}) {
+  outputType = getOutputType(outputType)
   let tic
   return compileRenderable({renderable, outputType})
     .then((Template) => {
@@ -166,7 +167,7 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
 
       const OutputType = (() => {
         try {
-          return require(`${componentDistRoot}/output-types/${getOutputType(outputType)}`)
+          return require(`${componentDistRoot}/output-types/${outputType}`)
         } catch (e) {
           const err = new Error(`Could not find output-type: ${outputType}`)
           err.statusCode = 400
@@ -201,7 +202,7 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
                 {
                   key: 'template',
                   type: 'application/javascript',
-                  src: `/${prefix}/dist/${name}/${getOutputType(outputType)}.js?v=${version}${useComponentLib ? '&useComponentLib=true' : ''}`,
+                  src: `/${prefix}/dist/${name}/${outputType}.js?v=${version}${useComponentLib ? '&useComponentLib=true' : ''}`,
                   defer: true
                 }
               )
@@ -235,24 +236,23 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
               }
               inline = (inline === undefined) ? false : !!inline
 
-              if (renderable.cssFile === undefined) {
+              if (renderable.css === undefined || renderable.css[outputType] === undefined) {
                 // these assets have yet to be compiled
                 // use the inlines promise to wait for compilation and make the css hash file available
                 // this should only happen in development
                 Component.inlines.styles = Component.inlines.styles || {
                   cached: undefined,
-                  fetched: compileScript({name, rendering: renderable, outputType})
+                  fetched: compileOne({name, rendering: renderable, outputType})
                     .then(({css, cssFile}) => {
-                      renderable.cssFile = `${name}/${cssFile}`
                       Component.inlines.styles.cached = css
                     })
                 }
-              } else if (inline && renderable.cssFile !== null) {
+              } else if (inline && renderable.css && renderable.css[outputType]) {
                 // these assets have been compiled
                 // read the css file to be inserted inline
                 Component.inlines.styles = Component.inlines.styles || {
                   cached: undefined,
-                  fetched: fetchFile(renderable.cssFile)
+                  fetched: fetchFile(renderable.css[outputType])
                     .then((css) => {
                       Component.inlines.styles.cached = css
                     })
@@ -269,7 +269,7 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
                     id: 'template-style',
                     rel: 'stylesheet',
                     type: 'text/css',
-                    href: renderable.cssFile ? `/${prefix}/dist/${renderable.cssFile}` : null
+                    href: (renderable.css && renderable.css[outputType]) ? `/${prefix}/dist/${renderable.css[outputType]}` : null
                   }
                 )
                 : (Component.inlines.styles.cached)

@@ -180,6 +180,37 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
           {
             /*
              * Each of the following are equivalent in JSX
+             *   {props.meta}
+             *   {props.meta()}
+             *
+             * To select a single meta tag
+             *   {props.meta('title')}
+             *   {props.meta({key: 'title'})}
+             */
+            meta: propFunction(function (name) {
+              if (typeof name === 'object') {
+                name = name.name
+              }
+
+              const metas = (renderable.meta || {})
+
+              const getElement = (name) => metas[name]
+                ? React.createElement(
+                  'meta',
+                  {
+                    key: `meta-${name}`,
+                    name,
+                    content: metas[name].value
+                  }
+                )
+                : null
+
+              return (name)
+                ? getElement(name)
+                : Object.keys(metas).filter(name => metas[name].html).map(getElement)
+            }),
+            /*
+             * Each of the following are equivalent in JSX
              *   {props.libs}
              *   {props.libs()}
              *   {props.libs(false)}

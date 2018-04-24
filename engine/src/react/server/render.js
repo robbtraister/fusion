@@ -166,7 +166,7 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
 
       const OutputType = (() => {
         try {
-          return require(`${componentDistRoot}/output-types/${getOutputType(outputType)}.js`)
+          return require(`${componentDistRoot}/output-types/${getOutputType(outputType)}`)
         } catch (e) {
           const err = new Error(`Could not find output-type: ${outputType}`)
           err.statusCode = 400
@@ -235,7 +235,33 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
               }
               inline = (inline === undefined) ? false : !!inline
 
+              if (renderable.cssFile === undefined) {
+                // these assets have yet to be compiled
+                // use the inlines promise to wait for compilation and make the css hash file available
+                // this should only happen in development
+                Component.inlines.styles = Component.inlines.styles || {
+                  cached: undefined,
+                  fetched: compileScript({name, rendering: renderable, outputType})
+                    .then(({css, cssFile}) => {
+                      renderable.cssFile = `${name}/${cssFile}`
+                      Component.inlines.styles.cached = css
+                    })
+                }
+              } else if (inline && renderable.cssFile !== null) {
+                // these assets have been compiled
+                // read the css file to be inserted inline
+                Component.inlines.styles = Component.inlines.styles || {
+                  cached: undefined,
+                  fetched: fetchFile(renderable.cssFile)
+                    .then((css) => {
+                      Component.inlines.styles.cached = css
+                    })
+                }
+              }
+
               return (!inline)
+                // even if cssFile is null, add the link tag with no href
+                // so it can be replaced by an updated template script later
                 ? React.createElement(
                   'link',
                   {
@@ -246,29 +272,13 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
                     href: renderable.cssFile ? `/${prefix}/dist/${renderable.cssFile}` : null
                   }
                 )
-                : (renderable.cssFile === null)
-                  ? null
-                  : (() => {
-                    Component.inlines.styles = Component.inlines.styles || {
-                      cached: undefined,
-                      fetched: (
-                        (renderable.cssFile)
-                          ? fetchFile(renderable.cssFile)
-                          : compileScript({name, rendering: renderable, outputType})
-                            .then(({css}) => css)
-                      )
-                        .then((data) => {
-                          Component.inlines.styles.cached = data
-                        })
-                    }
-                    return (Component.inlines.styles.cached)
-                      ? React.createElement(
-                        'style',
-                        {},
-                        Component.inlines.styles.cached
-                      )
-                      : null
-                  })()
+                : (Component.inlines.styles.cached)
+                  ? React.createElement(
+                    'style',
+                    {},
+                    Component.inlines.styles.cached
+                  )
+                  : null
             }),
             /*
              * Each of the following are equivalent in JSX

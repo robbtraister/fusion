@@ -2,7 +2,7 @@
 
 All endpoints described below will be handled as displayed by the lambda function. However, the lambda functions will be exposed publicly at `/pb/api/v3`, so each endpoint must be prefixed to be accessed.
 
-All requests that begin with `/pb/dist` will be handled as if prefixed with `/pb/api/v3/dist`. All other requests that do not begin with `/pb/api/v3` will be handled as `/pb/api/v3/make/:request_uri`.
+All requests that begin with `/pb/dist` or `/pb/resources` will be handled as if prefixed with `/pb/api/v3/dist`. All other requests that do not begin with `/pb/api/v3` will be handled as `/pb/api/v3/make/:request_uri`.
 
 
 ## Content
@@ -35,6 +35,12 @@ Resolve the trailing URI segment into a piece of global content and an associate
 ## Assets
 
 Assets are read significantly more frequently than they are written, so they will be stored in and served statically from S3.
+
+### Resources
+
+-   `/resources/*`
+
+Return static files as found in your bundle's `/resources` directory. See [here](../engine/bundle/resources) for an example.
 
 ### Scripts
 

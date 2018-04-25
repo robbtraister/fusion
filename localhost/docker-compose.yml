@@ -69,7 +69,7 @@ services:
       WATCH: 'true'
     volumes:
       - 'fusion-data-volume:/data/db:rw'
-      - './data/restore:/data/restore:rw'
+      - '../data/restore:/data/restore:rw'
 
 volumes:
   fusion-data-volume: {}

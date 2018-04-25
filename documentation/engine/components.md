@@ -1,6 +1,6 @@
 # Fusion Components
 
-In Fusion, the features of a page are build/defined as React components.
+In Fusion, the features of a page are built/defined as React components.
 
 Components will receive the information needed to render themselves via input props. The following props are passed to each component:
 
@@ -56,4 +56,4 @@ class Story extends React.Component {
 }
 ```
 
-For more on content fetching, see [here](./CONSUMER.md).
+For more on content fetching, see [here](./consumer.md).

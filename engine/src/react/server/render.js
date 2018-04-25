@@ -186,7 +186,7 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
              *
              * To select a single meta tag
              *   {props.meta('title')}
-             *   {props.meta({key: 'title'})}
+             *   {props.meta({name: 'title'})}
              */
             meta: propFunction(function (name) {
               if (typeof name === 'object') {

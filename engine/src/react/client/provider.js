@@ -45,14 +45,14 @@ const getContentGenerator = function getContentGenerator (contentCache) {
   }
 }
 
+const value = {
+  getContent: getContentGenerator(Fusion.contentCache),
+  globalContent: Fusion.globalContent,
+  requestUri: window.location.pathname + window.location.search
+}
+
 module.exports = (props) => React.createElement(
   Fusion.context.Provider,
-  {
-    value: {
-      getContent: getContentGenerator(Fusion.contentCache),
-      globalContent: Fusion.globalContent,
-      requestUri: window.location.pathname + window.location.search
-    }
-  },
+  {value},
   props.children
 )

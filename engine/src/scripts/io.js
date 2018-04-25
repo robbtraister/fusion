@@ -11,7 +11,6 @@ const s3 = new S3({region: 'us-east-1'})
 
 const {
   getBucket,
-  getOutputType,
   getS3Key
 } = require('./info')
 
@@ -62,9 +61,8 @@ const fetchRendering = (componentType) => {
 
   return (payload) => {
     const id = payload.id
-    const outputType = getOutputType(payload.outputType)
 
-    return fetchFile(`${componentType}/${id}/${getOutputType(outputType)}.json`)
+    return fetchFile(`${componentType}/${id}/rendering.json`)
       .then((source) => ({rendering: JSON.parse(source)}))
       .catch(() => fetchRecord({id}))
       .then(({rendering}) => ({id, rendering}))

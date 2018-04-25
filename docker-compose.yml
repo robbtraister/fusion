@@ -84,14 +84,14 @@ services:
   data:
     image: quay.io/washpost/mongo-localhost
     build:
-      context: ./localhost/data
+      context: ./data
     ports:
       - '27017:27017'
     environment:
       WATCH: 'true'
     volumes:
       - 'fusion-data-volume:/data/db:rw'
-      - './localhost/data/restore:/data/restore:rw'
+      - './data/restore:/data/restore:rw'
 
 volumes:
   fusion-data-volume: {}

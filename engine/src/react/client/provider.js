@@ -4,14 +4,18 @@
 
 const React = require('react')
 
+Fusion.context = React.createContext('fusion')
+
 const JSONNormalize = require('../../utils/normalize')
 
 const getContentGenerator = function getContentGenerator (contentCache) {
+  contentCache = contentCache || {}
+
   return function getContent (source, ...args) {
     const sourceCache = contentCache[source] || {}
 
     const fetchContent = (source, keyString, filter, cached) =>
-      window.fetch(`/${(Fusion.prefix || '').replace(/^\/+/, '/').replace(/\/+$/, '')}/api/v3/content/${source}?key=${keyString}` + (filter ? `&query=${filter}` : ''))
+      window.fetch(`${(Fusion.prefix || 'pb').replace(/^\/*/, '/').replace(/\/+$/, '')}/api/v3/content/${source}?key=${keyString}` + (filter ? `&query=${filter}` : ''))
         .then(resp => resp.json())
         .catch(() => cached)
 

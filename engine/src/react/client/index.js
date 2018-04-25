@@ -6,8 +6,6 @@ window.Fusion = window.Fusion || {}
 
 const React = require('react')
 
-Fusion.context = React.createContext('fusion')
-
 // support fragments in preact
 React.Fragment = React.Fragment || 'div'
 const ReactDOM = require('react-dom')

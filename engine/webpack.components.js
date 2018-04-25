@@ -6,6 +6,8 @@ const path = require('path')
 const glob = require('glob')
 
 const CleanWebpackPlugin = require('clean-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const ManifestPlugin = require('webpack-manifest-plugin')
 
 const { componentSrcRoot } = require('./src/environment')
 
@@ -60,7 +62,11 @@ module.exports = Components
   allConfig.output.libraryTarget = 'assign'
 
   // clear local compilations for developers
-  allConfig.plugins.push(
+  allConfig.plugins = [
+    new ManifestPlugin(),
+    new MiniCssExtractPlugin({
+      filename: 'all.css'
+    }),
     new CleanWebpackPlugin(
       [
         'page',
@@ -71,7 +77,7 @@ module.exports = Components
         watch: true
       }
     )
-  )
+  ]
 
   componentConfigs.push(allConfig)
 }

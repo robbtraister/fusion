@@ -112,32 +112,32 @@ const getResolverMatcher = function getResolverMatcher (resolver) {
   return () => null
 }
 
-const pages = daoUrl ? model('page').find() : new Promise(resolverConfig.pages)
-const pageResolvers = pages.then(data => data.map(resolver => {
-  // resolver type needs to be set outside of Object.assign because the type value needs to be accessible when evaluating getResolverHydrater
-  resolver.type = 'page'
-  return Object.assign(resolver,
-    {
-      hydrate: getResolverHydrater(resolver),
-      match: getResolverMatcher(resolver)
-    }
-  )
-}))
+const pages = (daoUrl ? model('page').find() : new Promise(resolverConfig.pages))
+  .then(data => data.map(resolver => {
+    // resolver type needs to be set outside of Object.assign because the type value needs to be accessible when evaluating getResolverHydrater
+    resolver.type = 'page'
+    return Object.assign(resolver,
+      {
+        hydrate: getResolverHydrater(resolver),
+        match: getResolverMatcher(resolver)
+      }
+    )
+  }))
 
 // create template resolvers
-const templates = daoUrl ? model('resolver_config').find() : new Promise(resolverConfig.resolvers)
-const templateResolvers = templates.then(data => data.map(resolver => {
-  // resolver type needs to be set outside of Object.assign because the type value needs to be accessible when evaluating getResolverHydrater
-  resolver.type = 'template'
-  return Object.assign(resolver,
-    {
-      hydrate: getResolverHydrater(resolver),
-      match: getResolverMatcher(resolver)
-    }
-  )
-}))
+const templates = (daoUrl ? model('resolver_config').find() : new Promise(resolverConfig.resolvers))
+  .then(data => data.map(resolver => {
+    // resolver type needs to be set outside of Object.assign because the type value needs to be accessible when evaluating getResolverHydrater
+    resolver.type = 'template'
+    return Object.assign(resolver,
+      {
+        hydrate: getResolverHydrater(resolver),
+        match: getResolverMatcher(resolver)
+      }
+    )
+  }))
 
-const resolvers = Promise.all([pageResolvers, templateResolvers]).then(([pages, templates]) => {
+const resolvers = Promise.all([pages, templates]).then(([pages, templates]) => {
   return pages.concat(templates)
 })
 

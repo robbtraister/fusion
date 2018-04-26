@@ -73,7 +73,9 @@ services:
       HTTP_ENGINE: http://engine.fusion:8080
       LAMBDA_ENGINE:
       TRAILING_SLASH_RULE: # Options are FORCE, DROP, or NOOP
+      DAO_URL: http://abc:def@localhost.dao.fusion:8080
     links:
+      - 'dao:localhost.dao.fusion'
       - 'engine:engine.fusion'
     ports:
       - '9002:8080'

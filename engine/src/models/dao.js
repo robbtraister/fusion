@@ -23,7 +23,7 @@ const getModel = function getModel (modelName) {
 
     find (query) {
       let tic = timer.tic()
-      return fetch(`/${modelName}?query=${encodeURIComponent(JSON.stringify(query))}`)
+      return fetch(`/${modelName}${query ? `?query=${encodeURIComponent(JSON.stringify(query))}` : ''}`)
         .then((data) => {
           debugTimer(`${modelName}.find()`, tic.toc())
           return data
@@ -35,16 +35,16 @@ const getModel = function getModel (modelName) {
       return fetch(`/${modelName}/${_id}`)
         .then((data) => {
           debugTimer(`${modelName}.findById(${_id})`, tic.toc())
-          return data // && data.shift()
+          return data
         })
     },
 
     findOne (query) {
       let tic = timer.tic()
-      return fetch(`/${modelName}?query=${encodeURIComponent(JSON.stringify(query))}&limit=1`)
+      return fetch(`/${modelName}${query ? `?query=${encodeURIComponent(JSON.stringify(query))}` : ''}&limit=1`)
         .then((data) => {
           debugTimer(`${modelName}.findOne()`, tic.toc())
-          return data // && data.shift()
+          return data
         })
     }
   }

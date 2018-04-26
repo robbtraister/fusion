@@ -1,4 +1,4 @@
-FROM alpine:3.6
+FROM alpine:3.7
 
 RUN \
     apk update && \
@@ -12,7 +12,7 @@ RUN \
     rm -rf /var/cache/apk/* && \
     openssl version
 
-ARG NGINX_VERSION=1.12.2
+ARG NGINX_VERSION=1.13.12
 ENV USER=nginx
 WORKDIR /etc/nginx
 

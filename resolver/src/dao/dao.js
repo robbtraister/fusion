@@ -1,6 +1,5 @@
 'use strict'
 
-// const BSON = require('bson')
 const request = require('request-promise-native')
 
 const debugTimer = require('debug')('fusion:timer:renderings:dao')

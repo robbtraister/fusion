@@ -6,11 +6,7 @@ const url = require('url')
 
 const fetch = require('./fetch')
 
-const { trailingSlashRule, daoUrl } = require('../environment')
-
-const model = require('../dao/dao')
-
-const resolverConfig = !daoUrl ? require('../../config/resolvers.json') : null
+const { trailingSlashRule, useDB } = require('../environment')
 
 const getNestedValue = function getNestedValue (target, field) {
   const keys = (field || '').split('.')
@@ -112,8 +108,26 @@ const getResolverMatcher = function getResolverMatcher (resolver) {
   return () => null
 }
 
-const pages = (daoUrl ? model('page').find() : Promise.resolve(resolverConfig.pages))
-  .then(data => data.map(resolver => {
+// fetch page/template resolvers from DB (local env) or config file (prod)
+const { pageConfigs, templateConfigs } = (useDB)
+  ? (() => {
+    const model = require('../dao/dao')
+    return {
+      pageConfigs: model('page').find(),
+      templateConfigs: model('resolver_config').find()
+    }
+  })()
+  : (() => {
+    const resolverConfigs = require('../../config/resolvers.json')
+    return {
+      pageConfigs: Promise.resolve(resolverConfigs.pages),
+      templateConfigs: Promise.resolve(resolverConfigs.resolvers)
+    }
+  })()
+
+// decorate pages and templates with resolver functions
+const resolversPromise = Promise.all([pageConfigs, templateConfigs]).then(([pageConfigs, templateConfigs]) => {
+  const pages = pageConfigs.map(resolver => {
     // resolver type needs to be set outside of Object.assign because the type value needs to be accessible when evaluating getResolverHydrater
     resolver.type = 'page'
     return Object.assign(resolver,
@@ -122,11 +136,9 @@ const pages = (daoUrl ? model('page').find() : Promise.resolve(resolverConfig.pa
         match: getResolverMatcher(resolver)
       }
     )
-  }))
+  })
 
-// create template resolvers
-const templates = (daoUrl ? model('resolver_config').find() : Promise.resolve(resolverConfig.resolvers))
-  .then(data => data.map(resolver => {
+  const templates = templateConfigs.map(resolver => {
     // resolver type needs to be set outside of Object.assign because the type value needs to be accessible when evaluating getResolverHydrater
     resolver.type = 'template'
     return Object.assign(resolver,
@@ -135,9 +147,8 @@ const templates = (daoUrl ? model('resolver_config').find() : Promise.resolve(re
         match: getResolverMatcher(resolver)
       }
     )
-  }))
+  })
 
-const resolversPromise = Promise.all([pages, templates]).then(([pages, templates]) => {
   return pages.concat(templates)
 })
 

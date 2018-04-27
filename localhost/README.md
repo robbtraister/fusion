@@ -7,6 +7,7 @@ Use this `docker-compose.data.yml` file (or `docker-compose.yml` if you have a s
 CONTENT_BASE=
 BUNDLE_DIR=
 RESOLVER_DIR=
+USE_DB=
 
 ON_DEMAND=
 NODE_ENV=

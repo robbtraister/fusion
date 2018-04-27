@@ -349,7 +349,8 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
                   dangerouslySetInnerHTML: { __html: getFusionScript(props.globalContent, Template.contentCache, refreshContent) }
                 }
               )
-            })
+            }),
+            ...props
           },
           React.createElement(
             Template,

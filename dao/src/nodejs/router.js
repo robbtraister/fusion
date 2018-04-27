@@ -24,7 +24,7 @@ router.get('/:table', queryHandler(
     environment: req.get('ARC_ORG_ENV'),
     table: req.params.table,
     method: (req.query.limit === '1') ? 'findOne' : 'find',
-    query: JSON.parse(req.query.query),
+    query: req.query.query ? JSON.parse(req.query.query) : {},
     limit: Number(req.query.limit)
   })
 ))

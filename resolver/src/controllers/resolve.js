@@ -112,7 +112,7 @@ const getResolverMatcher = function getResolverMatcher (resolver) {
   return () => null
 }
 
-const pages = (daoUrl ? model('page').find() : new Promise(resolverConfig.pages))
+const pages = (daoUrl ? model('page').find() : Promise.resolve(resolverConfig.pages))
   .then(data => data.map(resolver => {
     // resolver type needs to be set outside of Object.assign because the type value needs to be accessible when evaluating getResolverHydrater
     resolver.type = 'page'
@@ -125,7 +125,7 @@ const pages = (daoUrl ? model('page').find() : new Promise(resolverConfig.pages)
   }))
 
 // create template resolvers
-const templates = (daoUrl ? model('resolver_config').find() : new Promise(resolverConfig.resolvers))
+const templates = (daoUrl ? model('resolver_config').find() : Promise.resolve(resolverConfig.resolvers))
   .then(data => data.map(resolver => {
     // resolver type needs to be set outside of Object.assign because the type value needs to be accessible when evaluating getResolverHydrater
     resolver.type = 'template'
@@ -137,17 +137,18 @@ const templates = (daoUrl ? model('resolver_config').find() : new Promise(resolv
     )
   }))
 
-const resolvers = Promise.all([pages, templates]).then(([pages, templates]) => {
+const resolversPromise = Promise.all([pages, templates]).then(([pages, templates]) => {
   return pages.concat(templates)
 })
 
 const resolve = function resolve (requestUri) {
-  const resolver = resolvers.then(resolver => {
+  return resolversPromise.then(resolvers => {
+    const resolver = resolvers.find(resolver => resolver.match(requestUri))
     console.log(`matching resolver ${JSON.stringify(resolver)}`)
-    resolver.match(requestUri)})
-  return resolver
-    ? resolver.then(resolver => resolver.hydrate(requestUri))
-    : Promise.resolve(null)
+    return resolver
+      ? resolver.hydrate(requestUri)
+      : null
+  })
 }
 
 module.exports = resolve

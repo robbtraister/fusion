@@ -7,14 +7,14 @@ const glob = require('glob')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 // const ManifestPlugin = require('webpack-manifest-plugin')
 
+const cssLoader = require('./shared/css-loader')
 const externals = require('./shared/externals')
 const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
 
 const {
-  componentSrcRoot,
-  isDev
+  componentSrcRoot
 } = require('../src/environment')
 
 const outputTypeSrcRoot = path.resolve(`${componentSrcRoot}/output-types`)
@@ -74,24 +74,14 @@ module.exports = (Object.keys(entry).length)
             test: /\.css$/,
             use: [
               MiniCssExtractPlugin.loader,
-              {
-                loader: 'css-loader',
-                options: {
-                  minimize: !isDev
-                }
-              }
+              cssLoader
             ]
           },
           {
             test: /\.s[ac]ss$/,
             use: [
               MiniCssExtractPlugin.loader,
-              {
-                loader: 'css-loader',
-                options: {
-                  minimize: !isDev
-                }
-              },
+              cssLoader,
               'sass-loader'
             ]
           }
@@ -138,24 +128,14 @@ module.exports = (Object.keys(entry).length)
             test: /\.css$/,
             use: [
               'to-string-loader',
-              {
-                loader: 'css-loader',
-                options: {
-                  minimize: !isDev
-                }
-              }
+              cssLoader
             ]
           },
           {
             test: /\.s[ac]ss$/,
             use: [
               'to-string-loader',
-              {
-                loader: 'css-loader',
-                options: {
-                  minimize: !isDev
-                }
-              },
+              cssLoader,
               'sass-loader'
             ]
           }

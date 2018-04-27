@@ -5,12 +5,11 @@ const path = require('path')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
 
+const cssLoader = require('./shared/css-loader')
 const externals = require('./shared/externals')
 const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
-
-const { isDev } = require('../src/environment')
 
 module.exports = (entry) =>
   (Object.keys(entry).length)
@@ -44,24 +43,14 @@ module.exports = (entry) =>
             test: /\.css$/,
             use: [
               MiniCssExtractPlugin.loader,
-              {
-                loader: 'css-loader',
-                options: {
-                  minimize: !isDev
-                }
-              }
+              cssLoader
             ]
           },
           {
             test: /\.s[ac]ss$/,
             use: [
               MiniCssExtractPlugin.loader,
-              {
-                loader: 'css-loader',
-                options: {
-                  minimize: !isDev
-                }
-              },
+              cssLoader,
               'sass-loader'
             ]
           }

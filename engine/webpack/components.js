@@ -7,14 +7,14 @@ const glob = require('glob')
 const ManifestPlugin = require('webpack-manifest-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
+const cssLoader = require('./shared/css-loader')
 const externals = require('./shared/externals')
 const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
 
 const {
-  componentSrcRoot,
-  isDev
+  componentSrcRoot
 } = require('../src/environment')
 
 const entry = {}
@@ -59,24 +59,14 @@ module.exports = (Object.keys(entry).length)
           test: /\.css$/,
           use: [
             MiniCssExtractPlugin.loader,
-            {
-              loader: 'css-loader',
-              options: {
-                minimize: !isDev
-              }
-            }
+            cssLoader
           ]
         },
         {
           test: /\.s[ac]ss$/,
           use: [
             MiniCssExtractPlugin.loader,
-            {
-              loader: 'css-loader',
-              options: {
-                minimize: !isDev
-              }
-            },
+            cssLoader,
             'sass-loader'
           ]
         }

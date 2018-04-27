@@ -276,12 +276,7 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
              *   {props.css(true)}
              *   {props.css({inline: true})}
              */
-            css: propFunction(function (inline) {
-              if (typeof inline === 'object') {
-                inline = inline.inline
-              }
-              inline = (inline === undefined) ? false : !!inline
-
+            styles: propFunction(function (cb) {
               if (renderable.css === undefined || renderable.css[outputType] === undefined) {
                 // these assets have yet to be compiled
                 // use the inlines promise to wait for compilation and make the css hash file available
@@ -293,7 +288,7 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
                       Component.inlines.styles.cached = css
                     })
                 }
-              } else if (inline && renderable.css && renderable.css[outputType]) {
+              } else if (renderable.css && renderable.css[outputType]) {
                 // these assets have been compiled
                 // read the css file to be inserted inline
                 Component.inlines.styles = Component.inlines.styles || {
@@ -305,10 +300,36 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
                 }
               }
 
-              return (!inline)
+              return (cb)
+                ? cb(Component.inlines.styles.cached)
+                : React.createElement(
+                  'style',
+                  {},
+                  Component.inlines.styles.cached
+                )
+            }),
+            /*
+             * Each of the following are equivalent in JSX
+             *   {props.cssLink}
+             *   {props.cssLink()}
+             */
+            cssLink: propFunction(function (cb) {
+              if (renderable.css === undefined || renderable.css[outputType] === undefined) {
+                // these assets have yet to be compiled
+                // use the inlines promise to wait for compilation and make the css hash file available
+                // this should only happen in development
+                Component.inlines.styles = Component.inlines.styles || {
+                  fetched: compileOne({name, rendering: renderable, outputType})
+                }
+              }
+
+              const href = (renderable.css && renderable.css[outputType]) ? `/${prefix}/dist/${renderable.css[outputType]}` : null
+
+              return (cb)
+                ? cb(href)
                 // even if cssFile is null, add the link tag with no href
                 // so it can be replaced by an updated template script later
-                ? React.createElement(
+                : React.createElement(
                   'link',
                   {
                     key: 'template-style',
@@ -318,13 +339,6 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
                     href: (renderable.css && renderable.css[outputType]) ? `/${prefix}/dist/${renderable.css[outputType]}` : null
                   }
                 )
-                : (Component.inlines.styles.cached)
-                  ? React.createElement(
-                    'style',
-                    {},
-                    Component.inlines.styles.cached
-                  )
-                  : null
             }),
             /*
              * Each of the following are equivalent in JSX

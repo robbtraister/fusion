@@ -6,7 +6,7 @@ const OutputType = (props) =>
   <html>
     <head>
       <title>Fusion Rendering</title>
-      {props.meta}
+      {props.metaTag}
       {props.css({inline: true})}
       <link rel='icon' type='image/x-icon' href='/pb/resources/favicon.ico' />
     </head>

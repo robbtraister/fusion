@@ -18,25 +18,39 @@ Output Types are defined as React components, just like features and chains. How
 
 Each of the following properties are provided as functions that accept further customization (they can also be referenced directly without being called, which will call the function with the default values).
 
--   `meta([{name}])`
+-   `metaTag([{name, default}])`
 
 This prop will insert meta tags into your rendered HTML. If name is provided, it will insert the single meta tag specified. If no name is given, it will insert all meta tags that are enabled in the admin.
 
 The following are equivalent, and will insert multiple meta tags
 ```js
-{props.meta}
+{props.metaTag}
 ```
 ```js
-{props.meta()}
+{props.metaTag()}
 ```
 
 To insert a single meta tag, the following are equivalent.
 ```js
-{props.meta('title')}
+{props.metaTag('title')}
 ```
 ```js
-{props.meta({name: 'title'})}
+{props.metaTag({name: 'title'})}
 ```
+
+You may also specify a default value, in case the meta value has not been set
+```js
+{props.metaTag('title', 'Default Title')}
+```
+```js
+{props.metaTag({name: 'title', default: 'Default Title'})}
+```
+
+
+-   `metaValue([{name}])`
+
+Similar to `metaTag` above, but returns only the value, not a fully rendered HTML meta tag.
+
 
 -   `libs`
 

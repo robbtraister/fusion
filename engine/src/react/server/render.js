@@ -181,16 +181,17 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
           {
             /*
              * Each of the following are equivalent in JSX
-             *   {props.meta}
-             *   {props.meta()}
+             *   {props.metaTag}
+             *   {props.metaTag()}
              *
              * To select a single meta tag
-             *   {props.meta('title')}
-             *   {props.meta({name: 'title'})}
+             *   {props.metaTag('title')}
+             *   {props.metaTag({name: 'title'})}
              */
-            meta: propFunction(function (name) {
+            metaTag: propFunction(function (name, defaultValue) {
               if (typeof name === 'object') {
                 name = name.name
+                defaultValue = name.default || defaultValue
               }
 
               const metas = (renderable.meta || {})
@@ -201,7 +202,7 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
                   {
                     key: `meta-${name}`,
                     name,
-                    content: metas[name].value
+                    content: metas[name].value || defaultValue
                   }
                 )
                 : null
@@ -209,6 +210,20 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
               return (name)
                 ? getElement(name)
                 : Object.keys(metas).filter(name => metas[name].html).map(getElement)
+            }),
+            /*
+             * Each of the following are equivalent in JSX
+             * To select a single meta tag
+             *   {props.metaValue('title')}
+             *   {props.metaValue({name: 'title'})}
+             */
+            metaValue: propFunction(function (name) {
+              if (typeof name === 'object') {
+                name = name.name
+              }
+
+              const metas = (renderable.meta || {})
+              return name && metas[name] && metas[name].value
             }),
             /*
              * Each of the following are equivalent in JSX
@@ -334,7 +349,8 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
                   dangerouslySetInnerHTML: { __html: getFusionScript(props.globalContent, Template.contentCache, refreshContent) }
                 }
               )
-            })
+            }),
+            ...props
           },
           React.createElement(
             Template,

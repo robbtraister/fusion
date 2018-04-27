@@ -144,7 +144,6 @@ const resolversPromise = Promise.all([pages, templates]).then(([pages, templates
 const resolve = function resolve (requestUri) {
   return resolversPromise.then(resolvers => {
     const resolver = resolvers.find(resolver => resolver.match(requestUri))
-    console.log(`matching resolver ${JSON.stringify(resolver)}`)
     return resolver
       ? resolver.hydrate(requestUri)
       : null

@@ -2,7 +2,7 @@
 
 const UglifyWebpackPlugin = require('uglifyjs-webpack-plugin')
 
-const { isDev } = require('../src/environment')
+const { isDev } = require('../../src/environment')
 
 const optimization = (isDev)
   ? {}

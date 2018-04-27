@@ -13,7 +13,7 @@ const Provider = require('./provider')
 const timer = require('../../timer')
 
 const {
-  compileScript
+  compileOne
 } = require('../../scripts/compile')
 
 const {
@@ -159,6 +159,7 @@ const compileRenderable = function compileRenderable ({renderable, outputType}) 
 }
 
 const compileDocument = function compileDocument ({renderable, outputType, name}) {
+  outputType = getOutputType(outputType)
   let tic
   return compileRenderable({renderable, outputType})
     .then((Template) => {
@@ -166,7 +167,7 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
 
       const OutputType = (() => {
         try {
-          return require(`${componentDistRoot}/output-types/${getOutputType(outputType)}.js`)
+          return require(`${componentDistRoot}/output-types/${outputType}`)
         } catch (e) {
           const err = new Error(`Could not find output-type: ${outputType}`)
           err.statusCode = 400
@@ -178,6 +179,37 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
         return React.createElement(
           OutputType,
           {
+            /*
+             * Each of the following are equivalent in JSX
+             *   {props.meta}
+             *   {props.meta()}
+             *
+             * To select a single meta tag
+             *   {props.meta('title')}
+             *   {props.meta({name: 'title'})}
+             */
+            meta: propFunction(function (name) {
+              if (typeof name === 'object') {
+                name = name.name
+              }
+
+              const metas = (renderable.meta || {})
+
+              const getElement = (name) => metas[name]
+                ? React.createElement(
+                  'meta',
+                  {
+                    key: `meta-${name}`,
+                    name,
+                    content: metas[name].value
+                  }
+                )
+                : null
+
+              return (name)
+                ? getElement(name)
+                : Object.keys(metas).filter(name => metas[name].html).map(getElement)
+            }),
             /*
              * Each of the following are equivalent in JSX
              *   {props.libs}
@@ -201,7 +233,7 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
                 {
                   key: 'template',
                   type: 'application/javascript',
-                  src: `/${prefix}/dist/${name}/${getOutputType(outputType)}.js?v=${version}${useComponentLib ? '&useComponentLib=true' : ''}`,
+                  src: `/${prefix}/dist/${name}/${outputType}.js?v=${version}${useComponentLib ? '&useComponentLib=true' : ''}`,
                   defer: true
                 }
               )
@@ -235,7 +267,32 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
               }
               inline = (inline === undefined) ? false : !!inline
 
+              if (renderable.css === undefined || renderable.css[outputType] === undefined) {
+                // these assets have yet to be compiled
+                // use the inlines promise to wait for compilation and make the css hash file available
+                // this should only happen in development
+                Component.inlines.styles = Component.inlines.styles || {
+                  cached: undefined,
+                  fetched: compileOne({name, rendering: renderable, outputType})
+                    .then(({css, cssFile}) => {
+                      Component.inlines.styles.cached = css
+                    })
+                }
+              } else if (inline && renderable.css && renderable.css[outputType]) {
+                // these assets have been compiled
+                // read the css file to be inserted inline
+                Component.inlines.styles = Component.inlines.styles || {
+                  cached: undefined,
+                  fetched: fetchFile(renderable.css[outputType])
+                    .then((css) => {
+                      Component.inlines.styles.cached = css
+                    })
+                }
+              }
+
               return (!inline)
+                // even if cssFile is null, add the link tag with no href
+                // so it can be replaced by an updated template script later
                 ? React.createElement(
                   'link',
                   {
@@ -243,32 +300,16 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
                     id: 'template-style',
                     rel: 'stylesheet',
                     type: 'text/css',
-                    href: renderable.cssFile ? `/${prefix}/dist/${renderable.cssFile}` : null
+                    href: (renderable.css && renderable.css[outputType]) ? `/${prefix}/dist/${renderable.css[outputType]}` : null
                   }
                 )
-                : (renderable.cssFile === null)
-                  ? null
-                  : (() => {
-                    Component.inlines.styles = Component.inlines.styles || {
-                      cached: undefined,
-                      fetched: (
-                        (renderable.cssFile)
-                          ? fetchFile(renderable.cssFile)
-                          : compileScript({name, rendering: renderable, outputType})
-                            .then(({css}) => css)
-                      )
-                        .then((data) => {
-                          Component.inlines.styles.cached = data
-                        })
-                    }
-                    return (Component.inlines.styles.cached)
-                      ? React.createElement(
-                        'style',
-                        {},
-                        Component.inlines.styles.cached
-                      )
-                      : null
-                  })()
+                : (Component.inlines.styles.cached)
+                  ? React.createElement(
+                    'style',
+                    {},
+                    Component.inlines.styles.cached
+                  )
+                  : null
             }),
             /*
              * Each of the following are equivalent in JSX

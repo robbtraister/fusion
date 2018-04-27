@@ -2,7 +2,7 @@
 
 All endpoints described below will be handled as displayed by the lambda function. However, the lambda functions will be exposed publicly at `/pb/api/v3`, so each endpoint must be prefixed to be accessed.
 
-All requests that begin with `/pb/dist` will be handled as if prefixed with `/pb/api/v3/dist`. All other requests that do not begin with `/pb/api/v3` will be handled as `/pb/api/v3/make/:request_uri`.
+All requests that begin with `/pb/dist` or `/pb/resources` will be handled as if prefixed with `/pb/api/v3/dist`. All other requests that do not begin with `/pb/api/v3` will be handled as `/pb/api/v3/make/:request_uri`.
 
 
 ## Content
@@ -18,7 +18,7 @@ Fetch a specific piece of content, using the content source and key specified. O
 
 Render the specified page/rendering/template/chain/feature by id as HTML. If generating a page/rendering/template, the result will be wrapped in the appropriate output-type (either as specified, or the default) and is suitable as a complete webpage. If generating a chain/feature, the containing page/rendering/template must be specified, and the resultant HTML will be only the chain/feature requested, with no output-type wrapping. A page/rendering/template may be rendered without an output-type wrapping by specifying `outputType=false`.
 
-To render with global content, use a POST request where the body of the request contains a JSON object with top-level `content` property. The body may also contain the id. When POSTing, pages may be identified by either id or uri.
+To render with global content, use a POST request where the body of the request contains a JSON object with top-level `content` property. The body may also contain the id (and will take precedence over the URI).
 
 
 ## Resolver
@@ -36,6 +36,12 @@ Resolve the trailing URI segment into a piece of global content and an associate
 
 Assets are read significantly more frequently than they are written, so they will be stored in and served statically from S3.
 
+### Resources
+
+-   `/resources/*`
+
+Return static files as found in your bundle's `/resources` directory. See [here](../engine/bundle/resources) for an example.
+
 ### Scripts
 
 -   `/dist/engine/react.js`
@@ -50,9 +56,11 @@ Pages and Templates should be referenced by id so that you will always receive t
 
 If a request for a page/template is not found in S3, it will be generated on-demand, returned to the caller, and pushed to S3.
 
--   `POST /dist/(page|rendering|template)/:id`
+-   `POST /dist/(page|rendering|template)[/:id]`
 
 Page and Template scripts should be re-generated and pushed to S3 on publish; this can be accomplished by sending a POST request, as it will force a new script to be generated and uploaded to S3. These publish requests should not specify an outputType in the request since all output types will be re-generated.
+
+The id may be provided in the URI, but will generally be ignored as the body payload should have an id and will take precedence.
 
 ### Styles
 

@@ -34,7 +34,7 @@ class MyComponent extends React.Component {
 module.exports = Consumer(MyComponent)
 ```
 
--   Or with an annotation:
+-   Or using an annotation:
 
 ```jsx
 const React = require('react')
@@ -60,13 +60,13 @@ This is the full data object used as the global content for the rendered page.
 
 -   requestUri
 
-This is the uri that was requested to initiate this rendering
+This is the uri that was requested to initiate this rendering. In the client, you could access this using window.location, but this property exists to provide similar server-side access.
 
 ### Instance Methods
 
 -   getContent(sourceName, key, [query])
 
-The `getContent` method will fetch content and return an object with two properties, `cached` and `promise`. The first property, `cached`, will contain the synchronous data as already pre-fetched on the server. The second property, `promise`, will be a Promise object that resolves to freshly re-fetched content.
+The `getContent` method will fetch content and return an object with two properties, `cached` and `fetched`. The first property, `cached`, will contain the synchronous data as already pre-fetched on the server. The second property, `fetched`, will be a Promise object that resolves to freshly re-fetched content.
 
 The first input parameter, `sourceName`, is simply the name of the content source from which you want to fetch. This content source must be configured in your bundle.
 
@@ -82,9 +82,9 @@ const MyComponent = Consumer(
     constructor (props) {
       super(props)
 
-      const {cached, promise} = this.getContent('content-api', {uri: '/some/data'}, '{type version}')
+      const {cached, fetched} = this.getContent('content-api', {uri: '/some/data'}, '{type version}')
       this.state = cached || {}
-      promise.then(data => this.setState(data))
+      fetched.then(data => this.setState(data))
     }
 
     render () {
@@ -96,14 +96,14 @@ const MyComponent = Consumer(
 
 If you are fetching content asynchronously from the client only, you should either make the call from `componentDidMount` (which is not called during server-side-rendering), or wrap it in a `window` check.
 
-Also, if using only asynchronous client-side fetching, there is no need to set `this.state` on initial call as the client-side cache will not be pre-populated with any server-rendered data. In this case, you can just access the promise directly.
+Also, if using only asynchronous client-side fetching, there is no need to set `this.state` on initial call as the client-side cache will not be pre-populated with any server-rendered data. In this case, you can just access the fetched result directly.
 
 ```jsx
 @Consumer
 class MyComponent extends React.Component {
   componentDidMount () {
     this.getContent('content-api', {uri: '/some/data'}, '{type version}')
-      .promise
+      .fetched
       .then(content => this.setState({content}))
   }
 
@@ -123,7 +123,7 @@ class MyComponent extends React.Component {
 
     if (typeof window !== 'undefined') {
       this.getContent('content-api', {uri: '/some/data'}, '{type version}')
-        .promise
+        .fetched
         .then(content => this.setState({content}))
     }
   }
@@ -143,10 +143,10 @@ class MyComponent extends React.Component {
     super(props)
 
     const content1 = this.getContent('content-api', {uri: '/some/data'}, '{type version}')
-    content1.promise.then(content1 => this.setState({content1}))
+    content1.fetched.then(content1 => this.setState({content1}))
 
     const content2 = this.getContent('content-api', {uri: '/some/other/data'}, '{type version}')
-    content2.promise.then(content2 => this.setState({content2}))
+    content2.fetched.then(content2 => this.setState({content2}))
 
     this.state = {
       content1: content1.cached

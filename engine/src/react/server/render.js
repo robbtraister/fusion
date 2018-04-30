@@ -366,10 +366,10 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
             }),
             /*
              * Each of the following are equivalent in JSX
-             *   {props.cssLink}
-             *   {props.cssLink()}
+             *   {props.cssLinks}
+             *   {props.cssLinks()}
              */
-            cssLink: propFunction(function (cb) {
+            cssLinks: propFunction(function (cb) {
               if (renderable.css === undefined || renderable.css[outputType] === undefined) {
                 // these assets have yet to be compiled
                 // use the inlines promise to wait for compilation and make the css hash file available

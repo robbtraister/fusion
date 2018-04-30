@@ -10,7 +10,7 @@ const OutputType = (props) =>
       <title>Fusion Rendering</title>
       {props.metaTag}
       {props.libs}
-      {props.cssLink(({outputTypeHref, templateHref}) =>
+      {props.cssLinks(({outputTypeHref, templateHref}) =>
         <React.Fragment>
           <link rel='stylesheet' type='text/css' href={outputTypeHref} />
           <link rel='stylesheet' type='text/css' href={templateHref} id='template-style' />

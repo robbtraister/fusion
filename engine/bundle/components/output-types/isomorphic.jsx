@@ -11,7 +11,7 @@ const OutputType = (props) =>
       {props.metaTag}
       {props.libs}
       <link rel='stylesheet' type='text/css' href={`${props.prefix}/resources/css/bootstrap.min.css`} />
-      {props.cssLink}
+      {props.cssLinks}
       <link rel='icon' type='image/x-icon' href={`${props.prefix}/resources/img/favicon.ico`} />
     </head>
     <body>

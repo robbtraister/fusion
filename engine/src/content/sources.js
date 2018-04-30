@@ -17,8 +17,8 @@ const {
   getSourceConfig
 } = require('../models/sources')
 
-const getSourceFetcher = function getSourceFetcher (source) {
-  return (key) => Promise.resolve(url.resolve(contentBase, source.resolve(key)))
+function fetch (key) {
+  return Promise.resolve(url.resolve(contentBase, this.resolve(key)))
     .then((uri) => {
       debugFetch(uri)
       return request(uri)
@@ -36,20 +36,35 @@ const getSourceFetcher = function getSourceFetcher (source) {
 }
 
 const expandProperties = function expandProperties (string, properties) {
-  return string.replace(/\$\{([^}]+)\}/g, function (match, prop) {
+  return string.replace(/\{([^}]+)\}/g, function (match, prop) {
     return (prop === 'key')
       ? properties
       : properties[prop.replace(/^key\./, '')] || match
   })
 }
 
+const getJsonResolver = function getJsonResolver (config) {
+  return function resolve (key) {
+    const path = expandProperties(config.pattern, key)
+
+    const query = config.params
+      .map((param) => {
+        return (param.dropWhenEmpty && !(param.name in key))
+          ? null
+          : `${param.name}=${key[param.name]}`
+      })
+      .filter(v => v)
+      .join('&')
+
+    return `${path}${query ? `?${query}` : ''}`
+  }
+}
+
 const getSourceResolver = function getSourceResolver (source) {
   const nativeResolve = source.resolve
   return (nativeResolve instanceof Function)
     ? nativeResolve
-    : (source.pattern)
-      ? (key) => expandProperties(source.pattern, key)
-      : () => source.uri
+    : getJsonResolver(source)
 }
 
 const getBundleSource = function getBundleSource (sourceName) {
@@ -60,32 +75,10 @@ const getBundleSource = function getBundleSource (sourceName) {
   }
 }
 
-const getDbSource = function getDbSource (sourceName) {
-  return getSourceConfig(sourceName)
-    .then((config) => {
-      return {
-        resolve (key) {
-          const path = config.pattern.replace(/\{([^}]+)\}/g, (match, prop) => key[prop] || match)
-
-          const query = config.params
-            .map((param) => {
-              return (param.dropWhenEmpty && !(param.name in key))
-                ? null
-                : `${param.name}=${key[param.name]}`
-            })
-            .filter(v => v)
-            .join('&')
-
-          return `${path}${query ? `?${query}` : ''}`
-        }
-      }
-    })
-}
-
 const sourceCache = {}
 const getSource = function getSource (sourceName) {
   sourceCache[sourceName] = sourceCache[sourceName] || getBundleSource(sourceName)
-    .then((bundleSource) => bundleSource || getDbSource(sourceName))
+    .then((bundleSource) => bundleSource || getSourceConfig(sourceName))
     .then((source) => {
       if (!source) {
         delete sourceCache[sourceName]
@@ -95,7 +88,7 @@ const getSource = function getSource (sourceName) {
       return Object.assign(
         source,
         {
-          fetch: getSourceFetcher(source),
+          fetch,
           filter: getSchemaFilter(source.schemaName),
           resolve: getSourceResolver(source)
         }

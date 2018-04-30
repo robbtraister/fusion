@@ -5,8 +5,8 @@ const path = require('path')
 const glob = require('glob')
 
 const contentBase = process.env.CONTENT_BASE || ''
-const prefix = (process.env.CONTEXT || 'pb').replace(/^\/*/, '/').replace(/\/+$/, '')
-const apiPrefix = `${prefix}/api/v3`
+const contextPath = (process.env.CONTEXT_PATH || 'pb').replace(/^\/*/, '/').replace(/\/+$/, '')
+const apiPrefix = `${contextPath}/api/v3`
 const daoUrl = process.env.DAO_URL
 const environment = process.env.ENVIRONMENT
 const isDev = !/^prod/i.test(process.env.NODE_ENV)
@@ -32,6 +32,7 @@ module.exports = {
   componentDistRoot,
   componentSrcRoot,
   contentBase,
+  contextPath,
   daoUrl,
   distRoot,
   environment,
@@ -41,7 +42,6 @@ module.exports = {
   onDemand,
   outputTypes,
   port,
-  prefix,
   schemasRoot,
   sourcesRoot,
   version

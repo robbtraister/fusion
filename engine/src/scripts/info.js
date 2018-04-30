@@ -2,7 +2,7 @@
 
 const {
   environment,
-  prefix,
+  contextPath,
   version
 } = require('../environment')
 
@@ -19,8 +19,8 @@ const getOutputType = function getOutputType (outputType) {
 }
 
 const getRelativeUri = function getRelativeUri ({componentType, id, outputType}) {
-  return `${prefix}/dist/${componentType}/${id}.js?v=${version}&outputType=${getOutputType(outputType)}`
-  // return `${prefix}/dist/${name}.js?v=${version}&outputType=${getOutputType(outputType)}${useComponentLib ? '&useComponentLib=true' : ''}`,
+  return `${contextPath}/dist/${componentType}/${id}.js?v=${version}&outputType=${getOutputType(outputType)}`
+  // return `${contextPath}/dist/${name}.js?v=${version}&outputType=${getOutputType(outputType)}${useComponentLib ? '&useComponentLib=true' : ''}`,
 }
 
 const getS3Key = function getS3Key (name) {

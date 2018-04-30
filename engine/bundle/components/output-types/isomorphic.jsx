@@ -10,9 +10,9 @@ const OutputType = (props) =>
       <title>Fusion Rendering</title>
       {props.metaTag}
       {props.libs}
-      <link rel='stylesheet' type='text/css' href={`${props.prefix}/resources/css/bootstrap.min.css`} />
+      <link rel='stylesheet' type='text/css' href={`${props.contextPath}/resources/css/bootstrap.min.css`} />
       {props.cssLinks}
-      <link rel='icon' type='image/x-icon' href={`${props.prefix}/resources/img/favicon.ico`} />
+      <link rel='icon' type='image/x-icon' href={`${props.contextPath}/resources/img/favicon.ico`} />
     </head>
     <body>
       <div id='App'>

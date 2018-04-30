@@ -31,8 +31,8 @@ const {
 
 const {
   componentDistRoot,
+  contextPath,
   isDev,
-  prefix,
   onDemand,
   version
 } = require('../../environment')
@@ -86,7 +86,7 @@ const engineScript = React.createElement(
   {
     key: 'engine',
     type: 'application/javascript',
-    src: `${prefix}/dist/engine/react.js?v=${version}`,
+    src: `${contextPath}/dist/engine/react.js?v=${version}`,
     defer: true
   }
 )
@@ -95,7 +95,7 @@ const componentsScript = React.createElement(
   {
     key: 'components',
     type: 'application/javascript',
-    src: `${prefix}/dist/components/all.js?v=${version}`,
+    src: `${contextPath}/dist/components/all.js?v=${version}`,
     defer: true
   }
 )
@@ -112,7 +112,7 @@ function getFusionScript (globalContent, contentCache, refreshContent) {
     })
 
   return `window.Fusion=window.Fusion||{};` +
-    `Fusion.prefix='${prefix}';` +
+    `Fusion.contextPath='${contextPath}';` +
     `Fusion.refreshContent=${onDemand ? 'false' : !!refreshContent};` +
     `Fusion.globalContent=${JSON.stringify(globalContent || {})};` +
     `Fusion.contentCache=${JSON.stringify(condensedCache)}`
@@ -207,7 +207,7 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
         return React.createElement(
           OutputType,
           {
-            prefix,
+            contextPath,
             /*
              * Each of the following are equivalent in JSX
              *   {props.metaTag}
@@ -277,7 +277,7 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
                 {
                   key: 'template',
                   type: 'application/javascript',
-                  src: `${prefix}/dist/${name}/${outputType}.js?v=${version}${useComponentLib ? '&useComponentLib=true' : ''}`,
+                  src: `${contextPath}/dist/${name}/${outputType}.js?v=${version}${useComponentLib ? '&useComponentLib=true' : ''}`,
                   defer: true
                 }
               )
@@ -380,8 +380,8 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
               }
 
               const hrefs = {
-                outputTypeHref: (outputTypeHasCss(outputType)) ? `${prefix}/dist/components/output-types/${outputType}.css` : null,
-                templateHref: (renderable.css && renderable.css[outputType]) ? `${prefix}/dist/${renderable.css[outputType]}` : null
+                outputTypeHref: (outputTypeHasCss(outputType)) ? `${contextPath}/dist/components/output-types/${outputType}.css` : null,
+                templateHref: (renderable.css && renderable.css[outputType]) ? `${contextPath}/dist/${renderable.css[outputType]}` : null
               }
 
               return (cb)

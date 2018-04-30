@@ -2,6 +2,11 @@
 
 'use strict'
 
+const fs = require('fs')
+const path = require('path')
+
+const glob = require('glob')
+
 const debugTimer = require('debug')('fusion:timer:react:render')
 
 const React = require('react')
@@ -26,10 +31,33 @@ const {
 
 const {
   componentDistRoot,
+  isDev,
   prefix,
   onDemand,
   version
 } = require('../../environment')
+
+const outputTypeHasCss = (isDev)
+  ? (outputType) => {
+    try {
+      fs.accessSync(path.resolve(componentDistRoot, 'output-types', `${outputType}.css`), fs.constants.R_OK)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+  : (() => {
+    const outputTypeCssFiles = {}
+    const outputTypeDistRoot = path.resolve(componentDistRoot, 'output-types')
+    glob.sync(path.resolve(outputTypeDistRoot, '**/*.css'))
+      .forEach((f) => {
+        const name = f.substr(outputTypeDistRoot.length + 1)
+        const parts = path.parse(name)
+        const outputType = path.join(parts.dir, parts.name)
+        outputTypeCssFiles[outputType] = f
+      })
+    return (outputType) => outputTypeCssFiles[outputType]
+  })()
 
 // this wrapper allows a function to be used in JSX without parentheses
 // use `{props.scripts}` to execute the function with the defaults
@@ -58,7 +86,7 @@ const engineScript = React.createElement(
   {
     key: 'engine',
     type: 'application/javascript',
-    src: `/${prefix}/dist/engine/react.js?v=${version}`,
+    src: `${prefix}/dist/engine/react.js?v=${version}`,
     defer: true
   }
 )
@@ -67,7 +95,7 @@ const componentsScript = React.createElement(
   {
     key: 'components',
     type: 'application/javascript',
-    src: `/${prefix}/dist/components/all.js?v=${version}`,
+    src: `${prefix}/dist/components/all.js?v=${version}`,
     defer: true
   }
 )
@@ -102,7 +130,7 @@ const render = function render ({Component, requestUri, content}) {
           }
         )
       )
-      resolve(html)
+      resolve('<!DOCTYPE html>' + html)
     } catch (e) {
       reject(e)
     }
@@ -179,6 +207,7 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
         return React.createElement(
           OutputType,
           {
+            prefix,
             /*
              * Each of the following are equivalent in JSX
              *   {props.metaTag}
@@ -248,7 +277,7 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
                 {
                   key: 'template',
                   type: 'application/javascript',
-                  src: `/${prefix}/dist/${name}/${outputType}.js?v=${version}${useComponentLib ? '&useComponentLib=true' : ''}`,
+                  src: `${prefix}/dist/${name}/${outputType}.js?v=${version}${useComponentLib ? '&useComponentLib=true' : ''}`,
                   defer: true
                 }
               )
@@ -276,55 +305,112 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
              *   {props.css(true)}
              *   {props.css({inline: true})}
              */
-            css: propFunction(function (inline) {
-              if (typeof inline === 'object') {
-                inline = inline.inline
-              }
-              inline = (inline === undefined) ? false : !!inline
+            styles: propFunction(function (cb) {
+              const outputTypeStylesPromise = new Promise((resolve, reject) => {
+                fs.readFile(path.resolve(componentDistRoot, 'output-types', `${outputType}.css`), (err, data) => {
+                  err ? resolve(null) : resolve(data.toString())
+                })
+              })
 
               if (renderable.css === undefined || renderable.css[outputType] === undefined) {
                 // these assets have yet to be compiled
                 // use the inlines promise to wait for compilation and make the css hash file available
                 // this should only happen in development
                 Component.inlines.styles = Component.inlines.styles || {
-                  cached: undefined,
-                  fetched: compileOne({name, rendering: renderable, outputType})
-                    .then(({css, cssFile}) => {
-                      Component.inlines.styles.cached = css
+                  cached: {
+                    outputTypeStyles: undefined,
+                    templateStyles: undefined
+                  },
+                  fetched: Promise.all([
+                    outputTypeStylesPromise,
+                    compileOne({name, rendering: renderable, outputType})
+                  ])
+                    .then(([outputTypeStyles, {css, cssFile}]) => {
+                      Component.inlines.styles.cached = {
+                        outputTypeStyles,
+                        templateStyles: css
+                      }
                     })
                 }
-              } else if (inline && renderable.css && renderable.css[outputType]) {
+              } else if (renderable.css && renderable.css[outputType]) {
                 // these assets have been compiled
                 // read the css file to be inserted inline
                 Component.inlines.styles = Component.inlines.styles || {
-                  cached: undefined,
-                  fetched: fetchFile(renderable.css[outputType])
-                    .then((css) => {
-                      Component.inlines.styles.cached = css
+                  cached: {
+                    outputTypeStyles: undefined,
+                    templateStyles: undefined
+                  },
+                  fetched: Promise.all([
+                    outputTypeStylesPromise,
+                    fetchFile(renderable.css[outputType])
+                  ])
+                    .then(([outputTypeStyles, templateStyles]) => {
+                      Component.inlines.styles.cached = {
+                        outputTypeStyles,
+                        templateStyles
+                      }
                     })
                 }
               }
 
-              return (!inline)
+              return (cb)
+                ? cb(Component.inlines.styles.cached)
+                : React.createElement(
+                  'style',
+                  {},
+                  [
+                    Component.inlines.styles.cached.outputTypeStyles,
+                    Component.inlines.styles.cached.templateStyles
+                  ]
+                )
+            }),
+            /*
+             * Each of the following are equivalent in JSX
+             *   {props.cssLinks}
+             *   {props.cssLinks()}
+             */
+            cssLinks: propFunction(function (cb) {
+              if (renderable.css === undefined || renderable.css[outputType] === undefined) {
+                // these assets have yet to be compiled
+                // use the inlines promise to wait for compilation and make the css hash file available
+                // this should only happen in development
+                Component.inlines.styles = Component.inlines.styles || {
+                  fetched: compileOne({name, rendering: renderable, outputType})
+                }
+              }
+
+              const hrefs = {
+                outputTypeHref: (outputTypeHasCss(outputType)) ? `${prefix}/dist/components/output-types/${outputType}.css` : null,
+                templateHref: (renderable.css && renderable.css[outputType]) ? `${prefix}/dist/${renderable.css[outputType]}` : null
+              }
+
+              return (cb)
+                ? cb(hrefs)
                 // even if cssFile is null, add the link tag with no href
                 // so it can be replaced by an updated template script later
-                ? React.createElement(
-                  'link',
-                  {
-                    key: 'template-style',
-                    id: 'template-style',
-                    rel: 'stylesheet',
-                    type: 'text/css',
-                    href: (renderable.css && renderable.css[outputType]) ? `/${prefix}/dist/${renderable.css[outputType]}` : null
-                  }
-                )
-                : (Component.inlines.styles.cached)
-                  ? React.createElement(
-                    'style',
-                    {},
-                    Component.inlines.styles.cached
+                : [
+                  (hrefs.outputTypeHref)
+                    ? React.createElement(
+                      'link',
+                      {
+                        key: 'output-type-style',
+                        rel: 'stylesheet',
+                        type: 'text/css',
+                        href: hrefs.outputTypeHref
+                      }
+                    )
+                    : null,
+                  React.createElement(
+                    'link',
+                    {
+                      key: 'template-style',
+                      id: 'template-style',
+                      rel: 'stylesheet',
+                      type: 'text/css',
+                      href: hrefs.templateHref
+                    }
                   )
-                  : null
+                ]
             }),
             /*
              * Each of the following are equivalent in JSX

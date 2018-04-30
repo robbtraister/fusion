@@ -5,11 +5,12 @@ const path = require('path')
 const glob = require('glob')
 
 const contentBase = process.env.CONTENT_BASE || ''
-const prefix = (process.env.CONTEXT || 'pb').replace(/^\/+/, '').replace(/\/+$/, '')
-const apiPrefix = `/${prefix}/api/v3`
+const prefix = (process.env.CONTEXT || 'pb').replace(/^\/*/, '/').replace(/\/+$/, '')
+const apiPrefix = `${prefix}/api/v3`
 const daoUrl = process.env.DAO_URL
 const environment = process.env.ENVIRONMENT
 const isDev = !/^prod/i.test(process.env.NODE_ENV)
+const minify = (isDev) ? process.env.MINIFY === 'true' : true
 const mongoUrl = process.env.MONGO_URL
 const onDemand = process.env.ON_DEMAND === 'true'
 const port = process.env.PORT || 8080
@@ -35,6 +36,7 @@ module.exports = {
   distRoot,
   environment,
   isDev,
+  minify,
   mongoUrl,
   onDemand,
   outputTypes,

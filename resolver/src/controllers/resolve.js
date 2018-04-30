@@ -125,32 +125,31 @@ const { pageConfigs, templateConfigs } = (useDB)
     }
   })()
 
-// decorate pages and templates with resolver functions
-const resolversPromise = Promise.all([pageConfigs, templateConfigs]).then(([pageConfigs, templateConfigs]) => {
-  const pages = pageConfigs.map(resolver => {
+const pageResolvers = pageConfigs.then((configs) => {
+  return configs.map((resolver) => {
     // resolver type needs to be set outside of Object.assign because the type value needs to be accessible when evaluating getResolverHydrater
     resolver.type = 'page'
     return Object.assign(resolver,
       {
         hydrate: getResolverHydrater(resolver),
         match: getResolverMatcher(resolver)
-      }
-    )
+      })
   })
+})
 
-  const templates = templateConfigs.map(resolver => {
+const templateResolvers = templateConfigs.then((configs) => {
+  return configs.map((resolver) => {
     // resolver type needs to be set outside of Object.assign because the type value needs to be accessible when evaluating getResolverHydrater
     resolver.type = 'template'
     return Object.assign(resolver,
       {
         hydrate: getResolverHydrater(resolver),
         match: getResolverMatcher(resolver)
-      }
-    )
+      })
   })
-
-  return pages.concat(templates)
 })
+
+const resolversPromise = Promise.all([pageResolvers, templateResolvers]).then(([pageResolvers, templateResolvers]) => pageResolvers.concat(templateResolvers))
 
 const resolve = function resolve (requestUri) {
   return resolversPromise.then(resolvers => {

@@ -7,7 +7,7 @@ const JSONNormalize = require('../../utils/normalize')
 
 const getSource = require('../../content/sources')
 
-const getContentGenerator = function getContentGenerator (contentCache) {
+const getContentGenerator = function getContentGenerator (contentCache, arcSite) {
   contentCache = contentCache || {}
 
   return function getContent (sourceName, ...args) {
@@ -17,6 +17,7 @@ const getContentGenerator = function getContentGenerator (contentCache) {
     const getSourceContent = (key, query) => {
       // alphabetize object keys to ensure proper cacheing
       const keyString = JSONNormalize.stringify(key)
+      key['arc-site'] = arcSite
       const keyCache = sourceCache[keyString] = sourceCache[keyString] || {
         cached: undefined,
         filtered: undefined,
@@ -63,17 +64,21 @@ global.Fusion = {
 
 module.exports = (Template) => {
   const contentCache = {}
-  const wrapper = (props) => React.createElement(
-    FusionContext.Provider,
-    {
-      value: Object.assign({}, props || {}, {
-        getContent: getContentGenerator(contentCache),
-        globalContent: props.globalContent,
-        requestUri: props.requestUri
-      })
-    },
-    React.createElement(Template)
-  )
+  const wrapper = (props) => {
+    props = props || {}
+    return React.createElement(
+      FusionContext.Provider,
+      {
+        value: Object.assign({}, props, {
+          arcSite: props.arcSite,
+          getContent: getContentGenerator(contentCache, props.arcSite),
+          globalContent: props.globalContent,
+          requestUri: props.requestUri
+        })
+      },
+      React.createElement(Template)
+    )
+  }
   wrapper.contentCache = contentCache
   wrapper.inlines = {}
   return wrapper

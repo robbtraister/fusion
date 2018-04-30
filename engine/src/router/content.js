@@ -11,6 +11,7 @@ contentRouter.get(['/', '/:source', '/:source/:key'],
     const sourceName = req.params.source || req.query.source
     const keyString = req.params.key || req.query.key
     const query = req.query.query
+    const website = req.query._website
 
     Promise.all([
       getSource(sourceName),
@@ -21,7 +22,8 @@ contentRouter.get(['/', '/:source', '/:source/:key'],
           reject(e)
         }
       })
-        .catch(() => keyString)
+        .catch(() => ({key: keyString}))
+        .then((key) => Object.assign(key, {'arc-site': website}))
     ])
       .then(([source, key]) => source.fetch(key)
         .then(data => source.filter(query, data)))

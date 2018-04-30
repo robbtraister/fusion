@@ -100,7 +100,7 @@ const componentsScript = React.createElement(
   }
 )
 
-function getFusionScript (globalContent, contentCache, refreshContent) {
+function getFusionScript (globalContent, contentCache, refreshContent, arcSite) {
   const condensedCache = {}
   Object.keys(contentCache)
     .forEach(sourceName => {
@@ -113,18 +113,20 @@ function getFusionScript (globalContent, contentCache, refreshContent) {
 
   return `window.Fusion=window.Fusion||{};` +
     `Fusion.contextPath='${contextPath}';` +
+    (arcSite ? `Fusion.arcSite='${arcSite}';` : '') +
     `Fusion.refreshContent=${onDemand ? 'false' : !!refreshContent};` +
     `Fusion.globalContent=${JSON.stringify(globalContent || {})};` +
     `Fusion.contentCache=${JSON.stringify(condensedCache)}`
 }
 
-const render = function render ({Component, requestUri, content}) {
+const render = function render ({Component, requestUri, content, _website}) {
   const renderHTML = () => new Promise((resolve, reject) => {
     try {
       const html = ReactDOM.renderToStaticMarkup(
         React.createElement(
           Component,
           {
+            arcSite: _website,
             globalContent: content,
             requestUri
           }
@@ -432,7 +434,7 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
                 'script',
                 {
                   type: 'application/javascript',
-                  dangerouslySetInnerHTML: { __html: getFusionScript(props.globalContent, Template.contentCache, refreshContent) }
+                  dangerouslySetInnerHTML: { __html: getFusionScript(props.globalContent, Template.contentCache, refreshContent, props.arcSite) }
                 }
               )
             }),

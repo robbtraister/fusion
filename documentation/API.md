@@ -7,14 +7,16 @@ All requests that begin with `/pb/dist` or `/pb/resources` will be handled as if
 
 ## Content
 
--   `/content/:content-source?key=:key[&query=:query]`
+-   `/content/:content-source?key=:key[&query=:query][&_website=:website]`
 
-Fetch a specific piece of content, using the content source and key specified. Optionally filter the content with a provided graphql query
+Fetch a specific piece of content, using the content source and key specified. Optionally filter the content with a provided graphql query.
+
+The `_website` parameter will be appended automatically by the public origin
 
 
 ## Rendering
 
--   `/render/(page|rendering|template)[/:id[/:child-id]][?outputType=:outputType]`
+-   `/render/(page|rendering|template)[/:id[/:child-id]][?outputType=:outputType][&_website=:website]`
 
 Render the specified page/rendering/template/chain/feature by id as HTML. If generating a page/rendering/template, the result will be wrapped in the appropriate output-type (either as specified, or the default) and is suitable as a complete webpage. If generating a chain/feature, the containing page/rendering/template must be specified, and the resultant HTML will be only the chain/feature requested, with no output-type wrapping. A page/rendering/template may be rendered without an output-type wrapping by specifying `outputType=false`.
 

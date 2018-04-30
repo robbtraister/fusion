@@ -15,7 +15,7 @@ const getContentGenerator = function getContentGenerator (contentCache) {
     const sourceCache = contentCache[source] || {}
 
     const fetchContent = (source, keyString, filter, cached) =>
-      window.fetch(`${Fusion.contextPath || ''}/api/v3/content/${source}?key=${keyString}` + (filter ? `&query=${filter}` : ''))
+      window.fetch(`${Fusion.contextPath || ''}/api/v3/content/${source}?key=${encodeURIComponent(keyString)}` + (filter ? `&query=${encodeURIComponent(filter)}` : '') + (Fusion.arcSite ? `&_website=${encodeURIComponent(Fusion.arcSite)}` : ''))
         .then(resp => resp.json())
         .catch(() => cached)
 
@@ -50,6 +50,7 @@ const getContentGenerator = function getContentGenerator (contentCache) {
 }
 
 const value = {
+  arcSite: Fusion.arcSite,
   getContent: getContentGenerator(Fusion.contentCache),
   globalContent: Fusion.globalContent,
   requestUri: window.location.pathname + window.location.search

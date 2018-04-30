@@ -2,8 +2,13 @@
 
 const path = require('path')
 
+const babelLoader = require('./shared/loaders/babel-loader')
 const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
+
+const {
+  distRoot
+} = require('../src/environment')
 
 module.exports = [
   {
@@ -18,20 +23,7 @@ module.exports = [
           test: /\.jsx?$/i,
           exclude: /node_modules/,
           use: [
-            {
-              loader: 'babel-loader',
-              options: {
-                babelrc: false,
-                presets: [
-                  'es2015',
-                  'react'
-                ],
-                plugins: [
-                  'transform-decorators-legacy'
-                ],
-                comments: false
-              }
-            }
+            babelLoader
           ]
         }
       ]
@@ -39,7 +31,7 @@ module.exports = [
     optimization,
     output: {
       filename: `[name].js`,
-      path: path.resolve(__dirname, '..', 'dist', 'engine'),
+      path: path.resolve(distRoot, 'engine'),
       library: 'react',
       libraryTarget: 'var'
     },

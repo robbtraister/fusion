@@ -7,14 +7,16 @@ const glob = require('glob')
 const ManifestPlugin = require('webpack-manifest-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
-const cssLoader = require('./shared/css-loader')
+const babelLoader = require('./shared/loaders/babel-loader')
+const cssLoader = require('./shared/loaders/css-loader')
 const externals = require('./shared/externals')
 const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
 
 const {
-  componentSrcRoot
+  componentSrcRoot,
+  distRoot
 } = require('../src/environment')
 
 const entry = {}
@@ -39,20 +41,7 @@ module.exports = (Object.keys(entry).length)
           test: /\.jsx?$/i,
           exclude: /node_modules/,
           use: [
-            {
-              loader: 'babel-loader',
-              options: {
-                babelrc: false,
-                presets: [
-                  'es2015',
-                  'react'
-                ],
-                plugins: [
-                  'transform-decorators-legacy'
-                ],
-                comments: false
-              }
-            }
+            babelLoader
           ]
         },
         {
@@ -75,7 +64,7 @@ module.exports = (Object.keys(entry).length)
     optimization,
     output: {
       filename: `[name].js`,
-      path: path.resolve(__dirname, '..', 'dist', 'components'),
+      path: path.resolve(distRoot, 'components'),
       libraryTarget: 'commonjs2'
     },
     plugins: [

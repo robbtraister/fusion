@@ -71,7 +71,7 @@ const Masthead = (props) => {
                           <ImageFormat src={props.customFields.mastLogo} className='wplogo' alt={props.customFields.siteTitle} height={logoSize} />
                         </React.Fragment>
                     )
-                    : <img className='orgLogo' src='/pb/resources/assets/img/thenews.png' alt={props.customFields.siteTitle} height={logoSize} />
+                    : <img className='orgLogo' src='/pb/resources/img/thenews.png' alt={props.customFields.siteTitle} height={logoSize} />
                   }
                 </a>
               </div>

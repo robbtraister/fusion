@@ -6,9 +6,10 @@ const url = require('url')
 
 const fetch = require('./fetch')
 
-const resolverConfig = require('../../config/resolvers.json')
-
-const { trailingSlashRule } = require('../environment')
+const {
+  resolveFromDB,
+  trailingSlashRule
+} = require('../environment')
 
 const getNestedValue = function getNestedValue (target, field) {
   const keys = (field || '').split('.')
@@ -24,7 +25,7 @@ const getNestedValue = function getNestedValue (target, field) {
 const enforceTrailingSlashRule = {
   NOOP: (uri) => uri,
   FORCE: (uri) => uri.replace(/\/[^./]+$/, (match) => `${match}/`),
-  DROP: (uri) => uri.replace(/\/*$/, '')
+  DROP: (uri) => uri.replace(/\/+$/, '')
 }[trailingSlashRule]
 
 const getTemplateResolver = function getTemplateResolver (resolver) {
@@ -110,39 +111,46 @@ const getResolverMatcher = function getResolverMatcher (resolver) {
   return () => null
 }
 
-// create page resolvers
-const pageResolvers = resolverConfig
-  .pages.map(resolver => {
-    // resolver type needs to be set outside of Object.assign because the type value needs to be accessible when evaluating getResolverHydrater
-    resolver.type = 'page'
-    return Object.assign(resolver,
-      {
-        hydrate: getResolverHydrater(resolver),
-        match: getResolverMatcher(resolver)
-      }
-    )
-  })
+// fetch page/template resolvers from DB (local env) or config file (prod)
+const { pageConfigs, templateConfigs } = (resolveFromDB)
+  ? (() => {
+    const model = require('../dao/dao')
+    return {
+      pageConfigs: model('page').find(),
+      templateConfigs: model('resolver_config').find()
+    }
+  })()
+  : (() => {
+    const resolverConfigs = require('../../config/resolvers.json')
+    return {
+      pageConfigs: Promise.resolve(resolverConfigs.pages),
+      templateConfigs: Promise.resolve(resolverConfigs.resolvers)
+    }
+  })()
 
-// create template resolvers
-const templateResolvers = resolverConfig
-  .resolvers.map(resolver => {
-    // resolver type needs to be set outside of Object.assign because the type value needs to be accessible when evaluating getResolverHydrater
-    resolver.type = 'template'
-    return Object.assign(resolver,
-      {
-        hydrate: getResolverHydrater(resolver),
-        match: getResolverMatcher(resolver)
-      }
-    )
-  })
+const prepareResolver = (type) => (resolver) => {
+  // resolver type needs to be set outside of Object.assign because the type value needs to be accessible when evaluating getResolverHydrater
+  resolver.type = type
+  return Object.assign(resolver,
+    {
+      hydrate: getResolverHydrater(resolver),
+      match: getResolverMatcher(resolver)
+    })
+}
 
-const resolvers = pageResolvers.concat(templateResolvers)
+const pageResolvers = pageConfigs.then((configs) => configs.map(prepareResolver('page')))
+const templateResolvers = templateConfigs.then((configs) => configs.map(prepareResolver('template')))
+
+const resolversPromise = Promise.all([pageResolvers, templateResolvers])
+  .then(([pageResolvers, templateResolvers]) => pageResolvers.concat(templateResolvers))
 
 const resolve = function resolve (requestUri) {
-  const resolver = resolvers.find(resolver => resolver.match(requestUri))
-  return resolver
-    ? resolver.hydrate(requestUri)
-    : Promise.resolve(null)
+  return resolversPromise.then(resolvers => {
+    const resolver = resolvers.find(resolver => resolver.match(requestUri))
+    return resolver
+      ? resolver.hydrate(requestUri)
+      : null
+  })
 }
 
 module.exports = resolve

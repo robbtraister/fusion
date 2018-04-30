@@ -322,7 +322,7 @@ cat <<EOB
     }
 
     location = / {
-      rewrite                  (.*) /homepage;
+      rewrite                  (.*) /homepage/;
     }
 
     # all other requests should be treated as a new page to render

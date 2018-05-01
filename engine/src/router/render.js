@@ -30,7 +30,8 @@ function getTypeRouter (getComponent) {
         {
           id: req.params.id,
           child: req.params.child,
-          outputType
+          outputType,
+          _website: req.query._website
         },
         req.body
       )

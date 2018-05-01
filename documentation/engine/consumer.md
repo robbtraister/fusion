@@ -54,6 +54,10 @@ Once you have annotated your component as a consumer, it will have access to the
 
 ### Properties
 
+-   arcSite
+
+The arc site used in this rendering, if multi-site enabled.
+
 -   globalContent
 
 This is the full data object used as the global content for the rendered page.
@@ -70,7 +74,7 @@ The `getContent` method will fetch content and return an object with two propert
 
 The first input parameter, `sourceName`, is simply the name of the content source from which you want to fetch. This content source must be configured in your bundle.
 
-The second input parameter, `key`, will depend on the definition of the content-source, but will be used to uniquely identify the piece of content you want to fetch.
+The second input parameter, `key`, will depend on the definition of the content-source, but will be an object used to uniquely identify the piece of content you want to fetch.
 
 The optional third input parameter, `query`, is a GraphQL query that will be applied to the resultant data to minimize the payload size. This is beneficial for both client-side and server-side fetching, as server-side fetched data must be included in the final HTML rendering to prevent content flashing.
 

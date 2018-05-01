@@ -16,7 +16,7 @@ const OutputType = (props) =>
         </style>
       )}
       {/* {props.styles} */}
-      <link rel='icon' type='image/x-icon' href={`${props.prefix}/resources/img/favicon.ico`} />
+      <link rel='icon' type='image/x-icon' href={`${props.contextPath}/resources/img/favicon.ico`} />
     </head>
     <body>
       <div id='App'>

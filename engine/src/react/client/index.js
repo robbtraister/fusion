@@ -38,7 +38,7 @@ const render = () => {
       if (Fusion.Template.cssFile) {
         const templateStyle = window.document.getElementById('template-style')
         if (templateStyle) {
-          templateStyle.href = `${Fusion.prefix || ''}/dist/${Fusion.Template.cssFile}`
+          templateStyle.href = `${Fusion.contextPath || ''}/dist/${Fusion.Template.cssFile}`
         }
       }
 

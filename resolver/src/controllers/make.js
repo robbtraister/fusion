@@ -2,17 +2,23 @@
 
 const resolve = require('./resolve')
 const engine = require('./engine')
+const url = require('url')
 
-const endpoint = function endpoint (data, outputType) {
-  const query = outputType ? `?outputType=${outputType}` : ''
-  return `/render/${data.type}${query}`
+const endpoint = function endpoint (data, outputType, arcSite) {
+  return url.format({
+    pathname: `/render/${data.type}`,
+    query: {
+      outputType,
+      _website: arcSite
+    }
+  })
 }
 
-const make = function make (uri, outputType, version) {
-  return resolve(uri)
+const make = function make (uri, outputType, version, arcSite) {
+  return resolve(uri, arcSite)
     .then((data) => engine({
       method: 'POST',
-      uri: endpoint(data, outputType),
+      uri: endpoint(data, outputType, arcSite),
       data,
       version
     }))

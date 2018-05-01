@@ -7,7 +7,8 @@ const resolve = require('../controllers/resolve')
 const resolveRouter = express.Router()
 
 resolveRouter.get('*', (req, res, next) => {
-  resolve(req.url)
+  const arcSite = req.get('Arc-Site') || req.query._website
+  resolve(req.url, arcSite)
     .then(data => { res.send(data) })
     .catch(next)
 })

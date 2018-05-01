@@ -79,14 +79,14 @@ const getResolverHydrater = function getResolverHydrater (resolver) {
   const contentSourceParser = parseContentSourceParameters(resolver)
 
   const contentResolver = (resolver.contentSourceId)
-    ? (requestUri) => {
+    ? (requestUri, arcSite) => {
       const contentSourceParams = contentSourceParser(requestUri)
       requestUri = enforceTrailingSlashRule(requestUri)
-      return fetch(resolver.contentSourceId, Object.assign({'uri': requestUri}, contentSourceParams))
+      return fetch(resolver.contentSourceId, Object.assign({'uri': requestUri, '_website': arcSite}, contentSourceParams))
     }
-    : (requestUri) => Promise.resolve(null)
+    : (requestUri, arcSite) => Promise.resolve(null)
 
-  return (requestUri) => contentResolver(requestUri)
+  return (requestUri, arcSite) => contentResolver(requestUri, arcSite)
     .then(content => Object.assign(
       {
         requestUri,
@@ -102,13 +102,25 @@ const getUriPathname = function getUriPathname (requestUri) {
 }
 
 const getResolverMatcher = function getResolverMatcher (resolver) {
-  if (resolver.uri) {
-    return (requestUri) => resolver.uri === getUriPathname(requestUri)
-  } else if (resolver.pattern) {
+  const siteMatcher = (resolver.sites && resolver.sites.length)
+    ? (arcSite) => resolver.sites.includes(arcSite)
+    : () => true
+  if (resolver.uri) { // pages
+    return (requestUri, arcSite) => {
+      const pathMatch = (resolver.uri === getUriPathname(requestUri))
+      return pathMatch && siteMatcher(arcSite)
+    }
+  } else if (resolver.pattern) { // templates
     const pattern = new RegExp(resolver.pattern)
-    return (requestUri) => pattern.test(getUriPathname(requestUri))
+    return (requestUri, arcSite) => pattern.test(getUriPathname(requestUri)) && siteMatcher(arcSite)
   }
   return () => null
+}
+
+function sortOnSites (a, b) {
+  // sort on sites
+  if ((a.sites && a.sites.length) && !(b.sites && b.sites.length)) return -1
+  if (!(a.sites && a.sites.length) && (b.sites && b.sites.length)) return 1
 }
 
 // fetch page/template resolvers from DB (local env) or config file (prod)
@@ -142,13 +154,13 @@ const pageResolvers = pageConfigs.then((configs) => configs.map(prepareResolver(
 const templateResolvers = templateConfigs.then((configs) => configs.map(prepareResolver('template')))
 
 const resolversPromise = Promise.all([pageResolvers, templateResolvers])
-  .then(([pageResolvers, templateResolvers]) => pageResolvers.concat(templateResolvers))
+  .then(([pageResolvers, templateResolvers]) => pageResolvers.sort(sortOnSites).concat(templateResolvers))
 
-const resolve = function resolve (requestUri) {
+const resolve = function resolve (requestUri, arcSite) {
   return resolversPromise.then(resolvers => {
-    const resolver = resolvers.find(resolver => resolver.match(requestUri))
+    const resolver = resolvers.find(resolver => resolver.match(requestUri, arcSite))
     return resolver
-      ? resolver.hydrate(requestUri)
+      ? resolver.hydrate(requestUri, arcSite)
       : null
   })
 }

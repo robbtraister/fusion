@@ -102,7 +102,6 @@ const getUriPathname = function getUriPathname (requestUri) {
 }
 
 const getResolverMatcher = function getResolverMatcher (resolver) {
-  console.log(`resolver; ${JSON.stringify(resolver)}`)
   const siteMatcher = (resolver.sites === undefined || resolver.sites.length === 0)
     ? () => true
     : (arcSite) => resolver.sites.includes(arcSite)

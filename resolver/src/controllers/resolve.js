@@ -79,14 +79,14 @@ const getResolverHydrater = function getResolverHydrater (resolver) {
   const contentSourceParser = parseContentSourceParameters(resolver)
 
   const contentResolver = (resolver.contentSourceId)
-    ? (requestUri) => {
+    ? (requestUri, arcSite) => {
       const contentSourceParams = contentSourceParser(requestUri)
       requestUri = enforceTrailingSlashRule(requestUri)
-      return fetch(resolver.contentSourceId, Object.assign({'uri': requestUri}, contentSourceParams))
+      return fetch(resolver.contentSourceId, Object.assign({'uri': requestUri, '_website': arcSite}, contentSourceParams))
     }
     : (requestUri) => Promise.resolve(null)
 
-  return (requestUri) => contentResolver(requestUri)
+  return (requestUri, arcSite) => contentResolver(requestUri, arcSite)
     .then(content => Object.assign(
       {
         requestUri,
@@ -102,7 +102,7 @@ const getUriPathname = function getUriPathname (requestUri) {
 }
 
 const getResolverMatcher = function getResolverMatcher (resolver) {
-  const siteMatcher = (resolver.sites === undefined || resolver.sites.length === 0)
+  const siteMatcher = (resolver.sites && resolver.sites.length === 0)
     ? () => true
     : (arcSite) => resolver.sites.includes(arcSite)
   if (resolver.uri) { // pages
@@ -162,7 +162,7 @@ const resolve = function resolve (requestUri, arcSite) {
   return resolversPromise.then(resolvers => {
     const resolver = resolvers.find(resolver => resolver.match(requestUri, arcSite))
     return resolver
-      ? resolver.hydrate(requestUri)
+      ? resolver.hydrate(requestUri, arcSite)
       : null
   })
 }

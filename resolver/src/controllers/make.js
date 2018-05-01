@@ -2,11 +2,16 @@
 
 const resolve = require('./resolve')
 const engine = require('./engine')
+const url = require('url')
 
 const endpoint = function endpoint (data, outputType, arcSite) {
-  const query = outputType ? `?outputType=${outputType}` : ''
-  const arcSiteParam = arcSite && outputType ? `&_website=${arcSite}` : `?_website=${arcSite}`
-  return `/render/${data.type}${query}${arcSiteParam}`
+  return url.format({
+    pathname: `/render/${data.type}`,
+    query: {
+      outputType,
+      _website: arcSite
+    }
+  })
 }
 
 const make = function make (uri, outputType, version, arcSite) {

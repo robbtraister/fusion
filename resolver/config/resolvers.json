@@ -30,17 +30,17 @@
       "sites" : []
     },
     {
-      "_id" : "poodt31SjmYyiq",
+      "_id" : "poodt31SjmYyir",
       "uri" : "/about",
       "name" : "About-Foo",
-      "published" : "vPBUBS1UjmYyiq",
+      "published" : "vPBUBS1UjmYyir",
       "sites" : ["foo"]
     },
     {
-      "_id" : "poodt31SjmYyiq",
+      "_id" : "poodt31SjmYyis",
       "uri" : "/about-foo-bar",
       "name" : "About-Foo-Bar",
-      "published" : "vPBUBS1UjmYyiq",
+      "published" : "vPBUBS1UjmYyis",
       "sites" : ["foo", "bar"]
     }
   ],
@@ -102,4 +102,3 @@
     }
   ]
 }
-

@@ -16,7 +16,7 @@ const {
   componentSrcRoot
 } = require('../../../environment')
 const timer = require('../../../timer')
-const getConfigs = require('../../../../webpack.template.js')
+const getConfigs = require('../../../../webpack/template.js')
 
 const sourceFile = path.resolve(`${componentSrcRoot}/template.jsx`)
 const destFile = path.resolve(`${componentDistRoot}/template.js`)

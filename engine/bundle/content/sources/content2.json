@@ -1,4 +1,0 @@
-{
-  "pattern": "/content/v3/stories/?canonical_url=${key}",
-  "schemaName": "minimal"
-}

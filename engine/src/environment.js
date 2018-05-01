@@ -5,11 +5,12 @@ const path = require('path')
 const glob = require('glob')
 
 const contentBase = process.env.CONTENT_BASE || ''
-const prefix = (process.env.CONTEXT || 'pb').replace(/^\/+/, '').replace(/\/+$/, '')
-const apiPrefix = `/${prefix}/api/v3`
+const contextPath = (process.env.CONTEXT_PATH || 'pb').replace(/^\/*/, '/').replace(/\/+$/, '')
+const apiPrefix = `${contextPath}/api/v3`
 const daoUrl = process.env.DAO_URL
 const environment = process.env.ENVIRONMENT
 const isDev = !/^prod/i.test(process.env.NODE_ENV)
+const minify = (isDev) ? process.env.MINIFY === 'true' : true
 const mongoUrl = process.env.MONGO_URL
 const onDemand = process.env.ON_DEMAND === 'true'
 const port = process.env.PORT || 8080
@@ -31,15 +32,16 @@ module.exports = {
   componentDistRoot,
   componentSrcRoot,
   contentBase,
+  contextPath,
   daoUrl,
   distRoot,
   environment,
   isDev,
+  minify,
   mongoUrl,
   onDemand,
   outputTypes,
   port,
-  prefix,
   schemasRoot,
   sourcesRoot,
   version

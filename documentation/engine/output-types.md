@@ -46,11 +46,9 @@ You may also specify a default value, in case the meta value has not been set
 {props.metaTag({name: 'title', default: 'Default Title'})}
 ```
 
-
 -   `metaValue([{name}])`
 
 Similar to `metaTag` above, but returns only the value, not a fully rendered HTML meta tag.
-
 
 -   `libs`
 
@@ -64,32 +62,41 @@ The following are equivalent
 {props.libs()}
 ```
 
+-   `styles`
 
--   `css`
+Include the generated css for the appropriate page/template and/or output-type. Will insert the computed inlined styles appropriate to the rendering. For a reference link, see `cssLinks` below.
 
-Include the generated css for the appropriate page/template. May be a link reference tag, or inlined style tag. In the case of a link reference tag, the file name will be content hashed to the specific state of the page or template.
-
-Each of the following are equivalent and will insert a link reference tag.
+Each of the following are equivalent and will insert all inlined styles for the rendering (both output-type and page/template styles).
 ```js
-{props.css}
+{props.styles}
 ```
 ```js
-{props.css()}
-```
-```js
-{props.css(false)}
-```
-```js
-{props.css({inline: false})}
+{props.styles()}
 ```
 
-The following will insert an inlined style tag
+The following will provide access to the computed styles for custom access.
 ```js
-{props.css(true)}
+{props.styles(({outputTypeStyles, templateStyles}) => <style amp-custom='true'>{outputTypeStyles}</style>)}
+```
+
+-   `cssLinks`
+
+Include the reference links for the appropriate page/template and/or output-type. Will insert a link reference tag. In the case of page/template, the file name will be content hashed to the specific state of the page or template.
+
+Each of the following are equivalent and will insert up to two link tags (output-type link will be included if the output-type has styling; page/template link will always be included, even if empty, in order to support client-side updates).
+```js
+{props.cssLinks}
 ```
 ```js
-{props.css({inline: true})}
+{props.cssLinks()}
 ```
+
+The following will provide access to the css reference hrefs for custom access.
+```js
+{props.cssLinks(({outputTypeHref, templateHref}) => <link rel='stylesheet' type='text/css' href={outputTypeHref} />)}
+```
+
+_Note: customizing reference links is not recommended unless absolutely necessary. If inserting a custom link to the page/template styles, please be sure to include `id="template-styles"` since that id is used to update the styles in the case of a newly-published template._
 
 -   `fusion`
 

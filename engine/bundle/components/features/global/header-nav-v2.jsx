@@ -92,7 +92,7 @@ class HeaderNavV2 extends React.Component {
     super(props)
 
     this.setContent({
-      items: this.getContent('site-menu', '/', '{children{name,site{site_url},children{name,site{site_url}}}}')
+      items: this.getContent('site-menu', {id: '/'}, '{children{name,site{site_url},children{name,site{site_url}}}}')
     })
   }
 

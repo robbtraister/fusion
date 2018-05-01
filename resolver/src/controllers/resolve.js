@@ -7,9 +7,13 @@ const url = require('url')
 const fetch = require('./fetch')
 
 const {
-  resolveFromDB,
-  trailingSlashRule
+  resolveFromDB
 } = require('../environment')
+
+const {
+  TRAILING_SLASH_REWRITES,
+  trailingSlashRewrite
+} = require('../utils/trailing-slash-rule')
 
 const getNestedValue = function getNestedValue (target, field) {
   const keys = (field || '').split('.')
@@ -21,12 +25,6 @@ const getNestedValue = function getNestedValue (target, field) {
   }
   return value
 }
-
-const enforceTrailingSlashRule = {
-  NOOP: (uri) => uri,
-  FORCE: (uri) => uri.replace(/\/[^./]+$/, (match) => `${match}/`),
-  DROP: (uri) => uri.replace(/\/+$/, '')
-}[trailingSlashRule]
 
 const getTemplateResolver = function getTemplateResolver (resolver) {
   const getId = (resolver.type === 'page')
@@ -61,7 +59,7 @@ const parseContentSourceParameters = function parseContentSourceParameters (reso
           // TODO optimize for multiple pattern params so we don't regex match each time
           const pattern = new RegExp(resolver.pattern)
           const groups = getUriPathname(requestUri).match(pattern)
-          const uri = enforceTrailingSlashRule(groups[param.index])
+          const uri = trailingSlashRewrite(groups[param.index])
           return {[key]: uri} // force trailing slash
         },
         static: () => ({[key]: param.value})
@@ -81,7 +79,7 @@ const getResolverHydrater = function getResolverHydrater (resolver) {
   const contentResolver = (resolver.contentSourceId)
     ? (requestUri, arcSite) => {
       const contentSourceParams = contentSourceParser(requestUri)
-      requestUri = enforceTrailingSlashRule(requestUri)
+      requestUri = trailingSlashRewrite(requestUri)
       return fetch(resolver.contentSourceId, Object.assign({'uri': requestUri, '_website': arcSite}, contentSourceParams))
     }
     : (requestUri, arcSite) => Promise.resolve(null)
@@ -107,7 +105,7 @@ const getResolverMatcher = function getResolverMatcher (resolver) {
     : () => true
   if (resolver.uri) { // pages
     return (requestUri, arcSite) => {
-      const pathMatch = (resolver.uri === getUriPathname(requestUri))
+      const pathMatch = (resolver.uri === TRAILING_SLASH_REWRITES.DROP(getUriPathname(requestUri)))
       return pathMatch && siteMatcher(arcSite)
     }
   } else if (resolver.pattern) { // templates
@@ -150,7 +148,14 @@ const prepareResolver = (type) => (resolver) => {
     })
 }
 
-const pageResolvers = pageConfigs.then((configs) => configs.map(prepareResolver('page')))
+const pageResolvers = pageConfigs
+  .then((configs) => {
+    const preparer = prepareResolver('page')
+    return configs
+      // strip trailing slashes
+      .map(config => Object.assign(config, {uri: TRAILING_SLASH_REWRITES.DROP(config.uri)}))
+      .map(preparer)
+  })
 const templateResolvers = templateConfigs.then((configs) => configs.map(prepareResolver('template')))
 
 const resolversPromise = Promise.all([pageResolvers, templateResolvers])

@@ -83,6 +83,35 @@
       }
     },
     {
+      "_id" : "article-with-params",
+      "pattern" : "^/article-with-params(/[\\w\\-\\/]+/[0-9]{4}/[0-9]{1,2}/[0-9]{1,2}/[\\w\\-]+/)",
+      "params": [
+        {
+          "name": "req",
+          "value": "foo.*",
+          "required": true
+        },
+        {
+          "name": "not-req",
+          "value": "bar.*",
+          "required": false
+        }
+      ],
+      "page" : "article-template",
+      "contentSourceId" : "content-api",
+      "contentConfigMapping" : {
+          "canonical_url" : {
+              "type" : "pattern",
+              "index" : 1
+          },
+          "published" : {
+              "type" : "static",
+              "value" : "true"
+          }
+      },
+      "testUri" : []
+    },
+    {
       "_id" : "article",
       "pattern" : "^(/[\\w\\-\\/]+/[0-9]{4}/[0-9]{1,2}/[0-9]{1,2}/[\\w\\-]+/)",
       "params" : [],

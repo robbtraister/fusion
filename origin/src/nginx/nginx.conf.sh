@@ -1,12 +1,12 @@
 #!/bin/sh
 
-CONTEXT="${CONTEXT:-pb}"
+CONTEXT_PATH="${CONTEXT_PATH:-pb}"
 # strip trailing slash
-CONTEXT="${CONTEXT%%/}"
+CONTEXT_PATH="${CONTEXT_PATH%%/}"
 # enforce leading slash
-CONTEXT="/${CONTEXT##/}"
+CONTEXT_PATH="/${CONTEXT_PATH##/}"
 
-API_PREFIX="${CONTEXT}/api/v3"
+API_PREFIX="${CONTEXT_PATH}/api/v3"
 
 DNS_SERVER=''
 for word in $(cat '/etc/resolv.conf')
@@ -151,7 +151,7 @@ cat <<EOB
   }
 
   map \$request_uri \$context_free_uri {
-    ~^${CONTEXT}/(.*)          /\$1;
+    ~^${CONTEXT_PATH}/(.*)          /\$1;
     default                    \$request_uri;
   }
 
@@ -191,7 +191,7 @@ cat <<EOB
 
     location @engine {
       rewrite                  ^${API_PREFIX}(/|$)(.*) /\$2 break;
-      rewrite                  ^${CONTEXT}(/|$)(.*) /\$2 break;
+      rewrite                  ^${CONTEXT_PATH}(/|$)(.*) /\$2 break;
 EOB
 if [[ "${HTTP_ENGINE}" ]]
 then
@@ -207,11 +207,12 @@ else
 EOB
 fi
 cat <<EOB
+      proxy_redirect           / ' ${API_PREFIX}/';
     }
 
     location @resolver {
       rewrite                  ^${API_PREFIX}(/|$)(.*) /\$2 break;
-      rewrite                  ^${CONTEXT}(/|$)(.*) /\$2 break;
+      rewrite                  ^${CONTEXT_PATH}(/|$)(.*) /\$2 break;
 
       proxy_set_header         'Fusion-Engine-Version' '\${version}';
 EOB
@@ -228,13 +229,15 @@ else
 EOB
 fi
 cat <<EOB
+      proxy_redirect           /make/ ' ${CONTEXT_PATH}/';
+      proxy_redirect           / ' ${API_PREFIX}/';
     }
 
     location @resources {
       return 404;
     }
 
-    location ~ ^(${CONTEXT}|${API_PREFIX})/(resources)(/.*|$) {
+    location ~ ^(${CONTEXT_PATH}|${API_PREFIX})/(resources)(/.*|$) {
       proxy_intercept_errors   on;
       error_page               400 403 404 418 = @engine;
 
@@ -254,7 +257,7 @@ fi
 cat <<EOB
     }
 
-    location ~ ^(${CONTEXT}|${API_PREFIX})/(dist)(/.*|$) {
+    location ~ ^(${CONTEXT_PATH}|${API_PREFIX})/(dist)(/.*|$) {
       proxy_intercept_errors   on;
       error_page               400 403 404 418 = @engine;
 
@@ -327,7 +330,7 @@ cat <<EOB
 
     # all other requests should be treated as a new page to render
     location / {
-      rewrite                  ^(${CONTEXT})?(.*) ${API_PREFIX}/make\$2;
+      rewrite                  ^(${CONTEXT_PATH})?(.*) ${API_PREFIX}/make\$2;
     }
   }
 }

@@ -4,9 +4,13 @@ const express = require('express')
 
 const { isDev } = require('./environment')
 
+const { trailingSlashRedirect } = require('./utils/trailing-slash-rule')
+
 const app = express()
 
 app.disable('x-powered-by')
+
+trailingSlashRedirect && app.use(trailingSlashRedirect)
 
 app.use(require('./router'))
 

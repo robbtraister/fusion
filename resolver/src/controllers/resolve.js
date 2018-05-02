@@ -106,8 +106,21 @@ const getResolverMatcher = function getResolverMatcher (resolver) {
   if (resolver.uri) { // pages
     return (pathname, arcSite) => (resolver.uri === pathname) && siteMatcher(arcSite)
   } else if (resolver.pattern) { // templates
-    const pattern = new RegExp(resolver.pattern)
-    return (pathname, arcSite) => pattern.test(pathname) && siteMatcher(arcSite)
+    const params = resolver.params.map(param => ({
+      name: param.name,
+      pattern: new RegExp(param.value),
+      required: !!param.required
+    }))
+    const requiredParams = params.filter(param => param.required)
+    const optionalParams = params.filter(param => !param.required)
+    const requiredParamsMatcher = (requestParams) => requiredParams.every(param => param.pattern.test(requestParams[param.name]))
+    const optionalParamsMatcher = (requestParams) => optionalParams.every(param => (param.name in requestParams) ? param.pattern.test(requestParams[param.name]) : true)
+
+    // TODO we need to strip optional params that don't match, drop them from the request, and re-resolve
+    const queryParamMatcher = (requestParams) => (requiredParamsMatcher(requestParams) && optionalParamsMatcher(requestParams))
+
+    const pattern = new RegExp(resolver.pattern) // the resolver URI pattern
+    return (requestParts, arcSite) => pattern.test(requestParts.pathname) && queryParamMatcher(requestParts.query) && siteMatcher(arcSite)
   }
   return () => null
 }
@@ -157,14 +170,15 @@ const pageResolvers = pageConfigs
 const templateResolvers = templateConfigs.then((configs) => configs.map(prepareResolver('template')))
 
 const resolve = function resolve (requestUri, arcSite) {
-  const pathname = getUriPathname(requestUri)
+  const requestParts = url.parse(requestUri, true)
+  const pathname = requestParts.pathname
 
   return Promise.all([pageResolvers, templateResolvers])
     .then(([pageResolvers, templateResolvers]) => {
       const normalizedPathname = TRAILING_SLASH_REWRITES.DROP(pathname)
 
       const resolver = pageResolvers.find(resolver => resolver.match(normalizedPathname, arcSite)) ||
-        templateResolvers.find(resolver => resolver.match(pathname, arcSite))
+        templateResolvers.find(resolver => resolver.match(requestParts, arcSite))
 
       return resolver
         ? resolver.hydrate(requestUri, arcSite)

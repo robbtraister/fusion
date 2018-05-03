@@ -86,8 +86,7 @@ services:
 
   data:
     image: quay.io/washpost/mongo-localhost
-    build:
-      context: ./data
+    build: ./data
     ports:
       - '27017:27017'
     environment:

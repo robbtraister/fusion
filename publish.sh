@@ -1,20 +1,40 @@
 #!/bin/sh
 
-push () {
-  name=$1 && \
-  version=$(node -e "console.log(require('./${name}/package.json').version)") && \
+version () {
   if [ "${RELEASE}" ]
   then
-    docker tag "quay.io/washpost/fusion-${name}:latest" "quay.io/washpost/fusion-${name}:${version}" && \
-    docker push "quay.io/washpost/fusion-${name}:${version}"
+    name=$1
+    v=$(node -e "console.log(require('./${name}/package.json').version)")
+    echo ${v:-latest}
   else
-    docker push "quay.io/washpost/fusion-${name}:latest"
+    echo 'latest'
   fi
 }
 
+build () {
+  name=$1
+  v=$(version "$name")
+  if [ -f "./${name}/Dockerfile" ]
+  then
+    docker build -t "quay.io/washpost/fusion-${name}:${v}" -f "./${name}/Dockerfile" "./${name}"
+  else
+    docker build --build-arg "LAMBDA=${name}" -t "quay.io/washpost/fusion-${name}:${v}" -f ./serverless.Dockerfile .
+  fi
+}
+
+push () {
+  name=$1 && \
+  v=$(version "$name") && \
+  docker tag "quay.io/washpost/fusion-${name}:${v}" "quay.io/washpost/fusion-${name}:${v}" && \
+  docker push "quay.io/washpost/fusion-${name}:${v}"
+}
+
 cd $(dirname "$0") && \
-  docker-compose -f ./docker-compose.yml build && \
+  build 'dao' && \
   push 'dao' && \
+  build 'engine' && \
   push 'engine' && \
+  build 'origin' && \
   push 'origin' && \
+  build 'resolver' && \
   push 'resolver'

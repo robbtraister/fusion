@@ -2,6 +2,12 @@
 <html>
   <head>
     <title>React Admin</title>
+    <script type="application/javascript">
+      window.Fusion=window.Fusion||{}
+      Fusion.contextPath=(window.location.pathname.split('/').filter(p => p).shift() || '').replace(/^\/*/, '/').replace(/\/+$/, '')
+      Fusion.refreshContent=false
+      Fusion.contentCache={}
+    </script>
     <script type="application/javascript" src="/pb/dist/engine/admin.js"></script>
     <script type="application/javascript" src="/pb/dist/components/combined.js"></script>
     <link type="text/css" rel="stylesheet" href="/pb/dist/components/combined.css" />

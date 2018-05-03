@@ -12,7 +12,7 @@ const getContentGenerator = function getContentGenerator (contentCache) {
   contentCache = contentCache || {}
 
   return function getContent (source, ...args) {
-    const sourceCache = contentCache[source] || {}
+    const sourceCache = contentCache[source] = contentCache[source] || {}
 
     const fetchContent = (source, keyString, filter, cached) =>
       window.fetch(`${Fusion.contextPath || ''}/api/v3/content/${source}?key=${encodeURIComponent(keyString)}` + (filter ? `&query=${encodeURIComponent(filter)}` : '') + (Fusion.arcSite ? `&_website=${encodeURIComponent(Fusion.arcSite)}` : ''))

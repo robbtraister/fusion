@@ -127,6 +127,7 @@ const render = function render ({Component, requestUri, content, _website}) {
           Component,
           {
             arcSite: _website,
+            contextPath,
             globalContent: content,
             requestUri
           }

@@ -71,6 +71,7 @@ module.exports = (Template) => {
       {
         value: Object.assign({}, props, {
           arcSite: props.arcSite,
+          contextPath: props.contextPath,
           getContent: getContentGenerator(contentCache, props.arcSite),
           globalContent: props.globalContent,
           requestUri: props.requestUri

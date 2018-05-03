@@ -10,6 +10,7 @@ services:
       LAMBDA_ENGINE:
       LAMBDA_RESOLVER:
       ON_DEMAND:
+      CONTEXT_PATH:
     links:
       - 'engine:engine.fusion'
       - 'resolver:resolver.fusion'
@@ -50,6 +51,7 @@ services:
       DEBUG: fusion:*
       ON_DEMAND:
       CONTENT_BASE:
+      CONTEXT_PATH:
       DAO_URL: http://abc:def@localhost.dao.fusion:8080
     links:
       - 'dao:localhost.dao.fusion'

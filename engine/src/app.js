@@ -17,6 +17,14 @@ app.use((req, res, next) => {
 
 app.use(require('./router'))
 
+app.use((err, req, res, next) => {
+  if (err.location && err.statusCode && err.statusCode >= 300 && err.statusCode < 400) {
+    res.redirect(err.statusCode, err.location)
+  } else {
+    next(err)
+  }
+})
+
 app.use(
   (isDev)
     ? (err, req, res, next) => {

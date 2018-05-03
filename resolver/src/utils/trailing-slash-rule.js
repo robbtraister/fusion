@@ -15,17 +15,24 @@ const TRAILING_SLASH_REWRITES = {
   NOOP: (uri) => uri
 }
 
+const RedirectError = (statusCode, location) => {
+  const e = new Error('redirect')
+  e.statusCode = statusCode
+  e.location = location
+  return e
+}
+
 const TRAILING_SLASH_REDIRECTS = {
   DROP: (req, res, next) => {
     const parts = url.parse(req.url)
     TRAILING_SLASH_PATTERN.DROP.test(parts.pathname)
-      ? res.redirect(url.format(Object.assign(parts, {pathname: TRAILING_SLASH_REWRITES.DROP(parts.pathname)})))
+      ? next(RedirectError(302, url.format(Object.assign(parts, {pathname: TRAILING_SLASH_REWRITES.DROP(parts.pathname)}))))
       : next()
   },
   FORCE: (req, res, next) => {
     const parts = url.parse(req.url)
     TRAILING_SLASH_PATTERN.FORCE.test(parts.pathname)
-      ? res.redirect(url.format(Object.assign(parts, {pathname: TRAILING_SLASH_REWRITES.FORCE(parts.pathname)})))
+      ? next(RedirectError(302, url.format(Object.assign(parts, {pathname: TRAILING_SLASH_REWRITES.FORCE(parts.pathname)}))))
       : next()
   }
 }

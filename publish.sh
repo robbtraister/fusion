@@ -3,9 +3,13 @@
 push () {
   name=$1 && \
   version=$(node -e "console.log(require('./${name}/package.json').version)") && \
-  docker tag "quay.io/washpost/fusion-${name}:latest" "quay.io/washpost/fusion-${name}:${version}" && \
-  docker push "quay.io/washpost/fusion-${name}:latest"
-  # docker push "quay.io/washpost/fusion-${name}:${version}"
+  if [ "${RELEASE}" ]
+  then
+    docker tag "quay.io/washpost/fusion-${name}:latest" "quay.io/washpost/fusion-${name}:${version}" && \
+    docker push "quay.io/washpost/fusion-${name}:${version}"
+  else
+    docker push "quay.io/washpost/fusion-${name}:latest"
+  fi
 }
 
 cd $(dirname "$0") && \
@@ -13,5 +17,4 @@ cd $(dirname "$0") && \
   push 'dao' && \
   push 'engine' && \
   push 'origin' && \
-  push 'resolver' && \
-  docker push quay.io/washpost/mongo-localhost
+  push 'resolver'

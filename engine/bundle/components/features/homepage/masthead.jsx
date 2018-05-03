@@ -2,6 +2,8 @@
 
 const React = require('react')
 
+const Consumer = require('consumer')
+
 const ImageFormat = require('../../tags/arc/image-format.jsx')
 
 const fullDate = () => {
@@ -71,7 +73,7 @@ const Masthead = (props) => {
                           <ImageFormat src={props.customFields.mastLogo} className='wplogo' alt={props.customFields.siteTitle} height={logoSize} />
                         </React.Fragment>
                     )
-                    : <img className='orgLogo' src='/pb/resources/img/thenews.png' alt={props.customFields.siteTitle} height={logoSize} />
+                    : <img className='orgLogo' src={`${props.contextPath}/resources/img/thenews.png`} alt={props.customFields.siteTitle} height={logoSize} />
                   }
                 </a>
               </div>
@@ -147,4 +149,4 @@ const Masthead = (props) => {
   </div>
 }
 
-module.exports = Masthead
+module.exports = Consumer(Masthead)

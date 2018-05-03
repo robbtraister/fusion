@@ -51,6 +51,7 @@ const getContentGenerator = function getContentGenerator (contentCache) {
 
 const value = {
   arcSite: Fusion.arcSite,
+  contextPath: Fusion.contextPath,
   getContent: getContentGenerator(Fusion.contentCache),
   globalContent: Fusion.globalContent,
   requestUri: window.location.pathname + window.location.search

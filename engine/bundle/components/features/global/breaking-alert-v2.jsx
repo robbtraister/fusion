@@ -2,6 +2,8 @@
 
 const React = require('react')
 
+const Consumer = require('consumer')
+
 const BreakingAlertV2 = (props) => {
   const parentPage = (props.customFields.autoLink || '').split(',')[1]
   const parentFeatureName = (props.customFields.autoLink || '').split(',')[0]
@@ -17,7 +19,7 @@ const BreakingAlertV2 = (props) => {
   }
 
   return <div id='event-alert' className={`bar-wrapper ${props.isAdmin ? '' : 'hidden'}`}
-    data-href={`/pb/api/v2/render/feature?name=${parentFeatureName}&uri=${parentPage}`}
+    data-href={`${props.contextPath}/api/v2/render/feature?name=${parentFeatureName}&uri=${parentPage}`}
     data-has-news={!!props.customFields.barText}
     data-reload={validFeature && !props.isAdmin}
     style={{backgroundColor: props.customFields.backgroundColor, color: props.customFields.textColor}}
@@ -38,4 +40,4 @@ const BreakingAlertV2 = (props) => {
   </div>
 }
 
-module.exports = BreakingAlertV2
+module.exports = Consumer(BreakingAlertV2)

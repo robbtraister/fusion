@@ -58,6 +58,10 @@ Once you have annotated your component as a consumer, it will have access to the
 
 The arc site used in this rendering, if multi-site enabled.
 
+-   contextPath
+
+This is the base context path of the application. In the client, you could calculate this using window.location, but this property exists to provide similar server-side access.
+
 -   globalContent
 
 This is the full data object used as the global content for the rendered page.

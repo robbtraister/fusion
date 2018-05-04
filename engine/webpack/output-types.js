@@ -25,15 +25,8 @@ const {
 const outputTypeSrcRoot = path.resolve(`${componentSrcRoot}/output-types`)
 
 const entry = {}
-const types = {}
-glob.sync(`${outputTypeSrcRoot}/**/*.{hbs,js,jsx,vue}`)
-  .forEach(f => {
-    const name = f.substr(outputTypeSrcRoot.length + 1)
-    const type = name.split('/').shift()
-    types[type] = true
-    const parts = path.parse(name)
-    entry[path.join(parts.dir, parts.name)] = f
-  })
+glob.sync(`${outputTypeSrcRoot}/*.{hbs,js,jsx,vue}`)
+  .forEach(fp => { entry[path.parse(fp).name] = fp })
 
 // Compile twice.
 // First pass will extract css into a separate file suitable for references

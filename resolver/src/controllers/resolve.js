@@ -8,7 +8,7 @@ const fetch = require('./fetch')
 
 const {
   resolveFromDB
-} = require('../environment')
+} = require('../../environment')
 
 const {
   TRAILING_SLASH_REWRITES,

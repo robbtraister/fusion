@@ -12,7 +12,7 @@ const {
 
 const {
   outputTypes
-} = require('../environment')
+} = require('../../environment')
 
 const {
   findRenderableItem

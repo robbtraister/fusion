@@ -14,7 +14,7 @@ const resolve = require('./shared/resolve')
 
 const {
   distRoot
-} = require('../src/environment')
+} = require('../environment')
 
 module.exports = (entry) =>
   (Object.keys(entry).length)

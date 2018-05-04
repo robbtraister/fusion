@@ -4,7 +4,7 @@ const express = require('express')
 
 const logger = require('debug')('fusion:engine:app')
 
-const { isDev } = require('./environment')
+const { isDev } = require('../environment')
 
 const { RedirectError } = require('./errors')
 

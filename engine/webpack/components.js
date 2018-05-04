@@ -17,7 +17,7 @@ const resolve = require('./shared/resolve')
 const {
   componentSrcRoot,
   distRoot
-} = require('../src/environment')
+} = require('../environment')
 
 const entry = {}
 const types = {}

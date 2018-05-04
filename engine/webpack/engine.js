@@ -8,7 +8,7 @@ const optimization = require('./shared/optimization')
 
 const {
   distRoot
-} = require('../src/environment')
+} = require('../environment')
 
 module.exports = [
   {

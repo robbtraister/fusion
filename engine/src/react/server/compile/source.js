@@ -2,7 +2,7 @@
 
 const fs = require('fs')
 
-const { componentSrcRoot } = require('../../../environment')
+const { componentSrcRoot } = require('../../../../environment')
 
 function componentImport (fp, name) {
   return `Fusion.Components${name} = require('${fp}')`

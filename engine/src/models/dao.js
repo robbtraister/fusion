@@ -5,7 +5,7 @@ const request = require('request-promise-native')
 
 const debugTimer = require('debug')('fusion:timer:renderings:dao')
 
-const { daoUrl } = require('../environment')
+const { daoUrl } = require('../../environment')
 const timer = require('../timer')
 
 const models = {}

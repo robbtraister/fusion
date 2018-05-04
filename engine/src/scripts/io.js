@@ -17,7 +17,7 @@ const {
 const {
   distRoot,
   isDev
-} = require('../environment')
+} = require('../../environment')
 
 const {
   getPage,

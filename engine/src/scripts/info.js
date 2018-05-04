@@ -4,7 +4,7 @@ const {
   environment,
   contextPath,
   version
-} = require('../environment')
+} = require('../../environment')
 
 const getBucket = function getBucket () {
   return 'pagebuilder-fusion'

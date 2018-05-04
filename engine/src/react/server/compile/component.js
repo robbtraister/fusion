@@ -6,7 +6,7 @@ const React = require('react')
 
 const timer = require('../../../timer')
 
-const { componentDistRoot } = require('../../../environment')
+const { componentDistRoot } = require('../../../../environment')
 
 const componentFiles = [
   (componentType, componentName, outputType) => outputType ? `${componentDistRoot}/${componentType}/${componentName}/${outputType}.js` : null,

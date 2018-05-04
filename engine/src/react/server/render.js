@@ -35,7 +35,7 @@ const {
   isDev,
   onDemand,
   version
-} = require('../../environment')
+} = require('../../../environment')
 
 const outputTypeHasCss = (isDev)
   ? (outputType) => {

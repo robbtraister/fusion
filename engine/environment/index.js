@@ -25,13 +25,13 @@ const apiPrefix = `${contextPath}/api/v3`
 const daoUrl = env.DAO_URL
 const environment = env.ENVIRONMENT
 const isDev = !/^prod/i.test(env.NODE_ENV)
-const minify = (isDev) ? env.MINIFY === 'true' : true
+const minify = (isDev) ? /^true$/i.test(env.MINIFY) : true
 const mongoUrl = env.MONGO_URL
-const onDemand = env.ON_DEMAND === 'true'
+const onDemand = /^true$/i.test(env.ON_DEMAND)
 const port = env.PORT || 8080
 const version = env.AWS_LAMBDA_FUNCTION_VERSION || '$LATEST'
 
-const bundleRoot = path.resolve(env.BUNDLE_ROOT || `${__dirname}/../../bundle`)
+const bundleRoot = path.resolve(env.BUNDLE_ROOT || `${__dirname}/../bundle`)
 const distRoot = path.resolve(`${bundleRoot}/../dist`)
 const componentDistRoot = path.resolve(`${distRoot}/components`)
 const componentSrcRoot = path.resolve(`${bundleRoot}/components`)

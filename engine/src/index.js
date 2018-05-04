@@ -1,6 +1,6 @@
 'use strict'
 
-const { port } = require('./environment')
+const { port } = require('../environment')
 
 const app = require('./app')
 

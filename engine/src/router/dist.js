@@ -6,7 +6,7 @@ const express = require('express')
 const {
   distRoot,
   isDev
-} = require('../environment')
+} = require('../../environment')
 
 const {
   compileAll,

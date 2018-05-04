@@ -2,7 +2,7 @@
 
 const url = require('url')
 
-const { trailingSlashRule } = require('../environment')
+const { trailingSlashRule } = require('../../environment')
 
 const { RedirectError } = require('../errors')
 

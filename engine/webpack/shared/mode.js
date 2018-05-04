@@ -1,5 +1,5 @@
 'use strict'
 
-const { isDev } = require('../../src/environment')
+const { isDev } = require('../../environment')
 
 module.exports = (isDev) ? 'development' : 'production'

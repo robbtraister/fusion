@@ -14,7 +14,7 @@ const generateSource = require('./source')
 const {
   componentDistRoot,
   componentSrcRoot
-} = require('../../../environment')
+} = require('../../../../environment')
 const timer = require('../../../timer')
 const getConfigs = require('../../../../webpack/template.js')
 

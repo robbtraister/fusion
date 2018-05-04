@@ -2,7 +2,7 @@
 
 const express = require('express')
 
-const { isDev } = require('./environment')
+const { isDev } = require('../environment')
 
 const { RedirectError } = require('./errors')
 

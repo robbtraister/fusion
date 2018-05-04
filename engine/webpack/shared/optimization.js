@@ -2,7 +2,7 @@
 
 const UglifyWebpackPlugin = require('uglifyjs-webpack-plugin')
 
-const { minify } = require('../../src/environment')
+const { minify } = require('../../environment')
 
 const optimization = (minify)
   ? {}

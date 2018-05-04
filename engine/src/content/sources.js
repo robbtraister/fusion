@@ -9,7 +9,7 @@ const debugFetch = require('debug')('fusion:content:sources:fetch')
 const {
   contentBase,
   sourcesRoot
-} = require('../environment')
+} = require('../../environment')
 
 const getSchemaFilter = require('./filter')
 

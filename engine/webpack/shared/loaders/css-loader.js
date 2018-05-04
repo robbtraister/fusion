@@ -5,6 +5,7 @@ const { isDev } = require('../../../environment')
 module.exports = {
   loader: 'css-loader',
   options: {
-    minimize: !isDev
+    minimize: !isDev,
+    url: false
   }
 }

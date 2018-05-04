@@ -17,14 +17,13 @@ const getContentGenerator = function getContentGenerator (contentCache, arcSite)
     const getSourceContent = (key, query) => {
       // alphabetize object keys to ensure proper cacheing
       const keyString = JSONNormalize.stringify(key)
-      key['arc-site'] = arcSite
       const keyCache = sourceCache[keyString] = sourceCache[keyString] || {
         cached: undefined,
         filtered: undefined,
         fetched: sourcePromise
           .then(source => {
             keyCache.source = source
-            return source.fetch(key)
+            return source.fetch(Object.assign({}, key, {'arc-site': arcSite}))
           })
           .then(data => { keyCache.cached = data })
           .catch(() => { keyCache.cached = null })

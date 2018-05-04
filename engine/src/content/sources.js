@@ -18,10 +18,13 @@ const {
 } = require('../models/sources')
 
 function fetch (key) {
-  return Promise.resolve(url.resolve(contentBase, this.resolve(key)))
-    .then((uri) => {
-      debugFetch(uri)
-      return request(uri)
+  // start with an empty Promise so that this.resolve can return a static value or a Promise
+  // this way, we get proper error handling in either case
+  return Promise.resolve()
+    .then(() => this.resolve(key))
+    .then((contentUri) => {
+      debugFetch(contentUri)
+      return request(url.resolve(contentBase, contentUri))
     })
     .then((data) => JSON.parse(data))
     .catch((err) => {

@@ -4,6 +4,8 @@ const express = require('express')
 
 const { isDev } = require('./environment')
 
+const { RedirectError } = require('./errors')
+
 const { trailingSlashRedirect } = require('./utils/trailing-slash-rule')
 
 const app = express()
@@ -15,7 +17,7 @@ trailingSlashRedirect && app.use(trailingSlashRedirect)
 app.use(require('./router'))
 
 app.use((err, req, res, next) => {
-  if (err.location && err.statusCode && err.statusCode >= 300 && err.statusCode < 400) {
+  if (err instanceof RedirectError) {
     res.redirect(err.statusCode, err.location)
   } else {
     next(err)

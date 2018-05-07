@@ -1,5 +1,6 @@
 'use strict'
 
+const childProcess = require('child_process')
 const fs = require('fs')
 const path = require('path')
 
@@ -7,6 +8,7 @@ const glob = require('glob')
 
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const OnBuildWebpackPlugin = require('on-build-webpack')
 
 const babelLoader = require('./shared/loaders/babel-loader')
 const cssLoader = require('./shared/loaders/css-loader')
@@ -98,7 +100,10 @@ module.exports = {
         root: distRoot,
         watch: true
       }
-    )
+    ),
+    new OnBuildWebpackPlugin(function (stats) {
+      childProcess.execSync(`rm -rf './combined.jsx'`)
+    })
   ],
   resolve
 }

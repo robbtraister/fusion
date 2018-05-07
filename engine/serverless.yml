@@ -7,13 +7,6 @@ provider:
   runtime: nodejs8.10
   stage: ${opt:stage, 'localhost'}
   region: us-east-1
-  vpc:
-    securityGroupIds:
-      - sg-59fef325
-    subnetIds:
-      - subnet-ea737fb2
-      - subnet-c3ece0e9
-      - subnet-ee718da7
   environment:
     NODE_ENV: ${env:NODE_ENV, 'development'}
     ENVIRONMENT: ${self:provider.stage}
@@ -28,12 +21,8 @@ functions:
 
 package:
   exclude:
-    - bundle/components/**/*
-    - package.json
     - package-lock.json
-    - src/rendering.json
     - serverless.yml
-    - webpack.components.js
 
 plugins:
   - serverless-offline

@@ -1,6 +1,5 @@
 'use strict'
 
-const childProcess = require('child_process')
 const fs = require('fs')
 const path = require('path')
 
@@ -8,7 +7,6 @@ const glob = require('glob')
 
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const OnBuildWebpackPlugin = require('on-build-webpack')
 
 const babelLoader = require('./shared/loaders/babel-loader')
 const cssLoader = require('./shared/loaders/css-loader')
@@ -33,7 +31,8 @@ glob.sync(`${componentSrcRoot}/!(output-types)/**/*.{hbs,js,jsx,vue}`)
     entry[path.join(parts.dir, parts.name)] = f
   })
 
-fs.writeFileSync(`./combined.jsx`,
+const combinedSrcFile = path.resolve('./combined.jsx')
+fs.writeFileSync(combinedSrcFile,
   `
 const Components = {}
 ${Object.keys(types).map(type => `Components['${type}'] = Components['${type}'] || {}`).join('\n')}
@@ -50,7 +49,7 @@ module.exports = Components
 
 module.exports = {
   entry: {
-    combined: './combined.jsx'
+    combined: combinedSrcFile
   },
   externals,
   mode,
@@ -100,10 +99,7 @@ module.exports = {
         root: distRoot,
         watch: true
       }
-    ),
-    new OnBuildWebpackPlugin(function (stats) {
-      childProcess.execSync(`rm -rf './combined.jsx'`)
-    })
+    )
   ],
   resolve
 }

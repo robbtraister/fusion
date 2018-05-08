@@ -7,14 +7,14 @@ const debug = require('debug')('fusion:engine-generator')
 const promises = require('../utils/promises')
 
 const build = require('./build')
-// const deploy = require('./deploy')
+const deploy = require('./deploy')
 const download = require('./download')
 const extract = require('./extract')
 // const pushResources = require('./push-resources')
-// const upload = require('./upload')
+const upload = require('./upload')
 const zip = require('./zip')
 
-async function main () {
+async function main (deployment) {
   const downloadPromise = download('pagebuilder-fusion', 'fusion-bundle.zip')
 
   const tempDirPromise = promises.tempDir()
@@ -59,25 +59,25 @@ async function main () {
       })
     )
 
-  // const uploadPromise = zipPromise
-  //   .then((zipFile) => upload(zipFile)
-  //     .then((version) => {
-  //       promises.remove(zipFile)
-  //       return version
-  //     })
-  //   )
-  //
-  // const deployPromise = uploadPromise
-  //   .then((version) => deploy(version))
+  const uploadPromise = zipPromise
+    .then((zipFile) => upload(deployment, zipFile)
+      .then((data) => {
+        promises.remove(zipFile)
+        return data
+      })
+    )
+
+  const deployPromise = uploadPromise
+    .then(({VersionId}) => deploy(deployment, VersionId))
   //
   // const pushPromise = deployPromise
   //   .then((deployment) => pushResources(deployment))
 
-  return zipPromise
+  return deployPromise
 }
 
 module.exports = main
 
 if (module === require.main) {
-  main()
+  main('test')
 }

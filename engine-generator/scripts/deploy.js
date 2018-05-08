@@ -2,83 +2,87 @@
 
 const AWS = require('aws-sdk')
 
+const debug = require('debug')('fusion:engine-generator:deploy')
+
 const lambda = new AWS.Lambda()
 
-const code = () => ({
-  S3Bucket: 'pagebuilder-fusion',
-  S3Key: 'code.zip',
-  S3ObjectVersion: 'pr4siq1w8Muj97BLJDrPubdwbU9TgLaL'
-})
+const code = require('./code')
+const config = require('./config')
 
-const config = () => ({
-  Environment: {
-    Variables: {}
-  },
-  Handler: 'src/index.serverless',
-  KMSKeyArn: null,
-  MemorySize: 512,
-  Publish: true,
-  Role: 'arn:aws:iam::397853141546:role/fusion-engine-staging-us-east-1-lambdaRole',
-  Runtime: 'nodejs8.10',
-  Timeout: 10
-})
+const getFunctionName = (deployment) => `fusion-engine-${deployment}`
 
-function create () {
+function create (deployment, versionId) {
+  debug(`creating lambda for ${deployment} using ${versionId}`)
   return new Promise((resolve, reject) => {
     lambda.createFunction(Object.assign(
-      { FunctionName: 'fusion-lambda-test' },
+      { FunctionName: getFunctionName(deployment) },
       config(),
-      { Code: code() }
+      { Code: code(deployment, versionId) }
     ), (err, data) => {
       err ? reject(err) : resolve(data)
     })
   })
+    .then((result) => {
+      debug(`created lambda for ${deployment} using ${versionId}`)
+      return result
+    })
+    .catch((err) => {
+      debug(`error creating lambda for ${deployment} using ${versionId}: ${err}`)
+      throw err
+    })
 }
 
-// function deploy () {
-//   return new Promise((resolve, reject) => {
-//     cfn.updateStack({
-//       StackName: 'cfn-fusion-lambda-test',
-//       TemplateBody: JSON.stringify(require('./cfn.json'))
-//     }, (err, data) => {
-//       err ? reject(err) : resolve(data)
-//     })
-//   })
-// }
-
-function updateCode () {
+function updateCode (deployment, versionId) {
+  debug(`updating code for ${deployment} using ${versionId}`)
   return new Promise((resolve, reject) => {
     lambda.updateFunctionCode(Object.assign(
       {
-        FunctionName: 'fusion-lambda-test',
+        FunctionName: getFunctionName(deployment),
         Publish: true
       },
-      code()
+      code(deployment, versionId)
     ), (err, data) => {
       err ? reject(err) : resolve(data)
     })
   })
+    .then((result) => {
+      debug(`updated code for ${deployment} using ${versionId}`)
+      return result
+    })
+    .catch((err) => {
+      debug(`error updating code for ${deployment} using ${versionId}: ${err}`)
+      throw err
+    })
 }
 
-function updateConfig () {
+function updateConfig (deployment) {
+  debug(`updating config for ${deployment}`)
   return new Promise((resolve, reject) => {
     lambda.updateFunctionConfiguration(Object.assign(
-      { FunctionName: 'fusion-lambda-test' },
+      { FunctionName: getFunctionName(deployment) },
       config()
     ), (err, data) => {
       err ? reject(err) : resolve(data)
     })
   })
+    .then((result) => {
+      debug(`updated config for ${deployment}`)
+      return result
+    })
+    .catch((err) => {
+      debug(`error updating config for ${deployment}: ${err}`)
+      throw err
+    })
 }
 
-function update () {
-  return updateConfig()
-    .then(() => updateCode())
+function update (deployment, versionId) {
+  return updateConfig(deployment)
+    .then(() => updateCode(deployment, versionId))
 }
 
-function deploy () {
-  return create()
-    .catch(() => update())
+function deploy (deployment, versionId) {
+  return create(deployment, versionId)
+    .catch(() => update(deployment, versionId))
 }
 
 module.exports = deploy

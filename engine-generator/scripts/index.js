@@ -10,12 +10,15 @@ const build = require('./build')
 const deploy = require('./deploy')
 const download = require('./download')
 const extract = require('./extract')
-// const pushResources = require('./push-resources')
+const pushResources = require('./push-resources')
 const upload = require('./upload')
 const zip = require('./zip')
 
-async function main (deployment) {
-  const downloadPromise = download('pagebuilder-fusion', 'fusion-bundle.zip')
+const code = require('./code')
+const { S3Bucket } = code()
+
+async function main (deployment, bundleName) {
+  const downloadPromise = download(S3Bucket, `${deployment}/bundles/${bundleName}.zip`)
 
   const tempDirPromise = promises.tempDir()
 
@@ -69,11 +72,22 @@ async function main (deployment) {
 
   const deployPromise = uploadPromise
     .then(({VersionId}) => deploy(deployment, VersionId))
-  //
-  // const pushPromise = deployPromise
-  //   .then((deployment) => pushResources(deployment))
 
-  return deployPromise
+  const pushPromise = Promise.all([
+    buildPromise,
+    deployPromise
+  ])
+    .then(([srcDir, {Version}]) => pushResources(deployment, Version, srcDir))
+
+  return Promise.all([
+    tempDirPromise,
+    zipPromise,
+    pushPromise
+  ])
+    .then(([srcDir]) => {
+      promises.remove(srcDir)
+    })
+    .then(() => pushPromise)
 }
 
 module.exports = main

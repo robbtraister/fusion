@@ -16,7 +16,7 @@ function upload (deployment, fp) {
   return new Promise((resolve, reject) => {
     s3.upload({
       ACL: 'private',
-      Body: fs.readFileSync(fp),
+      Body: fs.createReadStream(fp),
       Bucket: S3Bucket,
       Key: S3Key,
       ServerSideEncryption: 'aws:kms',

@@ -65,7 +65,7 @@ services:
       - '9010:8080'
     volumes:
       # - '~/.aws:/root/.aws:ro'
-      - './engine/bundle:/workdir/engine/bundle:ro'
+      - './bundle:/workdir/engine/bundle:ro'
       - './engine/src:/workdir/engine/src:ro'
 
   resolver:

@@ -1,8 +1,9 @@
 'use strict'
 
+const promisify = require('util').promisify
+
 const debug = require('debug')('fusion:engine-generator:download')
 
-const promisify = require('../utils/promisify')
 const promises = require('../utils/promises')
 
 const S3 = require('aws-sdk').S3

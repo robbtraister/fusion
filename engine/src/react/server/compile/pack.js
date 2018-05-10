@@ -2,13 +2,12 @@
 
 const fs = require('fs')
 const path = require('path')
+const promisify = require('util').promisify
 
 const MemoryFS = require('memory-fs')
 const webpack = require('webpack')
 
 const debugTimer = require('debug')('fusion:timer:react:compile:pack')
-
-const promisify = require('../../../utils/promisify')
 
 const generateSource = require('./source')
 const {

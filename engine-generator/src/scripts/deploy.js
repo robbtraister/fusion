@@ -1,10 +1,10 @@
 'use strict'
 
+const promisify = require('util').promisify
+
 const AWS = require('aws-sdk')
 
 const debug = require('debug')('fusion:engine-generator:deploy')
-
-const promisify = require('../utils/promisify')
 
 const code = require('./code')
 const config = require('./config')

@@ -83,6 +83,7 @@ services:
       ENVIRONMENT: localhost
       HTTP_ENGINE: http://engine:8080
       LAMBDA_ENGINE:
+      DEBUG: fusion:*
       TRAILING_SLASH_RULE: # Options are FORCE, DROP, or NOOP
       DAO_URL: http://abc:def@localhost.dao:8080
       RESOLVE_FROM_DB: # should only be 'true' for local dev environments

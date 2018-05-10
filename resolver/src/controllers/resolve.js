@@ -6,6 +6,8 @@ const url = require('url')
 
 const fetch = require('./fetch')
 
+const debugLogger= require('debug')('fusion:resolver:logger')
+
 const { RedirectError } = require('../errors')
 
 const {
@@ -130,7 +132,7 @@ const getResolverMatcher = function getResolverMatcher (resolver) {
           .forEach(key => { query[key] = requestParts.query[key] })
         requestParts.query = query
 
-        console.log(`redirect issued: ${JSON.stringify(url.format(requestParts))}`)
+        debugLogger(`Redirect issued: ${JSON.stringify(url.format(requestParts))}`)
         throw new RedirectError(url.format(requestParts))
       }
       return true
@@ -190,7 +192,7 @@ const templateResolvers = templateConfigs.then((configs) => configs.map(prepareR
 const resolve = function resolve (requestUri, arcSite) {
   const requestParts = url.parse(requestUri, true)
   const pathname = requestParts.pathname
-  console.log(`resolving: ${JSON.stringify(requestUri)}`)
+  debugLogger(`Resolving: ${JSON.stringify(requestUri)}`)
 
   return Promise.all([pageResolvers, templateResolvers])
     .then(([pageResolvers, templateResolvers]) => {

@@ -4,85 +4,93 @@ const AWS = require('aws-sdk')
 
 const debug = require('debug')('fusion:engine-generator:deploy')
 
-const lambda = new AWS.Lambda()
+const promisify = require('../utils/promisify')
 
 const code = require('./code')
 const config = require('./config')
 
 const getFunctionName = (deployment) => `fusion-engine-${deployment}`
 
-function create (deployment, versionId) {
+const lambda = new AWS.Lambda()
+
+const createFunction = promisify(lambda.createFunction.bind(lambda))
+const updateFunctionCode = promisify(lambda.updateFunctionCode.bind(lambda))
+const updateFunctionConfiguration = promisify(lambda.updateFunctionConfiguration.bind(lambda))
+
+async function create (deployment, versionId) {
   debug(`creating lambda for ${deployment} using ${versionId}`)
-  return new Promise((resolve, reject) => {
-    lambda.createFunction(Object.assign(
-      { FunctionName: getFunctionName(deployment) },
-      config(),
-      { Code: code(deployment, versionId) }
-    ), (err, data) => {
-      err ? reject(err) : resolve(data)
-    })
-  })
-    .then((result) => {
-      debug(`created lambda for ${deployment} using ${versionId}`)
-      return result
-    })
-    .catch((err) => {
-      debug(`error creating lambda for ${deployment} using ${versionId}: ${err}`)
-      throw err
-    })
+  try {
+    const result = await createFunction(
+      Object.assign(
+        {
+          FunctionName: getFunctionName(deployment),
+          Code: code(deployment, versionId),
+          Publish: true
+        },
+        config()
+      )
+    )
+
+    debug(`created lambda for ${deployment} using ${versionId}`)
+    return result
+  } catch (e) {
+    debug(`error creating lambda for ${deployment} using ${versionId}: ${e}`)
+    throw e
+  }
 }
 
-function updateCode (deployment, versionId) {
+async function updateCode (deployment, versionId) {
   debug(`updating code for ${deployment} using ${versionId}`)
-  return new Promise((resolve, reject) => {
-    lambda.updateFunctionCode(Object.assign(
-      {
-        FunctionName: getFunctionName(deployment),
-        Publish: true
-      },
-      code(deployment, versionId)
-    ), (err, data) => {
-      err ? reject(err) : resolve(data)
-    })
-  })
-    .then((result) => {
-      debug(`updated code for ${deployment} using ${versionId}`)
-      return result
-    })
-    .catch((err) => {
-      debug(`error updating code for ${deployment} using ${versionId}: ${err}`)
-      throw err
-    })
+  try {
+    const result = await updateFunctionCode(
+      Object.assign(
+        {
+          FunctionName: getFunctionName(deployment),
+          Publish: true
+        },
+        code(deployment, versionId)
+      )
+    )
+
+    debug(`updated code for ${deployment} using ${versionId}`)
+    return result
+  } catch (e) {
+    debug(`error updating code for ${deployment} using ${versionId}: ${e}`)
+    throw e
+  }
 }
 
-function updateConfig (deployment) {
+async function updateConfig (deployment) {
   debug(`updating config for ${deployment}`)
-  return new Promise((resolve, reject) => {
-    lambda.updateFunctionConfiguration(Object.assign(
-      { FunctionName: getFunctionName(deployment) },
-      config()
-    ), (err, data) => {
-      err ? reject(err) : resolve(data)
-    })
-  })
-    .then((result) => {
-      debug(`updated config for ${deployment}`)
-      return result
-    })
-    .catch((err) => {
-      debug(`error updating config for ${deployment}: ${err}`)
-      throw err
-    })
+  try {
+    const result = await updateFunctionConfiguration(
+      Object.assign(
+        {
+          FunctionName: getFunctionName(deployment)
+        },
+        config()
+      )
+    )
+
+    debug(`updated config for ${deployment}`)
+    return result
+  } catch (e) {
+    debug(`error updating config for ${deployment}: ${e}`)
+    throw e
+  }
 }
 
-function update (deployment, versionId) {
-  return updateConfig(deployment)
-    .then(() => updateCode(deployment, versionId))
+async function update (deployment, versionId) {
+  await updateConfig(deployment)
+  return updateCode(deployment, versionId)
 }
 
-function deploy (deployment, versionId) {
-  return create(deployment, versionId)
-    .catch(() => update(deployment, versionId))
+async function deploy (deployment, versionId) {
+  try {
+    return await create(deployment, versionId)
+  } catch (e) {
+    return update(deployment, versionId)
+  }
 }
 
 module.exports = deploy

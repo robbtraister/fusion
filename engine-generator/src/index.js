@@ -17,82 +17,67 @@ const zip = require('./scripts/zip')
 const code = require('./scripts/code')
 const { S3Bucket } = code()
 
+async function getBundleDir (tempDirPromise) {
+  const tempDir = await tempDirPromise
+  return promises.mkdirp(path.resolve(tempDir, 'bundle'))
+}
+
+async function extractZip (fpPromise, destPromise) {
+  const fp = await fpPromise
+  const dest = await destPromise
+  await extract(fp, dest)
+  promises.remove(fp)
+  return dest
+}
+
+async function copy (srcPromise, destPromise) {
+  const src = await srcPromise
+  const dest = await destPromise
+  debug(`copying ${src} to ${dest}`)
+  const result = await promises.copy(src, dest)
+  debug(`copied ${src} to ${dest}`)
+  return result
+}
+
 async function main (deployment, bundleName) {
-  const downloadPromise = download(S3Bucket, `${deployment}/bundles/${bundleName}.zip`)
+  const downloadFilePromise = promises.tempFile()
+  const rootDirPromise = promises.tempDir()
+  const zipFilePromise = promises.tempFile()
 
-  const tempDirPromise = promises.tempDir()
+  try {
+    const copySrcPromise = copy(path.resolve(__dirname, '../../engine').replace(/\/*$/, '/'), rootDirPromise)
 
-  const bundleDirPromise = tempDirPromise
-    .then((tempDir) => promises.mkdirp(path.resolve(tempDir, 'bundle')))
+    const downloadPromise = download(downloadFilePromise, S3Bucket, `${deployment}/bundles/${bundleName}.zip`)
+    const bundleDirPromise = getBundleDir(rootDirPromise)
+    const extractPromise = extractZip(downloadPromise, bundleDirPromise)
+    promises.remove(await downloadFilePromise)
 
-  const extractPromise = Promise.all([
-    downloadPromise,
-    bundleDirPromise
-  ])
-    .then(([bundleFile, bundleDir]) => {
-      return extract(bundleFile, bundleDir)
-        .then(() => {
-          promises.remove(bundleFile)
-          return bundleDir
-        })
-    })
+    await Promise.all([copySrcPromise, extractPromise])
+    await build(await rootDirPromise)
 
-  const copySrcPromise = tempDirPromise
-    .then((tempDir) => {
-      debug(`copying src to ${tempDir}`)
-      return promises.copy(path.resolve(__dirname, '../../engine').replace(/\/*$/, '/'), tempDir)
-        .then(() => debug(`copied src to ${tempDir}`))
-        .then(() => tempDir)
-    })
+    await zip(await zipFilePromise, await rootDirPromise)
 
-  const buildPromise = Promise.all([
-    copySrcPromise,
-    extractPromise
-  ])
-    .then(([srcDir]) => build(srcDir))
+    const { VersionId } = await upload(deployment, await zipFilePromise)
+    promises.remove(await zipFilePromise)
 
-  const zipPromise = Promise.all([
-    promises.tempFile(),
-    tempDirPromise,
-    buildPromise
-  ])
-    .then(([destFile, srcDir]) => zip(destFile, srcDir)
-      .then((zipFile) => {
-        promises.remove(srcDir)
-        return zipFile
-      })
-    )
+    const { Version } = await deploy(deployment, VersionId)
 
-  const uploadPromise = zipPromise
-    .then((zipFile) => upload(deployment, zipFile)
-      .then((data) => {
-        promises.remove(zipFile)
-        return data
-      })
-    )
+    const result = await pushResources(deployment, Version, await rootDirPromise)
+    promises.remove(await rootDirPromise)
 
-  const deployPromise = uploadPromise
-    .then(({VersionId}) => deploy(deployment, VersionId))
-
-  const pushPromise = Promise.all([
-    buildPromise,
-    deployPromise
-  ])
-    .then(([srcDir, {Version}]) => pushResources(deployment, Version, srcDir))
-
-  return Promise.all([
-    tempDirPromise,
-    zipPromise,
-    pushPromise
-  ])
-    .then(([srcDir]) => {
-      promises.remove(srcDir)
-    })
-    .then(() => pushPromise)
+    return result
+  } catch (e) {
+    promises.remove(await downloadFilePromise)
+    promises.remove(await rootDirPromise)
+    promises.remove(await zipFilePromise)
+    throw e
+  }
 }
 
 module.exports = main
 
 if (module === require.main) {
   main('test', 'test')
+    .then(console.log)
+    .catch(console.error)
 }

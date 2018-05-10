@@ -8,7 +8,7 @@ const yazl = require('yazl')
 
 const debug = require('debug')('fusion:engine-generator:zip')
 
-function zip (zipFile, zipDirs) {
+async function zip (zipFile, zipDirs) {
   if (!(zipDirs instanceof Array)) {
     zipDirs = [zipDirs]
   }
@@ -17,7 +17,7 @@ function zip (zipFile, zipDirs) {
   const zipfile = new yazl.ZipFile()
   const output = fs.createWriteStream(zipFile)
 
-  return new Promise((resolve, reject) => {
+  await new Promise((resolve, reject) => {
     output.on('close', resolve)
     output.on('error', reject)
     zipfile.on('error', reject)
@@ -41,10 +41,10 @@ function zip (zipFile, zipDirs) {
     Promise.all(zipDirs.map(addDir))
       .then(() => { zipfile.end() })
   })
-    .then(() => {
-      debug(`zipped ${zipDirs} to ${zipFile}`)
-      return zipFile
-    })
+
+  debug(`zipped ${zipDirs} to ${zipFile}`)
+
+  return zipFile
 }
 
 module.exports = zip

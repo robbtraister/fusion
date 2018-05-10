@@ -9,7 +9,7 @@ const code = require('./code')
 const S3 = require('aws-sdk').S3
 const s3 = new S3({region: 'us-east-1'})
 
-function upload (deployment, fp) {
+async function upload (deployment, fp) {
   debug(`uploading ${fp} for ${deployment}`)
   const { S3Bucket, S3Key } = code(deployment)
 

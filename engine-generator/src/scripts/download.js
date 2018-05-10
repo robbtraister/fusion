@@ -10,7 +10,7 @@ const s3 = new S3({region: 'us-east-1'})
 
 const getObject = promisify(s3.getObject.bind(s3))
 
-function download (Bucket, Key, VersionId) {
+async function download (destFilePromise, Bucket, Key, VersionId) {
   const params = {
     Bucket,
     Key
@@ -20,14 +20,12 @@ function download (Bucket, Key, VersionId) {
     params.VersionId = VersionId
   }
 
-  return promises.tempFile()
-    .then(tf => {
-      debug(`downloading ${Bucket} ${Key} to ${tf}`)
-      return getObject(params)
-        .then(data => promises.writeFile(tf, data.Body))
-        .then(() => debug(`downloaded ${Bucket} ${Key} to ${tf}`))
-        .then(() => tf)
-    })
+  const destFile = await destFilePromise
+  debug(`downloading ${Bucket} ${Key} to ${destFile}`)
+  const data = await getObject(params)
+  await promises.writeFile(destFile, data.Body)
+  debug(`downloaded ${Bucket} ${Key} to ${destFile}`)
+  return destFile
 }
 
 module.exports = download

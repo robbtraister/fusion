@@ -9,7 +9,7 @@ const debug = require('debug')('fusion:engine-generator:extract')
 
 const promises = require('../utils/promises')
 
-function extract (fp, dest) {
+async function extract (fp, dest) {
   debug(`extracting ${fp} to ${dest}`)
   return new Promise((resolve, reject) => {
     yauzl.open(fp, {lazyEntries: true}, (err, zipfile) => {

@@ -95,6 +95,11 @@
           "name": "not-req",
           "value": "bar.*",
           "required": false
+        },
+        {
+          "name": "not-zoo",
+          "value": "zoo.*",
+          "required": false
         }
       ],
       "page" : "article-template",

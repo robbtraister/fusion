@@ -1,0 +1,10 @@
+[
+  "application/font-woff",
+  "font/otf",
+  "font/ttf",
+  "font/woff",
+  "font/woff2",
+  "image/jpeg",
+  "image/png",
+  "image/x-icon"
+]

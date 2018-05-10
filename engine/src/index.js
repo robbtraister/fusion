@@ -1,6 +1,9 @@
 'use strict'
 
-const { port } = require('../environment')
+const {
+  binaryContentTypes,
+  port
+} = require('../environment')
 
 const app = require('./app')
 
@@ -17,7 +20,7 @@ if (module === require.main) {
     render: require('./react/server/render'),
     router: require('./router'),
     schemas: require('./content/schemas'),
-    serverless: serverless(app, {binary: ['image/png', 'image/x-icon']}),
+    serverless: serverless(app, {binary: binaryContentTypes}),
     sources: require('./content/sources')
   }
 }

@@ -6,6 +6,10 @@ const url = require('url')
 
 const fetch = require('./fetch')
 
+const debugLogger= require('debug')('fusion:resolver:logger')
+
+const { RedirectError } = require('../errors')
+
 const {
   resolveFromDB
 } = require('../../environment')
@@ -114,19 +118,35 @@ const getResolverMatcher = function getResolverMatcher (resolver) {
     const requiredParams = params.filter(param => param.required)
     const optionalParams = params.filter(param => !param.required)
     const requiredParamsMatcher = (requestParams) => requiredParams.every(param => param.pattern.test(requestParams[param.name]))
-    const optionalParamsMatcher = (requestParams) => optionalParams.every(param => (param.name in requestParams) ? param.pattern.test(requestParams[param.name]) : true)
+    const optionalParamsMatcher = (requestParts) => {
+      const queryParams = requestParts.query
+      const mismatchParams = optionalParams.filter(param => ((param.name in queryParams) && !param.pattern.test(queryParams[param.name])))
+        .map(param => param.name)
 
-    // TODO we need to strip optional params that don't match, drop them from the request, and re-resolve
-    const queryParamMatcher = (requestParams) => (requiredParamsMatcher(requestParams) && optionalParamsMatcher(requestParams))
+      if (mismatchParams.length > 0) {
+        delete requestParts.search
+
+        const query = {}
+        Object.keys(requestParts.query)
+          .filter(key => !mismatchParams.includes(key))
+          .forEach(key => { query[key] = requestParts.query[key] })
+        requestParts.query = query
+
+        debugLogger(`Redirect issued: ${JSON.stringify(url.format(requestParts))}`)
+        throw new RedirectError(url.format(requestParts))
+      }
+      return true
+    }
+
+    const queryParamMatcher = (requestParts) => (requiredParamsMatcher(requestParts.query) && optionalParamsMatcher(requestParts))
 
     const pattern = new RegExp(resolver.pattern) // the resolver URI pattern
-    return (requestParts, arcSite) => pattern.test(requestParts.pathname) && queryParamMatcher(requestParts.query) && siteMatcher(arcSite)
+    return (requestParts, arcSite) => pattern.test(requestParts.pathname) && queryParamMatcher(requestParts) && siteMatcher(arcSite)
   }
   return () => null
 }
 
 function sortOnSites (a, b) {
-  // sort on sites
   if ((a.sites && a.sites.length) && !(b.sites && b.sites.length)) return -1
   if (!(a.sites && a.sites.length) && (b.sites && b.sites.length)) return 1
 }
@@ -172,11 +192,11 @@ const templateResolvers = templateConfigs.then((configs) => configs.map(prepareR
 const resolve = function resolve (requestUri, arcSite) {
   const requestParts = url.parse(requestUri, true)
   const pathname = requestParts.pathname
+  debugLogger(`Resolving: ${JSON.stringify(requestUri)}`)
 
   return Promise.all([pageResolvers, templateResolvers])
     .then(([pageResolvers, templateResolvers]) => {
       const normalizedPathname = TRAILING_SLASH_REWRITES.DROP(pathname)
-
       const resolver = pageResolvers.find(resolver => resolver.match(normalizedPathname, arcSite)) ||
         templateResolvers.find(resolver => resolver.match(requestParts, arcSite))
 

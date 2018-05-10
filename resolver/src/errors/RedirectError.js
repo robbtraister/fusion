@@ -8,4 +8,11 @@ class RedirectError extends Error {
   }
 }
 
+RedirectError.handler = (baseUrl) => (err) => {
+  if (err instanceof RedirectError) {
+    err.location = `${baseUrl || ''}${err.location}`
+  }
+  throw err
+}
+
 module.exports = RedirectError

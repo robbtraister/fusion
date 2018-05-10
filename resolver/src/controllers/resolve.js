@@ -119,10 +119,17 @@ const getResolverMatcher = function getResolverMatcher (resolver) {
     const optionalParamsMatcher = (requestParts) => {
       const queryParams = requestParts.query
       const mismatchParams = optionalParams.filter(param => ((param.name in queryParams) && !param.pattern.test(queryParams[param.name])))
+        .map(param => param.name)
 
       if (mismatchParams.length > 0) {
-        mismatchParams.forEach(param => { delete requestParts.query[param.name] })
-        delete requestParts['search']
+        delete requestParts.search
+
+        const query = {}
+        Object.keys(requestParts.query)
+          .filter(key => !mismatchParams.includes(key))
+          .forEach(key => { query[key] = requestParts.query[key] })
+        requestParts.query = query
+
         console.log(`redirect issued: ${JSON.stringify(url.format(requestParts))}`)
         throw new RedirectError(url.format(requestParts))
       }

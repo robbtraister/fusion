@@ -38,7 +38,8 @@ function zip (zipFile, zipDirs) {
       })
     }
 
-    Promise.all(zipDirs.map(addDir)).then(resolve)
+    Promise.all(zipDirs.map(addDir))
+      .then(() => { zipfile.end() })
   })
     .then(() => {
       debug(`zipped ${zipDirs} to ${zipFile}`)

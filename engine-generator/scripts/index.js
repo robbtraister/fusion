@@ -22,19 +22,12 @@ async function main (deployment, bundleName) {
 
   const tempDirPromise = promises.tempDir()
 
-  const copySrcPromise = tempDirPromise
-    .then((tempDir) => {
-      const bundleDir = path.resolve(tempDir, 'bundle')
-      debug(`copying src to ${tempDir}`)
-      return promises.copy(path.resolve(__dirname, '../../engine').replace(/\/*$/, '/'), tempDir)
-        .then(() => debug(`copied src to ${tempDir}`))
-        .then(() => promises.remove(`${bundleDir}`))
-        .then(() => promises.mkdirp(bundleDir))
-    })
+  const bundleDirPromise = tempDirPromise
+    .then((tempDir) => promises.mkdirp(path.resolve(tempDir, 'bundle')))
 
   const extractPromise = Promise.all([
     downloadPromise,
-    copySrcPromise
+    bundleDirPromise
   ])
     .then(([bundleFile, bundleDir]) => {
       return extract(bundleFile, bundleDir)
@@ -44,8 +37,16 @@ async function main (deployment, bundleName) {
         })
     })
 
+  const copySrcPromise = tempDirPromise
+    .then((tempDir) => {
+      debug(`copying src to ${tempDir}`)
+      return promises.copy(path.resolve(__dirname, '../../engine').replace(/\/*$/, '/'), tempDir)
+        .then(() => debug(`copied src to ${tempDir}`))
+        .then(() => tempDir)
+    })
+
   const buildPromise = Promise.all([
-    tempDirPromise,
+    copySrcPromise,
     extractPromise
   ])
     .then(([srcDir]) => build(srcDir))
@@ -93,5 +94,5 @@ async function main (deployment, bundleName) {
 module.exports = main
 
 if (module === require.main) {
-  main('test')
+  main('test', 'test')
 }

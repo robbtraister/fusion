@@ -4,17 +4,17 @@ const path = require('path')
 
 const debug = require('debug')('fusion:engine-generator')
 
-const promises = require('../utils/promises')
+const promises = require('./utils/promises')
 
-const build = require('./build')
-const deploy = require('./deploy')
-const download = require('./download')
-const extract = require('./extract')
-const pushResources = require('./push-resources')
-const upload = require('./upload')
-const zip = require('./zip')
+const build = require('./scripts/build')
+const deploy = require('./scripts/deploy')
+const download = require('./scripts/download')
+const extract = require('./scripts/extract')
+const pushResources = require('./scripts/push-resources')
+const upload = require('./scripts/upload')
+const zip = require('./scripts/zip')
 
-const code = require('./code')
+const code = require('./scripts/code')
 const { S3Bucket } = code()
 
 async function main (deployment, bundleName) {

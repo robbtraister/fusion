@@ -19,6 +19,9 @@ const env = Object.assign(
   process.env
 )
 
+const binaryContentTypes = env.BINARY_CONTENT_TYPES
+  ? env.BINARY_CONTENT_TYPES.split(/[,;]/)
+  : require('./binary-content-types.json')
 const contentBase = env.CONTENT_BASE || ''
 const contextPath = (env.CONTEXT_PATH || 'pb').replace(/^\/*/, '/').replace(/\/+$/, '')
 const apiPrefix = `${contextPath}/api/v3`
@@ -43,6 +46,7 @@ const outputTypes = glob.sync(`${componentSrcRoot}/output-types/**/*.{hbs,js,jsx
 
 module.exports = {
   apiPrefix,
+  binaryContentTypes,
   bundleRoot,
   componentDistRoot,
   componentSrcRoot,

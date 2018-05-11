@@ -31,7 +31,7 @@ const config = () => ({
   },
   Handler: 'engine-generator/src/index.handler',
   KMSKeyArn: null,
-  MemorySize: 2048,
+  MemorySize: 1024,
   Role: 'arn:aws:iam::397853141546:role/fusion-generator',
   Runtime: 'nodejs8.10',
   Timeout: 300

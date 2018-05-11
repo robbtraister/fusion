@@ -27,7 +27,7 @@ async function create (deployment, versionId) {
           Code: code(deployment, versionId),
           Publish: true
         },
-        config()
+        config(deployment)
       )
     )
 
@@ -68,7 +68,7 @@ async function updateConfig (deployment) {
         {
           FunctionName: getFunctionName(deployment)
         },
-        config()
+        config(deployment)
       )
     )
 

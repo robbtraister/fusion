@@ -26,6 +26,7 @@ async function download (destFilePromise, Bucket, Key, VersionId) {
   const data = await getObject(params)
   await promises.writeFile(destFile, data.Body)
   debug(`downloaded ${Bucket} ${Key} to ${destFile}`)
+
   return destFile
 }
 

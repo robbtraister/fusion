@@ -38,8 +38,8 @@ async function pushFiles (cwd, prefix) {
 
 async function pushResources (deployment, version, srcDir) {
   return Promise.all([
-    pushFiles(path.join(srcDir, 'bundle', 'resources'), `${deployment}/${version}/resources`),
-    pushFiles(path.join(srcDir, 'dist'), `${deployment}/${version}/resources`)
+    pushFiles(path.join(srcDir, 'bundle', 'resources'), `${deployment}/static/${version}/resources`),
+    pushFiles(path.join(srcDir, 'dist'), `${deployment}/static/${version}/dist`)
   ])
 }
 

@@ -45,16 +45,16 @@ async function main (deployment, bundleName) {
   const zipFilePromise = promises.tempFile()
 
   try {
-    const copySrcPromise = copy(path.resolve(__dirname, '../../engine').replace(/\/*$/, '/'), rootDirPromise)
+    const copySrcPromise = copy(path.resolve(__dirname, '../../engine/*'), rootDirPromise)
 
     const downloadPromise = download(downloadFilePromise, S3Bucket, `${deployment}/bundles/${bundleName}.zip`)
-    const bundleDirPromise = getBundleDir(rootDirPromise)
-    const extractPromise = extractZip(downloadPromise, bundleDirPromise)
+    const extractPromise = extractZip(downloadPromise, getBundleDir(rootDirPromise))
+
+    await extractPromise
     promises.remove(await downloadFilePromise)
 
-    await Promise.all([copySrcPromise, extractPromise])
+    await copySrcPromise
     await build(await rootDirPromise)
-
     await zip(await zipFilePromise, await rootDirPromise)
 
     const { VersionId } = await upload(deployment, await zipFilePromise)
@@ -74,7 +74,10 @@ async function main (deployment, bundleName) {
   }
 }
 
-module.exports = main
+module.exports.handler = (event, context) => {
+  main(event.deployment, event.bundle)
+    .catch(console.error)
+}
 
 if (module === require.main) {
   main('test', 'test')

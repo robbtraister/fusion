@@ -12,10 +12,12 @@ const s3 = new AWS.S3({region: 'us-east-1'})
 
 const FunctionName = `fusion-generator-engine`
 
-const createFunction = promisify(lambda.createFunction.bind(lambda))
-const updateFunctionCode = promisify(lambda.updateFunctionCode.bind(lambda))
-const updateFunctionConfiguration = promisify(lambda.updateFunctionConfiguration.bind(lambda))
-const upload = promisify(s3.upload.bind(s3))
+const awsCreateFunction = promisify(lambda.createFunction.bind(lambda))
+const awsUpdateFunctionCode = promisify(lambda.updateFunctionCode.bind(lambda))
+const awsUpdateFunctionConfiguration = promisify(lambda.updateFunctionConfiguration.bind(lambda))
+const awsUpload = promisify(s3.upload.bind(s3))
+const awsCreateAlias = promisify(lambda.createAlias.bind(lambda))
+const awsUpdateAlias = promisify(lambda.updateAlias.bind(lambda))
 
 const code = (S3ObjectVersion) => ({
   S3Bucket: 'pagebuilder-fusion',
@@ -37,10 +39,10 @@ const config = () => ({
   Timeout: 300
 })
 
-async function uploadToS3 (fp) {
+async function upload (fp) {
   debug(`uploading ${fp}`)
 
-  const result = await upload({
+  const result = await awsUpload({
     ACL: 'private',
     Body: fs.createReadStream(fp),
     Bucket: code().S3Bucket,
@@ -53,10 +55,10 @@ async function uploadToS3 (fp) {
   return result
 }
 
-async function create (versionId) {
+async function createFunction (versionId) {
   debug(`creating generating lambda ${versionId}`)
   try {
-    const result = await createFunction(
+    const result = await awsCreateFunction(
       Object.assign(
         {
           FunctionName,
@@ -75,10 +77,10 @@ async function create (versionId) {
   }
 }
 
-async function updateCode (versionId) {
+async function updateFunctionCode (versionId) {
   debug(`updating generating code ${versionId}`)
   try {
-    const result = await updateFunctionCode(
+    const result = await awsUpdateFunctionCode(
       Object.assign(
         {
           FunctionName,
@@ -96,10 +98,10 @@ async function updateCode (versionId) {
   }
 }
 
-async function updateConfig () {
+async function updateFunctionConfiguration () {
   debug(`updating generating config`)
   try {
-    const result = await updateFunctionConfiguration(
+    const result = await awsUpdateFunctionConfiguration(
       Object.assign(
         {
           FunctionName
@@ -116,22 +118,64 @@ async function updateConfig () {
   }
 }
 
-async function update (versionId) {
-  await updateConfig()
-  return updateCode(versionId)
+async function updateFunction (versionId) {
+  await updateFunctionConfiguration()
+  return updateFunctionCode(versionId)
 }
 
 async function deploy (versionId) {
   try {
-    return await create(versionId)
+    return await createFunction(versionId)
   } catch (e) {
-    return update(versionId)
+    return updateFunction(versionId)
+  }
+}
+
+async function createAlias (Name, FunctionName, FunctionVersion) {
+  debug(`creating alias: ${Name}`)
+  try {
+    const result = await awsCreateAlias({
+      FunctionName,
+      FunctionVersion,
+      Name
+    })
+    debug(`created alias: ${Name}`)
+    return result
+  } catch (e) {
+    debug(`error creating alias ${Name}: ${e}`)
+    throw e
+  }
+}
+
+async function updateAlias (Name, FunctionName, FunctionVersion) {
+  debug(`updating alias: ${Name}`)
+  try {
+    const result = await awsUpdateAlias({
+      FunctionName,
+      FunctionVersion,
+      Name
+    })
+    debug(`updated alias: ${Name}`)
+    return result
+  } catch (e) {
+    debug(`error updating alias ${Name}: ${e}`)
+    throw e
+  }
+}
+
+async function alias (Name, FunctionName, FunctionVersion) {
+  try {
+    return await createAlias(Name, FunctionName, FunctionVersion)
+  } catch (e) {
+    return updateAlias(Name, FunctionName, FunctionVersion)
   }
 }
 
 async function main () {
-  const { VersionId } = await uploadToS3(path.resolve(__dirname, 'generator.zip'))
-  return deploy(VersionId)
+  const { VersionId } = await upload(path.resolve(__dirname, 'generator.zip'))
+  const result = await deploy(VersionId)
+  await alias(require('../engine/package.json').version.replace(/\./g, '_'), result.FunctionName, result.Version)
+  return result
 }
 
 module.exports = main

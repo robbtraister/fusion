@@ -6,8 +6,8 @@
   npm install --production
 
   cd ../engine
-  # rm -rf node_modules dist
-  # npm install --production
+  rm -rf node_modules dist
+  npm install --production
   cd -
 
   zip generator.zip -r ../engine ../engine-generator

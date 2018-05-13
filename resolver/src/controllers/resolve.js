@@ -6,7 +6,7 @@ const url = require('url')
 
 const fetch = require('./fetch')
 
-const debugLogger= require('debug')('fusion:resolver:logger')
+const debugLogger = require('debug')('fusion:resolver:logger')
 
 const { RedirectError } = require('../errors')
 
@@ -84,19 +84,28 @@ const getResolverHydrater = function getResolverHydrater (resolver) {
     ? (requestUri, arcSite) => {
       const contentSourceParams = contentSourceParser(requestUri)
       requestUri = trailingSlashRewrite(requestUri)
-      return fetch(resolver.contentSourceId, Object.assign({'uri': requestUri, '_website': arcSite}, contentSourceParams))
+      const key = Object.assign({'uri': requestUri, '_website': arcSite}, contentSourceParams)
+      return fetch(resolver.contentSourceId, key)
+        .then(content => ({key, content}))
     }
-    : (requestUri, arcSite) => Promise.resolve(null)
+    : (requestUri, arcSite) => Promise.resolve({key: null, content: null})
 
   return (requestUri, arcSite) => contentResolver(requestUri, arcSite)
-    .then(content => Object.assign(
+    .then(({content, key}) => Object.assign(
       {
         requestUri,
-        content
+        template: templateResolver(content)
       },
-      templateResolver(content)
-    )
-    )
+      resolver.contentSourceId
+        ? {
+          content: {
+            source: resolver.contentSourceId,
+            key,
+            document: content
+          }
+        }
+        : {}
+    ))
 }
 
 const getUriPathname = function getUriPathname (requestUri) {

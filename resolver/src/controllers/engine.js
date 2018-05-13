@@ -5,12 +5,15 @@ const url = require('url')
 const AWS = require('aws-sdk')
 const request = require('request-promise-native')
 
-const getHttpEngine = function getHttpEngine () {
-  const engineHandler = process.env.HTTP_ENGINE
+const {
+  httpEngine,
+  lambdaEngine
+} = require('../../environment')
 
-  return function httpEngine ({method, uri, data}) {
+const getHttpEngine = function getHttpEngine () {
+  return function httpEngineHandler ({method, uri, data}) {
     return request[(method || 'get').toLowerCase()]({
-      uri: `${engineHandler}${uri}`,
+      uri: `${httpEngine}${uri}`,
       body: data,
       json: true
     })
@@ -18,15 +21,14 @@ const getHttpEngine = function getHttpEngine () {
 }
 
 const getLambdaEngine = function getLambdaEngine () {
-  const functionArn = process.env.LAMBDA_ENGINE || `arn:aws:lambda:${process.env.AWS_REGION || 'us-east-1'}:${process.env.AWS_ACCOUNT_ID || '397853141546'}:function:fusion-engine-${process.env.ENVIRONMENT}-engine}`
-  const region = functionArn.split(':')[3]
+  const region = lambdaEngine.split(':')[3]
   const lambda = new AWS.Lambda(Object.assign({region}))
 
-  return function lambdaEngine ({method, uri, data, version}) {
+  return function lambdaEngineHandler ({method, uri, data, version}) {
     const parts = url.parse(uri, true)
     return new Promise((resolve, reject) => {
       lambda.invoke({
-        FunctionName: functionArn,
+        FunctionName: lambdaEngine,
         InvocationType: 'RequestResponse',
         LogType: 'None',
         Payload: JSON.stringify({
@@ -60,6 +62,16 @@ const getLambdaEngine = function getLambdaEngine () {
   }
 }
 
-module.exports = (process.env.HTTP_ENGINE && !process.env.LAMBDA_ENGINE)
-  ? getHttpEngine()
-  : getLambdaEngine()
+function getEngine () {
+  const engine = (httpEngine && !lambdaEngine)
+    ? getHttpEngine()
+    : getLambdaEngine()
+
+  return (args) => engine(args)
+    .catch((e) => {
+      e.isEngine = true
+      throw e
+    })
+}
+
+module.exports = getEngine()

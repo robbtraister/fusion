@@ -16,7 +16,7 @@ const {
 const getComponent = (componentType) => {
   const fetchType = fetchRendering(componentType)
 
-  return (payload) => fetchType(payload)
+  return (payload) => fetchType(payload.id)
     .then(({rendering, id}) => {
       const renderable = (payload.child)
         ? findRenderableItem(rendering)(payload.child)

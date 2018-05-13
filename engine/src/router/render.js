@@ -28,15 +28,22 @@ function getTypeRouter (getComponent) {
         : req.query.outputType || undefined
       const payload = Object.assign(
         {
-          id: req.params.id,
-          child: req.params.child,
-          outputType,
           _website: req.query._website
         },
-        req.body
+        req.body,
+        {
+          template: Object.assign(
+            {
+              id: req.params.id,
+              child: req.params.child,
+              outputType
+            },
+            req.body && req.body.template
+          )
+        }
       )
 
-      getComponent(payload)
+      getComponent(payload.template)
         .then(Component => render(Object.assign({}, payload, {Component})))
         .then(data => { res.send(data) })
         .then(() => {
@@ -52,5 +59,7 @@ function getTypeRouter (getComponent) {
 renderRouter.use('/page', getTypeRouter(getComponent('page')))
 renderRouter.use('/rendering', getTypeRouter(getComponent('rendering')))
 renderRouter.use('/template', getTypeRouter(getComponent('template')))
+
+renderRouter.use('/', getTypeRouter((templateInfo) => getComponent(templateInfo.type)(templateInfo)))
 
 module.exports = renderRouter

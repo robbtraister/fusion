@@ -32,18 +32,18 @@ function getTypeRouter (getComponent) {
         },
         req.body,
         {
-          template: Object.assign(
+          rendering: Object.assign(
             {
               id: req.params.id,
               child: req.params.child,
               outputType
             },
-            req.body && req.body.template
+            req.body && req.body.rendering
           )
         }
       )
 
-      getComponent(payload.template)
+      getComponent(payload.rendering)
         .then(Component => render(Object.assign({}, payload, {Component})))
         .then(data => { res.send(data) })
         .then(() => {

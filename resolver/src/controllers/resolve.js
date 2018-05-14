@@ -30,7 +30,7 @@ const getNestedValue = function getNestedValue (target, field) {
   return value
 }
 
-const getTemplateResolver = function getTemplateResolver (resolver) {
+const getRenderingResolver = function getRenderingResolver (resolver) {
   const getId = (resolver.type === 'page')
     ? (content) => resolver._id // Pages
     : (content) => { // Templates
@@ -76,7 +76,7 @@ const parseContentSourceParameters = function parseContentSourceParameters (reso
 }
 
 const getResolverHydrater = function getResolverHydrater (resolver) {
-  const templateResolver = getTemplateResolver(resolver)
+  const renderingResolver = getRenderingResolver(resolver)
 
   const contentSourceParser = parseContentSourceParameters(resolver)
 
@@ -94,7 +94,7 @@ const getResolverHydrater = function getResolverHydrater (resolver) {
     .then(({content, key}) => Object.assign(
       {
         requestUri,
-        template: templateResolver(content)
+        rendering: renderingResolver(content)
       },
       resolver.contentSourceId
         ? {

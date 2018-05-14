@@ -5,7 +5,7 @@ module.exports = {
   options: {
     babelrc: false,
     presets: [
-      'es2015',
+      'env',
       'react'
     ],
     plugins: [

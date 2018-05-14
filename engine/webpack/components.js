@@ -9,6 +9,8 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 const babelLoader = require('./shared/loaders/babel-loader')
 const cssLoader = require('./shared/loaders/css-loader')
+const sassLoader = require('./shared/loaders/sass-loader')
+
 const externals = require('./shared/externals')
 const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
@@ -56,7 +58,7 @@ module.exports = (Object.keys(entry).length)
           use: [
             MiniCssExtractPlugin.loader,
             cssLoader,
-            'sass-loader'
+            sassLoader
           ]
         }
       ]

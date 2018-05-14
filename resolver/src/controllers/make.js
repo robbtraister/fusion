@@ -6,7 +6,7 @@ const url = require('url')
 
 const endpoint = function endpoint (data, outputType, arcSite) {
   return url.format({
-    pathname: `/render/${data.type}`,
+    pathname: `/render`,
     query: {
       outputType,
       _website: arcSite

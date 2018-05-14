@@ -27,11 +27,11 @@ app.use((err, req, res, next) => {
 app.use(
   (isDev)
     ? (err, req, res, next) => {
-      console.error(err)
+      !err.isEngine && console.error(err)
       res.status(err.statusCode || 500).send(err.message || err)
     }
     : (err, req, res, next) => {
-      console.error(err)
+      !err.isEngine && console.error(err)
       res.sendStatus(err.statusCode || 500)
     }
 )

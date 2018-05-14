@@ -59,15 +59,11 @@ const fetchRendering = (componentType) => {
     template: getTemplate
   }[componentType]
 
-  return (payload) => {
-    const id = payload.id
-
-    return fetchFile(`${componentType}/${id}/rendering.json`)
-      .then((source) => ({rendering: JSON.parse(source)}))
-      .catch(() => fetchRecord({id}))
-      .then(({rendering}) => ({id, rendering}))
-      .catch(() => { throw new Error(`Did not recognize component type: ${componentType}`) })
-  }
+  return (id) => fetchFile(`${componentType}/${id}/rendering.json`)
+    .then((source) => ({rendering: JSON.parse(source)}))
+    .catch(() => fetchRecord({id}))
+    .then(({rendering}) => ({id, rendering}))
+    .catch(() => { throw new Error(`Did not recognize component type: ${componentType}`) })
 }
 
 const pushToFs = function pushToFs (name, src) {

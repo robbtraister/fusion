@@ -13,7 +13,7 @@ for word in $(cat '/etc/resolv.conf')
 do
   # the dns must be 4 segments of digits separated by '.'s
   dns=$(echo "${word}" | egrep '^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$')
-  if [[ "${dns}"  ]]
+  if [ "${dns}"  ]
   then
     DNS_SERVER="${DNS_SERVER}${dns} "
   fi
@@ -193,7 +193,7 @@ cat <<EOB
       rewrite                  ^${API_PREFIX}(/|$)(.*) /\$2 break;
       rewrite                  ^${CONTEXT_PATH}(/|$)(.*) /\$2 break;
 EOB
-if [[ "${HTTP_ENGINE}" ]]
+if [ "${HTTP_ENGINE}" ]
 then
   cat <<EOB
       proxy_pass               ${HTTP_ENGINE};
@@ -216,7 +216,7 @@ cat <<EOB
 
       proxy_set_header         'Fusion-Engine-Version' '\${version}';
 EOB
-if [[ "${HTTP_RESOLVER}" ]]
+if [ "${HTTP_RESOLVER}" ]
 then
   cat <<EOB
       proxy_pass               ${HTTP_RESOLVER};
@@ -300,7 +300,7 @@ cat <<EOB
       proxy_intercept_errors   on;
 
 EOB
-if [ ! "$(echo "${NODE_ENV}" | grep -i "^prod")" ] || [ "${ON_DEMAND}" == 'true' ]]
+if [ ! "$(echo "${NODE_ENV}" | grep -i "^prod")" ] || [ "${ON_DEMAND}" == 'true' ]
 then
   cat <<EOB
       return                   418;

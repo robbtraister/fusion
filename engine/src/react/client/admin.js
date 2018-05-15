@@ -22,7 +22,9 @@ function render (config) {
   ReactDOM.render(
     React.createElement(
       Provider,
-      {},
+      {
+        isAdmin: true
+      },
       React.createElement(
         getElement(config),
         Fusion.globalContent || {}

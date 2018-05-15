@@ -1,8 +1,8 @@
 'use strict'
 
-const React = require('react')
+import React from 'react'
 
-const Consumer = require('consumer')
+import Consumer from 'consumer'
 
 const BreakingAlertV2 = (props) => {
   const parentPage = (props.customFields.autoLink || '').split(',')[1]
@@ -40,4 +40,4 @@ const BreakingAlertV2 = (props) => {
   </div>
 }
 
-module.exports = Consumer(BreakingAlertV2)
+export default Consumer(BreakingAlertV2)

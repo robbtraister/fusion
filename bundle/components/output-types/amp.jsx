@@ -1,6 +1,6 @@
 'use strict'
 
-const React = require('react')
+import React from 'react'
 
 require(`../../resources/css/bootstrap.min.css`)
 
@@ -15,7 +15,6 @@ const OutputType = (props) =>
           {templateStyles}
         </style>
       )}
-      {/* {props.styles} */}
       <link rel='icon' type='image/x-icon' href={`${props.contextPath}/resources/img/favicon.ico`} />
     </head>
     <body>
@@ -25,4 +24,4 @@ const OutputType = (props) =>
     </body>
   </html>
 
-module.exports = OutputType
+export default OutputType

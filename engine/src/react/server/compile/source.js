@@ -5,7 +5,7 @@ const fs = require('fs')
 const { componentSrcRoot } = require('../../../../environment')
 
 function componentImport (fp, name) {
-  return `Fusion.Components${name} = require('${fp}')`
+  return `Fusion.Components${name} = unpack(require('${fp}'))`
 }
 
 const componentFiles = [
@@ -132,6 +132,7 @@ ${(useComponentLib)
     ? 'var React = React || window.react'
     : `
 const React = require('react')
+const unpack = require('${require.resolve('../../shared/unpack')}')
 window.Fusion = window.Fusion || {}
 Fusion.Components = Fusion.Components || {}
 ${Object.keys(types).map(t => `Fusion.Components.${t} = Fusion.Components.${t} || {}`)}

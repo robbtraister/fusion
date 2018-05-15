@@ -15,6 +15,8 @@ const ReactDOM = require('react-dom/server')
 const compileComponent = require('./compile/component')
 const Provider = require('./provider')
 
+const unpack = require('../shared/unpack')
+
 const timer = require('../../timer')
 
 const {
@@ -198,7 +200,7 @@ const compileDocument = function compileDocument ({renderable, outputType, name}
 
       const OutputType = (() => {
         try {
-          return require(`${componentDistRoot}/output-types/${outputType}`)
+          return unpack(require(`${componentDistRoot}/output-types/${outputType}`))
         } catch (e) {
           const err = new Error(`Could not find output-type: ${outputType}`)
           err.statusCode = 400

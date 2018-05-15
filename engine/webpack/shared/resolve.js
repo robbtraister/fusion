@@ -4,7 +4,7 @@
 let alias = {}
 try {
   alias = {
-    'consumer': require.resolve('../../src/react/shared/consumer.js')
+    'consumer': require.resolve('../../src/react/shared/consumer')
   }
 } catch (e) {}
 

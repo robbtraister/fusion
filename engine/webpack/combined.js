@@ -33,9 +33,12 @@ glob.sync(`${componentSrcRoot}/!(output-types)/**/*.{hbs,js,jsx,vue}`)
     entry[path.join(parts.dir, parts.name)] = f
   })
 
-const combinedSrcFile = path.resolve('./combined.jsx')
+// this should probably be in bundle, but the bundle volume is generally mapped as read-only
+// so just put it in the root
+const combinedSrcFile = path.resolve(__dirname, '../combined.jsx')
 fs.writeFileSync(combinedSrcFile,
   `
+const unpack = require('./src/react/shared/unpack')
 const Components = {}
 ${Object.keys(types).map(type => `Components['${type}'] = Components['${type}'] || {}`).join('\n')}
 ${Object.keys(entry).map(name => {
@@ -43,7 +46,7 @@ ${Object.keys(entry).map(name => {
     const pieces = name.split('/')
     const type = pieces.shift()
     const id = pieces.join('/')
-    return `Components['${type}']['${id.replace(/\.(hbs|jsx?|vue)$/, '')}'] = require('${f}')`
+    return `Components['${type}']['${id.replace(/\.(hbs|jsx?|vue)$/, '')}'] = unpack(require('${f}'))`
   }).join('\n')}
 module.exports = Components
   `
@@ -85,7 +88,7 @@ module.exports = {
   output: {
     filename: `[name].js`,
     path: path.resolve(distRoot, 'components'),
-    library: `window.Fusion=window.Fusion||{};Fusion.Components`,
+    library: `window.Fusion=window.Fusion||{};window.Fusion.Components`,
     libraryTarget: 'assign'
   },
   plugins: [

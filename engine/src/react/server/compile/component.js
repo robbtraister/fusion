@@ -4,6 +4,8 @@ const debugTimer = require('debug')('fusion:timer:react:component')
 
 const React = require('react')
 
+const unpack = require('../../shared/unpack')
+
 const timer = require('../../../timer')
 
 const { componentDistRoot } = require('../../../../environment')
@@ -25,7 +27,7 @@ const TimedComponent = (Component) => (props) => {
 const loadComponent = function loadComponent (componentType, componentName, outputType) {
   for (let i = 0; i < componentFiles.length; i++) {
     try {
-      return TimedComponent(require(componentFiles[i](componentType, componentName, outputType)))
+      return TimedComponent(unpack(require(componentFiles[i](componentType, componentName, outputType))))
     } catch (e) {}
   }
   return null

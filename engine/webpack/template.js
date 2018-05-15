@@ -54,7 +54,7 @@ module.exports = (entry) =>
       output: {
         filename: `[name].js`,
         path: path.resolve(distRoot, 'components'),
-        library: `var Fusion=Fusion||{};Fusion.Template`,
+        library: `window.Fusion=window.Fusion||{};window.Fusion.Template`,
         libraryTarget: 'assign'
       },
       plugins: [

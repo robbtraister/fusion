@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.232.1",
+    "aws-sdk": "^2.239.1",
     "debug": "^3.1.0",
     "express": "^4.16.3",
     "request": "^2.85.0",
@@ -20,6 +20,6 @@
     "serverless-http": "^1.5.5"
   },
   "devDependencies": {
-    "serverless-offline": "github:robbtraister/serverless-offline#preserve-trailing-slash-option"
+    "serverless-offline": "^3.21.1"
   }
 }

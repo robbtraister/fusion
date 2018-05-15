@@ -18,6 +18,10 @@ Output Types are defined as React components, just like features and chains. How
 
 Each of the following properties are provided as functions that accept further customization (they can also be referenced directly without being called, which will call the function with the default values).
 
+-   `contextPath`
+
+The context path where the app is running. Should be used to prefix resource references. Default is `/pb`.
+
 -   `metaTag([{name, default}])`
 
 This prop will insert meta tags into your rendered HTML. If name is provided, it will insert the single meta tag specified. If no name is given, it will insert all meta tags that are enabled in the admin.

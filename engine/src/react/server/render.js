@@ -65,20 +65,8 @@ const outputTypeHasCss = (isDev)
 // use `{props.scripts}` to execute the function with the defaults
 // use `{props.scripts(true)}` to execute the function with custom inputs
 function propFunction (fn) {
-  fn[Symbol.iterator] = function () {
-    let done = false
-    return {
-      next () {
-        const result = (done)
-          ? {done}
-          : {
-            value: fn(),
-            done: false
-          }
-        done = true
-        return result
-      }
-    }
+  fn[Symbol.iterator] = function * () {
+    yield fn()
   }
   return fn
 }

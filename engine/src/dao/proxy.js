@@ -3,7 +3,7 @@
 // const BSON = require('bson')
 const request = require('request-promise-native')
 
-const debugTimer = require('debug')('fusion:timer:renderings:dao')
+const debugTimer = require('debug')('fusion:timer:dao:proxy')
 
 const { daoUrl } = require('../../environment')
 const timer = require('../timer')

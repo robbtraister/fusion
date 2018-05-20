@@ -1,6 +1,6 @@
 'use strict'
 
-const model = require('./dao')
+const model = require('../dao')
 const SourceConfig = model('jge_config')
 
 const getSourceConfig = function getSourceConfig (sourceName) {

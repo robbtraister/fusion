@@ -1,6 +1,6 @@
 'use strict'
 
-const model = require('./dao')
+const model = require('../dao')
 const Pages = model('page')
 const Renderings = model('rendering')
 const Templates = model('template')
@@ -11,34 +11,14 @@ const getRendering = function getRendering (id) {
   }
 
   return Renderings.findById(id)
-    .then((rendering) => {
-      return (rendering)
-        ? Promise.all([
-          Pages.findById(rendering._pt),
-          Templates.findById(rendering._pt)
-        ])
-          .then(([page, template]) => ({
-            pt: template || page,
-            rendering
-          }))
-        : {
-          pt: null,
-          rendering: null
-        }
-    })
+    .then(rendering => ({rendering}))
 }
 
 const getRenderingFromPageOrTemplate = function getRenderingFromPageOrTemplate (pt) {
   return (pt)
     ? Renderings.findById(pt.versions[pt.published].head)
-      .then((rendering) => ({
-        pt,
-        rendering
-      }))
-    : Promise.resolve({
-      pt: null,
-      rendering: null
-    })
+      .then(rendering => ({rendering}))
+    : Promise.resolve(null)
 }
 
 const getPage = function getPage (query) {

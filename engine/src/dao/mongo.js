@@ -1,34 +1,39 @@
 'use strict'
 
-const mongoose = require('mongoose')
+const url = require('url')
 
-const debugTimer = require('debug')('fusion:timer:renderings:schemaless')
+const debugTimer = require('debug')('fusion:timer:dao:mongo')
 
 const { mongoUrl } = require('../../environment')
+
 const timer = require('../timer')
 
-const schema = new mongoose.Schema({_id: String})
+const MongoClient = require('mongodb').MongoClient
 
 function getNewConnection (mongoUrl) {
-  return Promise.resolve(mongoose.createConnection(mongoUrl))
+  return new Promise((resolve, reject) => {
+    MongoClient.connect(mongoUrl, (err, connection) => err ? reject(err) : resolve(connection))
+  })
 }
 
-function Mongoose (mongoUrl) {
-  let connection
-  function getConnection () {
-    if (connection instanceof Promise) {
-      return connection
-    } else if (connection && [1, 2].includes(connection.readyState)) {
-      return Promise.resolve(connection)
+function Mongo (mongoUrl) {
+  const dbName = url.parse(mongoUrl).pathname.replace(/^\/+/, '')
+
+  let db
+  function getDatabase () {
+    if (db instanceof Promise) {
+      return db
+    } else if (db && db.topology.isConnected()) {
+      return Promise.resolve(db)
     }
 
-    connection = getNewConnection(mongoUrl)
+    db = getNewConnection(mongoUrl)
       .then((conn) => {
-        connection = conn
-        return conn
+        db = conn.db(dbName)
+        return db
       })
 
-    return connection
+    return db
   }
 
   const collections = {}
@@ -41,9 +46,9 @@ function Mongoose (mongoUrl) {
       }
     }
 
-    collections[collectionName] = getConnection()
-      .then((conn) => {
-        collections[collectionName] = conn.model(collectionName, schema, collectionName)
+    collections[collectionName] = getDatabase()
+      .then((db) => {
+        collections[collectionName] = db.collection(collectionName)
         return collections[collectionName]
       })
 
@@ -59,10 +64,11 @@ function Mongoose (mongoUrl) {
         find (query) {
           let tic
           return getCollection(modelName)
-            .then((model) => {
+            .then((collection) => {
               tic = timer.tic()
-              return model.find(query)
+              return collection.find(query)
             })
+            .then((cursor) => cursor.toArray())
             .then((data) => {
               debugTimer(`${modelName}.find()`, tic.toc())
               return data
@@ -72,9 +78,9 @@ function Mongoose (mongoUrl) {
         findById (_id) {
           let tic
           return getCollection(modelName)
-            .then((model) => {
+            .then((collection) => {
               tic = timer.tic()
-              return model.findById(_id)
+              return collection.findOne({_id})
             })
             .then((data) => {
               debugTimer(`${modelName}.findById(${_id})`, tic.toc())
@@ -85,9 +91,9 @@ function Mongoose (mongoUrl) {
         findOne (query) {
           let tic
           return getCollection(modelName)
-            .then((model) => {
+            .then((collection) => {
               tic = timer.tic()
-              return model.findOne(query)
+              return collection.findOne(query)
             })
             .then((data) => {
               debugTimer(`${modelName}.findOne()`, tic.toc())
@@ -101,4 +107,4 @@ function Mongoose (mongoUrl) {
   }
 }
 
-module.exports = Mongoose(mongoUrl).getModel
+module.exports = Mongo(mongoUrl).getModel

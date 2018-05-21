@@ -47,7 +47,7 @@ async function main (deployment, bundleName) {
   try {
     const copySrcPromise = copy(path.resolve(__dirname, '../../engine/*'), rootDirPromise)
 
-    const downloadPromise = download(downloadFilePromise, S3Bucket, `${deployment}/bundles/${bundleName}.zip`)
+    const downloadPromise = download(downloadFilePromise, S3Bucket, `${deployment}/bundles/${bundleName}`)
     const extractPromise = extractZip(await downloadPromise, getBundleDir(rootDirPromise))
 
     await extractPromise

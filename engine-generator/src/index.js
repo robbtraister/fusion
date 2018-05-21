@@ -48,7 +48,7 @@ async function main (deployment, bundleName) {
     const copySrcPromise = copy(path.resolve(__dirname, '../../engine/*'), rootDirPromise)
 
     const downloadPromise = download(downloadFilePromise, S3Bucket, `${deployment}/bundles/${bundleName}.zip`)
-    const extractPromise = extractZip(downloadPromise, getBundleDir(rootDirPromise))
+    const extractPromise = extractZip(await downloadPromise, getBundleDir(rootDirPromise))
 
     await extractPromise
     promises.remove(await downloadFilePromise)
@@ -74,9 +74,13 @@ async function main (deployment, bundleName) {
   }
 }
 
-module.exports.handler = (event, context) => {
+module.exports.handler = (event, context, callback) => {
   main(event.deployment, event.bundle)
-    .catch(console.error)
+    .then((result) => callback(null, result))
+    .catch((err) => {
+      console.error(err)
+      callback(err)
+    })
 }
 
 if (module === require.main) {

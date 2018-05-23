@@ -7,8 +7,6 @@ const zlib = require('zlib')
 
 const S3 = require('aws-sdk').S3
 
-const s3 = new S3({region: 'us-east-1'})
-
 const {
   getBucket,
   getS3Key
@@ -16,17 +14,14 @@ const {
 
 const {
   distRoot,
-  isDev
+  isDev,
+  region
 } = require('../../environment')
 
-const {
-  getPage,
-  getRendering,
-  getTemplate
-} = require('../models/renderings')
+const s3 = new S3({region})
 
 const fetchFromFS = (name) => {
-  const fp = path.resolve(`${distRoot}/${name}`)
+  const fp = path.resolve(distRoot, name)
   return new Promise((resolve, reject) => {
     fs.readFile(fp, (err, data) => {
       err ? reject(err) : resolve(data.toString())
@@ -50,23 +45,7 @@ const fetchFromS3 = (name) => {
     }))
 }
 
-const fetchFile = (isDev) ? fetchFromFS : fetchFromS3
-
-const fetchRendering = (componentType) => {
-  const fetchRecord = {
-    page: getPage,
-    rendering: getRendering,
-    template: getTemplate
-  }[componentType]
-
-  return (id) => fetchFile(`${componentType}/${id}/rendering.json`)
-    .then((source) => ({rendering: JSON.parse(source)}))
-    .catch(() => fetchRecord({id}))
-    .then(({rendering}) => ({id, rendering}))
-    .catch(() => { throw new Error(`Did not recognize component type: ${componentType}`) })
-}
-
-const pushToFs = function pushToFs (name, src) {
+const pushToFS = function pushToFS (name, src) {
   const filePath = path.resolve(`${distRoot}/${name}`)
   return new Promise((resolve, reject) => {
     childProcess.exec(`mkdir -p ${path.dirname(filePath)}`, (err) => {
@@ -100,10 +79,7 @@ const pushToS3 = function pushToS3 (name, src, ContentType) {
     }))
 }
 
-const pushFile = (isDev) ? pushToFs : pushToS3
-
 module.exports = {
-  fetchFile,
-  fetchRendering,
-  pushFile
+  fetchFile: (isDev) ? fetchFromFS : fetchFromS3,
+  pushFile: (isDev) ? pushToFS : pushToS3
 }

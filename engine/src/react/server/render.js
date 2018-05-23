@@ -5,8 +5,6 @@
 const fs = require('fs')
 const path = require('path')
 
-const glob = require('glob')
-
 const debugTimer = require('debug')('fusion:timer:react:render')
 
 const React = require('react')
@@ -20,16 +18,8 @@ const unpack = require('../shared/unpack')
 const timer = require('../../timer')
 
 const {
-  compileOne
-} = require('../../scripts/compile')
-
-const {
   fetchFile
-} = require('../../scripts/io')
-
-const {
-  getOutputType
-} = require('../../scripts/info')
+} = require('../../assets/io')
 
 const {
   componentDistRoot,
@@ -39,26 +29,27 @@ const {
   version
 } = require('../../../environment')
 
-const outputTypeHasCss = (isDev)
-  ? (outputType) => {
-    try {
-      fs.accessSync(path.resolve(componentDistRoot, 'output-types', `${outputType}.css`), fs.constants.R_OK)
-      return true
-    } catch (e) {
-      return false
-    }
+const fileExists = (fp) => {
+  try {
+    fs.accessSync(fp, fs.constants.R_OK)
+    return true
+  } catch (e) {
+    return false
   }
+}
+
+const outputTypeHasCss = (isDev)
+  // don't cache it in dev because it might change
+  ? (outputType) => fileExists(path.resolve(componentDistRoot, 'output-types', `${outputType}.css`))
+  // cache it in prod because it won't change
   : (() => {
-    const outputTypeCssFiles = {}
-    const outputTypeDistRoot = path.resolve(componentDistRoot, 'output-types')
-    glob.sync(path.resolve(outputTypeDistRoot, '**/*.css'))
-      .forEach((f) => {
-        const name = f.substr(outputTypeDistRoot.length + 1)
-        const parts = path.parse(name)
-        const outputType = path.join(parts.dir, parts.name)
-        outputTypeCssFiles[outputType] = f
-      })
-    return (outputType) => outputTypeCssFiles[outputType]
+    const _outputTypeHasCss = {}
+    return (outputType) => {
+      if (!_outputTypeHasCss.hasOwnProperty(outputType)) {
+        _outputTypeHasCss[outputType] = fileExists(path.resolve(componentDistRoot, 'output-types', `${outputType}.css`))
+      }
+      return _outputTypeHasCss[outputType]
+    }
   })()
 
 // this wrapper allows a function to be used in JSX without parentheses
@@ -77,15 +68,6 @@ const engineScript = React.createElement(
     key: 'engine',
     type: 'application/javascript',
     src: `${contextPath}/dist/engine/react.js?v=${version}`,
-    defer: true
-  }
-)
-const componentsScript = React.createElement(
-  'script',
-  {
-    key: 'components',
-    type: 'application/javascript',
-    src: `${contextPath}/dist/components/all.js?v=${version}`,
     defer: true
   }
 )
@@ -123,7 +105,7 @@ const render = function render ({Component, requestUri, content, _website}) {
           }
         )
       )
-      resolve('<!DOCTYPE html>' + html)
+      resolve(html)
     } catch (e) {
       reject(e)
     }
@@ -179,274 +161,235 @@ const compileRenderable = function compileRenderable ({renderable, outputType}) 
     })
 }
 
-const compileDocument = function compileDocument ({renderable, outputType, name}) {
-  outputType = getOutputType(outputType)
+const compileDocument = function compileDocument ({rendering, outputType, name}) {
   let tic
-  return compileRenderable({renderable, outputType})
-    .then((Template) => {
-      tic = timer.tic()
+  return rendering.getJson()
+    .then((json) => {
+      return compileRenderable({renderable: json, outputType})
+        .then((Template) => {
+          if (!outputType) {
+            return Template
+          }
 
-      const OutputType = (() => {
-        try {
-          return unpack(require(`${componentDistRoot}/output-types/${outputType}`))
-        } catch (e) {
-          const err = new Error(`Could not find output-type: ${outputType}`)
-          err.statusCode = 400
-          throw err
-        }
-      })()
+          tic = timer.tic()
 
-      const Component = (props) => {
-        return React.createElement(
-          OutputType,
-          {
-            contextPath,
-            /*
-             * Each of the following are equivalent in JSX
-             *   {props.metaTag}
-             *   {props.metaTag()}
-             *
-             * To select a single meta tag
-             *   {props.metaTag('title')}
-             *   {props.metaTag({name: 'title'})}
-             */
-            metaTag: propFunction(function (name, defaultValue) {
-              if (typeof name === 'object') {
-                name = name.name
-                defaultValue = name.default || defaultValue
-              }
+          const OutputType = (() => {
+            try {
+              return unpack(require(`${componentDistRoot}/output-types/${outputType}`))
+            } catch (e) {
+              const err = new Error(`Could not find output-type: ${outputType}`)
+              err.statusCode = 400
+              throw err
+            }
+          })()
 
-              const metas = (renderable.meta || {})
-
-              const getElement = (name) => metas[name]
-                ? React.createElement(
-                  'meta',
-                  {
-                    key: `meta-${name}`,
-                    name,
-                    content: metas[name].value || defaultValue
+          const Component = (props) => {
+            return React.createElement(
+              OutputType,
+              {
+                contextPath,
+                /*
+                 * Each of the following are equivalent in JSX
+                 *   {props.metaTag}
+                 *   {props.metaTag()}
+                 *
+                 * To select a single meta tag
+                 *   {props.metaTag('title')}
+                 *   {props.metaTag({name: 'title'})}
+                 */
+                metaTag: propFunction(function (name, defaultValue) {
+                  if (typeof name === 'object') {
+                    name = name.name
+                    defaultValue = name.default || defaultValue
                   }
-                )
-                : null
 
-              return (name)
-                ? getElement(name)
-                : Object.keys(metas).filter(name => metas[name].html).map(getElement)
-            }),
-            /*
-             * Each of the following are equivalent in JSX
-             * To select a single meta tag
-             *   {props.metaValue('title')}
-             *   {props.metaValue({name: 'title'})}
-             */
-            metaValue: propFunction(function (name) {
-              if (typeof name === 'object') {
-                name = name.name
-              }
+                  const metas = (json.meta || {})
 
-              const metas = (renderable.meta || {})
-              return name && metas[name] && metas[name].value
-            }),
-            /*
-             * Each of the following are equivalent in JSX
-             *   {props.libs}
-             *   {props.libs()}
-             *   {props.libs(false)}
-             *   {props.libs({useComponentLib: false})}
-             *
-             * To use the complete component library
-             * (faster compilation, but larger payload; suitable for faster changes in admin)
-             *   {props.libs(true)}
-             *   {props.libs({useComponentLib: true})}
-             */
-            libs: propFunction(function (useComponentLib) {
-              if (typeof useComponentLib === 'object') {
-                useComponentLib = useComponentLib.useComponentLib
-              }
-              useComponentLib = (useComponentLib === undefined) ? false : !!useComponentLib
-
-              const templateScript = React.createElement(
-                'script',
-                {
-                  key: 'template',
-                  type: 'application/javascript',
-                  src: `${contextPath}/dist/${name}/${outputType}.js?v=${version}${useComponentLib ? '&useComponentLib=true' : ''}`,
-                  defer: true
-                }
-              )
-
-              return (useComponentLib)
-                ? [
-                  engineScript,
-                  componentsScript,
-                  templateScript
-                ]
-                : [
-                  engineScript,
-                  templateScript
-                ]
-            }),
-            /*
-             * Each of the following are equivalent in JSX
-             *   {props.css}
-             *   {props.css()}
-             *   {props.css(false)}
-             *   {props.css({inline: false})}
-             *
-             * To inline the css
-             * (larger payload, bad for cache; suitable for AMP)
-             *   {props.css(true)}
-             *   {props.css({inline: true})}
-             */
-            styles: propFunction(function (cb) {
-              const outputTypeStylesPromise = new Promise((resolve, reject) => {
-                fs.readFile(path.resolve(componentDistRoot, 'output-types', `${outputType}.css`), (err, data) => {
-                  err ? resolve(null) : resolve(data.toString())
-                })
-              })
-
-              if (renderable.css === undefined || renderable.css[outputType] === undefined) {
-                // these assets have yet to be compiled
-                // use the inlines promise to wait for compilation and make the css hash file available
-                // this should only happen in development
-                Component.inlines.styles = Component.inlines.styles || {
-                  cached: {
-                    outputTypeStyles: undefined,
-                    templateStyles: undefined
-                  },
-                  fetched: Promise.all([
-                    outputTypeStylesPromise,
-                    compileOne({name, rendering: renderable, outputType})
-                  ])
-                    .then(([outputTypeStyles, {css, cssFile}]) => {
-                      Component.inlines.styles.cached = {
-                        outputTypeStyles,
-                        templateStyles: css
-                      }
-                    })
-                }
-              } else if (renderable.css && renderable.css[outputType]) {
-                // these assets have been compiled
-                // read the css file to be inserted inline
-                Component.inlines.styles = Component.inlines.styles || {
-                  cached: {
-                    outputTypeStyles: undefined,
-                    templateStyles: undefined
-                  },
-                  fetched: Promise.all([
-                    outputTypeStylesPromise,
-                    fetchFile(renderable.css[outputType])
-                  ])
-                    .then(([outputTypeStyles, templateStyles]) => {
-                      Component.inlines.styles.cached = {
-                        outputTypeStyles,
-                        templateStyles
-                      }
-                    })
-                }
-              }
-
-              return (cb)
-                ? cb(Component.inlines.styles.cached)
-                : React.createElement(
-                  'style',
-                  {},
-                  [
-                    Component.inlines.styles.cached.outputTypeStyles,
-                    Component.inlines.styles.cached.templateStyles
-                  ]
-                )
-            }),
-            /*
-             * Each of the following are equivalent in JSX
-             *   {props.cssLinks}
-             *   {props.cssLinks()}
-             */
-            cssLinks: propFunction(function (cb) {
-              if (renderable.css === undefined || renderable.css[outputType] === undefined) {
-                // these assets have yet to be compiled
-                // use the inlines promise to wait for compilation and make the css hash file available
-                // this should only happen in development
-                Component.inlines.styles = Component.inlines.styles || {
-                  fetched: compileOne({name, rendering: renderable, outputType})
-                }
-              }
-
-              const hrefs = {
-                outputTypeHref: (outputTypeHasCss(outputType)) ? `${contextPath}/dist/components/output-types/${outputType}.css` : null,
-                templateHref: (renderable.css && renderable.css[outputType]) ? `${contextPath}/dist/${renderable.css[outputType]}` : null
-              }
-
-              return (cb)
-                ? cb(hrefs)
-                // even if cssFile is null, add the link tag with no href
-                // so it can be replaced by an updated template script later
-                : [
-                  (hrefs.outputTypeHref)
+                  const getElement = (name) => metas[name]
                     ? React.createElement(
-                      'link',
+                      'meta',
                       {
-                        key: 'output-type-style',
-                        rel: 'stylesheet',
-                        type: 'text/css',
-                        href: hrefs.outputTypeHref
+                        key: `meta-${name}`,
+                        name,
+                        content: metas[name].value || defaultValue
                       }
                     )
-                    : null,
-                  React.createElement(
-                    'link',
+                    : null
+
+                  return (name)
+                    ? getElement(name)
+                    : Object.keys(metas).filter(name => metas[name].html).map(getElement)
+                }),
+                /*
+                 * Each of the following are equivalent in JSX
+                 * To select a single meta tag
+                 *   {props.metaValue('title')}
+                 *   {props.metaValue({name: 'title'})}
+                 */
+                metaValue: propFunction(function (name) {
+                  if (typeof name === 'object') {
+                    name = name.name
+                  }
+
+                  const metas = (json.meta || {})
+                  return name && metas[name] && metas[name].value
+                }),
+                /*
+                 * Each of the following are equivalent in JSX
+                 *   {props.libs}
+                 *   {props.libs()}
+                 */
+                libs: propFunction(function () {
+                  const templateScript = React.createElement(
+                    'script',
                     {
-                      key: 'template-style',
-                      id: 'template-style',
-                      rel: 'stylesheet',
-                      type: 'text/css',
-                      href: hrefs.templateHref
+                      key: 'template',
+                      type: 'application/javascript',
+                      src: `${contextPath}/dist/${name}/${outputType}.js?v=${version}`,
+                      defer: true
                     }
                   )
-                ]
-            }),
-            /*
-             * Each of the following are equivalent in JSX
-             *   {props.fusion}
-             *   {props.fusion()}
-             *   {props.fusion(true)}
-             *   {props.fusion({refreshContent: true})}
-             *
-             * To disable client-side content refresh
-             *   {props.fusion(false)}
-             *   {props.fusion({refreshContent: false})}
-             */
-            fusion: propFunction(function (refreshContent) {
-              if (typeof refreshContent === 'object') {
-                refreshContent = refreshContent.refreshContent
-              }
-              refreshContent = refreshContent === undefined ? true : !!refreshContent
-              return React.createElement(
-                'script',
-                {
-                  type: 'application/javascript',
-                  dangerouslySetInnerHTML: { __html: getFusionScript(props.globalContent, Template.contentCache, refreshContent, props.arcSite) }
-                }
-              )
-            }),
-            ...props
-          },
-          React.createElement(
-            Template,
-            // pass down the original props
-            props
-          )
-        )
-      }
 
-      Component.inlines = Template.inlines
-      // bubble up the Provider contentCache
-      Component.contentCache = Template.contentCache
-      return Component
-    })
-    .then((Component) => {
-      debugTimer('output-type wrapping', tic.toc())
-      return Component
+                  return [
+                    engineScript,
+                    templateScript
+                  ]
+                }),
+                /*
+                 * Each of the following are equivalent in JSX
+                 *   {props.css}
+                 *   {props.css()}
+                 *   {props.css(false)}
+                 *   {props.css({inline: false})}
+                 *
+                 * To inline the css
+                 * (larger payload, bad for cache; suitable for AMP)
+                 *   {props.css(true)}
+                 *   {props.css({inline: true})}
+                 */
+                styles: propFunction(function (cb) {
+                  const outputTypeStylesPromise = fetchFile(`components/output-types/${outputType}.css`)
+                    .catch(() => null)
+
+                  const templateStylesPromise = rendering.getStyles()
+                    .catch(() => null)
+
+                  Component.inlines.styles = Component.inlines.styles || {
+                    cached: {
+                      outputTypeStyles: undefined,
+                      templateStyles: undefined
+                    },
+                    fetched: Promise.all([
+                      outputTypeStylesPromise,
+                      templateStylesPromise
+                    ])
+                      .then(([outputTypeStyles, templateStyles]) => {
+                        Component.inlines.styles.cached = {
+                          outputTypeStyles,
+                          templateStyles
+                        }
+                      })
+                  }
+
+                  return (cb)
+                    ? cb(Component.inlines.styles.cached)
+                    : React.createElement(
+                      'style',
+                      {},
+                      [
+                        Component.inlines.styles.cached.outputTypeStyles,
+                        Component.inlines.styles.cached.templateStyles
+                      ]
+                    )
+                }),
+                /*
+                 * Each of the following are equivalent in JSX
+                 *   {props.cssLinks}
+                 *   {props.cssLinks()}
+                 */
+                cssLinks: propFunction(function (cb) {
+                  Component.inlines.cssLinks = Component.inlines.cssLinks || {
+                    cached: {
+                      outputTypeHref: undefined,
+                      templateHref: undefined
+                    },
+                    fetched: rendering.getCssFile()
+                      .then((templateCssFile) => {
+                        Component.inlines.cssLinks.cached = {
+                          outputTypeHref: (outputTypeHasCss(outputType)) ? `${contextPath}/dist/components/output-types/${outputType}.css` : null,
+                          templateHref: (templateCssFile) ? `${contextPath}/dist/${templateCssFile}` : null
+                        }
+                      })
+                  }
+
+                  return (cb)
+                    ? cb(Component.inlines.cssLinks.cached)
+                    // even if cssFile is null, add the link tag with no href
+                    // so it can be replaced by an updated template script later
+                    : [
+                      (Component.inlines.cssLinks.cached.outputTypeHref)
+                        ? React.createElement(
+                          'link',
+                          {
+                            key: 'output-type-style',
+                            rel: 'stylesheet',
+                            type: 'text/css',
+                            href: Component.inlines.cssLinks.cached.outputTypeHref
+                          }
+                        )
+                        : null,
+                      React.createElement(
+                        'link',
+                        {
+                          key: 'template-style',
+                          id: 'template-style',
+                          rel: 'stylesheet',
+                          type: 'text/css',
+                          href: Component.inlines.cssLinks.cached.templateHref
+                        }
+                      )
+                    ]
+                }),
+                /*
+                 * Each of the following are equivalent in JSX
+                 *   {props.fusion}
+                 *   {props.fusion()}
+                 *   {props.fusion(true)}
+                 *   {props.fusion({refreshContent: true})}
+                 *
+                 * To disable client-side content refresh
+                 *   {props.fusion(false)}
+                 *   {props.fusion({refreshContent: false})}
+                 */
+                fusion: propFunction(function (refreshContent) {
+                  if (typeof refreshContent === 'object') {
+                    refreshContent = refreshContent.refreshContent
+                  }
+                  refreshContent = refreshContent === undefined ? true : !!refreshContent
+                  return React.createElement(
+                    'script',
+                    {
+                      type: 'application/javascript',
+                      dangerouslySetInnerHTML: { __html: getFusionScript(props.globalContent, Template.contentCache, refreshContent, props.arcSite) }
+                    }
+                  )
+                }),
+                ...props
+              },
+              React.createElement(
+                Template,
+                // pass down the original props
+                props
+              )
+            )
+          }
+
+          Component.inlines = Template.inlines
+          // bubble up the Provider contentCache
+          Component.contentCache = Template.contentCache
+          debugTimer('output-type wrapping', tic.toc())
+          return Component
+        })
     })
 }
 

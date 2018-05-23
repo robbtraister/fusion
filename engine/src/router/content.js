@@ -2,7 +2,7 @@
 
 const express = require('express')
 
-const getSource = require('../content/sources')
+const getSource = require('../models/sources')
 
 const contentRouter = express.Router()
 

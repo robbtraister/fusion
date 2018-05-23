@@ -2,7 +2,7 @@
 
 const mongoose = require('mongoose')
 
-const debugTimer = require('debug')('fusion:timer:renderings:schemaless')
+const debugTimer = require('debug')('fusion:timer:dao:mongoose')
 
 const { mongoUrl } = require('../../environment')
 const timer = require('../timer')
@@ -69,19 +69,6 @@ function Mongoose (mongoUrl) {
             })
         },
 
-        findById (_id) {
-          let tic
-          return getCollection(modelName)
-            .then((model) => {
-              tic = timer.tic()
-              return model.findById(_id)
-            })
-            .then((data) => {
-              debugTimer(`${modelName}.findById(${_id})`, tic.toc())
-              return data
-            })
-        },
-
         findOne (query) {
           let tic
           return getCollection(modelName)
@@ -91,6 +78,32 @@ function Mongoose (mongoUrl) {
             })
             .then((data) => {
               debugTimer(`${modelName}.findOne()`, tic.toc())
+              return data
+            })
+        },
+
+        get (_id) {
+          let tic
+          return getCollection(modelName)
+            .then((model) => {
+              tic = timer.tic()
+              return model.findById(_id)
+            })
+            .then((data) => {
+              debugTimer(`${modelName}.get(${_id})`, tic.toc())
+              return data
+            })
+        },
+
+        put (doc) {
+          let tic
+          return getCollection(modelName)
+            .then((model) => {
+              tic = timer.tic()
+              return model.update({_id: doc._id}, doc, { upsert: true })
+            })
+            .then((data) => {
+              debugTimer(`${modelName}.put()`, tic.toc())
               return data
             })
         }

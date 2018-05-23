@@ -6,6 +6,9 @@ networks:
     external: false
     internal: false
 
+volumes:
+  fusion-dist-volume: {}
+
 services:
   data:
     image: quay.io/washpost/mongo-localhost
@@ -20,28 +23,6 @@ services:
       - './data/db:/data/db:rw'
       - './data/restore:/data/restore:rw'
 
-  dao:
-    image: quay.io/washpost/fusion-dao
-    build: ./dao
-    depends_on:
-      - data
-    environment:
-      NODE_ENV:
-      DAO_CREDENTIALS: |
-        localhost|abc|def
-      MONGO_URLS: |
-        localhost|mongodb://data:27017/${DB_NAME:-fusion_dev}
-    networks:
-      fusion:
-        aliases:
-          # the subdomain is used for multitenant determination
-          - localhost.dao
-    ports:
-      - '8090:8080'
-      - '8091:8081'
-    volumes:
-      - './dao/src:/etc/nginx/src:ro'
-
   engine:
     image: quay.io/washpost/fusion-engine
     build:
@@ -50,7 +31,7 @@ services:
       args:
         LAMBDA: engine
     depends_on:
-      - dao
+      - data
     environment:
       NODE_ENV:
       ENVIRONMENT: localhost
@@ -58,7 +39,8 @@ services:
       ON_DEMAND:
       CONTENT_BASE:
       CONTEXT_PATH:
-      DAO_URL: http://abc:def@localhost.dao:8080
+      MINIFY:
+      MONGO_URL: mongodb://data:27017/${DB_NAME:-fusion_dev}
     networks:
       - fusion
     ports:
@@ -67,6 +49,7 @@ services:
       # - '~/.aws:/root/.aws:ro'
       - '${FUSION_REPO:-./bundle}:/workdir/engine/bundle:rw'
       - './engine/src:/workdir/engine/src:ro'
+      - 'fusion-dist-volume:/workdir/engine/dist:rw'
 
   resolver:
     image: quay.io/washpost/fusion-resolver
@@ -76,7 +59,7 @@ services:
       args:
         LAMBDA: resolver
     depends_on:
-      - dao
+      - data
       - engine
     environment:
       NODE_ENV:
@@ -85,8 +68,8 @@ services:
       LAMBDA_ENGINE:
       DEBUG: fusion:*
       TRAILING_SLASH_RULE: # Options are FORCE, DROP, or NOOP
-      DAO_URL: http://abc:def@localhost.dao:8080
-      RESOLVE_FROM_DB: # should only be 'true' for local dev environments
+      MONGO_URL: mongodb://data:27017/${DB_NAME:-fusion_dev}
+      RESOLVE_FROM_DB: 'true' # should only be 'true' for local dev environments
     networks:
       - fusion
     ports:
@@ -117,3 +100,5 @@ services:
     volumes:
       # - '~/.aws:/home/nginx/.aws:ro'
       - './origin/src:/etc/nginx/src:ro'
+      - 'fusion-dist-volume:/etc/nginx/dist:ro'
+      - '${FUSION_REPO:-./bundle}/resources:/etc/nginx/resources:ro'

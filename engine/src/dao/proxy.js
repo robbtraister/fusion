@@ -3,7 +3,7 @@
 // const BSON = require('bson')
 const request = require('request-promise-native')
 
-const debugTimer = require('debug')('fusion:timer:renderings:dao')
+const debugTimer = require('debug')('fusion:timer:dao:proxy')
 
 const { daoUrl } = require('../../environment')
 const timer = require('../timer')
@@ -30,20 +30,20 @@ const getModel = function getModel (modelName) {
         })
     },
 
-    findById (_id) {
-      let tic = timer.tic()
-      return fetch(`/${modelName}/${_id}`)
-        .then((data) => {
-          debugTimer(`${modelName}.findById(${_id})`, tic.toc())
-          return data
-        })
-    },
-
     findOne (query) {
       let tic = timer.tic()
       return fetch(`/${modelName}${query ? `?query=${encodeURIComponent(JSON.stringify(query))}` : ''}&limit=1`)
         .then((data) => {
           debugTimer(`${modelName}.findOne()`, tic.toc())
+          return data
+        })
+    },
+
+    get (_id) {
+      let tic = timer.tic()
+      return fetch(`/${modelName}/${_id}`)
+        .then((data) => {
+          debugTimer(`${modelName}.get(${_id})`, tic.toc())
           return data
         })
     }

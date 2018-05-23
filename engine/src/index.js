@@ -16,11 +16,11 @@ if (module === require.main) {
 
   module.exports = {
     app,
-    filter: require('./content/filter'),
-    render: require('./react/server/render'),
+    // filter: require('./content/filter'),
+    // render: require('./react/server/render'),
     router: require('./router'),
-    schemas: require('./content/schemas'),
-    serverless: serverless(app, {binary: binaryContentTypes}),
-    sources: require('./content/sources')
+    // schemas: require('./content/schemas'),
+    serverless: serverless(app, {binary: binaryContentTypes})
+    // sources: require('./content/sources')
   }
 }

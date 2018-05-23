@@ -14,26 +14,36 @@ const componentGenerator = function componentGenerator (loadComponent) {
   }
 
   const feature = function feature (config, outputType) {
-    const Feature = loadComponent('features', config.featureConfig, outputType)
-    if (Feature) {
-      const props = {
-        key: config.id,
-        id: config.id,
-        type: config.featureConfig,
-        contentConfig: config.contentConfig || {},
-        customFields: config.customFields || {}
-      }
+    const key = config.id
+    const id = config.id
+    const type = config.featureConfig
 
-      // we only need local edits for content consumers, which must be stateful
-      if (Feature instanceof React.Component) {
-        props.localEdits = config.localEdits || {}
-      }
+    const Feature = loadComponent('features', type, outputType)
 
-      return () => React.createElement(
+    return (Feature)
+      ? () => React.createElement(
         Feature,
-        props
+        {
+          key,
+          type,
+          id,
+          contentConfig: config.contentConfig || {},
+          customFields: config.customFields || {},
+          // we only need local edits for content consumers, which must be stateful
+          localEdits: (Feature instanceof React.Component)
+            ? config.localEdits || {}
+            : undefined
+        }
       )
-    }
+      : () => React.createElement(
+        'div',
+        {
+          key,
+          type,
+          id,
+          dangerouslySetInnerHTML: { __html: `<!-- feature "${type}" could not be found -->` }
+        }
+      )
   }
 
   const chain = function chain (config, outputType) {
@@ -43,8 +53,8 @@ const componentGenerator = function componentGenerator (loadComponent) {
       Chain || 'div',
       {
         key: config.id,
-        id: config.id,
-        type: config.chainConfig
+        type: config.chainConfig,
+        id: config.id
       },
       renderAll(config.features, outputType)
     )
@@ -55,8 +65,8 @@ const componentGenerator = function componentGenerator (loadComponent) {
       'section',
       {
         key: index,
-        id: index,
-        type: 'section'
+        type: 'section',
+        id: index
       },
       renderAll(config.renderableItems, outputType)
     )
@@ -69,8 +79,8 @@ const componentGenerator = function componentGenerator (loadComponent) {
       Layout || 'div',
       {
         key: rendering.id || rendering._id,
-        id: rendering.id || rendering._id,
-        type: 'rendering'
+        type: 'rendering',
+        id: rendering.id || rendering._id
       },
       renderAll(rendering.layoutItems, outputType)
     )

@@ -26,7 +26,7 @@ const getComponentFile = function getComponentFile (type, id, outputType) {
   return null
 }
 
-function generateFile (renderable, outputType, useComponentLib) {
+function generateSource (renderable, outputType) {
   const components = {}
   const types = {}
 
@@ -40,7 +40,11 @@ function generateFile (renderable, outputType, useComponentLib) {
   }
 
   function feature (config) {
-    const componentName = getComponentName('features', config.featureConfig.id || config.featureConfig)
+    const key = config.id
+    const type = config.featureConfig.id || config.featureConfig
+    const id = config.id
+
+    const componentName = getComponentName('features', type)
     if (componentName) {
       const component = `Fusion.Components${componentName}`
       const contentConfig = config.contentConfig || {}
@@ -48,15 +52,17 @@ function generateFile (renderable, outputType, useComponentLib) {
       const localEdits = config.localEdits || {}
 
       const props = {
-        key: config.id,
-        id: config.id,
-        type: config.featureConfig,
+        key,
+        id,
+        type,
         customFields,
         contentConfig,
         localEdits
       }
 
       return `React.createElement(${component}, ${JSON.stringify(props)})`
+    } else {
+      return `React.createElement('div', ${JSON.stringify({key, type, id, dangerouslySetInnerHTML: { __html: `<!-- feature "${type}" could not be found -->` }})})`
     }
   }
 
@@ -68,8 +74,8 @@ function generateFile (renderable, outputType, useComponentLib) {
 
     const props = {
       key: config.id,
-      id: config.id,
-      type: config.chainConfig
+      type: config.chainConfig,
+      id: config.id
     }
 
     return `React.createElement(${component}, ${JSON.stringify(props)}, [${config.features.map(renderableItem).filter(ri => ri).join(',')}])`
@@ -79,8 +85,8 @@ function generateFile (renderable, outputType, useComponentLib) {
     const component = `'section'`
     const props = {
       key: index,
-      id: index,
-      type: 'section'
+      type: 'section',
+      id: index
     }
     return `React.createElement(${component}, ${JSON.stringify(props)}, [${config.renderableItems.map(renderableItem).filter(ri => ri).join(',')}])`
   }
@@ -97,8 +103,8 @@ function generateFile (renderable, outputType, useComponentLib) {
 
     const props = {
       key: config.id || config._id,
-      id: config.id || config._id,
-      type: 'rendering'
+      type: 'rendering',
+      id: config.id || config._id
     }
 
     return `React.createElement(${component}, ${JSON.stringify(props)}, [${config.layoutItems.map(renderableItem).join(',')}])`
@@ -128,29 +134,19 @@ function generateFile (renderable, outputType, useComponentLib) {
   const Template = renderableItem(renderable)
 
   const contents = `'use strict'
-${(useComponentLib)
-    ? 'var React = React || window.react'
-    : `
 const React = require('react')
 const unpack = require('${require.resolve('../../shared/unpack')}')
 window.Fusion = window.Fusion || {}
 Fusion.Components = Fusion.Components || {}
 ${Object.keys(types).map(t => `Fusion.Components.${t} = Fusion.Components.${t} || {}`)}
 ${Object.keys(components).map(k => componentImport(k, components[k])).join('\n')}
-`
-}
 Fusion.Template = function (props) {
   return React.createElement(React.Fragment, {}, ${Template})
 }
-${(useComponentLib)
-    ? ''
-    : `
 module.exports = Fusion.Template
-`
-}
 `
 
   return Promise.resolve(contents)
 }
 
-module.exports = generateFile
+module.exports = generateSource

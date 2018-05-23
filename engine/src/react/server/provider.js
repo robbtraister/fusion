@@ -5,7 +5,7 @@ const React = require('react')
 
 const JSONNormalize = require('../../utils/normalize')
 
-const getSource = require('../../content/sources')
+const getSource = require('../../models/sources')
 
 const getContentGenerator = function getContentGenerator (contentCache, arcSite) {
   contentCache = contentCache || {}

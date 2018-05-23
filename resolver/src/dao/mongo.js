@@ -2,7 +2,7 @@
 
 const url = require('url')
 
-const debugTimer = require('debug')('fusion:timer:renderings:schemaless')
+const debugTimer = require('debug')('fusion:timer:dao:mongo')
 
 const { mongoUrl } = require('../../environment')
 

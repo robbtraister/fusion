@@ -62,13 +62,13 @@
     "to-string-loader": "^1.1.5",
     "uglifyjs-webpack-plugin": "^1.2.4",
     "webpack": "^4.8.3",
-    "webpack-cli": "^2.0.13",
-    "webpack-manifest-plugin": "^2.0.0-rc.2",
+    "webpack-cli": "^2.1.4",
+    "webpack-manifest-plugin": "^2.0.3",
     "webpack-sources": "^1.1.0"
   },
   "devDependencies": {
-    "aws-sdk": "^2.244.1",
-    "mongoose": "^5.1.2",
-    "serverless-offline": "^3.23.0"
+    "aws-sdk": "^2.245.1",
+    "mongodb": "^3.1.0-beta4",
+    "serverless-offline": "^3.23.1"
   }
 }

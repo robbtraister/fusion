@@ -69,7 +69,7 @@ services:
       DEBUG: fusion:*
       TRAILING_SLASH_RULE: # Options are FORCE, DROP, or NOOP
       MONGO_URL: mongodb://data:27017/${DB_NAME:-fusion_dev}
-      RESOLVE_FROM_DB: # should only be 'true' for local dev environments
+      RESOLVE_FROM_DB: 'true' # should only be 'true' for local dev environments
     networks:
       - fusion
     ports:

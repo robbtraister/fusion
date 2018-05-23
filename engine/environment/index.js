@@ -24,7 +24,6 @@ const contentBase = env.CONTENT_BASE || ''
 const contextPath = (env.CONTEXT_PATH || 'pb').replace(/^\/*/, '/').replace(/\/+$/, '')
 const defaultOutputType = env.DEFAULT_OUTPUT_TYPE || 'default'
 const apiPrefix = `${contextPath}/api/v3`
-const daoUrl = env.DAO_URL
 const environment = env.ENVIRONMENT
 const functionName = env.AWS_LAMBDA_FUNCTION_NAME || `fusion-engine-${environment}`
 const isDev = !/^prod/i.test(env.NODE_ENV)
@@ -50,7 +49,6 @@ module.exports = {
   componentSrcRoot,
   contentBase,
   contextPath,
-  daoUrl,
   defaultOutputType,
   distRoot,
   environment,

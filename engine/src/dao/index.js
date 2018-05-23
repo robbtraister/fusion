@@ -1,3 +1,9 @@
 'use strict'
 
-module.exports = require('./mongo')
+const {
+  isDev
+} = require('../../environment')
+
+module.exports = (isDev)
+  ? require('./mongo')
+  : require('./dynamoose')

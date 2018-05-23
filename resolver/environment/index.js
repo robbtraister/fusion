@@ -16,7 +16,7 @@ const env = Object.assign(
 )
 
 const environment = env.ENVIRONMENT
-const daoUrl = env.DAO_URL
+const mongoUrl = env.MONGO_URL
 const httpEngine = env.HTTP_ENGINE
 const isDev = !/^prod/i.test(env.NODE_ENV)
 // if LAMBDA_ENGINE is defined, use it
@@ -31,11 +31,11 @@ const resolveFromDB = env.RESOLVE_FROM_DB
 const trailingSlashRule = (env.TRAILING_SLASH_RULE || 'NOOP').toUpperCase()
 
 module.exports = {
-  daoUrl,
   environment,
   httpEngine,
   isDev,
   lambdaEngine,
+  mongoUrl,
   resolveFromDB,
   trailingSlashRule
 }

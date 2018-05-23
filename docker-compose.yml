@@ -39,9 +39,8 @@ services:
       ON_DEMAND:
       CONTENT_BASE:
       CONTEXT_PATH:
-      # DAO_URL: http://abc:def@localhost.dao:8080
-      MONGO_URL: mongodb://data:27017/${DB_NAME:-fusion_dev}
       MINIFY:
+      MONGO_URL: mongodb://data:27017/${DB_NAME:-fusion_dev}
     networks:
       - fusion
     ports:

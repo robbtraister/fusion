@@ -1,11 +1,11 @@
 'use strict'
 
-const { isDev } = require('../../../environment')
+const { minify } = require('../../../environment')
 
 module.exports = {
   loader: 'css-loader',
   options: {
-    minimize: !isDev,
+    minimize: minify,
     url: false
   }
 }

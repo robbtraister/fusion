@@ -246,7 +246,9 @@ EOB
 if [ ! "$(echo "${NODE_ENV}" | grep -i "^prod")" ]
 then
   cat <<EOB
-      return                   418;
+      root                     '/etc/nginx/resources';
+      try_files                \$3 =418;
+      # return                   418;
 EOB
 else
   cat <<EOB
@@ -266,7 +268,9 @@ EOB
 if [ ! "$(echo "${NODE_ENV}" | grep -i "^prod")" ]
 then
   cat <<EOB
-      return                   418;
+      root                     '/etc/nginx/dist';
+      try_files                \$3 =418;
+      # return                   418;
 EOB
 else
   cat <<EOB

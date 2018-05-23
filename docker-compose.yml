@@ -6,6 +6,9 @@ networks:
     external: false
     internal: false
 
+volumes:
+  fusion-dist-volume: {}
+
 services:
   data:
     image: quay.io/washpost/mongo-localhost
@@ -38,6 +41,7 @@ services:
       CONTEXT_PATH:
       # DAO_URL: http://abc:def@localhost.dao:8080
       MONGO_URL: mongodb://data:27017/${DB_NAME:-fusion_dev}
+      MINIFY:
     networks:
       - fusion
     ports:
@@ -46,6 +50,7 @@ services:
       # - '~/.aws:/root/.aws:ro'
       - '${FUSION_REPO:-./bundle}:/workdir/engine/bundle:rw'
       - './engine/src:/workdir/engine/src:ro'
+      - 'fusion-dist-volume:/workdir/engine/dist:rw'
 
   resolver:
     image: quay.io/washpost/fusion-resolver
@@ -96,3 +101,5 @@ services:
     volumes:
       # - '~/.aws:/home/nginx/.aws:ro'
       - './origin/src:/etc/nginx/src:ro'
+      - 'fusion-dist-volume:/etc/nginx/dist:ro'
+      - '${FUSION_REPO:-./bundle}/resources:/etc/nginx/resources:ro'

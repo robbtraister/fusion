@@ -25,8 +25,8 @@ const componentGenerator = function componentGenerator (loadComponent) {
         Feature,
         {
           key,
-          id,
           type,
+          id,
           contentConfig: config.contentConfig || {},
           customFields: config.customFields || {},
           // we only need local edits for content consumers, which must be stateful
@@ -39,8 +39,8 @@ const componentGenerator = function componentGenerator (loadComponent) {
         'div',
         {
           key,
-          id,
           type,
+          id,
           dangerouslySetInnerHTML: { __html: `<!-- feature "${type}" could not be found -->` }
         }
       )
@@ -53,8 +53,8 @@ const componentGenerator = function componentGenerator (loadComponent) {
       Chain || 'div',
       {
         key: config.id,
-        id: config.id,
-        type: config.chainConfig
+        type: config.chainConfig,
+        id: config.id
       },
       renderAll(config.features, outputType)
     )
@@ -65,8 +65,8 @@ const componentGenerator = function componentGenerator (loadComponent) {
       'section',
       {
         key: index,
-        id: index,
-        type: 'section'
+        type: 'section',
+        id: index
       },
       renderAll(config.renderableItems, outputType)
     )
@@ -79,8 +79,8 @@ const componentGenerator = function componentGenerator (loadComponent) {
       Layout || 'div',
       {
         key: rendering.id || rendering._id,
-        id: rendering.id || rendering._id,
-        type: 'rendering'
+        type: 'rendering',
+        id: rendering.id || rendering._id
       },
       renderAll(rendering.layoutItems, outputType)
     )

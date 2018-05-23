@@ -41,8 +41,8 @@ function generateSource (renderable, outputType) {
 
   function feature (config) {
     const key = config.id
-    const id = config.id
     const type = config.featureConfig.id || config.featureConfig
+    const id = config.id
 
     const componentName = getComponentName('features', type)
     if (componentName) {
@@ -62,7 +62,7 @@ function generateSource (renderable, outputType) {
 
       return `React.createElement(${component}, ${JSON.stringify(props)})`
     } else {
-      return `React.createElement('div', ${JSON.stringify({key, type, id})})`
+      return `React.createElement('div', ${JSON.stringify({key, type, id, dangerouslySetInnerHTML: { __html: `<!-- feature "${type}" could not be found -->` }})})`
     }
   }
 
@@ -74,8 +74,8 @@ function generateSource (renderable, outputType) {
 
     const props = {
       key: config.id,
-      id: config.id,
-      type: config.chainConfig
+      type: config.chainConfig,
+      id: config.id
     }
 
     return `React.createElement(${component}, ${JSON.stringify(props)}, [${config.features.map(renderableItem).filter(ri => ri).join(',')}])`
@@ -85,8 +85,8 @@ function generateSource (renderable, outputType) {
     const component = `'section'`
     const props = {
       key: index,
-      id: index,
-      type: 'section'
+      type: 'section',
+      id: index
     }
     return `React.createElement(${component}, ${JSON.stringify(props)}, [${config.renderableItems.map(renderableItem).filter(ri => ri).join(',')}])`
   }
@@ -103,8 +103,8 @@ function generateSource (renderable, outputType) {
 
     const props = {
       key: config.id || config._id,
-      id: config.id || config._id,
-      type: 'rendering'
+      type: 'rendering',
+      id: config.id || config._id
     }
 
     return `React.createElement(${component}, ${JSON.stringify(props)}, [${config.layoutItems.map(renderableItem).join(',')}])`

@@ -9,13 +9,15 @@ const webpack = require('webpack')
 
 const debugTimer = require('debug')('fusion:timer:react:compile:pack')
 
-const generateSource = require('./source')
+const generateSource = require('../../react/server/compile/source')
+
 const {
   componentDistRoot,
-  componentSrcRoot
-} = require('../../../../environment')
-const timer = require('../../../timer')
-const getConfigs = require('../../../../webpack/template.js')
+  componentSrcRoot,
+  defaultOutputType
+} = require('../../../environment')
+const timer = require('../../timer')
+const getConfigs = require('../../../webpack/template.js')
 
 const sourceFile = path.resolve(`${componentSrcRoot}/template.jsx`)
 const destFile = path.resolve(`${componentDistRoot}/template.js`)
@@ -49,7 +51,7 @@ const getMemoryFS = function getMemoryFS () {
   return memFs
 }
 
-const compile = function compile (src) {
+const compileSource = function compileSource (src) {
   let tic = timer.tic()
 
   const mfs = getMemoryFS()
@@ -94,26 +96,30 @@ const compile = function compile (src) {
           return cssFile
             ? mfs.readFilePromise(`${componentDistRoot}/${cssFile}`)
               .then((cssBuf) => cssBuf.toString())
-              .then((css) => ({cssFile, css}))
+              .then((css) => ({css, cssFile}))
             : {
-              cssFile: null,
-              css: null
+              css: null,
+              cssFile: null
             }
         })
     ]))
-    .then(([src, {cssFile, css}]) => ({src, cssFile, css}))
+    .then(([js, {cssFile, css}]) => ({js, cssFile, css}))
 }
 
-const pack = function pack ({renderable, outputType, useComponentLib}) {
+const compileRendering = function compileRendering ({name, rendering, outputType = defaultOutputType}) {
   let tic = timer.tic()
-  return generateSource(renderable, outputType, useComponentLib)
+  return generateSource(rendering, outputType)
     .then((src) => {
       debugTimer('generate source', tic.toc())
 
-      return (useComponentLib)
-        ? {src}
-        : compile(src)
+      return compileSource(src)
+    })
+    .then(({js, css, cssFile}) => {
+      const cssPath = cssFile ? `${name}/${cssFile}` : null
+      js = js.replace(/;*$/, `;Fusion.Template.cssFile=${cssPath ? `'${cssPath}'` : 'null'}`)
+
+      return {js, css, cssFile: cssPath}
     })
 }
 
-module.exports = pack
+module.exports = compileRendering

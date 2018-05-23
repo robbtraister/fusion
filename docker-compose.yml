@@ -20,28 +20,6 @@ services:
       - './data/db:/data/db:rw'
       - './data/restore:/data/restore:rw'
 
-  dao:
-    image: quay.io/washpost/fusion-dao
-    build: ./dao
-    depends_on:
-      - data
-    environment:
-      NODE_ENV:
-      DAO_CREDENTIALS: |
-        localhost|abc|def
-      MONGO_URLS: |
-        localhost|mongodb://data:27017/${DB_NAME:-fusion_dev}
-    networks:
-      fusion:
-        aliases:
-          # the subdomain is used for multitenant determination
-          - localhost.dao
-    ports:
-      - '8090:8080'
-      - '8091:8081'
-    volumes:
-      - './dao/src:/etc/nginx/src:ro'
-
   engine:
     image: quay.io/washpost/fusion-engine
     build:
@@ -50,7 +28,7 @@ services:
       args:
         LAMBDA: engine
     depends_on:
-      - dao
+      - data
     environment:
       NODE_ENV:
       ENVIRONMENT: localhost
@@ -58,7 +36,8 @@ services:
       ON_DEMAND:
       CONTENT_BASE:
       CONTEXT_PATH:
-      DAO_URL: http://abc:def@localhost.dao:8080
+      # DAO_URL: http://abc:def@localhost.dao:8080
+      MONGO_URL: mongodb://data:27017/${DB_NAME:-fusion_dev}
     networks:
       - fusion
     ports:
@@ -76,7 +55,7 @@ services:
       args:
         LAMBDA: resolver
     depends_on:
-      - dao
+      - data
       - engine
     environment:
       NODE_ENV:
@@ -85,7 +64,7 @@ services:
       LAMBDA_ENGINE:
       DEBUG: fusion:*
       TRAILING_SLASH_RULE: # Options are FORCE, DROP, or NOOP
-      DAO_URL: http://abc:def@localhost.dao:8080
+      MONGO_URL: mongodb://data:27017/${DB_NAME:-fusion_dev}
       RESOLVE_FROM_DB: # should only be 'true' for local dev environments
     networks:
       - fusion

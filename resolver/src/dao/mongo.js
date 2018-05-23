@@ -75,6 +75,19 @@ function Mongo (mongoUrl) {
             })
         },
 
+        findById (_id) {
+          let tic
+          return getCollection(modelName)
+            .then((collection) => {
+              tic = timer.tic()
+              return collection.findOne({_id})
+            })
+            .then((data) => {
+              debugTimer(`${modelName}.findById(${_id})`, tic.toc())
+              return data
+            })
+        },
+
         findOne (query) {
           let tic
           return getCollection(modelName)
@@ -84,32 +97,6 @@ function Mongo (mongoUrl) {
             })
             .then((data) => {
               debugTimer(`${modelName}.findOne()`, tic.toc())
-              return data
-            })
-        },
-
-        get (_id) {
-          let tic
-          return getCollection(modelName)
-            .then((collection) => {
-              tic = timer.tic()
-              return collection.findOne({_id})
-            })
-            .then((data) => {
-              debugTimer(`${modelName}.get(${_id})`, tic.toc())
-              return data
-            })
-        },
-
-        put (doc) {
-          let tic
-          return getCollection(modelName)
-            .then((collection) => {
-              tic = timer.tic()
-              return collection.update({_id: doc._id}, doc, { upsert: true })
-            })
-            .then((data) => {
-              debugTimer(`${modelName}.put()`, tic.toc())
               return data
             })
         }

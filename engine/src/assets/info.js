@@ -1,8 +1,14 @@
 'use strict'
 
+const path = require('path')
+
+const glob = require('glob')
+
 const {
-  environment,
+  componentSrcRoot,
   contextPath,
+  defaultOutputType,
+  environment,
   version
 } = require('../../environment')
 
@@ -14,13 +20,15 @@ const getKeyBase = function getKeyBase () {
   return `${environment}/${version}`
 }
 
-const getOutputType = function getOutputType (outputType) {
-  return outputType || 'default'
+let _outputTypes
+const getOutputTypes = function getOutputTypes () {
+  _outputTypes = _outputTypes || glob(`${componentSrcRoot}/output-types/**/*.{hbs,js,jsx,vue}`)
+    .then((result) => result.map((fp) => path.parse(fp).name))
+  return _outputTypes
 }
 
-const getRelativeUri = function getRelativeUri ({componentType, id, outputType}) {
-  return `${contextPath}/dist/${componentType}/${id}.js?v=${version}&outputType=${getOutputType(outputType)}`
-  // return `${contextPath}/dist/${name}.js?v=${version}&outputType=${getOutputType(outputType)}${useComponentLib ? '&useComponentLib=true' : ''}`,
+const getRelativeUri = function getRelativeUri ({componentType, id, outputType = defaultOutputType}) {
+  return `${contextPath}/dist/${componentType}/${id}.js?v=${version}&outputType=${outputType}`
 }
 
 const getS3Key = function getS3Key (name) {
@@ -34,7 +42,7 @@ const getS3Url = function getS3Url ({componentType, id, outputType}) {
 module.exports = {
   getBucket,
   getKeyBase,
-  getOutputType,
+  getOutputTypes,
   getRelativeUri,
   getS3Key,
   getS3Url

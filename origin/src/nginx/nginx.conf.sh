@@ -257,7 +257,7 @@ fi
 cat <<EOB
     }
 
-    location ~ ^(${CONTEXT_PATH}|${API_PREFIX})/(dist)(/.*|$) {
+    location ~ ^(${CONTEXT_PATH}|${API_PREFIX})/(assets|dist)(/.*|$) {
       proxy_intercept_errors   on;
       error_page               400 403 404 418 = @engine;
 

@@ -6,16 +6,20 @@ const express = require('express')
 const debugTimer = require('debug')('fusion:timer:router')
 
 const {
+  defaultOutputType
+} = require('../../environment')
+
+const Rendering = require('../models/rendering')
+
+const {
   render
 } = require('../react/server/render')
-
-const { getComponent } = require('../scripts/component')
 
 const timer = require('../timer')
 
 const renderRouter = express.Router()
 
-function getTypeRouter (getComponent) {
+function getTypeRouter (routeType) {
   const typeRouter = express.Router()
 
   typeRouter.all(['/', '/:id', '/:id/:child'],
@@ -25,7 +29,8 @@ function getTypeRouter (getComponent) {
 
       const outputType = /^(false|none|off|0)$/i.test(req.query.outputType)
         ? null
-        : req.query.outputType || undefined
+        : req.query.outputType || defaultOutputType
+
       const payload = Object.assign(
         {
           _website: req.query._website
@@ -43,9 +48,12 @@ function getTypeRouter (getComponent) {
         }
       )
 
-      getComponent(payload.rendering)
+      const type = payload.rendering.type || routeType
+
+      return new Rendering(type, payload.rendering.id)
+        .getComponent(outputType, payload.rendering.child)
         .then(Component => render(Object.assign({}, payload, {Component})))
-        .then(data => { res.send(data) })
+        .then(data => { res.send(`${outputType ? '<!DOCTYPE html>' : ''}${data}`) })
         .then(() => {
           debugTimer('complete response', tic.toc())
         })
@@ -56,10 +64,10 @@ function getTypeRouter (getComponent) {
   return typeRouter
 }
 
-renderRouter.use('/page', getTypeRouter(getComponent('page')))
-renderRouter.use('/rendering', getTypeRouter(getComponent('rendering')))
-renderRouter.use('/template', getTypeRouter(getComponent('template')))
+renderRouter.use('/page', getTypeRouter('page'))
+renderRouter.use('/rendering', getTypeRouter('rendering'))
+renderRouter.use('/template', getTypeRouter('template'))
 
-renderRouter.use('/', getTypeRouter((templateInfo) => getComponent(templateInfo.type)(templateInfo)))
+renderRouter.use('/', getTypeRouter())
 
 module.exports = renderRouter

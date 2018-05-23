@@ -163,7 +163,7 @@ function sortOnSites (a, b) {
 // fetch page/template resolvers from DB (local env) or config file (prod)
 const { pageConfigs, templateConfigs } = (resolveFromDB)
   ? (() => {
-    const model = require('../dao/dao')
+    const model = require('../dao')
     return {
       pageConfigs: model('page').find(),
       templateConfigs: model('resolver_config').find()

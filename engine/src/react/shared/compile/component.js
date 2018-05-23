@@ -14,26 +14,36 @@ const componentGenerator = function componentGenerator (loadComponent) {
   }
 
   const feature = function feature (config, outputType) {
-    const Feature = loadComponent('features', config.featureConfig, outputType)
-    if (Feature) {
-      const props = {
-        key: config.id,
-        id: config.id,
-        type: config.featureConfig,
-        contentConfig: config.contentConfig || {},
-        customFields: config.customFields || {}
-      }
+    const key = config.id
+    const id = config.id
+    const type = config.featureConfig
 
-      // we only need local edits for content consumers, which must be stateful
-      if (Feature instanceof React.Component) {
-        props.localEdits = config.localEdits || {}
-      }
+    const Feature = loadComponent('features', type, outputType)
 
-      return () => React.createElement(
+    return (Feature)
+      ? () => React.createElement(
         Feature,
-        props
+        {
+          key,
+          id,
+          type,
+          contentConfig: config.contentConfig || {},
+          customFields: config.customFields || {},
+          // we only need local edits for content consumers, which must be stateful
+          localEdits: (Feature instanceof React.Component)
+            ? config.localEdits || {}
+            : undefined
+        }
       )
-    }
+      : () => React.createElement(
+        'div',
+        {
+          key,
+          id,
+          type,
+          dangerouslySetInnerHTML: { __html: `<!-- feature "${type}" could not be found -->` }
+        }
+      )
   }
 
   const chain = function chain (config, outputType) {

@@ -9,13 +9,10 @@ const debugFetch = require('debug')('fusion:content:sources:fetch')
 const {
   contentBase,
   sourcesRoot
-} = require('../../environment')
+} = require('../../../environment')
 
 const getSchemaFilter = require('./filter')
-
-const {
-  getSourceConfig
-} = require('../models/sources')
+const getSourceConfig = require('./jge')
 
 const expandProperties = function expandProperties (string, properties) {
   return string.replace(/\{([^}]+)\}/g, function (match, prop) {

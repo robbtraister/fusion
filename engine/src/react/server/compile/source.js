@@ -26,7 +26,7 @@ const getComponentFile = function getComponentFile (type, id, outputType) {
   return null
 }
 
-function generateFile (renderable, outputType, useComponentLib) {
+function generateSource (renderable, outputType) {
   const components = {}
   const types = {}
 
@@ -40,7 +40,11 @@ function generateFile (renderable, outputType, useComponentLib) {
   }
 
   function feature (config) {
-    const componentName = getComponentName('features', config.featureConfig.id || config.featureConfig)
+    const key = config.id
+    const id = config.id
+    const type = config.featureConfig.id || config.featureConfig
+
+    const componentName = getComponentName('features', type)
     if (componentName) {
       const component = `Fusion.Components${componentName}`
       const contentConfig = config.contentConfig || {}
@@ -48,15 +52,17 @@ function generateFile (renderable, outputType, useComponentLib) {
       const localEdits = config.localEdits || {}
 
       const props = {
-        key: config.id,
-        id: config.id,
-        type: config.featureConfig,
+        key,
+        id,
+        type,
         customFields,
         contentConfig,
         localEdits
       }
 
       return `React.createElement(${component}, ${JSON.stringify(props)})`
+    } else {
+      return `React.createElement('div', ${JSON.stringify({key, type, id})})`
     }
   }
 
@@ -128,29 +134,19 @@ function generateFile (renderable, outputType, useComponentLib) {
   const Template = renderableItem(renderable)
 
   const contents = `'use strict'
-${(useComponentLib)
-    ? 'var React = React || window.react'
-    : `
 const React = require('react')
 const unpack = require('${require.resolve('../../shared/unpack')}')
 window.Fusion = window.Fusion || {}
 Fusion.Components = Fusion.Components || {}
 ${Object.keys(types).map(t => `Fusion.Components.${t} = Fusion.Components.${t} || {}`)}
 ${Object.keys(components).map(k => componentImport(k, components[k])).join('\n')}
-`
-}
 Fusion.Template = function (props) {
   return React.createElement(React.Fragment, {}, ${Template})
 }
-${(useComponentLib)
-    ? ''
-    : `
 module.exports = Fusion.Template
-`
-}
 `
 
   return Promise.resolve(contents)
 }
 
-module.exports = generateFile
+module.exports = generateSource

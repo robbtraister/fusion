@@ -5,6 +5,7 @@ const path = require('path')
 
 const glob = require('glob')
 
+const CleanWebpackPlugin = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OnBuildWebpackPlugin = require('on-build-webpack')
 // const PreBuildWebpackPlugin = require('pre-build-webpack')
@@ -75,6 +76,15 @@ module.exports = (Object.keys(entry).length)
         libraryTarget: 'commonjs2'
       },
       plugins: [
+        new CleanWebpackPlugin(
+          [
+            path.resolve(distRoot, 'components', 'output-types', '**/*.css')
+          ],
+          {
+            root: distRoot,
+            watch: true
+          }
+        ),
         new MiniCssExtractPlugin({
           filename: 'output-types/[name].css'
         }),
@@ -122,6 +132,15 @@ module.exports = (Object.keys(entry).length)
         libraryTarget: 'commonjs2'
       },
       plugins: [
+        new CleanWebpackPlugin(
+          [
+            path.resolve(distRoot, 'components', 'output-types', '**/*.js')
+          ],
+          {
+            root: distRoot,
+            watch: true
+          }
+        )
         // new ManifestPlugin()
       ],
       resolve

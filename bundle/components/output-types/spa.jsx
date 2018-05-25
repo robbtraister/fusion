@@ -2,8 +2,6 @@
 
 const React = require('react')
 
-const Consumer = require('consumer')
-
 require(`../../resources/css/bootstrap.min.css`)
 
 const OutputType = (props) =>
@@ -26,4 +24,4 @@ const OutputType = (props) =>
     </body>
   </html>
 
-module.exports = Consumer(OutputType)
+module.exports = OutputType

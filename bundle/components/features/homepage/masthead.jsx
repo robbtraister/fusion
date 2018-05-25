@@ -2,8 +2,6 @@
 
 const React = require('react')
 
-const Consumer = require('consumer')
-
 const ImageFormat = require('../../tags/arc/image-format.jsx')
 
 const fullDate = () => {
@@ -149,4 +147,4 @@ const Masthead = (props) => {
   </div>
 }
 
-module.exports = Consumer(Masthead)
+module.exports = Masthead

@@ -5,7 +5,7 @@ const path = require('path')
 
 const glob = require('glob')
 
-const CleanWebpackPlugin = require('clean-webpack-plugin')
+// const CleanWebpackPlugin = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OnBuildWebpackPlugin = require('on-build-webpack')
 // const PreBuildWebpackPlugin = require('pre-build-webpack')
@@ -18,7 +18,6 @@ const sassLoader = require('./shared/loaders/sass-loader')
 const externals = require('./shared/externals')
 const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
-const resolve = require('./shared/resolve')
 
 const {
   componentSrcRoot,
@@ -76,15 +75,15 @@ module.exports = (Object.keys(entry).length)
         libraryTarget: 'commonjs2'
       },
       plugins: [
-        new CleanWebpackPlugin(
-          [
-            path.resolve(distRoot, 'components', 'output-types', '**/*.css')
-          ],
-          {
-            root: distRoot,
-            watch: true
-          }
-        ),
+        // new CleanWebpackPlugin(
+        //   [
+        //     path.resolve(distRoot, 'components', 'output-types', '**/*.css')
+        //   ],
+        //   {
+        //     root: distRoot,
+        //     watch: true
+        //   }
+        // ),
         new MiniCssExtractPlugin({
           filename: 'output-types/[name].css'
         }),
@@ -92,8 +91,7 @@ module.exports = (Object.keys(entry).length)
         new OnBuildWebpackPlugin(function (stats) {
           childProcess.execSync(`rm -rf ${path.resolve(distRoot, 'components', 'junk')}`)
         })
-      ],
-      resolve
+      ]
     },
     {
       entry,
@@ -132,18 +130,17 @@ module.exports = (Object.keys(entry).length)
         libraryTarget: 'commonjs2'
       },
       plugins: [
-        new CleanWebpackPlugin(
-          [
-            path.resolve(distRoot, 'components', 'output-types', '**/*.js')
-          ],
-          {
-            root: distRoot,
-            watch: true
-          }
-        )
+        // new CleanWebpackPlugin(
+        //   [
+        //     path.resolve(distRoot, 'components', 'output-types', '**/*.js')
+        //   ],
+        //   {
+        //     root: distRoot,
+        //     watch: true
+        //   }
+        // )
         // new ManifestPlugin()
-      ],
-      resolve
+      ]
     }
   ]
   : null

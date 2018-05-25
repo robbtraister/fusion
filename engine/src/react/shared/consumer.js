@@ -33,6 +33,7 @@ function HOC (Component) {
   const createElement = (Comp, props, context) => {
     const combinedProps = Object.assign({}, props, context)
     delete combinedProps.getContent
+    delete combinedProps.setContent
     return React.createElement(
       Comp,
       combinedProps

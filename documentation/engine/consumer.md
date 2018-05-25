@@ -1,56 +1,14 @@
 # Fusion Context
 
-In Fusion, features are React components. The custom configuration values that used to come from request attributes are now passed as component properties. But how do you get access to global content? Or fetch custom feature content? These capabilities (I would call them features, but...) are optionally provided to your component via context. This document explains how to use them.
+In Fusion, features are React components. The custom configuration values that used to come from request attributes are now passed as component properties. But how do you get access to global content? Or fetch custom feature content? These capabilities (I would call them features, but...) are provided to your component via context. This document explains how to use them.
 
 If you want to know more about React context: [https://reactjs.org/docs/context.html](https://reactjs.org/docs/context.html)
 
 ## Consumer
 
-The first thing that you need to do is designate your component as a consumer of the data you need. There is a single consumer wrapper that includes all of the globally provided data and can be accessed simply by requiring in `consumer`. It should be used as a higher-order component (HOC), as follows:
+~The first thing that you need to do is designate your component as a consumer of the data you need. There is a single consumer wrapper that includes all of the globally provided data and can be accessed simply by requiring in `consumer`. It should be used as a higher-order component (HOC), as follows~ For simplicity, all features will be designated as Consumers and have the hooks injected automatically.
 
--   Functional Component:
-
-```jsx
-const React = require('react')
-const Consumer = require('consumer')
-
-const MyComponent = (props) => <div>{props.globalContent.version}</div>
-
-module.exports = Consumer(MyComponent)
-```
-
--   Or with a React class component:
-
-```jsx
-const React = require('react')
-const Consumer = require('consumer')
-
-class MyComponent extends React.Component {
-  render () {
-    return <div>{this.props.globalContent.version}</div>
-  }
-}
-
-module.exports = Consumer(MyComponent)
-```
-
--   Or using an annotation:
-
-```jsx
-const React = require('react')
-const Consumer = require('consumer')
-
-@Consumer
-class MyComponent extends React.Component {
-  render () {
-    return <div>{this.props.globalContent.version}</div>
-  }
-}
-
-module.exports = MyComponent
-```
-
-Once you have annotated your component as a consumer, it will have access to the following properties and, if a class, instance methods. Instance methods are only available for class components and will be accessed directly on `this` (e.g., `this.getContent()`)
+Features will have access to the following properties and, if a class, instance methods. Instance methods are only available for class components and will be accessed directly on `this` (e.g., `this.getContent()`)
 
 ### Properties
 
@@ -85,21 +43,19 @@ The optional third input parameter, `query`, is a GraphQL query that will be app
 If you are using this for server-rendered content, you should make sure to fetch the content from within the constructor (or componentWillMount, which is also executed during server-side-rendering), as well as set state using the return value.
 
 ```jsx
-const MyComponent = Consumer(
-  class extends React.Component {
-    constructor (props) {
-      super(props)
+class MyComponent extends React.Component {
+  constructor (props) {
+    super(props)
 
-      const {cached, fetched} = this.getContent('content-api', {uri: '/some/data'}, '{type version}')
-      this.state = cached || {}
-      fetched.then(data => this.setState(data))
-    }
-
-    render () {
-      return <div>{this.state && this.state.content && this.state.content.type}</div>
-    }
+    const {cached, fetched} = this.getContent('content-api', {uri: '/some/data'}, '{type version}')
+    this.state = cached || {}
+    fetched.then(data => this.setState(data))
   }
-)
+
+  render () {
+    return <div>{this.state && this.state.content && this.state.content.type}</div>
+  }
+}
 ```
 
 If you are fetching content asynchronously from the client only, you should either make the call from `componentDidMount` (which is not called during server-side-rendering), or wrap it in a `window` check.
@@ -107,7 +63,6 @@ If you are fetching content asynchronously from the client only, you should eith
 Also, if using only asynchronous client-side fetching, there is no need to set `this.state` on initial call as the client-side cache will not be pre-populated with any server-rendered data. In this case, you can just access the fetched result directly.
 
 ```jsx
-@Consumer
 class MyComponent extends React.Component {
   componentDidMount () {
     this.getContent('content-api', {uri: '/some/data'}, '{type version}')
@@ -124,7 +79,6 @@ class MyComponent extends React.Component {
 or
 
 ```jsx
-@Consumer
 class MyComponent extends React.Component {
   constructor (props) {
     super(props)
@@ -145,7 +99,6 @@ class MyComponent extends React.Component {
 You can fetch multiple pieces of content by making multiple calls to getContent.
 
 ```jsx
-@Consumer
 class MyComponent extends React.Component {
   constructor (props) {
     super(props)
@@ -170,7 +123,7 @@ class MyComponent extends React.Component {
 
 -   setContent(contentFetches)
 
-The `setContent` method is syntactic sugar for setting both the cached data to the initial state property and calling setState on the resolved Promise. It is used as follows:
+The `setContent` method is syntactic sugar for setting both the `cached` data to the initial state property and calling setState on the resolved `fetched` Promise. It is used as follows:
 
 ```jsx
 @Consumer

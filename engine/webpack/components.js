@@ -4,7 +4,7 @@ const path = require('path')
 
 const glob = require('glob')
 
-const CleanWebpackPlugin = require('clean-webpack-plugin')
+// const CleanWebpackPlugin = require('clean-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
@@ -15,7 +15,6 @@ const sassLoader = require('./shared/loaders/sass-loader')
 const externals = require('./shared/externals')
 const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
-const resolve = require('./shared/resolve')
 
 const {
   componentSrcRoot,
@@ -71,20 +70,17 @@ module.exports = (Object.keys(entry).length)
       libraryTarget: 'commonjs2'
     },
     plugins: [
-      new CleanWebpackPlugin(
-        [
-          'components'
-        ],
-        {
-          root: distRoot,
-          watch: true
-        }
-      ),
+      // new CleanWebpackPlugin(
+      //   glob.sync(`${componentSrcRoot}/!(output-types)/`).map(f => path.basename(f)),
+      //   {
+      //     root: path.resolve(distRoot, 'components'),
+      //     watch: true
+      //   }
+      // ),
       new MiniCssExtractPlugin({
         filename: '[name].css'
       }),
       new ManifestPlugin()
-    ],
-    resolve
+    ]
   }
   : null

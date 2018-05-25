@@ -2,8 +2,6 @@
 
 import React from 'react'
 
-import Consumer from 'consumer'
-
 const BreakingAlertV2 = (props) => {
   const parentPage = (props.customFields.autoLink || '').split(',')[1]
   const parentFeatureName = (props.customFields.autoLink || '').split(',')[0]
@@ -40,4 +38,4 @@ const BreakingAlertV2 = (props) => {
   </div>
 }
 
-export default Consumer(BreakingAlertV2)
+export default BreakingAlertV2

@@ -1,7 +1,6 @@
 'use strict'
 
 const React = require('react')
-const Consumer = require('consumer')
 
 require('./style.scss')
 require('./style2.scss')
@@ -38,7 +37,6 @@ const StoryItem = (props) => {
   </React.Fragment>
 }
 
-@Consumer
 class Story extends React.Component {
   constructor (props) {
     super(props)

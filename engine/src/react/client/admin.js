@@ -11,9 +11,13 @@ React.Fragment = React.Fragment || 'div'
 const ReactDOM = require('react-dom')
 
 const Provider = require('./provider')
+const Consumer = require('../shared/consumer')
 
 const getComponent = (componentType, componentName, outputType) => {
-  return Fusion.Components[componentType][componentName]
+  const Component = Fusion.Components[componentType][componentName]
+  return (componentType === 'features')
+    ? Consumer(Component)
+    : Component
 }
 
 const getElement = require('../shared/compile/component')(getComponent)

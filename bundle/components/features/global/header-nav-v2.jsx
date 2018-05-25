@@ -1,7 +1,6 @@
 'use strict'
 
 const React = require('react')
-const Consumer = require('consumer')
 
 const Search = require('../utilities/search.jsx')
 
@@ -116,4 +115,4 @@ class HeaderNavV2 extends React.Component {
   }
 }
 
-module.exports = Consumer(HeaderNavV2)
+module.exports = HeaderNavV2

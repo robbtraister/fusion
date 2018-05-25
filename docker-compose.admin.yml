@@ -88,7 +88,7 @@ services:
       - 11211:11211
 
   admin:
-    image: quay.io/washpost/pagebuilder-nilev1:${PB_VERSION:-fusion-admin.1}
+    image: quay.io/washpost/pagebuilder-nilev1:${PB_VERSION:-fusion-admin.2}
     depends_on:
       - memcache
       - data

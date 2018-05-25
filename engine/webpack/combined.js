@@ -92,9 +92,6 @@ module.exports = {
     libraryTarget: 'assign'
   },
   plugins: [
-    new MiniCssExtractPlugin({
-      filename: '[name].css'
-    }),
     new CleanWebpackPlugin(
       [
         'page',
@@ -104,7 +101,10 @@ module.exports = {
         root: distRoot,
         watch: true
       }
-    )
+    ),
+    new MiniCssExtractPlugin({
+      filename: '[name].css'
+    })
   ],
   resolve
 }

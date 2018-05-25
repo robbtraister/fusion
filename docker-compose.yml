@@ -6,9 +6,6 @@ networks:
     external: false
     internal: false
 
-volumes:
-  fusion-dist-volume: {}
-
 services:
   data:
     image: quay.io/washpost/mongo-localhost
@@ -16,7 +13,10 @@ services:
     environment:
       WATCH: 'true'
     networks:
-      - fusion
+      fusion:
+        aliases:
+          - db
+          - database
     ports:
       - '27017:27017'
     volumes:
@@ -34,13 +34,13 @@ services:
       - data
     environment:
       NODE_ENV:
-      ENVIRONMENT: localhost
       DEBUG: fusion:*
-      ON_DEMAND:
+      ENVIRONMENT: localhost
+      MONGO_URL: mongodb://data:27017/${DB_NAME:-fusion_dev}
       CONTENT_BASE:
       CONTEXT_PATH:
       MINIFY:
-      MONGO_URL: mongodb://data:27017/${DB_NAME:-fusion_dev}
+      ON_DEMAND:
     networks:
       - fusion
     ports:
@@ -49,7 +49,7 @@ services:
       # - '~/.aws:/root/.aws:ro'
       - '${FUSION_REPO:-./bundle}:/workdir/engine/bundle:rw'
       - './engine/src:/workdir/engine/src:ro'
-      - 'fusion-dist-volume:/workdir/engine/dist:rw'
+      - './dist:/workdir/engine/dist:rw'
 
   resolver:
     image: quay.io/washpost/fusion-resolver
@@ -63,13 +63,13 @@ services:
       - engine
     environment:
       NODE_ENV:
+      DEBUG: fusion:*
       ENVIRONMENT: localhost
       HTTP_ENGINE: http://engine:8080
-      LAMBDA_ENGINE:
-      DEBUG: fusion:*
-      TRAILING_SLASH_RULE: # Options are FORCE, DROP, or NOOP
       MONGO_URL: mongodb://data:27017/${DB_NAME:-fusion_dev}
       RESOLVE_FROM_DB: 'true' # should only be 'true' for local dev environments
+      LAMBDA_ENGINE:
+      TRAILING_SLASH_RULE: # Options are FORCE, DROP, or NOOP
     networks:
       - fusion
     ports:
@@ -90,8 +90,8 @@ services:
       HTTP_RESOLVER: http://resolver:8080
       LAMBDA_ENGINE:
       LAMBDA_RESOLVER:
-      ON_DEMAND:
       CONTEXT_PATH:
+      ON_DEMAND:
     networks:
       - fusion
     ports:
@@ -100,5 +100,5 @@ services:
     volumes:
       # - '~/.aws:/home/nginx/.aws:ro'
       - './origin/src:/etc/nginx/src:ro'
-      - 'fusion-dist-volume:/etc/nginx/dist:ro'
+      - './dist:/etc/nginx/dist:ro'
       - '${FUSION_REPO:-./bundle}/resources:/etc/nginx/resources:ro'

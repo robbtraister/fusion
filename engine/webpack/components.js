@@ -4,6 +4,7 @@ const path = require('path')
 
 const glob = require('glob')
 
+const CleanWebpackPlugin = require('clean-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
@@ -70,6 +71,15 @@ module.exports = (Object.keys(entry).length)
       libraryTarget: 'commonjs2'
     },
     plugins: [
+      new CleanWebpackPlugin(
+        [
+          'components'
+        ],
+        {
+          root: distRoot,
+          watch: true
+        }
+      ),
       new MiniCssExtractPlugin({
         filename: '[name].css'
       }),

@@ -16,6 +16,7 @@ const externals = require('./shared/externals')
 const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
+const isTest = require('./shared/is-test')
 
 const {
   componentSrcRoot,
@@ -25,6 +26,7 @@ const {
 const entry = {}
 const types = {}
 glob.sync(`${componentSrcRoot}/!(output-types)/**/*.{hbs,js,jsx,vue}`)
+  .filter(f => !isTest(f))
   .forEach(f => {
     const name = f.substr(componentSrcRoot.length + 1)
     const type = name.split('/').shift()

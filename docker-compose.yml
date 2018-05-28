@@ -46,7 +46,6 @@ services:
     ports:
       - '9010:8080'
     volumes:
-      # - '~/.aws:/root/.aws:ro'
       - '${FUSION_REPO:-./bundle}:/workdir/engine/bundle:rw'
       - './engine/src:/workdir/engine/src:ro'
       - './dist:/workdir/engine/dist:rw'
@@ -98,7 +97,6 @@ services:
       - '80:8080'
       - '8081:8081'
     volumes:
-      # - '~/.aws:/home/nginx/.aws:ro'
       - './origin/src:/etc/nginx/src:ro'
       - './dist:/etc/nginx/dist:ro'
       - '${FUSION_REPO:-./bundle}/resources:/etc/nginx/resources:ro'

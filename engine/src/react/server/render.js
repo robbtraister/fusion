@@ -72,6 +72,10 @@ const engineScript = React.createElement(
   }
 )
 
+function escapeContent (content) {
+  return JSON.stringify(content).replace(/<\/script>/g, '<\\/script>')
+}
+
 function getFusionScript (globalContent, contentCache, refreshContent, arcSite) {
   const condensedCache = {}
   Object.keys(contentCache)
@@ -87,8 +91,8 @@ function getFusionScript (globalContent, contentCache, refreshContent, arcSite) 
     `Fusion.contextPath='${contextPath}';` +
     (arcSite ? `Fusion.arcSite='${arcSite}';` : '') +
     `Fusion.refreshContent=${onDemand ? 'false' : !!refreshContent};` +
-    `Fusion.globalContent=${JSON.stringify(globalContent || {})};` +
-    `Fusion.contentCache=${JSON.stringify(condensedCache)}`
+    `Fusion.globalContent=${escapeContent(globalContent || {})};` +
+    `Fusion.contentCache=${escapeContent(condensedCache)}`
 }
 
 const render = function render ({Component, requestUri, content, _website}) {

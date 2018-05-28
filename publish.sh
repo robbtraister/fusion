@@ -30,8 +30,6 @@ push () {
 }
 
 cd $(dirname "$0") && \
-  build 'dao' && \
-  push 'dao' && \
   build 'engine' && \
   push 'engine' && \
   build 'origin' && \

@@ -15,6 +15,7 @@ const sassLoader = require('./shared/loaders/sass-loader')
 const externals = require('./shared/externals')
 const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
+const resolve = require('./shared/resolve')
 const isTest = require('./shared/is-test')
 
 const {
@@ -83,6 +84,7 @@ module.exports = (Object.keys(entry).length)
         filename: '[name].css'
       }),
       new ManifestPlugin()
-    ]
+    ],
+    resolve
   }
   : null

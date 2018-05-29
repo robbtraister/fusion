@@ -8,6 +8,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const babelLoader = require('./shared/loaders/babel-loader')
 const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
+const resolve = require('./shared/resolve')
 
 const {
   distRoot,
@@ -57,6 +58,7 @@ module.exports = [
         }
       ])
     ],
+    resolve,
     target: 'web'
   }
 ]

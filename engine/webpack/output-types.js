@@ -18,6 +18,7 @@ const sassLoader = require('./shared/loaders/sass-loader')
 const externals = require('./shared/externals')
 const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
+const resolve = require('./shared/resolve')
 const isTest = require('./shared/is-test')
 
 const {
@@ -93,7 +94,8 @@ module.exports = (Object.keys(entry).length)
         new OnBuildWebpackPlugin(function (stats) {
           childProcess.execSync(`rm -rf ${path.resolve(distRoot, 'components', 'junk')}`)
         })
-      ]
+      ],
+      resolve
     },
     {
       entry,
@@ -142,7 +144,8 @@ module.exports = (Object.keys(entry).length)
         //   }
         // )
         // new ManifestPlugin()
-      ]
+      ],
+      resolve
     }
   ]
   : null

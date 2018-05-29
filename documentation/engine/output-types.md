@@ -100,7 +100,7 @@ The following will provide access to the css reference hrefs for custom access.
 {props.cssLinks(({outputTypeHref, templateHref}) => <link rel='stylesheet' type='text/css' href={outputTypeHref} />)}
 ```
 
-_Note: customizing reference links is not recommended unless absolutely necessary. If inserting a custom link to the page/template styles, please be sure to include `id="template-styles"` since that id is used to update the styles in the case of a newly-published template._
+_Note: customizing reference links is not recommended unless absolutely necessary. If inserting a custom link to the page/template styles, please be sure to include `id="fusion-template-styles"` since that id is used to update the styles in the case of a newly-published template._
 
 -   `fusion`
 

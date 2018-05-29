@@ -65,7 +65,8 @@ function propFunction (fn) {
 const engineScript = React.createElement(
   'script',
   {
-    key: 'engine',
+    key: 'fusion-engine-script',
+    id: 'fusion-engine-script',
     type: 'application/javascript',
     src: `${contextPath}/dist/engine/react.js?v=${version}`,
     defer: true
@@ -247,7 +248,8 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
                   const templateScript = React.createElement(
                     'script',
                     {
-                      key: 'template',
+                      key: 'fusion-template-script',
+                      id: 'fusion-template-script',
                       type: 'application/javascript',
                       src: `${contextPath}/dist/${name}/${outputType}.js?v=${version}`,
                       defer: true
@@ -335,7 +337,8 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
                         ? React.createElement(
                           'link',
                           {
-                            key: 'output-type-style',
+                            key: 'fusion-output-type-styles',
+                            id: 'fusion-output-type-styles',
                             rel: 'stylesheet',
                             type: 'text/css',
                             href: Component.inlines.cssLinks.cached.outputTypeHref
@@ -345,8 +348,8 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
                       React.createElement(
                         'link',
                         {
-                          key: 'template-style',
-                          id: 'template-style',
+                          key: 'fusion-template-styles',
+                          id: 'fusion-template-styles',
                           rel: 'stylesheet',
                           type: 'text/css',
                           href: Component.inlines.cssLinks.cached.templateHref

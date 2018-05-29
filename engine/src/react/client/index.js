@@ -2,7 +2,15 @@
 
 /* global Fusion */
 
+const { parse } = require('url')
+
 window.Fusion = window.Fusion || {}
+if (!Fusion.contextPath) {
+  const engineScript = document.getElementById('fusion-engine-script')
+  if (engineScript) {
+    Fusion.contextPath = parse(engineScript.src).pathname.replace(/\/dist\/engine\/react\.js$/, '')
+  }
+}
 
 const React = require('react')
 
@@ -36,7 +44,7 @@ const render = () => {
       notFound()
     } else {
       if (Fusion.Template.cssFile) {
-        const templateStyle = window.document.getElementById('template-style')
+        const templateStyle = window.document.getElementById('fusion-template-styles')
         if (templateStyle) {
           templateStyle.href = `${Fusion.contextPath || ''}/dist/${Fusion.Template.cssFile}`
         }
@@ -52,7 +60,7 @@ const render = () => {
             Fusion.globalContent || {}
           )
         ),
-        window.document.getElementById('App')
+        window.document.getElementById('fusion-app')
       )
     }
   }

@@ -18,7 +18,7 @@ const OutputType = (props) =>
       <link rel='icon' type='image/x-icon' href={`${props.contextPath}/resources/img/favicon.ico`} />
     </head>
     <body>
-      <div id='App'>
+      <div id='fusion-app'>
         {props.children}
       </div>
     </body>

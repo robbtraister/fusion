@@ -60,7 +60,7 @@ const render = () => {
             Fusion.globalContent || {}
           )
         ),
-        window.document.getElementById('App')
+        window.document.getElementById('fusion-app')
       )
     }
   }

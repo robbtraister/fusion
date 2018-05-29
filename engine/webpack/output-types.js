@@ -79,9 +79,10 @@ module.exports = (Object.keys(entry).length)
       plugins: [
         new CleanWebpackPlugin(
           [
-            path.resolve(componentDistRoot, 'output-types', '**/*.css')
+            'output-types/**/*.css'
           ],
           {
+            root: componentDistRoot,
             watch: true
           }
         ),
@@ -134,9 +135,10 @@ module.exports = (Object.keys(entry).length)
       plugins: [
         new CleanWebpackPlugin(
           [
-            path.resolve(componentDistRoot, 'output-types', '**/*.js')
+            'output-types/**/*.js'
           ],
           {
+            root: componentDistRoot,
             watch: true
           }
         )

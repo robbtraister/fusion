@@ -4,7 +4,8 @@
 let alias = {}
 try {
   alias = {
-    'consumer': require.resolve('../../src/react/shared/consumer')
+    // consumer should be auto-applied
+    // 'consumer': require.resolve('../../src/react/shared/consumer')
   }
 } catch (e) {}
 

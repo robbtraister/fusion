@@ -19,6 +19,7 @@ const resolve = require('./shared/resolve')
 const isTest = require('./shared/is-test')
 
 const {
+  componentDistRoot,
   componentSrcRoot,
   distRoot
 } = require('../environment')
@@ -89,7 +90,7 @@ module.exports = {
   optimization,
   output: {
     filename: `[name].js`,
-    path: path.resolve(distRoot, 'components'),
+    path: componentDistRoot,
     library: `window.Fusion=window.Fusion||{};window.Fusion.Components`,
     libraryTarget: 'assign'
   },

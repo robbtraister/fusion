@@ -2,8 +2,6 @@
 
 const React = require('react')
 
-const Consumer = require('consumer')
-
 const modalContent = `
 path:
 <pre className='path'>No path. Try refreshing the page.</pre>
@@ -131,4 +129,4 @@ const Dfp = (props) => {
   </React.Fragment>
 }
 
-module.exports = Consumer(Dfp)
+module.exports = Dfp

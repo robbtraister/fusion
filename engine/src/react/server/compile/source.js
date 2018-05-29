@@ -5,7 +5,9 @@ const fs = require('fs')
 const { componentSrcRoot } = require('../../../../environment')
 
 function componentImport (fp, name) {
-  return `Fusion.Components${name} = unpack(require('${fp}'))`
+  return name.startsWith(`['features']`)
+    ? `Fusion.Components${name} = Consumer(unpack(require('${fp}')))`
+    : `Fusion.Components${name} = unpack(require('${fp}'))`
 }
 
 const componentFiles = [
@@ -135,6 +137,7 @@ function generateSource (renderable, outputType) {
 
   const contents = `'use strict'
 const React = require('react')
+const Consumer = require('${require.resolve('../../shared/consumer')}')
 const unpack = require('${require.resolve('../../shared/unpack')}')
 window.Fusion = window.Fusion || {}
 Fusion.Components = Fusion.Components || {}

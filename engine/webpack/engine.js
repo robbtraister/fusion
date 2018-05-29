@@ -2,12 +2,13 @@
 
 const path = require('path')
 
-// const CleanWebpackPlugin = require('clean-webpack-plugin')
+const CleanWebpackPlugin = require('clean-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 const babelLoader = require('./shared/loaders/babel-loader')
 const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
+const resolve = require('./shared/resolve')
 
 const {
   distRoot,
@@ -40,15 +41,15 @@ module.exports = [
       libraryTarget: 'var'
     },
     plugins: [
-      // new CleanWebpackPlugin(
-      //   [
-      //     'engine'
-      //   ],
-      //   {
-      //     root: distRoot,
-      //     watch: true
-      //   }
-      // ),
+      new CleanWebpackPlugin(
+        [
+          'engine'
+        ],
+        {
+          root: distRoot,
+          watch: true
+        }
+      ),
       new CopyWebpackPlugin([
         {
           from: require.resolve('../src/react/client/preview.html'),
@@ -57,6 +58,7 @@ module.exports = [
         }
       ])
     ],
+    resolve,
     target: 'web'
   }
 ]

@@ -16,12 +16,20 @@ const endpoint = function endpoint (data, outputType, arcSite) {
 
 const make = function make (uri, outputType, version, arcSite) {
   return resolve(uri, arcSite)
-    .then((data) => engine({
-      method: 'POST',
-      uri: endpoint(data, outputType, arcSite),
-      data,
-      version
-    }))
+    .then((data) =>
+      data
+        ? engine({
+          method: 'POST',
+          uri: endpoint(data, outputType, arcSite),
+          data,
+          version
+        })
+        : (() => {
+          const e = new Error(`Could not resolve ${uri}`)
+          e.statusCode = 404
+          throw e
+        })()
+    )
 }
 
 module.exports = make

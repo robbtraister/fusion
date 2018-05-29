@@ -1,7 +1,5 @@
 'use strict'
 
-const path = require('path')
-
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
 
@@ -15,7 +13,7 @@ const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
 
 const {
-  distRoot
+  componentDistRoot
 } = require('../environment')
 
 module.exports = (entry) =>
@@ -53,7 +51,7 @@ module.exports = (entry) =>
       optimization,
       output: {
         filename: `[name].js`,
-        path: path.resolve(distRoot, 'components'),
+        path: componentDistRoot,
         library: `window.Fusion=window.Fusion||{};window.Fusion.Template`,
         libraryTarget: 'assign'
       },

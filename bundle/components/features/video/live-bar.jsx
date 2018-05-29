@@ -1,7 +1,6 @@
 'use strict'
 
 const React = require('react')
-const Consumer = require('consumer')
 
 // const headlineQuery = '{headlines{basic}}'
 
@@ -39,4 +38,4 @@ class LiveBar extends React.Component {
   }
 }
 
-module.exports = Consumer(LiveBar)
+module.exports = LiveBar

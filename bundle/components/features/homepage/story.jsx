@@ -42,8 +42,12 @@ class Story extends React.Component {
     super(props)
 
     if (props.contentConfig && props.contentConfig.contentService && props.contentConfig.contentConfigValues) {
-      this.setContent({
-        story: this.getContent(props.contentConfig.contentService, props.contentConfig.contentConfigValues, query)
+      this.fetchContent({
+        story: {
+          source: props.contentConfig.contentService,
+          key: props.contentConfig.contentConfigValues,
+          query
+        }
       })
     } else {
       this.state = {story: null}

@@ -78,9 +78,9 @@ const componentGenerator = function componentGenerator (loadComponent) {
     return () => React.createElement(
       Layout || 'div',
       {
-        key: rendering.id || rendering._id,
-        type: 'rendering',
-        id: rendering.id || rendering._id
+        key: rendering.layout,
+        type: 'layout',
+        id: rendering.layout
       },
       renderAll(rendering.layoutItems, outputType)
     )

@@ -126,7 +126,6 @@ class MyComponent extends React.Component {
 The `setContent` method is syntactic sugar for setting both the `cached` data to the initial state property and calling setState on the resolved `fetched` Promise. It is used as follows:
 
 ```jsx
-@Consumer
 class MyComponent extends React.Component {
   constructor (props) {
     super(props)
@@ -134,6 +133,35 @@ class MyComponent extends React.Component {
     this.setContent({
       content1: this.getContent('content-api', {uri: '/some/data'}, '{type version}'),
       content2: this.getContent('content-api', {uri: '/some/other/data'}, '{type version}')
+    })
+  }
+
+  render () {
+    return <div>{this.state.content1 && this.state.content1.type} / {this.state.content2 && this.state.content2.type}</div>
+  }
+}
+```
+
+-   fetchContent(contentFetches)
+
+The `fetchContent` method is second-level syntactic sugar that incorporates both `setContent` and `getContent`. It can be used as follows:
+
+```jsx
+class MyComponent extends React.Component {
+  constructor (props) {
+    super(props)
+
+    this.fetchContent({
+      content1: {
+        source: 'content-api',
+        key: {uri: '/some/data'},
+        query: '{type version}'
+      },
+      content2: {
+        source: 'content-api',
+        key: {uri: '/some/other/data'},
+        query: '{type version}'
+      }
     })
   }
 

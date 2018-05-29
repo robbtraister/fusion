@@ -2,7 +2,7 @@
 
 const path = require('path')
 
-const CleanWebpackPlugin = require('clean-webpack-plugin')
+// const CleanWebpackPlugin = require('clean-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 const babelLoader = require('./shared/loaders/babel-loader')
@@ -41,15 +41,16 @@ module.exports = [
       libraryTarget: 'var'
     },
     plugins: [
-      new CleanWebpackPlugin(
-        [
-          'engine'
-        ],
-        {
-          root: distRoot,
-          watch: true
-        }
-      ),
+      // each entry is handled independently, so we can't reliably clean all components
+      // new CleanWebpackPlugin(
+      //   [
+      //     'engine'
+      //   ],
+      //   {
+      //     root: distRoot,
+      //     watch: true
+      //   }
+      // ),
       new CopyWebpackPlugin([
         {
           from: require.resolve('../src/react/client/preview.html'),

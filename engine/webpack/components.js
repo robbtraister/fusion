@@ -73,7 +73,7 @@ module.exports = (Object.keys(entry).length)
       libraryTarget: 'commonjs2'
     },
     plugins: [
-      // each entry is handled independently, so we can't reliably clean all components
+      // each entry is watched independently, so we can't reliably clean all components
       // new CleanWebpackPlugin(
       //   glob.sync(`${componentSrcRoot}/!(output-types)/`).map(f => path.basename(f)),
       //   {

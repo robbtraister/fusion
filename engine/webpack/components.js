@@ -4,7 +4,7 @@ const path = require('path')
 
 const glob = require('glob')
 
-// const CleanWebpackPlugin = require('clean-webpack-plugin')
+const CleanWebpackPlugin = require('clean-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
@@ -19,8 +19,8 @@ const resolve = require('./shared/resolve')
 const isTest = require('./shared/is-test')
 
 const {
-  componentSrcRoot,
-  distRoot
+  componentDistRoot,
+  componentSrcRoot
 } = require('../environment')
 
 const entry = {}
@@ -69,17 +69,17 @@ module.exports = (Object.keys(entry).length)
     optimization,
     output: {
       filename: `[name].js`,
-      path: path.resolve(distRoot, 'components'),
+      path: componentDistRoot,
       libraryTarget: 'commonjs2'
     },
     plugins: [
-      // new CleanWebpackPlugin(
-      //   glob.sync(`${componentSrcRoot}/!(output-types)/`).map(f => path.basename(f)),
-      //   {
-      //     root: path.resolve(distRoot, 'components'),
-      //     watch: true
-      //   }
-      // ),
+      new CleanWebpackPlugin(
+        glob.sync(`${componentSrcRoot}/!(output-types)/`).map(f => path.basename(f)),
+        {
+          root: componentDistRoot,
+          watch: true
+        }
+      ),
       new MiniCssExtractPlugin({
         filename: '[name].css'
       }),

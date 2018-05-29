@@ -31,7 +31,7 @@ const getJsonResolver = function getJsonResolver (config) {
         .map((param) => {
           return (param.dropWhenEmpty && !(param.name in key))
             ? null
-            : `${param.name}=${key[param.name]}`
+            : `${param.name}=${key[param.name] || param.default}`
         })
         .filter(v => v)
         .join('&')

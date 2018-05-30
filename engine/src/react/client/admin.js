@@ -34,7 +34,7 @@ function render (config) {
         Fusion.globalContent || {}
       )
     ),
-    window.document.getElementById('App')
+    window.document.getElementById('fusion-app')
   )
 }
 

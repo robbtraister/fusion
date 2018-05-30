@@ -1,5 +1,15 @@
 #!/bin/sh
 
+restoreFromDir() {
+  DIR_NAME=$1
+  # allow for hard-coded DB_NAME env var
+  DB_NAME=${DB_NAME:-${DIR_NAME}}
+  echo "restoring data into ${DB_NAME}..."
+  mongorestore -d "${DB_NAME}" --drop "./${DIR_NAME}"
+  rm -rf "./${DIR_NAME}"
+  echo "${DB_NAME} restored."
+}
+
 restore() {
   (
     cd /data/restore
@@ -9,11 +19,7 @@ restore() {
       flush="true"
       for directory in $directories
       do
-        DB_NAME="${directory%%/}"
-        echo "restoring data into ${DB_NAME}..."
-        mongorestore -d "${DB_NAME}" --drop "./${DB_NAME}"
-        rm -rf "./${DB_NAME}"
-        echo "${DB_NAME} restored."
+        restoreFromDir "${directory%%/}"
       done
     fi
 
@@ -23,15 +29,14 @@ restore() {
       flush="true"
       for tarball in $tarballs
       do
-        DB_NAME="${tarball%%.tar.gz}"
-        echo "restoring data into ${DB_NAME}..."
-        rm -rf "./${DB_NAME}"
-        mkdir -p "./${DB_NAME}"
-        tar xf ${tarball} --strip-components 1 -C "./${DB_NAME}"
-        mongorestore -d "${DB_NAME}" --drop "./${DB_NAME}"
-        rm -rf "./${DB_NAME}"
+        FILE_NAME="${tarball%%.tar.gz}"
+        rm -rf "./${FILE_NAME}"
+        mkdir -p "./${FILE_NAME}"
+        tar xf ${tarball} --strip-components 1 -C "./${FILE_NAME}"
+
+        restoreFromDir "${FILE_NAME}"
+
         rm -rf ${tarball}
-        echo "${DB_NAME} restored."
       done
     fi
 

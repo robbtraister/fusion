@@ -5,7 +5,7 @@ const path = require('path')
 
 const glob = require('glob')
 
-const CleanWebpackPlugin = require('clean-webpack-plugin')
+// const CleanWebpackPlugin = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OnBuildWebpackPlugin = require('on-build-webpack')
 // const ManifestPlugin = require('webpack-manifest-plugin')
@@ -77,15 +77,16 @@ module.exports = (Object.keys(entry).length)
         libraryTarget: 'commonjs2'
       },
       plugins: [
-        new CleanWebpackPlugin(
-          [
-            'output-types/**/*.css'
-          ],
-          {
-            root: componentDistRoot,
-            watch: true
-          }
-        ),
+        // each entry is watched independently, so we can't reliably clean all components
+        // new CleanWebpackPlugin(
+        //   [
+        //     'output-types/**/*.css'
+        //   ],
+        //   {
+        //     root: componentDistRoot,
+        //     watch: true
+        //   }
+        // ),
         new MiniCssExtractPlugin({
           filename: 'output-types/[name].css'
         }),
@@ -133,15 +134,16 @@ module.exports = (Object.keys(entry).length)
         libraryTarget: 'commonjs2'
       },
       plugins: [
-        new CleanWebpackPlugin(
-          [
-            'output-types/**/*.js'
-          ],
-          {
-            root: componentDistRoot,
-            watch: true
-          }
-        )
+        // each entry is watched independently, so we can't reliably clean all components
+        // new CleanWebpackPlugin(
+        //   [
+        //     'output-types/**/*.js'
+        //   ],
+        //   {
+        //     root: componentDistRoot,
+        //     watch: true
+        //   }
+        // )
         // new ManifestPlugin()
       ],
       resolve

@@ -44,6 +44,18 @@ function HOC (Component) {
     // if Component is a React Component class, wrap it with new class with context access and `getContent` instance method
     ? (props) => (context) => {
       class ComponentConsumer extends Component {
+        fetchContent (contents) {
+          this.setContent(
+            Object.assign({},
+              ...Object.keys(contents)
+                .map(key => {
+                  const content = contents[key]
+                  return {[key]: this.getContent(content.source, content.key, content.query)}
+                })
+            )
+          )
+        }
+
         getContent (...args) {
           const localEdits = Object.assign({}, this.props.localEdits || {})
           const localEditItems = localEdits.items || {}

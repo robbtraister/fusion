@@ -4,7 +4,7 @@ const path = require('path')
 
 const glob = require('glob')
 
-const CleanWebpackPlugin = require('clean-webpack-plugin')
+// const CleanWebpackPlugin = require('clean-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
@@ -73,13 +73,14 @@ module.exports = (Object.keys(entry).length)
       libraryTarget: 'commonjs2'
     },
     plugins: [
-      new CleanWebpackPlugin(
-        glob.sync(`${componentSrcRoot}/!(output-types)/`).map(f => path.basename(f)),
-        {
-          root: componentDistRoot,
-          watch: true
-        }
-      ),
+      // each entry is watched independently, so we can't reliably clean all components
+      // new CleanWebpackPlugin(
+      //   glob.sync(`${componentSrcRoot}/!(output-types)/`).map(f => path.basename(f)),
+      //   {
+      //     root: componentDistRoot,
+      //     watch: true
+      //   }
+      // ),
       new MiniCssExtractPlugin({
         filename: '[name].css'
       }),

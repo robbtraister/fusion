@@ -95,6 +95,7 @@ module.exports = {
     libraryTarget: 'assign'
   },
   plugins: [
+    // only a single entry, so these can be cleaned reliably
     new CleanWebpackPlugin(
       [
         'page',

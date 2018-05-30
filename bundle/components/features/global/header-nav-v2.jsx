@@ -90,8 +90,12 @@ class HeaderNavV2 extends React.Component {
   constructor (props) {
     super(props)
 
-    this.setContent({
-      items: this.getContent('site-menu', {id: '/'}, '{children{name,site{site_url},children{name,site{site_url}}}}')
+    this.fetchContent({
+      items: {
+        source: 'site-menu',
+        key: {id: '/'},
+        query: '{children{name,site{site_url},children{name,site{site_url}}}}'
+      }
     })
   }
 

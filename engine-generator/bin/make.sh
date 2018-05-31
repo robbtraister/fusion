@@ -3,5 +3,4 @@
 
   ./zip.sh
   ./deploy.js
-  rm -rf generator.zip
 )

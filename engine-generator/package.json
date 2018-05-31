@@ -15,5 +15,8 @@
     "mime-types": "^2.1.18",
     "yauzl": "^2.9.1",
     "yazl": "^2.4.3"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.249.1"
   }
 }

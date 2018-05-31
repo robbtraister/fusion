@@ -174,9 +174,9 @@ async function alias (Name, FunctionName, FunctionVersion) {
 }
 
 async function main () {
-  const { VersionId } = await upload(path.resolve(__dirname, 'generator.zip'))
+  const { VersionId } = await upload(path.resolve(__dirname, '../dist/generator.zip'))
   const result = await deploy(VersionId)
-  await alias(require('../engine/package.json').version.replace(/\./g, '_'), result.FunctionName, result.Version)
+  await alias(require('../../engine/package.json').version.replace(/\./g, '_'), result.FunctionName, result.Version)
   return result
 }
 

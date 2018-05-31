@@ -2,7 +2,7 @@
 
 const promisify = require('util').promisify
 
-const debug = require('debug')('fusion:engine-generator:download')
+const debug = require('debug')('fusion:compiler:download')
 
 const promises = require('../utils/promises')
 

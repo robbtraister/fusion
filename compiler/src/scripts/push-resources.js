@@ -5,7 +5,7 @@ const path = require('path')
 
 const mimeTypes = require('mime-types')
 
-const debug = require('debug')('fusion:engine-generator:push')
+const debug = require('debug')('fusion:compiler:push')
 
 const promises = require('../utils/promises')
 

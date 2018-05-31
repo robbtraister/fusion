@@ -6,13 +6,13 @@ const fs = require('fs')
 const path = require('path')
 const promisify = require('util').promisify
 
-const debug = require('debug')('fusion:engine-generator')
+const debug = require('debug')('fusion:compiler')
 
 const AWS = require('aws-sdk')
 const lambda = new AWS.Lambda()
 const s3 = new AWS.S3({region: 'us-east-1'})
 
-const FunctionName = `fusion-generator-engine`
+const FunctionName = `fusion-compiler`
 
 const awsCreateFunction = promisify(lambda.createFunction.bind(lambda))
 const awsUpdateFunctionCode = promisify(lambda.updateFunctionCode.bind(lambda))
@@ -23,7 +23,7 @@ const awsUpdateAlias = promisify(lambda.updateAlias.bind(lambda))
 
 const code = (S3ObjectVersion) => ({
   S3Bucket: 'pagebuilder-fusion',
-  S3Key: `engine-generator.zip`,
+  S3Key: `compiler.zip`,
   S3ObjectVersion
 })
 
@@ -33,10 +33,10 @@ const config = () => ({
       DEBUG: 'fusion:*'
     }
   },
-  Handler: 'engine-generator/src/index.handler',
+  Handler: 'compiler/src/index.handler',
   KMSKeyArn: null,
   MemorySize: 1024,
-  Role: 'arn:aws:iam::397853141546:role/fusion-generator',
+  Role: 'arn:aws:iam::397853141546:role/fusion-compiler',
   Runtime: 'nodejs8.10',
   Timeout: 300
 })
@@ -58,7 +58,7 @@ async function upload (fp) {
 }
 
 async function createFunction (versionId) {
-  debug(`creating generating lambda ${versionId}`)
+  debug(`creating compiler lambda ${versionId}`)
   try {
     const result = await awsCreateFunction(
       Object.assign(
@@ -71,16 +71,16 @@ async function createFunction (versionId) {
       )
     )
 
-    debug(`created generating lambda ${versionId}`)
+    debug(`created compiler lambda ${versionId}`)
     return result
   } catch (e) {
-    debug(`error creating generating lambda ${versionId}: ${e}`)
+    debug(`error creating compiler lambda ${versionId}: ${e}`)
     throw e
   }
 }
 
 async function updateFunctionCode (versionId) {
-  debug(`updating generating code ${versionId}`)
+  debug(`updating compiler code ${versionId}`)
   try {
     const result = await awsUpdateFunctionCode(
       Object.assign(
@@ -101,7 +101,7 @@ async function updateFunctionCode (versionId) {
 }
 
 async function updateFunctionConfiguration () {
-  debug(`updating generating config`)
+  debug(`updating compiler config`)
   try {
     const result = await awsUpdateFunctionConfiguration(
       Object.assign(
@@ -112,10 +112,10 @@ async function updateFunctionConfiguration () {
       )
     )
 
-    debug(`updated generating config`)
+    debug(`updated compiler config`)
     return result
   } catch (e) {
-    debug(`error updating generating config: ${e}`)
+    debug(`error updating compiler config: ${e}`)
     throw e
   }
 }
@@ -174,7 +174,7 @@ async function alias (Name, FunctionName, FunctionVersion) {
 }
 
 async function main () {
-  const { VersionId } = await upload(path.resolve(__dirname, '../dist/generator.zip'))
+  const { VersionId } = await upload(path.resolve(__dirname, '../dist/compiler.zip'))
   const result = await deploy(VersionId)
   await alias(require('../../engine/package.json').version.replace(/\./g, '_'), result.FunctionName, result.Version)
   return result

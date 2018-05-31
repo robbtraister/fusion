@@ -2,7 +2,7 @@
 
 const path = require('path')
 
-const debug = require('debug')('fusion:engine-generator')
+const debug = require('debug')('fusion:compiler')
 
 const promises = require('./utils/promises')
 

@@ -2,7 +2,7 @@
 
 const fs = require('fs')
 
-const debug = require('debug')('fusion:engine-generator:upload')
+const debug = require('debug')('fusion:compiler:upload')
 
 const code = require('./code')
 

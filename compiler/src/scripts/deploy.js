@@ -4,7 +4,7 @@ const promisify = require('util').promisify
 
 const AWS = require('aws-sdk')
 
-const debug = require('debug')('fusion:engine-generator:deploy')
+const debug = require('debug')('fusion:compiler:deploy')
 
 const code = require('./code')
 const config = require('./config')

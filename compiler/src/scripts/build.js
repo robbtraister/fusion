@@ -1,6 +1,6 @@
 'use strict'
 
-const debug = require('debug')('fusion:engine-generator:build')
+const debug = require('debug')('fusion:compiler:build')
 
 const promises = require('../utils/promises')
 

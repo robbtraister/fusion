@@ -6,7 +6,7 @@ const path = require('path')
 const glob = require('glob')
 const yazl = require('yazl')
 
-const debug = require('debug')('fusion:engine-generator:zip')
+const debug = require('debug')('fusion:compiler:zip')
 
 async function zip (zipFile, zipDirs) {
   if (!(zipDirs instanceof Array)) {

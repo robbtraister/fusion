@@ -13,9 +13,9 @@
   rm -rf ./node_modules/aws-sdk
 
   cd ..
-  zip engine-generator/dist/generator.zip -r engine engine-generator -x engine-generator/bin/\* engine-generator/dist/\*
+  zip compiler/dist/compiler.zip -r compiler engine -x compiler/bin/\* compiler/dist/\*
 
   # aws-sdk is required by the ./deploy command, so re-install it
-  cd engine-generator
+  cd compiler
   npm install
 )

@@ -20,6 +20,7 @@ const env = Object.assign(
 const binaryContentTypes = env.BINARY_CONTENT_TYPES
   ? env.BINARY_CONTENT_TYPES.split(/[,;]/)
   : require('./binary-content-types.json')
+const bodyLimit = '100mb'
 const contentBase = env.CONTENT_BASE || ''
 const contextPath = (env.CONTEXT_PATH || 'pb').replace(/^\/*/, '/').replace(/\/+$/, '')
 const defaultOutputType = env.DEFAULT_OUTPUT_TYPE || 'default'
@@ -44,6 +45,7 @@ const sourcesRoot = path.resolve(env.SOURCES_ROOT || `${bundleRoot}/content/sour
 module.exports = {
   apiPrefix,
   binaryContentTypes,
+  bodyLimit,
   bundleRoot,
   componentDistRoot,
   componentSrcRoot,

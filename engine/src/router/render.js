@@ -6,6 +6,7 @@ const express = require('express')
 const debugTimer = require('debug')('fusion:timer:router')
 
 const {
+  bodyLimit,
   defaultOutputType
 } = require('../../environment')
 
@@ -23,7 +24,7 @@ function getTypeRouter (routeType) {
   const typeRouter = express.Router()
 
   typeRouter.all(['/', '/:id', '/:id/:child'],
-    bodyParser.json(),
+    bodyParser.json({limit: bodyLimit}),
     (req, res, next) => {
       const tic = timer.tic()
 

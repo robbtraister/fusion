@@ -10,9 +10,10 @@ const {
 } = require('../assets/io')
 
 const {
-  isDev,
+  bodyLimit,
   defaultOutputType,
-  distRoot
+  distRoot,
+  isDev
 } = require('../../environment')
 
 const distRouter = express.Router()
@@ -33,7 +34,7 @@ function getTypeRouter (routeType, allowPost) {
   const typeRouter = express.Router()
 
   typeRouter.get('/:id/:outputType.js',
-    bodyParser.json(),
+    bodyParser.json({limit: bodyLimit}),
     (req, res, next) => {
       const id = req.body.id || req.params.id
       const type = req.body.type || routeType
@@ -47,7 +48,7 @@ function getTypeRouter (routeType, allowPost) {
 
   if (allowPost) {
     typeRouter.post(['/', '/:id'],
-      bodyParser.json(),
+      bodyParser.json({limit: bodyLimit}),
       (req, res, next) => {
         const id = req.params.id || req.body.id
         const type = req.body.type || routeType

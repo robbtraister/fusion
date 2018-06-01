@@ -38,6 +38,19 @@ const pushCssFile = (isDev)
   ? (name, outputType = defaultOutputType, cssFile) => pushFile(`${name}/${outputType}.css.json`, JSON.stringify({cssFile}))
   : (name, outputType = defaultOutputType, cssFile) => Hash.put({id: `${name}/${outputType}/${version}`, version, cssFile})
 
+const getJson = (isDev)
+  ? (type, id) => model(type).get(id)
+    .then((data) => (type === 'rendering')
+      ? data
+      : model('rendering').get(data.versions[data.published].head)
+    )
+  : (type, id) => model(type).get(id)
+
+const putJson = (isDev)
+  // do nothing
+  ? (type, json) => {}
+  : (type, json) => model(type).put(json)
+
 class Rendering {
   constructor (type, id, json) {
     this.type = type
@@ -50,12 +63,7 @@ class Rendering {
   // Lazy load all the things (YpAGNI)
 
   getJson () {
-    this.json = this.json ||
-      model(this.type).get(this.id)
-        .then((data) => (this.type === 'rendering')
-          ? data
-          : model('rendering').get(data.versions[data.published].head)
-        )
+    this.json = this.json || getJson(this.type, this.id)
     return this.json
   }
 
@@ -125,7 +133,10 @@ class Rendering {
   publish () {
     return (
       (this.json)
-        ? this.compileAll()
+        ? Promise.all([
+          putJson(this.type, this.json),
+          this.compileAll()
+        ])
         : Promise.reject(new Error('no rendering provided to publish'))
     )
       .then(() => publishToOtherVersions(`/dist/${this.type}/${this.id}`, this.json))

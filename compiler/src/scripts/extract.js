@@ -5,7 +5,7 @@ const path = require('path')
 
 const yauzl = require('yauzl')
 
-const debug = require('debug')('fusion:engine-generator:extract')
+const debug = require('debug')('fusion:compiler:extract')
 
 const promises = require('../utils/promises')
 

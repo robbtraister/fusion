@@ -12,7 +12,13 @@ const S3 = require('aws-sdk').S3
 
 const promises = require('./utils/promises')
 
-const configs = require('./configs')
+const {
+  bundleKey,
+  engineArtifact,
+  engineDistPrefix,
+  engineResourcesPrefix,
+  S3Bucket
+} = require('./configs')
 
 const build = require('./scripts/build')
 const deploy = require('./scripts/deploy')
@@ -46,7 +52,7 @@ class Compiler {
     this.contextName = contextName
     this.bundleName = bundleName
     this.envVars = envVars || {}
-    this.bundlePath = `${this.contextName}/bundles/${this.bundleName}`
+    this.bundlePath = bundleKey(this.contextName, this.bundleName)
 
     this.region = region || 'us-east-1'
     this.s3 = new S3({region: this.region})
@@ -91,7 +97,7 @@ class Compiler {
 
   async download (destFilePromise) {
     const params = {
-      Bucket: configs.S3Bucket,
+      Bucket: S3Bucket,
       Key: this.bundlePath
     }
     // if (VersionId) {
@@ -113,7 +119,7 @@ class Compiler {
         {
           ACL: 'public-read',
           Body: fs.createReadStream(fp),
-          Bucket: configs.S3Bucket,
+          Bucket: S3Bucket,
           ContentType: mimeTypes.contentType(path.extname(fp)) || 'application/octet-stream',
           Key
         }
@@ -132,8 +138,8 @@ class Compiler {
     }
 
     return Promise.all([
-      pushFiles(path.join(srcDir, 'bundle', 'resources'), configs.engineResourcesPrefix(this.contextName, deployment)),
-      pushFiles(path.join(srcDir, 'dist'), configs.engineDistPrefix(this.contextName, deployment))
+      pushFiles(path.join(srcDir, 'bundle', 'resources'), engineResourcesPrefix(this.contextName, deployment)),
+      pushFiles(path.join(srcDir, 'dist'), engineDistPrefix(this.contextName, deployment))
     ])
   }
 
@@ -142,7 +148,7 @@ class Compiler {
 
     return this.s3upload(
       Object.assign(
-        configs.engineArtifact(this.contextName),
+        engineArtifact(this.contextName),
         { Body: fs.createReadStream(fp) }
       )
     )

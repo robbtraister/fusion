@@ -4,13 +4,19 @@ const S3Bucket = 'pagebuilder-fusion'
 
 const { version } = require('../../engine/package.json')
 
+const bundleKey = (contextName, bundleName) => `bundles/${contextName}/${bundleName}`
+
+// we'll just use default S3 versioning here, because we never need to re-use these
+const engineKey = (contextName) => `engine/${contextName}.zip`
 const engineName = (contextName) => `fusion-engine-${contextName}`
+const engineRole = (contextName) => `arn:aws:iam::397853141546:role/${engineName(contextName)}`
+const engineDistPrefix = (contextName, deployment) => `static/${contextName}/${deployment}/resources`
+const engineResourcesPrefix = (contextName, deployment) => `static/${contextName}/${deployment}/dist`
 
 const engineCode = (contextName, versionId) => {
   const code = {
     S3Bucket,
-    // we'll just use default S3 versioning here, because we never need to re-use these
-    S3Key: `engine/${contextName}.zip`
+    S3Key: engineKey(contextName)
   }
 
   if (versionId) {
@@ -32,7 +38,7 @@ const engineConfig = (contextName, envVars) => ({
   },
   Handler: 'src/index.serverless',
   MemorySize: 512,
-  Role: `arn:aws:iam::397853141546:role/${engineName(contextName)}`,
+  Role: engineRole(contextName),
   Runtime: 'nodejs8.10',
   Timeout: 10
 })
@@ -51,10 +57,8 @@ const engineArtifact = (contextName) => {
   }
 }
 
-const engineDistPrefix = (contextName, deployment) => `static/${contextName}/${deployment}/resources`
-const engineResourcesPrefix = (contextName, deployment) => `static/${contextName}/${deployment}/dist`
-
 module.exports = {
+  bundleKey,
   engineArtifact,
   engineCode,
   engineConfig,

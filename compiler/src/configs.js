@@ -20,13 +20,15 @@ const engineCode = (contextName, versionId) => {
   return code
 }
 
-const engineConfig = (contextName) => ({
+const engineConfig = (contextName, envVars) => ({
   Environment: {
-    Variables: {
-      NODE_ENV: 'production',
-      CONTENT_BASE: '',
-      FUSION_RELEASE: version
-    }
+    Variables: Object.assign(
+      envVars || {},
+      {
+        NODE_ENV: 'production',
+        FUSION_RELEASE: version
+      }
+    )
   },
   Handler: 'src/index.serverless',
   MemorySize: 512,

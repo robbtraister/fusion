@@ -42,9 +42,10 @@ async function getBundleDir (tempDirPromise) {
 }
 
 class Compiler {
-  constructor (contextName, bundleName, region) {
+  constructor (contextName, bundleName, envVars, region) {
     this.contextName = contextName
     this.bundleName = bundleName
+    this.envVars = envVars || {}
     this.bundlePath = `${this.contextName}/bundles/${this.bundleName}`
 
     this.region = region || 'us-east-1'

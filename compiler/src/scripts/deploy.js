@@ -18,7 +18,7 @@ const createFunction = promisify(lambda.createFunction.bind(lambda))
 const updateFunctionCode = promisify(lambda.updateFunctionCode.bind(lambda))
 const updateFunctionConfiguration = promisify(lambda.updateFunctionConfiguration.bind(lambda))
 
-async function create (contextName, versionId) {
+async function create (contextName, versionId, envVars) {
   debug(`creating lambda for ${contextName} using ${versionId}`)
   try {
     const result = await createFunction(
@@ -28,7 +28,7 @@ async function create (contextName, versionId) {
           Code: engineCode(contextName, versionId),
           Publish: true
         },
-        engineConfig(contextName)
+        engineConfig(contextName, envVars)
       )
     )
 
@@ -61,7 +61,7 @@ async function updateCode (contextName, versionId) {
   }
 }
 
-async function updateConfig (contextName) {
+async function updateConfig (contextName, envVars) {
   debug(`updating config for ${contextName}`)
   try {
     const result = await updateFunctionConfiguration(
@@ -69,7 +69,7 @@ async function updateConfig (contextName) {
         {
           FunctionName: engineName(contextName)
         },
-        engineConfig(contextName)
+        engineConfig(contextName, envVars)
       )
     )
 
@@ -81,16 +81,16 @@ async function updateConfig (contextName) {
   }
 }
 
-async function update (contextName, versionId) {
-  await updateConfig(contextName)
+async function update (contextName, versionId, envVars) {
+  await updateConfig(contextName, envVars)
   return updateCode(contextName, versionId)
 }
 
-async function deploy (contextName, versionId) {
+async function deploy (contextName, versionId, envVars) {
   try {
-    return await create(contextName, versionId)
+    return await create(contextName, versionId, envVars)
   } catch (e) {
-    return update(contextName, versionId)
+    return update(contextName, versionId, envVars)
   }
 }
 

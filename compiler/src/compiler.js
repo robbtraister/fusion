@@ -48,11 +48,11 @@ async function getBundleDir (tempDirPromise) {
 }
 
 class Compiler {
-  constructor (contextName, bundleName, envVars, region) {
-    this.contextName = contextName
+  constructor (environment, bundleName, variables, region) {
+    this.environment = environment
     this.bundleName = bundleName
-    this.envVars = envVars || {}
-    this.bundlePath = bundleKey(this.contextName, this.bundleName)
+    this.variables = variables || {}
+    this.bundlePath = bundleKey(this.environment, this.bundleName)
 
     this.region = region || 'us-east-1'
     this.s3 = new S3({region: this.region})
@@ -81,7 +81,7 @@ class Compiler {
       const { VersionId } = await this.upload(await zipFilePromise)
       promises.remove(await zipFilePromise)
 
-      const { Version } = await deploy(this.contextName, VersionId)
+      const { Version } = await deploy(this.environment, VersionId)
 
       const result = await this.pushResources(Version, await rootDirPromise)
       promises.remove(await rootDirPromise)
@@ -138,17 +138,17 @@ class Compiler {
     }
 
     return Promise.all([
-      pushFiles(path.join(srcDir, 'bundle', 'resources'), engineResourcesPrefix(this.contextName, deployment)),
-      pushFiles(path.join(srcDir, 'dist'), engineDistPrefix(this.contextName, deployment))
+      pushFiles(path.join(srcDir, 'bundle', 'resources'), engineResourcesPrefix(this.environment, deployment)),
+      pushFiles(path.join(srcDir, 'dist'), engineDistPrefix(this.environment, deployment))
     ])
   }
 
   async upload (fp) {
-    debug(`uploading ${fp} for ${this.contextName}`)
+    debug(`uploading ${fp} for ${this.environment}`)
 
     return this.s3upload(
       Object.assign(
-        engineArtifact(this.contextName),
+        engineArtifact(this.environment),
         { Body: fs.createReadStream(fp) }
       )
     )

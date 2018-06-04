@@ -18,79 +18,79 @@ const createFunction = promisify(lambda.createFunction.bind(lambda))
 const updateFunctionCode = promisify(lambda.updateFunctionCode.bind(lambda))
 const updateFunctionConfiguration = promisify(lambda.updateFunctionConfiguration.bind(lambda))
 
-async function create (contextName, versionId, envVars) {
-  debug(`creating lambda for ${contextName} using ${versionId}`)
+async function create (environment, versionId, variables) {
+  debug(`creating lambda for ${environment} using ${versionId}`)
   try {
     const result = await createFunction(
       Object.assign(
         {
-          FunctionName: engineName(contextName),
-          Code: engineCode(contextName, versionId),
+          FunctionName: engineName(environment),
+          Code: engineCode(environment, versionId),
           Publish: true
         },
-        engineConfig(contextName, envVars)
+        engineConfig(environment, variables)
       )
     )
 
-    debug(`created lambda for ${contextName} using ${versionId}`)
+    debug(`created lambda for ${environment} using ${versionId}`)
     return result
   } catch (e) {
-    debug(`error creating lambda for ${contextName} using ${versionId}: ${e}`)
+    debug(`error creating lambda for ${environment} using ${versionId}: ${e}`)
     throw e
   }
 }
 
-async function updateCode (contextName, versionId) {
-  debug(`updating code for ${contextName} using ${versionId}`)
+async function updateCode (environment, versionId) {
+  debug(`updating code for ${environment} using ${versionId}`)
   try {
     const result = await updateFunctionCode(
       Object.assign(
         {
-          FunctionName: engineName(contextName),
+          FunctionName: engineName(environment),
           Publish: true
         },
-        engineCode(contextName, versionId)
+        engineCode(environment, versionId)
       )
     )
 
-    debug(`updated code for ${contextName} using ${versionId}`)
+    debug(`updated code for ${environment} using ${versionId}`)
     return result
   } catch (e) {
-    debug(`error updating code for ${contextName} using ${versionId}: ${e}`)
+    debug(`error updating code for ${environment} using ${versionId}: ${e}`)
     throw e
   }
 }
 
-async function updateConfig (contextName, envVars) {
-  debug(`updating config for ${contextName}`)
+async function updateConfig (environment, variables) {
+  debug(`updating config for ${environment}`)
   try {
     const result = await updateFunctionConfiguration(
       Object.assign(
         {
-          FunctionName: engineName(contextName)
+          FunctionName: engineName(environment)
         },
-        engineConfig(contextName, envVars)
+        engineConfig(environment, variables)
       )
     )
 
-    debug(`updated config for ${contextName}`)
+    debug(`updated config for ${environment}`)
     return result
   } catch (e) {
-    debug(`error updating config for ${contextName}: ${e}`)
+    debug(`error updating config for ${environment}: ${e}`)
     throw e
   }
 }
 
-async function update (contextName, versionId, envVars) {
-  await updateConfig(contextName, envVars)
-  return updateCode(contextName, versionId)
+async function update (environment, versionId, variables) {
+  await updateConfig(environment, variables)
+  return updateCode(environment, versionId)
 }
 
-async function deploy (contextName, versionId, envVars) {
+async function deploy (environment, versionId, variables) {
   try {
-    return await create(contextName, versionId, envVars)
+    return await create(environment, versionId, variables)
   } catch (e) {
-    return update(contextName, versionId, envVars)
+    return update(environment, versionId, variables)
   }
 }
 

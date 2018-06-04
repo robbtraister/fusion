@@ -4,19 +4,19 @@ const S3Bucket = 'pagebuilder-fusion'
 
 const { version } = require('../../engine/package.json')
 
-const bundleKey = (contextName, bundleName) => `bundles/${contextName}/${bundleName}`
+const bundleKey = (environment, bundleName) => `environments/${environment}/bundles/${bundleName}`
 
 // we'll just use default S3 versioning here, because we never need to re-use these
-const engineKey = (contextName) => `engine/${contextName}.zip`
-const engineName = (contextName) => `fusion-engine-${contextName}`
-const engineRole = (contextName) => `arn:aws:iam::397853141546:role/${engineName(contextName)}`
-const engineDistPrefix = (contextName, deployment) => `static/${contextName}/${deployment}/resources`
-const engineResourcesPrefix = (contextName, deployment) => `static/${contextName}/${deployment}/dist`
+const engineKey = (environment) => `engine/${environment}.zip`
+const engineName = (environment) => `fusion-engine-${environment}`
+const engineRole = (environment) => `arn:aws:iam::397853141546:role/${engineName(environment)}`
+const engineDistPrefix = (environment, deployment) => `environments/${environment}/deployments/${deployment}/resources`
+const engineResourcesPrefix = (environment, deployment) => `environments/${environment}/deployments/${deployment}/dist`
 
-const engineCode = (contextName, versionId) => {
+const engineCode = (environment, versionId) => {
   const code = {
     S3Bucket,
-    S3Key: engineKey(contextName)
+    S3Key: engineKey(environment)
   }
 
   if (versionId) {
@@ -26,10 +26,10 @@ const engineCode = (contextName, versionId) => {
   return code
 }
 
-const engineConfig = (contextName, envVars) => ({
+const engineConfig = (environment, variables) => ({
   Environment: {
     Variables: Object.assign(
-      envVars || {},
+      variables || {},
       {
         NODE_ENV: 'production',
         FUSION_RELEASE: version
@@ -38,16 +38,16 @@ const engineConfig = (contextName, envVars) => ({
   },
   Handler: 'src/index.serverless',
   MemorySize: 512,
-  Role: engineRole(contextName),
+  Role: engineRole(environment),
   Runtime: 'nodejs8.10',
   Timeout: 10
 })
 
-const engineArtifact = (contextName) => {
+const engineArtifact = (environment) => {
   const {
     S3Bucket: Bucket,
     S3Key: Key
-  } = engineCode(contextName)
+  } = engineCode(environment)
 
   return {
     ACL: 'private',

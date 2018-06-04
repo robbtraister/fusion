@@ -7,7 +7,7 @@ const { version } = require('../../engine/package.json')
 const bundleKey = (environment, bundleName) => `environments/${environment}/bundles/${bundleName}`
 
 // we'll just use default S3 versioning here, because we never need to re-use these
-const engineKey = (environment) => `engine/${environment}.zip`
+const engineKey = (environment) => `environments/${environment}/engine.zip`
 const engineName = (environment) => `fusion-engine-${environment}`
 const engineRole = (environment) => `arn:aws:iam::397853141546:role/${engineName(environment)}`
 const engineDistPrefix = (environment, deployment) => `environments/${environment}/deployments/${deployment}/resources`

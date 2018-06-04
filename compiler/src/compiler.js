@@ -114,7 +114,7 @@ class Compiler {
   }
 
   async pushResources (deployment, srcDir) {
-    async function pushFile (fp, Key) {
+    const pushFile = async (fp, Key) => {
       const resultPromise = await this.s3upload(
         {
           ACL: 'public-read',
@@ -128,7 +128,7 @@ class Compiler {
       return resultPromise
     }
 
-    async function pushFiles (cwd, prefix) {
+    const pushFiles = async (cwd, prefix) => {
       const files = await promises.glob('**/*', {cwd, nodir: true})
       return Promise.all(
         files.map(file => pushFile(path.join(cwd, file), path.join(prefix, file)))

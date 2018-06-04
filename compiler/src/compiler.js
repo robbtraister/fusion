@@ -106,7 +106,7 @@ class Compiler {
 
     const destFile = await destFilePromise
     debug(`downloading ${params.Bucket} ${params.Key} to ${destFile}`)
-    const data = this.s3getObject(params)
+    const data = await this.s3getObject(params)
     await promises.writeFile(destFile, data.Body)
     debug(`downloaded ${params.Bucket} ${params.Key} to ${destFile}`)
 
@@ -115,7 +115,7 @@ class Compiler {
 
   async pushResources (deployment, srcDir) {
     async function pushFile (fp, Key) {
-      return this.s3upload(
+      const resultPromise = await this.s3upload(
         {
           ACL: 'public-read',
           Body: fs.createReadStream(fp),
@@ -124,10 +124,8 @@ class Compiler {
           Key
         }
       )
-        .then(data => {
-          debug(`uploaded: ${JSON.stringify(data)}`)
-          return data
-        })
+      debug(`uploaded: ${fp}`)
+      return resultPromise
     }
 
     async function pushFiles (cwd, prefix) {
@@ -146,16 +144,14 @@ class Compiler {
   async upload (fp) {
     debug(`uploading ${fp} for ${this.environment}`)
 
-    return this.s3upload(
+    const resultPromise = await this.s3upload(
       Object.assign(
         engineArtifact(this.environment),
         { Body: fs.createReadStream(fp) }
       )
     )
-      .then(data => {
-        debug(`uploaded: ${JSON.stringify(data)}`)
-        return data
-      })
+    debug(`uploaded: ${fp}`)
+    return resultPromise
   }
 }
 

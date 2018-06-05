@@ -17,7 +17,7 @@ module.exports.handler = (event, context, callback) => {
 }
 
 if (module === require.main) {
-  main('test', 'test')
+  main('localhost', 'test.zip')
     .then(console.log)
     .catch(console.error)
 }

@@ -6,7 +6,7 @@ const promisify = require('util').promisify
 
 const mimeTypes = require('mime-types')
 
-const debug = require('debug')('fusion:compiler:upload')
+const debug = require('debug')('fusion:compiler')
 
 const S3 = require('aws-sdk').S3
 

@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "build:all": "webpack --config ./webpack.config.js --no-update-notifier",
+    "build:all": "webpack --config ./webpack.config.js",
     "build:all:production": "NODE_ENV=production npm run build:all -- --mode production -p",
     "build:combined": "webpack --config ./webpack/combined.js",
     "build:combined:production": "NODE_ENV=production npm run build:combined -- --mode production -p",

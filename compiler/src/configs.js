@@ -10,8 +10,8 @@ const bundleKey = (environment, bundleName) => `environments/${environment}/bund
 const engineKey = (environment) => `environments/${environment}/engine.zip`
 const engineName = (environment) => `fusion-engine-${environment}`
 const engineRole = (environment) => `arn:aws:iam::397853141546:role/${engineName(environment)}`
-const engineDistPrefix = (environment, deployment) => `environments/${environment}/deployments/${deployment}/resources`
-const engineResourcesPrefix = (environment, deployment) => `environments/${environment}/deployments/${deployment}/dist`
+const engineDistPrefix = (environment, deployment) => `environments/${environment}/deployments/${deployment}/dist`
+const engineResourcesPrefix = (environment, deployment) => `environments/${environment}/deployments/${deployment}/resources`
 
 const engineCode = (environment, versionId) => {
   const code = {

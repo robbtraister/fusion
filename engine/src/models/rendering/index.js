@@ -12,8 +12,6 @@ const model = (isDev)
   ? require('../../dao/mongo')
   : require('../../dao/dynamoose')
 
-const Hash = model('hash')
-
 const compileRendering = require('./compile')
 const getComponent = require('./component')
 const {
@@ -32,11 +30,11 @@ const {
 const fetchCssFile = (isDev)
   ? (name, outputType = defaultOutputType) => fetchFile(`${name}/${outputType}.css.json`)
     .then((json) => JSON.parse(json))
-  : (name, outputType = defaultOutputType) => Hash.get(`${name}/${outputType}/${version}`)
+  : (name, outputType = defaultOutputType) => model('hash').get(`${name}/${outputType}/${version}`)
 
 const pushCssFile = (isDev)
   ? (name, outputType = defaultOutputType, cssFile) => pushFile(`${name}/${outputType}.css.json`, JSON.stringify({cssFile}))
-  : (name, outputType = defaultOutputType, cssFile) => Hash.put({id: `${name}/${outputType}/${version}`, version, cssFile})
+  : (name, outputType = defaultOutputType, cssFile) => model('hash').put({id: `${name}/${outputType}/${version}`, version, cssFile})
 
 const getJson = (isDev)
   ? (type, id) => model(type).get(id)

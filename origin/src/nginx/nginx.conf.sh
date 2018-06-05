@@ -251,7 +251,7 @@ then
 EOB
 else
   cat <<EOB
-      set                       \$target ${S3_HOST}/static/\${environment}/\${version}/\$2\$3;
+      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/\$2\$3;
       proxy_pass                \$target;
 EOB
 fi
@@ -275,7 +275,7 @@ then
 EOB
 else
   cat <<EOB
-      set                       \$target ${S3_HOST}/static/\${environment}/\${version}/\$2\$3;
+      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/\$2\$3;
       proxy_pass                \$target;
 EOB
 fi
@@ -305,7 +305,7 @@ then
 EOB
 else
   cat <<EOB
-      set                       \$target ${S3_HOST}/static/\${environment}/\${version}/html\$2.html;
+      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/html\$2.html;
       proxy_pass                \$target;
 EOB
 fi

@@ -17,7 +17,7 @@ const getBucket = function getBucket () {
 }
 
 const getKeyBase = function getKeyBase () {
-  return `${environment}/${version}`
+  return `environments/${environment}/deployments/${version}`
 }
 
 let _outputTypes

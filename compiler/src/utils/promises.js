@@ -12,7 +12,9 @@ const readFile = promisify(fs.readFile.bind(fs))
 const remove = (dest) => exec(`rm -rf ${dest}`)
 const spawn = (cmd, args, options) => new Promise((resolve, reject) => {
   const proc = childProcess.spawn(cmd, args, options)
-  proc.on('close', resolve)
+  proc.on('close', (code) => {
+    code === 0 ? resolve() : reject(new Error(`"${cmd}" exited with code: ${code}`))
+  })
 })
 const stat = promisify(fs.stat.bind(fs))
 const tempDir = () => exec('mktemp -d').then(d => d.trim())

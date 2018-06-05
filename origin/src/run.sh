@@ -31,7 +31,7 @@ watch() {
   while [ true ]
   do
     touch "${LOOP_FILE}"
-    if [ $(find ./src -type f -newer "${MOD_FILE}") ]
+    if [ $(find ./src/nginx -type f -newer "${MOD_FILE}") ]
     then
       mv -f "${LOOP_FILE}" "${MOD_FILE}"
       reload

@@ -32,6 +32,7 @@ const engineConfig = (environment, variables) => ({
       variables || {},
       {
         NODE_ENV: 'production',
+        ENVIRONMENT: environment,
         FUSION_RELEASE: version
       }
     )

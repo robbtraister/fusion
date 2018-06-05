@@ -4,7 +4,6 @@ const debug = require('debug')('fusion:models:rendering')
 
 const {
   defaultOutputType,
-  environment,
   isDev,
   version
 } = require('../../../environment')
@@ -13,7 +12,7 @@ const model = (isDev)
   ? require('../../dao/mongo')
   : require('../../dao/dynamoose')
 
-const Hash = model(`fusion-hash-${environment}`)
+const Hash = model('hash')
 
 const compileRendering = require('./compile')
 const getComponent = require('./component')
@@ -45,12 +44,12 @@ const getJson = (isDev)
       ? data
       : model('rendering').get(data.versions[data.published].head)
     )
-  : (type, id) => model(`fusion-${type}-${environment}`).get(id)
+  : (type, id) => model(type).get(id)
 
 const putJson = (isDev)
   // do nothing
   ? (type, json) => {}
-  : (type, json) => model(`fusion-${type}-${environment}`).put(json)
+  : (type, json) => model(type).put(json)
 
 class Rendering {
   constructor (type, id, json) {

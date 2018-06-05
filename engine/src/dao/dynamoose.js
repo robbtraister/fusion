@@ -22,14 +22,15 @@ const defaultSchema = new dynamoose.Schema(
   { useDocumentTypes: true }
 )
 
-const getModel = function (modelName) {
-  const d = new dynamoose.Dynamoose()
-  d.AWS.config.update({region})
-  const model = d.model(`fusion.${environment}.${modelName}`, defaultSchema)
+const db = new dynamoose.Dynamoose()
+db.AWS.config.update({region})
+
+const createModel = (modelName) => {
+  const _model = db.model(`fusion.${environment}.${modelName}`, defaultSchema)
 
   return {
     get (id) {
-      return model.get({version, id})
+      return _model.get({version, id})
     },
 
     find () {
@@ -42,10 +43,16 @@ const getModel = function (modelName) {
 
     put (doc) {
       return new Promise((resolve, reject) => {
-        model.save(Object.assign({}, doc, {version}), (err, data) => (err ? reject(err) : resolve(data)))
+        _model.save(Object.assign({}, doc, {version}), (err, data) => (err ? reject(err) : resolve(data)))
       })
     }
   }
+}
+
+const models = {}
+const getModel = function (modelName) {
+  models[modelName] = models[modelName] || createModel(modelName)
+  return models[modelName]
 }
 
 module.exports = getModel

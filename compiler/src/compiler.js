@@ -4,8 +4,6 @@ const fs = require('fs')
 const path = require('path')
 const promisify = require('util').promisify
 
-const mimeTypes = require('mime-types')
-
 const debug = require('debug')('fusion:compiler')
 
 const S3 = require('aws-sdk').S3
@@ -15,13 +13,10 @@ const promises = require('./utils/promises')
 const {
   bundleKey,
   engineArtifact,
-  engineDistPrefix,
-  engineResourcesPrefix,
   S3Bucket
 } = require('./configs')
 
 const build = require('./scripts/build')
-const deploy = require('./scripts/deploy')
 const extract = require('./scripts/extract')
 const zip = require('./scripts/zip')
 
@@ -78,12 +73,8 @@ class Compiler {
       await build(await rootDirPromise)
       await zip(await zipFilePromise, await rootDirPromise)
 
-      const { VersionId } = await this.upload(await zipFilePromise)
+      const result = await this.upload(await zipFilePromise)
       promises.remove(await zipFilePromise)
-
-      const { Version } = await deploy(this.environment, VersionId)
-
-      const result = await this.pushResources(Version, await rootDirPromise)
       promises.remove(await rootDirPromise)
 
       return result
@@ -100,9 +91,6 @@ class Compiler {
       Bucket: S3Bucket,
       Key: this.bundlePath
     }
-    // if (VersionId) {
-    //   params.VersionId = VersionId
-    // }
 
     const destFile = await destFilePromise
     debug(`downloading ${params.Bucket} ${params.Key} to ${destFile}`)
@@ -111,34 +99,6 @@ class Compiler {
     debug(`downloaded ${params.Bucket} ${params.Key} to ${destFile}`)
 
     return destFile
-  }
-
-  async pushResources (deployment, srcDir) {
-    const pushFile = async (fp, Key) => {
-      const resultPromise = await this.s3upload(
-        {
-          ACL: 'public-read',
-          Body: fs.createReadStream(fp),
-          Bucket: S3Bucket,
-          ContentType: mimeTypes.contentType(path.extname(fp)) || 'application/octet-stream',
-          Key
-        }
-      )
-      debug(`uploaded: ${fp}`)
-      return resultPromise
-    }
-
-    const pushFiles = async (cwd, prefix) => {
-      const files = await promises.glob('**/*', {cwd, nodir: true})
-      return Promise.all(
-        files.map(file => pushFile(path.join(cwd, file), path.join(prefix, file)))
-      )
-    }
-
-    return Promise.all([
-      pushFiles(path.join(srcDir, 'bundle', 'resources'), engineResourcesPrefix(this.environment, deployment)),
-      pushFiles(path.join(srcDir, 'dist'), engineDistPrefix(this.environment, deployment))
-    ])
   }
 
   async upload (fp) {

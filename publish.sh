@@ -4,8 +4,8 @@ version () {
   if [ "${RELEASE}" ]
   then
     name=$1
-    v=$(node -e "console.log(require('./${name}/package.json').version)")
-    echo ${v:-latest}
+    version=$(python -c "import json; print json.load(open('./${name}/package.json'))['version']")
+    echo ${version:-latest}
   else
     echo 'latest'
   fi

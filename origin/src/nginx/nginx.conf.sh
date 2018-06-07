@@ -25,7 +25,7 @@ then
 else
   if [ ! "${HTTP_ENGINE}" ]
   then
-    LAMBDA_ENGINE="arn:aws:lambda:${AWS_REGION:-us-east-1}:${AWS_ACCOUNT_ID:-397853141546}:function:fusion-engine-\${environment}:production"
+    LAMBDA_ENGINE="arn:aws:lambda:${AWS_REGION:-us-east-1}:${AWS_ACCOUNT_ID:-397853141546}:function:fusion-engine-\${environment}"
   fi
 fi
 
@@ -157,7 +157,7 @@ cat <<EOB
 
   map \$http_referer \$refererVersion {
     ~(\?|&)v=([0-9]+)(&|$)      \$2;
-    default                     '\${dollar}LATEST';
+    default                     'production'; #'\${dollar}LATEST';
   }
 
   map \$cookie_version \$cookieVersion {

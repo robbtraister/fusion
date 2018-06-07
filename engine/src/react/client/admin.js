@@ -15,7 +15,7 @@ const Consumer = require('../shared/consumer')
 
 const getComponent = (componentType, componentName, outputType) => {
   const Component = Fusion.Components[componentType][componentName]
-  return (componentType === 'features')
+  return (Component && componentType === 'features')
     ? Consumer(Component)
     : Component
 }

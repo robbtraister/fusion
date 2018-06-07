@@ -96,8 +96,6 @@ const invoke = function invoke (options) {
     } else {
       const lambda = new AWS.Lambda(Object.assign({region: 'us-east-1'}, options, getOptions(req)))
       lambda.invoke(mapRequest(req), function (err, data) {
-        console.error(err)
-        console.log(data)
         mapResponse(err, data, res)
       })
     }

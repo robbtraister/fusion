@@ -8,7 +8,7 @@ const main = (environment, bundleName, variables, region) => {
 }
 
 module.exports.handler = (event, context, callback) => {
-  main(event.environment, event.bundle, event.variables, event.region)
+  main(process.env.ENVIRONMENT, event.bundle, event.variables, event.region)
     .then((result) => { callback(null, result) })
     .catch((err) => {
       console.error(err)

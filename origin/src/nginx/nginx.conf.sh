@@ -177,7 +177,13 @@ cat <<EOB
 
   map \$host \$environment {
     default                     'offline';
-    # ~^(?<env>[^.]+)             \$env;
+EOB
+if [ "$(echo "${NODE_ENV}" | grep -i "^prod")" ]
+then
+  cat <<EOB
+    ~^(?<env>[^.]+)             \$env;
+EOB
+cat <<EOB
   }
 
   # map \$arg_outputType \$outputType {
@@ -243,16 +249,16 @@ cat <<EOB
 
 EOB
 
-if [ ! "$(echo "${NODE_ENV}" | grep -i "^prod")" ]
+if [ "$(echo "${NODE_ENV}" | grep -i "^prod")" ]
 then
-  cat <<EOB
-      root                      '/etc/nginx/resources';
-      try_files                 \$3 =418;
-EOB
-else
   cat <<EOB
       set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/\$2\$3;
       proxy_pass                \$target;
+EOB
+else
+  cat <<EOB
+      root                      '/etc/nginx/resources';
+      try_files                 \$3 =418;
 EOB
 fi
 cat <<EOB
@@ -267,16 +273,16 @@ cat <<EOB
       }
 EOB
 
-if [ ! "$(echo "${NODE_ENV}" | grep -i "^prod")" ]
+if [ "$(echo "${NODE_ENV}" | grep -i "^prod")" ]
 then
-  cat <<EOB
-      root                      '/etc/nginx/dist';
-      try_files                 \$3 =418;
-EOB
-else
   cat <<EOB
       set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/\$2\$3;
       proxy_pass                \$target;
+EOB
+else
+  cat <<EOB
+      root                      '/etc/nginx/dist';
+      try_files                 \$3 =418;
 EOB
 fi
 cat <<EOB
@@ -298,7 +304,7 @@ cat <<EOB
       proxy_intercept_errors    on;
 
 EOB
-if [ ! "$(echo "${NODE_ENV}" | grep -i "^prod")" ] || [ "${ON_DEMAND}" == 'true' ]
+if [ "${ON_DEMAND}" == 'true' ] || [ ! "$(echo "${NODE_ENV}" | grep -i "^prod")" ]
 then
   cat <<EOB
       return                    418;
@@ -323,7 +329,7 @@ EOB
 fi
 cat <<EOB
 
-    location ${API_PREFIX}/health {
+    location = /healthcheck {
       access_log                off;
       add_header                Content-Type text/html;
       return                    200 'OK';

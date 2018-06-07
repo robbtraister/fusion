@@ -25,7 +25,7 @@ then
 else
   if [ ! "${HTTP_ENGINE}" ]
   then
-    LAMBDA_ENGINE="arn:aws:lambda:${AWS_REGION:-us-east-1}:${AWS_ACCOUNT_ID:-397853141546}:function:fusion-engine-\${environment}-engine"
+    LAMBDA_ENGINE="arn:aws:lambda:${AWS_REGION:-us-east-1}:${AWS_ACCOUNT_ID:-397853141546}:function:fusion-engine-\${environment}:production"
   fi
 fi
 
@@ -35,11 +35,11 @@ then
 else
   if [ ! "${HTTP_RESOLVER}" ]
   then
-    LAMBDA_RESOLVER="arn:aws:lambda:${AWS_REGION:-us-east-1}:${AWS_ACCOUNT_ID:-397853141546}:function:fusion-resolver-\${environment}-resolver"
+    LAMBDA_RESOLVER="arn:aws:lambda:${AWS_REGION:-us-east-1}:${AWS_ACCOUNT_ID:-397853141546}:function:fusion-resolver-\${environment}"
   fi
 fi
 
-S3_HOST="http://${S3_BUCKET:-${NILE_NAMESPACE:-pagebuilder-fusion}}.s3.amazonaws.com"
+S3_HOST="http://${S3_BUCKET:-pagebuilder-fusion}.s3.amazonaws.com"
 
 cat <<EOB
 daemon off;

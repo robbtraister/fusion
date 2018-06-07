@@ -323,7 +323,7 @@ EOB
 fi
 cat <<EOB
 
-    location ${API_PREFIX}/health {
+    location = /healthcheck {
       access_log                off;
       add_header                Content-Type text/html;
       return                    200 'OK';

@@ -183,6 +183,7 @@ then
   cat <<EOB
     ~^(?<env>[^.]+)             \$env;
 EOB
+fi
 cat <<EOB
   }
 

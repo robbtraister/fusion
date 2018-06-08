@@ -289,7 +289,7 @@ fi
 cat <<EOB
     }
 
-    location ~ ^${API_PREFIX}/(content|generate|render)(/.*|$) {
+    location ~ ^${API_PREFIX}/(configs|content|generate|render)(/.*|$) {
       error_page                418 = @engine;
       return                    418;
     }

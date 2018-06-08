@@ -2,7 +2,7 @@
 
 const path = require('path')
 
-const glob = require('glob')
+const { glob } = require('../utils/promises')
 
 const {
   componentSrcRoot,

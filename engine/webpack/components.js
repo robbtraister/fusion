@@ -84,7 +84,7 @@ module.exports = (Object.keys(entry).length)
       new MiniCssExtractPlugin({
         filename: '[name].css'
       }),
-      new ManifestPlugin()
+      new ManifestPlugin({fileName: 'manifest.components.json'})
     ],
     resolve
   }

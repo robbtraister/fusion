@@ -11,8 +11,8 @@ const S3 = require('aws-sdk').S3
 const promises = require('./utils/promises')
 
 const {
+  buildArtifact,
   bundleKey,
-  engineArtifact,
   S3Bucket
 } = require('./configs')
 
@@ -69,7 +69,10 @@ class Compiler {
 
       await copySrcPromise
       await build(await rootDirPromise)
-      await zip(await zipFilePromise, await rootDirPromise)
+      await zip(await zipFilePromise, {
+        bundle: path.resolve(await rootDirPromise, 'bundle'),
+        dist: path.resolve(await rootDirPromise, 'dist')
+      })
 
       const result = await this.upload(await zipFilePromise)
 
@@ -103,7 +106,7 @@ class Compiler {
 
     const resultPromise = await this.s3upload(
       Object.assign(
-        engineArtifact(this.environment),
+        buildArtifact(this.environment),
         { Body: fs.createReadStream(fp) }
       )
     )

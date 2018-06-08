@@ -326,6 +326,9 @@ then
     location ${CONTEXT_PATH}/admin {
       proxy_pass                ${PB_ADMIN};
     }
+    location ${CONTEXT_PATH}/app/info {
+      proxy_pass                ${PB_ADMIN};
+    }
 EOB
 fi
 cat <<EOB
@@ -342,6 +345,15 @@ cat <<EOB
 
     location = / {
       rewrite                   (.*) /homepage;
+    }
+
+    # admin rewrites
+    location = ${CONTEXT_PATH}/content/api/content-config {
+      rewrite                   (.*) ${API_PREFIX}/configs/content/sources;
+    }
+
+    location ~ ^${CONTEXT_PATH}/admin/api/(chain|feature|layout)-config/?$ {
+      rewrite                   ^${CONTEXT_PATH}/admin/api/(chain|feature|layout)-config/? ${API_PREFIX}/configs/\$1s;
     }
 
     # all other requests should be treated as a new page to render

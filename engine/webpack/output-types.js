@@ -12,6 +12,7 @@ const OnBuildWebpackPlugin = require('on-build-webpack')
 
 const babelLoader = require('./shared/loaders/babel-loader')
 const cssLoader = require('./shared/loaders/css-loader')
+const ignoreLoader = require('./shared/loaders/ignore-loader')
 const sassLoader = require('./shared/loaders/sass-loader')
 
 const externals = require('./shared/externals')
@@ -111,18 +112,9 @@ module.exports = (Object.keys(entry).length)
             ]
           },
           {
-            test: /\.css$/,
+            test: /\.s?[ac]ss$/,
             use: [
-              'to-string-loader',
-              cssLoader
-            ]
-          },
-          {
-            test: /\.s[ac]ss$/,
-            use: [
-              'to-string-loader',
-              cssLoader,
-              sassLoader
+              ignoreLoader
             ]
           }
         ]

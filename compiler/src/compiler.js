@@ -43,10 +43,9 @@ async function getBundleDir (tempDirPromise) {
 }
 
 class Compiler {
-  constructor (environment, bundleName, variables, region) {
+  constructor (region, environment, bundleName) {
     this.environment = environment
     this.bundleName = bundleName
-    this.variables = variables || {}
     this.bundlePath = bundleKey(this.environment, this.bundleName)
 
     this.region = region || 'us-east-1'
@@ -67,22 +66,20 @@ class Compiler {
       const extractPromise = extractZip(await downloadPromise, getBundleDir(rootDirPromise))
 
       await extractPromise
-      promises.remove(await downloadFilePromise)
 
       await copySrcPromise
       await build(await rootDirPromise)
       await zip(await zipFilePromise, await rootDirPromise)
 
       const result = await this.upload(await zipFilePromise)
-      promises.remove(await zipFilePromise)
-      promises.remove(await rootDirPromise)
 
       return result
-    } catch (e) {
-      promises.remove(await downloadFilePromise)
-      promises.remove(await rootDirPromise)
-      promises.remove(await zipFilePromise)
-      throw e
+    } finally {
+      await Promise.all([
+        promises.remove(await downloadFilePromise),
+        promises.remove(await rootDirPromise),
+        promises.remove(await zipFilePromise)
+      ])
     }
   }
 

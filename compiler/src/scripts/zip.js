@@ -8,12 +8,12 @@ const yazl = require('yazl')
 
 const debug = require('debug')('fusion:compiler:zip')
 
-async function zip (zipFile, zipDirs) {
-  if (!(zipDirs instanceof Array)) {
-    zipDirs = [zipDirs]
+async function zip (zipFile, zipDirMap) {
+  if (!(zipDirMap instanceof Object)) {
+    zipDirMap = {'.': zipDirMap}
   }
 
-  debug(`zipping ${zipDirs} to ${zipFile}`)
+  debug(`zipping ${Object.values(zipDirMap)} to ${zipFile}`)
   const zipfile = new yazl.ZipFile()
   const output = fs.createWriteStream(zipFile)
 
@@ -24,25 +24,25 @@ async function zip (zipFile, zipDirs) {
 
     zipfile.outputStream.pipe(output)
 
-    function addDir (zipDir) {
+    function addDir (zipDir, prefix) {
       debug(`adding ${zipDir} to ${zipFile}`)
       return new Promise((resolve, reject) => {
         glob('**/*', {cwd: zipDir, nodir: true}, (err, files) => {
           if (err) {
             reject(err)
           } else {
-            files.forEach((f) => zipfile.addFile(path.resolve(zipDir, f), f))
+            files.forEach((f) => zipfile.addFile(path.resolve(zipDir, f), prefix ? path.join(prefix, f) : f))
             resolve()
           }
         })
       })
     }
 
-    Promise.all(zipDirs.map(addDir))
+    Promise.all(Object.keys(zipDirMap).map((prefix) => addDir(zipDirMap[prefix], prefix)))
       .then(() => { zipfile.end() })
   })
 
-  debug(`zipped ${zipDirs} to ${zipFile}`)
+  debug(`zipped ${Object.values(zipDirMap)} to ${zipFile}`)
 
   return zipFile
 }

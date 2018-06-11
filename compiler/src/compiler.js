@@ -4,8 +4,6 @@ const fs = require('fs')
 const path = require('path')
 const promisify = require('util').promisify
 
-const mimeTypes = require('mime-types')
-
 const debug = require('debug')('fusion:compiler')
 
 const S3 = require('aws-sdk').S3
@@ -13,15 +11,12 @@ const S3 = require('aws-sdk').S3
 const promises = require('./utils/promises')
 
 const {
+  buildArtifact,
   bundleKey,
-  engineArtifact,
-  engineDistPrefix,
-  engineResourcesPrefix,
   S3Bucket
 } = require('./configs')
 
 const build = require('./scripts/build')
-const deploy = require('./scripts/deploy')
 const extract = require('./scripts/extract')
 const zip = require('./scripts/zip')
 
@@ -48,10 +43,9 @@ async function getBundleDir (tempDirPromise) {
 }
 
 class Compiler {
-  constructor (environment, bundleName, variables, region) {
+  constructor (region, environment, bundleName) {
     this.environment = environment
     this.bundleName = bundleName
-    this.variables = variables || {}
     this.bundlePath = bundleKey(this.environment, this.bundleName)
 
     this.region = region || 'us-east-1'
@@ -72,26 +66,23 @@ class Compiler {
       const extractPromise = extractZip(await downloadPromise, getBundleDir(rootDirPromise))
 
       await extractPromise
-      promises.remove(await downloadFilePromise)
 
       await copySrcPromise
       await build(await rootDirPromise)
-      await zip(await zipFilePromise, await rootDirPromise)
+      await zip(await zipFilePromise, {
+        bundle: path.resolve(await rootDirPromise, 'bundle'),
+        dist: path.resolve(await rootDirPromise, 'dist')
+      })
 
-      const { VersionId } = await this.upload(await zipFilePromise)
-      promises.remove(await zipFilePromise)
-
-      const { Version } = await deploy(this.environment, VersionId)
-
-      const result = await this.pushResources(Version, await rootDirPromise)
-      promises.remove(await rootDirPromise)
+      const result = await this.upload(await zipFilePromise)
 
       return result
-    } catch (e) {
-      promises.remove(await downloadFilePromise)
-      promises.remove(await rootDirPromise)
-      promises.remove(await zipFilePromise)
-      throw e
+    } finally {
+      await Promise.all([
+        promises.remove(await downloadFilePromise),
+        promises.remove(await rootDirPromise),
+        promises.remove(await zipFilePromise)
+      ])
     }
   }
 
@@ -100,9 +91,6 @@ class Compiler {
       Bucket: S3Bucket,
       Key: this.bundlePath
     }
-    // if (VersionId) {
-    //   params.VersionId = VersionId
-    // }
 
     const destFile = await destFilePromise
     debug(`downloading ${params.Bucket} ${params.Key} to ${destFile}`)
@@ -113,40 +101,12 @@ class Compiler {
     return destFile
   }
 
-  async pushResources (deployment, srcDir) {
-    const pushFile = async (fp, Key) => {
-      const resultPromise = await this.s3upload(
-        {
-          ACL: 'public-read',
-          Body: fs.createReadStream(fp),
-          Bucket: S3Bucket,
-          ContentType: mimeTypes.contentType(path.extname(fp)) || 'application/octet-stream',
-          Key
-        }
-      )
-      debug(`uploaded: ${fp}`)
-      return resultPromise
-    }
-
-    const pushFiles = async (cwd, prefix) => {
-      const files = await promises.glob('**/*', {cwd, nodir: true})
-      return Promise.all(
-        files.map(file => pushFile(path.join(cwd, file), path.join(prefix, file)))
-      )
-    }
-
-    return Promise.all([
-      pushFiles(path.join(srcDir, 'bundle', 'resources'), engineResourcesPrefix(this.environment, deployment)),
-      pushFiles(path.join(srcDir, 'dist'), engineDistPrefix(this.environment, deployment))
-    ])
-  }
-
   async upload (fp) {
     debug(`uploading ${fp} for ${this.environment}`)
 
     const resultPromise = await this.s3upload(
       Object.assign(
-        engineArtifact(this.environment),
+        buildArtifact(this.environment),
         { Body: fs.createReadStream(fp) }
       )
     )

@@ -7,6 +7,7 @@ const { minify } = require('../../environment')
 const optimization = (minify)
   ? {
     minimizer: [new UglifyWebpackPlugin({
+      parallel: true,
       test: /\.jsx?$/i
     })]
   }

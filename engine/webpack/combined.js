@@ -21,7 +21,8 @@ const isTest = require('./shared/is-test')
 const {
   componentDistRoot,
   componentSrcRoot,
-  distRoot
+  distRoot,
+  isDev
 } = require('../environment')
 
 const entry = {}
@@ -54,6 +55,28 @@ ${Object.keys(entry).map(name => {
 module.exports = Components
   `
 )
+
+const plugins = [
+  new MiniCssExtractPlugin({
+    filename: '[name].css'
+  })
+]
+
+if (isDev) {
+  plugins.push(
+    // only a single entry, so these can be cleaned reliably
+    new CleanWebpackPlugin(
+      [
+        'page',
+        'template'
+      ],
+      {
+        root: distRoot,
+        watch: true
+      }
+    )
+  )
+}
 
 module.exports = {
   entry: {
@@ -94,21 +117,6 @@ module.exports = {
     library: `window.Fusion=window.Fusion||{};window.Fusion.Components`,
     libraryTarget: 'assign'
   },
-  plugins: [
-    // only a single entry, so these can be cleaned reliably
-    new CleanWebpackPlugin(
-      [
-        'page',
-        'template'
-      ],
-      {
-        root: distRoot,
-        watch: true
-      }
-    ),
-    new MiniCssExtractPlugin({
-      filename: '[name].css'
-    })
-  ],
+  plugins,
   resolve
 }

@@ -2,13 +2,13 @@
 
 const Compiler = require('./compiler')
 
-const main = (environment, bundleName, variables, region) => {
-  return new Compiler(environment, bundleName, variables, region)
+const main = (region, environment, bundleName) => {
+  return new Compiler(region, environment, bundleName)
     .compile()
 }
 
 module.exports.handler = (event, context, callback) => {
-  main(event.environment, event.bundle, event.variables, event.region)
+  main(process.env.REGION, process.env.ENVIRONMENT, event.bundle)
     .then((result) => { callback(null, result) })
     .catch((err) => {
       console.error(err)

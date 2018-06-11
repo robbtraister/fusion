@@ -240,6 +240,12 @@ cat <<EOB
       proxy_redirect            / ' ${API_PREFIX}/';
     }
 
+    location @nodejs {
+      rewrite                   ^${API_PREFIX}(/|$)(.*) /\$2 break;
+      proxy_pass                http://0.0.0.0:${NODEJS_PORT:-8081}\$uri\$query_params;
+      proxy_redirect            / ' ${API_PREFIX}/';
+    }
+
     location @resources {
       return 404;
     }
@@ -329,6 +335,16 @@ then
 EOB
 fi
 cat <<EOB
+
+    location ${CONTEXT_PATH}/_ {
+      rewrite ^${CONTEXT_PATH}/_/(.*) ${API_PREFIX}/\$1;
+    }
+
+    location ~ ^${API_PREFIX}/status/(\\d\\d\\d)$ {
+      # nginx can't return dynamic status codes, so proxy to nodejs
+      error_page                418 = @nodejs;
+      return                    418;
+    }
 
     location = /healthcheck {
       access_log                off;

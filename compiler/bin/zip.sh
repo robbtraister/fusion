@@ -12,6 +12,8 @@
   # aws-sdk is still depended on by dynamoose, so manually delete it
   rm -rf ./node_modules/aws-sdk
 
+  zip ../compiler/dist/engine.zip -r ./
+
   cd ..
   zip compiler/dist/compiler.zip -r compiler engine -x compiler/bin/\* compiler/dist/\*
 

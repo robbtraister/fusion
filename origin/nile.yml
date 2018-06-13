@@ -38,7 +38,7 @@ _services: &_services
 
 _settings: &_settings
   <<: *_healthcheck
-  scheme: external
+  scheme: internet-facing
 
 _task: &_task
   task:

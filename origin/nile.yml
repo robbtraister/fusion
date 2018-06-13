@@ -64,4 +64,4 @@ environments:
           <<: *_healthcheck
           domain: staging.origin.fusion.arc.pub
           parent_domain: fusion.arc.pub
-          scheme: internal
+          scheme: external

@@ -259,7 +259,8 @@ EOB
 if [ "$(echo "${NODE_ENV}" | grep -i "^prod")" ]
 then
   cat <<EOB
-      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/\$2\$3;
+      set                       \$p \$2\$3;
+      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/\$p;
       proxy_pass                \$target;
 EOB
 else
@@ -283,7 +284,8 @@ EOB
 if [ "$(echo "${NODE_ENV}" | grep -i "^prod")" ]
 then
   cat <<EOB
-      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/\$2\$3;
+      set                       \$p \$2\$3;
+      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/\$p;
       proxy_pass                \$target;
 EOB
 else
@@ -318,7 +320,8 @@ then
 EOB
 else
   cat <<EOB
-      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/html\$2.html;
+      set                       \$p \$2.html;
+      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/html\$p;
       proxy_pass                \$target;
 EOB
 fi

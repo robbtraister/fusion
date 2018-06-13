@@ -10,37 +10,37 @@ const getOptionalJson = (fp) => {
   }
 }
 
-const env = Object.assign(
+const variables = Object.assign(
   // ordered by increasing precedence
   getOptionalJson('./env.json'),
   getOptionalJson('./environment.json'),
   process.env
 )
 
-const binaryContentTypes = env.BINARY_CONTENT_TYPES
-  ? env.BINARY_CONTENT_TYPES.split(/[,;]/)
+const binaryContentTypes = variables.BINARY_CONTENT_TYPES
+  ? variables.BINARY_CONTENT_TYPES.split(/[,;]/)
   : require('./binary-content-types.json')
 const bodyLimit = '100mb'
-const contentBase = env.CONTENT_BASE || ''
-const contextPath = (env.CONTEXT_PATH || 'pb').replace(/^\/*/, '/').replace(/\/+$/, '')
-const defaultOutputType = env.DEFAULT_OUTPUT_TYPE || 'default'
+const contentBase = variables.CONTENT_BASE || ''
+const contextPath = (variables.CONTEXT_PATH || 'pb').replace(/^\/*/, '/').replace(/\/+$/, '')
+const defaultOutputType = variables.DEFAULT_OUTPUT_TYPE || 'default'
 const apiPrefix = `${contextPath}/api/v3`
-const environment = env.ENVIRONMENT
-const functionName = env.AWS_LAMBDA_FUNCTION_NAME || `fusion-engine-${environment}`
-const isDev = !/^prod/i.test(env.NODE_ENV)
-const minify = (isDev) ? /^true$/i.test(env.MINIFY) : true
-const mongoUrl = env.MONGO_URL
-const onDemand = /^true$/i.test(env.ON_DEMAND)
-const port = env.PORT || 8080
-const region = env.REGION || 'us-east-1'
-const version = env.AWS_LAMBDA_FUNCTION_VERSION || '$LATEST'
+const environment = variables.ENVIRONMENT
+const functionName = variables.AWS_LAMBDA_FUNCTION_NAME || `fusion-engine-${environment}`
+const isDev = !/^prod/i.test(variables.NODE_ENV)
+const minify = (isDev) ? /^true$/i.test(variables.MINIFY) : true
+const mongoUrl = variables.MONGO_URL
+const onDemand = /^true$/i.test(variables.ON_DEMAND)
+const port = variables.PORT || 8080
+const region = variables.REGION || 'us-east-1'
+const version = variables.AWS_LAMBDA_FUNCTION_VERSION || '$LATEST'
 
-const bundleRoot = path.resolve(env.BUNDLE_ROOT || `${__dirname}/../bundle`)
+const bundleRoot = path.resolve(variables.BUNDLE_ROOT || `${__dirname}/../bundle`)
 const distRoot = path.resolve(`${bundleRoot}/../dist`)
 const componentDistRoot = path.resolve(`${distRoot}/components`)
 const componentSrcRoot = path.resolve(`${bundleRoot}/components`)
-const schemasRoot = path.resolve(env.SCHEMAS_ROOT || `${bundleRoot}/content/schemas`)
-const sourcesRoot = path.resolve(env.SOURCES_ROOT || `${bundleRoot}/content/sources`)
+const schemasRoot = path.resolve(variables.SCHEMAS_ROOT || `${bundleRoot}/content/schemas`)
+const sourcesRoot = path.resolve(variables.SOURCES_ROOT || `${bundleRoot}/content/sources`)
 
 module.exports = {
   apiPrefix,
@@ -63,5 +63,6 @@ module.exports = {
   region,
   schemasRoot,
   sourcesRoot,
+  variables,
   version
 }

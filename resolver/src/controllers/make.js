@@ -4,7 +4,7 @@ const resolve = require('./resolve')
 const engine = require('./engine')
 const url = require('url')
 
-const endpoint = function endpoint (data, outputType, arcSite) {
+const endpoint = function endpoint (data, arcSite, outputType) {
   return url.format({
     pathname: `/render`,
     query: {
@@ -14,13 +14,13 @@ const endpoint = function endpoint (data, outputType, arcSite) {
   })
 }
 
-const make = function make (uri, outputType, version, arcSite) {
+const make = function make (uri, arcSite, version, outputType) {
   return resolve(uri, arcSite)
     .then((data) =>
       data
         ? engine({
           method: 'POST',
-          uri: endpoint(data, outputType, arcSite),
+          uri: endpoint(data, arcSite, outputType),
           data,
           version
         })

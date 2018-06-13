@@ -41,7 +41,7 @@ const getLambdaEngine = function getLambdaEngine () {
           queryStringParameters: parts.query,
           protocol: 'http'
         }),
-        Qualifier: version || '$LATEST'
+        Qualifier: version || 'production'
       }, (err, data) => {
         if (err) {
           return reject(err)

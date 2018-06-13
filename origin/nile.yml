@@ -68,3 +68,7 @@ environments:
           <<: *_settings
           domain: staging.fusion.arcpublishing.com
           parent_domain: fusion.arcpublishing.com
+          subnets:
+            - subnet-1a8f9640
+            - subnet-9d4bafb2
+            - subnet-42943209

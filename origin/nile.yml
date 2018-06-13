@@ -62,6 +62,6 @@ environments:
       - <<: *_resource
         settings:
           <<: *_healthcheck
-          domain: staging.origin.fusion.arc.pub
-          parent_domain: fusion.arc.pub
+          domain: staging.fusion.arcpublishing.com
+          parent_domain: fusion.arcpublishing.com
           scheme: external

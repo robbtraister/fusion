@@ -172,8 +172,8 @@ const { pageConfigs, templateConfigs } = (resolveFromDB)
   : (() => {
     const resolverConfigs = require('../../config/resolvers.json')
     return {
-      pageConfigs: Promise.resolve(resolverConfigs.pages),
-      templateConfigs: Promise.resolve(resolverConfigs.resolvers)
+      pageConfigs: Promise.resolve(resolverConfigs.pages || []),
+      templateConfigs: Promise.resolve(resolverConfigs.resolvers || [])
     }
   })()
 

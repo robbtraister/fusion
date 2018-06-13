@@ -9,7 +9,7 @@ const makeRouter = express.Router()
 
 makeRouter.get('*', (req, res, next) => {
   const arcSite = req.query._website || req.get('Arc-Site')
-  make(req.url, req.query.outputType, req.get('Fusion-Engine-Version'), arcSite)
+  make(req.url, arcSite, req.get('Fusion-Engine-Version'), req.query.outputType)
     .then(data => { res.send(data) })
     .catch(redirectHandler(req.baseUrl))
     .catch(next)

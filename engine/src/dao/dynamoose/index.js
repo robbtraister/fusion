@@ -4,33 +4,26 @@ const dynamoose = require('dynamoose')
 
 const {
   environment,
-  region,
-  version
-} = require('../../environment')
-
-const defaultSchema = new dynamoose.Schema(
-  {
-    version: {
-      type: String,
-      hashKey: true
-    },
-    id: {
-      type: String,
-      rangeKey: true
-    }
-  },
-  { useDocumentTypes: true }
-)
+  region
+} = require('../../../environment')
 
 const db = new dynamoose.Dynamoose()
 db.AWS.config.update({region})
 
+const getSchema = modelName => {
+  try {
+    return require(`./schemas/${modelName}`)
+  } catch (e) {
+    return require(`./schemas/default`)
+  }
+}
+
 const createModel = (modelName) => {
-  const _model = db.model(`fusion.${environment}.${modelName}`, defaultSchema)
+  const _model = db.model(`fusion.${environment}.${modelName}`, getSchema(modelName))
 
   return {
     get (id) {
-      return _model.get({version, id})
+      return _model.get({id})
     },
 
     find () {
@@ -43,7 +36,7 @@ const createModel = (modelName) => {
 
     put (doc) {
       return new Promise((resolve, reject) => {
-        _model.save(Object.assign({}, doc, {version}), (err, data) => (err ? reject(err) : resolve(data)))
+        _model.create(Object.assign({}, doc), (err, data) => (err ? reject(err) : resolve(data)))
       })
     }
   }

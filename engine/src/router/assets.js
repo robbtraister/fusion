@@ -54,7 +54,7 @@ function getTypeRouter (routeType, allowPost) {
         const type = req.body.type || routeType
 
         new Rendering(type, id, req.body)
-          .publish()
+          .publish(req.query.propagate !== 'false')
           .then(() => { res.sendStatus(200) })
           .catch(next)
       }

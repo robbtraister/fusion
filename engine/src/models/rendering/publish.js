@@ -36,7 +36,8 @@ const publishToVersion = function publishToVersion (uri, payload, version) {
         Payload: JSON.stringify({
           method: 'POST',
           path: uri,
-          body: payload
+          body: payload,
+          queryStringParameters: {propagate: 'false'}
         })
       },
       (err, data) => err ? reject(err) : resolve(data)

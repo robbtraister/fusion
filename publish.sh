@@ -41,16 +41,14 @@ notify () {
 
   if [ "${HAL_TOKEN}" ]
   then
-    curl -X POST -k -H 'Content-Type: application/json' -d "{\"app\":\"${APP_NAME}\",\"cluster\":\"${CLUSTER_NAME}\",\"autoDeploy\":false,\"status\":\"${status}\",\"version\":\"${TAG}\",\"step\":\"${step}\",\"msg\":\"${msg}\"}" ${NOTIFICATIONS_URL}/hubot/notify?token=${HAL_TOKEN}\&room=${SLACK_CHANNEL}\&type=build-status
+    curl -X POST -k -H 'Content-Type: application/json' -d "{\"app\":\"${appName:-${APP_NAME}}\",\"cluster\":\"${CLUSTER_NAME}\",\"autoDeploy\":false,\"status\":\"${status}\",\"version\":\"${tag:-${TAG}}\",\"step\":\"${step}\",\"msg\":\"${msg}\"}" ${NOTIFICATIONS_URL}/hubot/notify?token=${HAL_TOKEN}\&room=${SLACK_CHANNEL}\&type=build-status
   fi
 }
 
 notifyBuildStart() {
-  app=${1:-${APP_NAME}}
-  tag=${2:-${TAG}}
   if [ "${HAL_TOKEN}" ]
   then
-    curl -X POST -k -H 'Content-Type: application/json' -d "{\"app\":\"${app}\",\"cluster\":\"${CLUSTER_NAME}\",\"version\":\"${tag}\"}" ${NOTIFICATIONS_URL}/hubot/notify?token=${HAL_TOKEN}\&room=${SLACK_CHANNEL}\&type=build-started
+    curl -X POST -k -H 'Content-Type: application/json' -d "{\"app\":\"${appName:-${APP_NAME}}\",\"cluster\":\"${CLUSTER_NAME}\",\"version\":\"${tag:-${TAG}}\"}" ${NOTIFICATIONS_URL}/hubot/notify?token=${HAL_TOKEN}\&room=${SLACK_CHANNEL}\&type=build-started
   fi
 }
 
@@ -63,12 +61,12 @@ build () {
   name=$1
   v=$(version "$name")
 
-  notifyBuildStart "${APP_NAME}-${name}" "${v}"
+  appName="${APP_NAME}-${name}" tag="${v}" notifyBuildStart
 
   buildImage "${name}" || notifyBuildError "building ${name}"
   pushImage "${name}" || notifyBuildError "pushing ${name}"
 
-  notify 'success' "${name} completed"
+  appName="${APP_NAME}-${name}" tag="${v}" notify 'success' 'build completed'
 }
 
 TAG='latest'

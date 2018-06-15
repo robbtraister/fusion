@@ -4,7 +4,7 @@ APP_NAME=${APP_NAME:-fusion}
 HAL_URL=${HAL_URL:-"https://hal.ext.nile.works"}
 SLACK_CHANNEL=${SLACK_CHANNEL:-"fusion-notices"}
 
-_version () {
+version () {
   if [ "${RELEASE}" ]
   then
     name=$1
@@ -15,7 +15,7 @@ _version () {
   fi
 }
 
-_build () {
+buildImage () {
   name=$1
   v=$(version "$name")
   if [ -f "./${name}/Dockerfile" ]
@@ -26,7 +26,7 @@ _build () {
   fi
 }
 
-_push () {
+push () {
   name=$1 && \
   v=$(version "$name") && \
   docker tag "quay.io/washpost/fusion-${name}:${v}" "quay.io/washpost/fusion-${name}:${v}" && \
@@ -58,12 +58,12 @@ notifyBuildError () {
 
 build () {
   name=$1
-  v=$(_version "$name")
+  v=$(version "$name")
 
   APP_NAME="${APP_NAME}-${name}" TAG="${v}" notifyBuildStart
 
-  _build "${name}" || notifyBuildError "building ${name}"
-  _push "${name}" || notifyBuildError "pushing ${name}"
+  buildImage "${name}" || notifyBuildError "building ${name}"
+  push "${name}" || notifyBuildError "pushing ${name}"
 
   notify 'success' "${name} completed"
 }

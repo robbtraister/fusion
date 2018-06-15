@@ -1,8 +1,9 @@
 'use strict'
 
 const path = require('path')
+const promisify = require('util').promisify
 
-const glob = require('glob')
+const glob = promisify(require('glob'))
 
 const {
   componentSrcRoot,

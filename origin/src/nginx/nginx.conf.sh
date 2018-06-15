@@ -8,6 +8,8 @@ CONTEXT_PATH="/${CONTEXT_PATH##/}"
 
 API_PREFIX="${CONTEXT_PATH}/api/v3"
 
+IS_PROD=$(echo "${NODE_ENV}" | grep -i "^prod")
+
 DNS_SERVER=''
 for word in $(cat '/etc/resolv.conf')
 do
@@ -122,7 +124,7 @@ cat <<EOB
     default                     '\$';
   }
 
-  map \$uri \$valid_request {
+  map \$request_uri \$valid_request {
     ~[\{\}]                     'false';
     default                     'true';
   }
@@ -176,9 +178,9 @@ cat <<EOB
   }
 
   map \$host \$environment {
-    default                     'offline';
+    default                     'localhost';
 EOB
-if [ "$(echo "${NODE_ENV}" | grep -i "^prod")" ]
+if [ "${IS_PROD}" ]
 then
   cat <<EOB
     ~^(?<env>[^.]+)             \$env;
@@ -196,10 +198,23 @@ cat <<EOB
     listen                      ${PORT:-8080};
     server_name                 _;
 
+EOB
+if [ "${IS_PROD}" ]
+then
+  cat <<EOB
+    if (\$http_x_forwarded_port = 80) {
+      return 301 '\${http_x_forwarded_proto}s://\${host}\${request_uri}\${query_params}';
+    }
+
+EOB
+fi
+
+cat <<EOB
     location @engine {
       rewrite                   ^${API_PREFIX}(/|$)(.*) /\$2 break;
       rewrite                   ^${CONTEXT_PATH}(/|$)(.*) /\$2 break;
 EOB
+
 if [ "${HTTP_ENGINE}" ]
 then
   cat <<EOB
@@ -213,6 +228,7 @@ else
       proxy_pass                ${LAMBDA_PROXY:-http://0.0.0.0:${NODEJS_PORT:-8081}}\$uri\$query_params;
 EOB
 fi
+
 cat <<EOB
       proxy_redirect            / ' ${API_PREFIX}/';
     }
@@ -223,6 +239,7 @@ cat <<EOB
 
       proxy_set_header          'Fusion-Engine-Version' '\${version}';
 EOB
+
 if [ "${HTTP_RESOLVER}" ]
 then
   cat <<EOB
@@ -235,8 +252,15 @@ else
       proxy_pass                ${LAMBDA_PROXY:-http://0.0.0.0:${NODEJS_PORT:-8081}}\$uri\$query_params;
 EOB
 fi
+
 cat <<EOB
       proxy_redirect            /make/ ' ${CONTEXT_PATH}/';
+      proxy_redirect            / ' ${API_PREFIX}/';
+    }
+
+    location @nodejs {
+      rewrite                   ^${API_PREFIX}(/|$)(.*) /\$2 break;
+      proxy_pass                http://0.0.0.0:${NODEJS_PORT:-8081}\$uri\$query_params;
       proxy_redirect            / ' ${API_PREFIX}/';
     }
 
@@ -250,10 +274,11 @@ cat <<EOB
 
 EOB
 
-if [ "$(echo "${NODE_ENV}" | grep -i "^prod")" ]
+if [ "${IS_PROD}" ]
 then
   cat <<EOB
-      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/\$2\$3;
+      set                       \$p \$2\$3;
+      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/\$p;
       proxy_pass                \$target;
 EOB
 else
@@ -262,6 +287,7 @@ else
       try_files                 \$3 =418;
 EOB
 fi
+
 cat <<EOB
     }
 
@@ -274,10 +300,11 @@ cat <<EOB
       }
 EOB
 
-if [ "$(echo "${NODE_ENV}" | grep -i "^prod")" ]
+if [ "${IS_PROD}" ]
 then
   cat <<EOB
-      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/\$2\$3;
+      set                       \$p \$2\$3;
+      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/\$p;
       proxy_pass                \$target;
 EOB
 else
@@ -286,6 +313,7 @@ else
       try_files                 \$3 =418;
 EOB
 fi
+
 cat <<EOB
     }
 
@@ -305,21 +333,25 @@ cat <<EOB
       proxy_intercept_errors    on;
 
 EOB
-if [ "${ON_DEMAND}" == 'true' ] || [ ! "$(echo "${NODE_ENV}" | grep -i "^prod")" ]
+
+if [ "${ON_DEMAND}" == 'true' ] || [ ! "${IS_PROD}" ]
 then
   cat <<EOB
       return                    418;
 EOB
 else
   cat <<EOB
-      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/html\$2.html;
+      set                       \$p \$2.html;
+      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/html\$p;
       proxy_pass                \$target;
 EOB
 fi
+
 cat <<EOB
     }
 
 EOB
+
 if [ "${PB_ADMIN}" ]
 then
   cat <<EOB
@@ -328,7 +360,18 @@ then
     }
 EOB
 fi
+
 cat <<EOB
+
+    location ${CONTEXT_PATH}/_ {
+      rewrite ^${CONTEXT_PATH}/_/(.*) ${API_PREFIX}/\$1;
+    }
+
+    location ~ ^${API_PREFIX}/status/(\\d\\d\\d)$ {
+      # nginx can't return dynamic status codes, so proxy to nodejs
+      error_page                418 = @nodejs;
+      return                    418;
+    }
 
     location = /healthcheck {
       access_log                off;

@@ -3,8 +3,6 @@
 const fs = require('fs')
 const path = require('path')
 
-const glob = require('glob')
-
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
@@ -18,15 +16,18 @@ const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
 const isTest = require('./shared/is-test')
 
+const components = require('./shared/components')
+
 const {
   componentDistRoot,
   componentSrcRoot,
-  distRoot
+  distRoot,
+  isDev
 } = require('../environment')
 
 const entry = {}
 const types = {}
-glob.sync(`${componentSrcRoot}/!(output-types)/**/*.{hbs,js,jsx,vue}`)
+components
   .filter(f => !isTest(f))
   .forEach(f => {
     const name = f.substr(componentSrcRoot.length + 1)
@@ -54,6 +55,28 @@ ${Object.keys(entry).map(name => {
 module.exports = Components
   `
 )
+
+const plugins = [
+  new MiniCssExtractPlugin({
+    filename: '[name].css'
+  })
+]
+
+if (isDev) {
+  plugins.push(
+    // only a single entry, so these can be cleaned reliably
+    new CleanWebpackPlugin(
+      [
+        'page',
+        'template'
+      ],
+      {
+        root: distRoot,
+        watch: true
+      }
+    )
+  )
+}
 
 module.exports = {
   entry: {
@@ -94,21 +117,6 @@ module.exports = {
     library: `window.Fusion=window.Fusion||{};window.Fusion.Components`,
     libraryTarget: 'assign'
   },
-  plugins: [
-    // only a single entry, so these can be cleaned reliably
-    new CleanWebpackPlugin(
-      [
-        'page',
-        'template'
-      ],
-      {
-        root: distRoot,
-        watch: true
-      }
-    ),
-    new MiniCssExtractPlugin({
-      filename: '[name].css'
-    })
-  ],
+  plugins,
   resolve
 }

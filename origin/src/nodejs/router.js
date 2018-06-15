@@ -7,6 +7,10 @@ const lambdaProxy = require('./lambda')
 
 const router = express.Router()
 
+router.all('/status/:code', (req, res, next) => {
+  res.sendStatus(req.params.code)
+})
+
 // Add parsers
 router.use(bodyParser.json())
 router.use(bodyParser.urlencoded({ extended: false }))

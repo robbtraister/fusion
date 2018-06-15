@@ -2,7 +2,7 @@
 
 const childProcess = require('child_process')
 const fs = require('fs')
-const promisify = require('util').promisify
+const { promisify } = require('util')
 
 const copy = (src, dest) => exec(`cp -R ${src} ${dest}`)
 const exec = promisify(childProcess.exec.bind(childProcess))

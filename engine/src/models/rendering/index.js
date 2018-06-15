@@ -61,8 +61,13 @@ class Rendering {
   // Lazy load all the things (YpAGNI)
 
   getJson () {
-    this.json = this.json || getJson(this.type, this.id)
-    return this.json
+    this.jsonPromise = this.jsonPromise ||
+      (
+        (this.json)
+          ? Promise.resolve(this.json)
+          : getJson(this.type, this.id)
+      )
+    return this.jsonPromise
   }
 
   compile (outputType = defaultOutputType) {
@@ -128,16 +133,22 @@ class Rendering {
     return this.js
   }
 
-  publish () {
+  publish (propagate) {
     return (
       (this.json)
-        ? Promise.all([
-          putJson(this.type, this.json),
-          this.compileAll()
-        ])
+        ? Promise.all([this.compileAll()]
+          .concat(
+            // if this is the first version to receive this rendering
+            (propagate)
+              ? [
+                putJson(this.type, this.json),
+                publishToOtherVersions(`/dist/${this.type}/${this.id}`, this.json)
+              ]
+              : []
+          )
+        )
         : Promise.reject(new Error('no rendering provided to publish'))
     )
-      .then(() => publishToOtherVersions(`/dist/${this.type}/${this.id}`, this.json))
   }
 }
 

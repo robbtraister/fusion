@@ -81,11 +81,11 @@ const getResolverHydrater = function getResolverHydrater (resolver) {
   const contentSourceParser = parseContentSourceParameters(resolver)
 
   const contentResolver = (resolver.contentSourceId)
-    ? (requestUri, arcSite) => {
+    ? (requestUri, arcSite, version) => {
       const contentSourceParams = contentSourceParser(requestUri)
       requestUri = trailingSlashRewrite(requestUri)
       const key = Object.assign({'uri': requestUri, '_website': arcSite}, contentSourceParams)
-      return fetch(resolver.contentSourceId, key)
+      return fetch(resolver.contentSourceId, key, version)
         .then(content => ({key, content}))
     }
     : (requestUri, arcSite) => Promise.resolve({key: null, content: null})
@@ -172,8 +172,8 @@ const { pageConfigs, templateConfigs } = (resolveFromDB)
   : (() => {
     const resolverConfigs = require('../../config/resolvers.json')
     return {
-      pageConfigs: Promise.resolve(resolverConfigs.pages),
-      templateConfigs: Promise.resolve(resolverConfigs.resolvers)
+      pageConfigs: Promise.resolve(resolverConfigs.pages || []),
+      templateConfigs: Promise.resolve(resolverConfigs.resolvers || [])
     }
   })()
 
@@ -198,7 +198,7 @@ const pageResolvers = pageConfigs
   })
 const templateResolvers = templateConfigs.then((configs) => configs.map(prepareResolver('template')))
 
-const resolve = function resolve (requestUri, arcSite) {
+const resolve = function resolve (requestUri, arcSite, version) {
   const requestParts = url.parse(requestUri, true)
   const pathname = requestParts.pathname
   debugLogger(`Resolving: ${JSON.stringify(requestUri)}`)
@@ -210,7 +210,7 @@ const resolve = function resolve (requestUri, arcSite) {
         templateResolvers.find(resolver => resolver.match(requestParts, arcSite))
 
       return resolver
-        ? resolver.hydrate(requestUri, arcSite)
+        ? resolver.hydrate(requestUri, arcSite, version)
         : null
     })
 }

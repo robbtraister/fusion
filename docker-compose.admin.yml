@@ -1,4 +1,20 @@
-version: '3'
+version: '3.4'
+
+x-environment: &_environment
+  DB_NAME: ${DB_NAME:-fusion_dev}
+  MONGO_URL: mongodb://data:27017/${DB_NAME:-fusion_dev}
+  PB_MONGODB_URI: mongodb://data:27017/${DB_NAME:-fusion_dev}
+
+  HTTP_ENGINE: http://engine:8080
+  HTTP_RESOLVER: http://resolver:8080
+  LAMBDA_ENGINE:
+  LAMBDA_RESOLVER:
+
+  NODE_ENV:
+  ENVIRONMENT: localhost
+  CONTEXT_PATH:
+  ON_DEMAND:
+  DEBUG: fusion:*
 
 networks:
   fusion:
@@ -11,6 +27,7 @@ services:
     image: quay.io/washpost/mongo-localhost
     build: ./data
     environment:
+      <<: *_environment
       WATCH: 'true'
     networks:
       fusion:
@@ -33,14 +50,9 @@ services:
     depends_on:
       - data
     environment:
-      NODE_ENV:
-      DEBUG: fusion:*
-      ENVIRONMENT: localhost
-      MONGO_URL: mongodb://data:27017/${DB_NAME:-fusion_dev}
+      <<: *_environment
       CONTENT_BASE:
-      CONTEXT_PATH:
       MINIFY:
-      ON_DEMAND:
     networks:
       - fusion
     ports:
@@ -62,13 +74,8 @@ services:
       - data
       - engine
     environment:
-      NODE_ENV:
-      DEBUG: fusion:*
-      ENVIRONMENT: localhost
-      HTTP_ENGINE: http://engine:8080
-      MONGO_URL: mongodb://data:27017/${DB_NAME:-fusion_dev}
+      <<: *_environment
       RESOLVE_FROM_DB: 'true' # should only be 'true' for local dev environments
-      LAMBDA_ENGINE:
       TRAILING_SLASH_RULE: # Options are FORCE, DROP, or NOOP
     networks:
       - fusion
@@ -93,13 +100,13 @@ services:
       - memcache
       - data
     environment:
+      <<: *_environment
       NGINX_PORT: ""
       TOMCAT_PORT: "8888"
       PB_AUTH_DISABLED: "true"
       PB_ASSETS_IMPORT_PATH: "/assets"
       PB_ASSETS_IMPORT_METHOD: "symlink"
       PB_MEMCACHED_HOST: "memcache:11211"
-      PB_MONGODB_URI: "mongodb://data:27017/${DB_NAME:-fusion_dev}"
       PB_MONGODB_GARBAGE_COLLECTION: "false"
       PB_RENDERING_DEBUG: "true"
       PB_SYSTEM_LOG_CONFIG: "logback-info.xml"
@@ -121,14 +128,8 @@ services:
       - resolver
       - admin
     environment:
-      NODE_ENV:
-      HTTP_ENGINE: http://engine:8080
-      HTTP_RESOLVER: http://resolver:8080
+      <<: *_environment
       PB_ADMIN: http://admin:8888
-      LAMBDA_ENGINE:
-      LAMBDA_RESOLVER:
-      CONTEXT_PATH:
-      ON_DEMAND:
     networks:
       - fusion
     ports:

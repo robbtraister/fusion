@@ -1,8 +1,9 @@
 #!/bin/sh
 
-APP_NAME=${APP_NAME:-fusion}
-HAL_URL=${HAL_URL:-"https://hal.ext.nile.works"}
-SLACK_CHANNEL=${SLACK_CHANNEL:-"fusion-notices"}
+CLUSTER_NAME=${CLUSTER_NAME:-'arc.nile.works'}
+APP_NAME=${APP_NAME:-'fusion'}
+NOTIFICATIONS_URL=${NOTIFICATIONS_URL:-'http://jenkins-bot.internal.arc.nile.works'}
+SLACK_CHANNEL=${SLACK_CHANNEL:-'fusion-notices'}
 
 version () {
   if [ "${RELEASE}" ]
@@ -26,7 +27,7 @@ buildImage () {
   fi
 }
 
-push () {
+pushImage () {
   name=$1 && \
   v=$(version "$name") && \
   docker tag "quay.io/washpost/fusion-${name}:${v}" "quay.io/washpost/fusion-${name}:${v}" && \
@@ -40,14 +41,14 @@ notify () {
 
   if [ "${HAL_TOKEN}" ]
   then
-    curl -X POST -k -H 'Content-Type: application/json' -d "{\"app\":\"${APP_NAME}\",\"cluster\":\"${CLUSTER_NAME}\",\"autoDeploy\":false,\"status\":\"${status}\",\"version\":\"${TAG}\",\"step\":\"${step}\",\"msg\":\"${msg}\"}" ${HAL_URL}/hubot/notify?token=${HAL_TOKEN}\&room=${SLACK_CHANNEL}\&type=build-status
+    curl -X POST -k -H 'Content-Type: application/json' -d "{\"app\":\"${APP_NAME}\",\"cluster\":\"${CLUSTER_NAME}\",\"autoDeploy\":false,\"status\":\"${status}\",\"version\":\"${TAG}\",\"step\":\"${step}\",\"msg\":\"${msg}\"}" ${NOTIFICATIONS_URL}/hubot/notify?token=${HAL_TOKEN}\&room=${SLACK_CHANNEL}\&type=build-status
   fi
 }
 
 notifyBuildStart() {
   if [ "${HAL_TOKEN}" ]
   then
-    curl -X POST -k -H 'Content-Type: application/json' -d "{\"app\":\"${APP_NAME}\",\"cluster\":\"${CLUSTER_NAME}\",\"version\":\"${TAG}\"}" ${HAL_URL}/hubot/notify?token=${HAL_TOKEN}\&room=${SLACK_CHANNEL}\&type=build-started
+    curl -X POST -k -H 'Content-Type: application/json' -d "{\"app\":\"${APP_NAME}\",\"cluster\":\"${CLUSTER_NAME}\",\"version\":\"${TAG}\"}" ${NOTIFICATIONS_URL}/hubot/notify?token=${HAL_TOKEN}\&room=${SLACK_CHANNEL}\&type=build-started
   fi
 }
 
@@ -63,7 +64,7 @@ build () {
   APP_NAME="${APP_NAME}-${name}" TAG="${v}" notifyBuildStart
 
   buildImage "${name}" || notifyBuildError "building ${name}"
-  push "${name}" || notifyBuildError "pushing ${name}"
+  pushImage "${name}" || notifyBuildError "pushing ${name}"
 
   notify 'success' "${name} completed"
 }

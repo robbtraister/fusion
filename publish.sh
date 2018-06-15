@@ -46,9 +46,11 @@ notify () {
 }
 
 notifyBuildStart() {
+  app=${1:-${APP_NAME}}
+  tag=${2:-${TAG}}
   if [ "${HAL_TOKEN}" ]
   then
-    curl -X POST -k -H 'Content-Type: application/json' -d "{\"app\":\"${APP_NAME}\",\"cluster\":\"${CLUSTER_NAME}\",\"version\":\"${TAG}\"}" ${NOTIFICATIONS_URL}/hubot/notify?token=${HAL_TOKEN}\&room=${SLACK_CHANNEL}\&type=build-started
+    curl -X POST -k -H 'Content-Type: application/json' -d "{\"app\":\"${app}\",\"cluster\":\"${CLUSTER_NAME}\",\"version\":\"${tag}\"}" ${NOTIFICATIONS_URL}/hubot/notify?token=${HAL_TOKEN}\&room=${SLACK_CHANNEL}\&type=build-started
   fi
 }
 
@@ -61,7 +63,7 @@ build () {
   name=$1
   v=$(version "$name")
 
-  APP_NAME="${APP_NAME}-${name}" TAG="${v}" notifyBuildStart
+  notifyBuildStart "${APP_NAME}-${name}" "${v}"
 
   buildImage "${name}" || notifyBuildError "building ${name}"
   pushImage "${name}" || notifyBuildError "pushing ${name}"

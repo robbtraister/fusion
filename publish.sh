@@ -5,6 +5,12 @@ APP_NAME=${APP_NAME:-'fusion'}
 NOTIFICATIONS_URL=${NOTIFICATIONS_URL:-'http://jenkins-bot.internal.arc.nile.works'}
 SLACK_CHANNEL=${SLACK_CHANNEL:-'fusion-notices'}
 
+TAG='latest'
+if [ "${RELEASE}" ]
+then
+  TAG='release'
+fi
+
 version () {
   if [ "${RELEASE}" ]
   then
@@ -61,19 +67,13 @@ build () {
   name=$1
   v=$(version "$name")
 
-  appName="${APP_NAME}-${name}" tag="${v}" notifyBuildStart
+  (appName="${APP_NAME}-${name}" tag="${v}" notifyBuildStart)
 
   buildImage "${name}" || notifyBuildError "building ${name}"
   pushImage "${name}" || notifyBuildError "pushing ${name}"
 
-  appName="${APP_NAME}-${name}" tag="${v}" notify 'success' 'build completed'
+  (appName="${APP_NAME}-${name}" tag="${v}" notify 'success' 'build completed')
 }
-
-TAG='latest'
-if [ "${RELEASE}" ]
-then
-  TAG='release'
-fi
 
 notifyBuildStart
 

@@ -1,6 +1,6 @@
 'use strict'
 
 module.exports = {
-  ENVIRONMENT: process.env.ENVIRONMENT,
-  REGION: process.env.REGION
+  environment: process.env.ENVIRONMENT,
+  region: process.env.REGION
 }

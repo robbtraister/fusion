@@ -99,17 +99,20 @@ function getFusionScript (globalContent, contentCache, refreshContent, arcSite) 
 const render = function render ({Component, requestUri, content, _website}) {
   const renderHTML = () => new Promise((resolve, reject) => {
     try {
-      const html = ReactDOM.renderToStaticMarkup(
-        React.createElement(
-          Component,
-          {
-            arcSite: _website,
-            contextPath,
-            globalContent: content ? content.document : null,
-            requestUri
-          }
-        )
+      const elementTic = timer.tic()
+      const element = React.createElement(
+        Component,
+        {
+          arcSite: _website,
+          contextPath,
+          globalContent: content ? content.document : null,
+          requestUri
+        }
       )
+      debugTimer(`create element`, elementTic.toc())
+      const htmlTic = timer.tic()
+      const html = ReactDOM.renderToStaticMarkup(element)
+      debugTimer(`render html`, htmlTic.toc())
       resolve(html)
     } catch (e) {
       reject(e)
@@ -166,6 +169,18 @@ const compileRenderable = function compileRenderable ({renderable, outputType}) 
     })
 }
 
+const outputTypeCache = {}
+const getOutputTypeComponent = function getOutputTypeComponent (outputType) {
+  try {
+    outputTypeCache[outputType] = outputTypeCache[outputType] || unpack(require(`${componentDistRoot}/output-types/${outputType}`))
+    return outputTypeCache[outputType]
+  } catch (e) {
+    const err = new Error(`Could not find output-type: ${outputType}`)
+    err.statusCode = 400
+    throw err
+  }
+}
+
 const compileDocument = function compileDocument ({rendering, outputType, name}) {
   let tic
   return rendering.getJson()
@@ -178,15 +193,7 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
 
           tic = timer.tic()
 
-          const OutputType = (() => {
-            try {
-              return unpack(require(`${componentDistRoot}/output-types/${outputType}`))
-            } catch (e) {
-              const err = new Error(`Could not find output-type: ${outputType}`)
-              err.statusCode = 400
-              throw err
-            }
-          })()
+          const OutputType = getOutputTypeComponent(outputType)
 
           const Component = (props) => {
             return React.createElement(

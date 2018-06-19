@@ -183,16 +183,16 @@ EOB
 if [ "${IS_PROD}" ]
 then
   cat <<EOB
-    ~^(?<env>[^.]+)             \$env;
+    ~^(?<subdomain>[^.]+)\.     \$subdomain;
 EOB
 fi
 cat <<EOB
   }
 
-  # map \$arg_outputType \$outputType {
-  #   default                     \$arg_outputType;
-  #   ''                          'default';
-  # }
+  map \$arg_outputType \$outputType {
+    default                     \$arg_outputType;
+    ''                          'default';
+  }
 
   server {
     listen                      ${PORT:-8080};
@@ -283,7 +283,7 @@ then
 EOB
 else
   cat <<EOB
-      root                      '/etc/nginx/resources';
+      root                      /etc/nginx/resources;
       try_files                 \$3 =418;
 EOB
 fi
@@ -309,7 +309,7 @@ then
 EOB
 else
   cat <<EOB
-      root                      '/etc/nginx/dist';
+      root                      /etc/nginx/dist;
       try_files                 \$3 =418;
 EOB
 fi
@@ -342,7 +342,7 @@ EOB
 else
   cat <<EOB
       set                       \$p \$2.html;
-      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/html\$p;
+      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/html/\${outputType}\$p;
       proxy_pass                \$target;
 EOB
 fi
@@ -367,7 +367,7 @@ fi
 cat <<EOB
 
     location ${CONTEXT_PATH}/_ {
-      rewrite ^${CONTEXT_PATH}/_/(.*) ${API_PREFIX}/\$1;
+      rewrite ^${CONTEXT_PATH}/_(.*) ${API_PREFIX}\$1;
     }
 
     location ~ ^${API_PREFIX}/status/(\\d\\d\\d)$ {
@@ -397,6 +397,10 @@ cat <<EOB
 
     location ~ ^${CONTEXT_PATH}/admin/api/(chain|feature|layout)-config/?$ {
       rewrite                   ^${CONTEXT_PATH}/admin/api/(chain|feature|layout)-config/? ${API_PREFIX}/configs/\$1s;
+    }
+
+    location ${API_PREFIX} {
+      return                    404;
     }
 
     # all other requests should be treated as a new page to render

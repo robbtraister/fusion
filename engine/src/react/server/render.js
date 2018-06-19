@@ -77,7 +77,7 @@ function escapeContent (content) {
   return JSON.stringify(content).replace(/<\/script>/g, '<\\/script>')
 }
 
-function getFusionScript (globalContent, contentCache, refreshContent, arcSite) {
+function getFusionScript (globalContent, contentCache, outputType, arcSite, refreshContent) {
   const condensedCache = {}
   Object.keys(contentCache)
     .forEach(sourceName => {
@@ -90,6 +90,7 @@ function getFusionScript (globalContent, contentCache, refreshContent, arcSite) 
 
   return `window.Fusion=window.Fusion||{};` +
     `Fusion.contextPath='${contextPath}';` +
+    `Fusion.outputType='${outputType}';` +
     (arcSite ? `Fusion.arcSite='${arcSite}';` : '') +
     `Fusion.refreshContent=${onDemand ? 'false' : !!refreshContent};` +
     `Fusion.globalContent=${escapeContent(globalContent || {})};` +
@@ -106,6 +107,7 @@ const render = function render ({Component, requestUri, content, _website}) {
           arcSite: _website,
           contextPath,
           globalContent: content ? content.document : null,
+          outputType: Component.outputType,
           requestUri
         }
       )
@@ -384,7 +386,7 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
                     'script',
                     {
                       type: 'application/javascript',
-                      dangerouslySetInnerHTML: { __html: getFusionScript(props.globalContent, Template.contentCache, refreshContent, props.arcSite) }
+                      dangerouslySetInnerHTML: { __html: getFusionScript(props.globalContent, Template.contentCache, outputType, props.arcSite, refreshContent) }
                     }
                   )
                 }),

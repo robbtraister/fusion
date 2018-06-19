@@ -54,6 +54,7 @@ const value = {
   contextPath: Fusion.contextPath,
   getContent: getContentGenerator(Fusion.contentCache),
   globalContent: Fusion.globalContent,
+  outputType: Fusion.outputType,
   requestUri: window.location.pathname + window.location.search
 }
 

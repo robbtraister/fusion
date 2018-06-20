@@ -2,8 +2,12 @@
 
 const model = require('../../dao')
 
-const getSourceConfig = function getSourceConfig (sourceName) {
-  return model('jge_config').get(sourceName)
-}
+module.exports = {
+  find () {
+    return model('jge_config').find()
+  },
 
-module.exports = getSourceConfig
+  get (sourceName) {
+    return model('jge_config').get(sourceName)
+  }
+}

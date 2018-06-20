@@ -15,7 +15,7 @@ const {
 } = require('../../../environment')
 
 const getSchemaFilter = require('./filter')
-const getSourceConfig = require('./jge')
+const getSourceConfig = require('./jge').get
 
 const expandProperties = function expandProperties (string, properties) {
   return string.replace(/\{([^}]+)\}/g, function (match, prop) {

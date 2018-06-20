@@ -2,7 +2,7 @@
 
 const path = require('path')
 
-const getOptionalJson = (fp) => {
+const optionalRequire = (fp) => {
   try {
     return require(fp)
   } catch (e) {
@@ -12,8 +12,8 @@ const getOptionalJson = (fp) => {
 
 const variables = Object.assign(
   // ordered by increasing precedence
-  getOptionalJson('./env.json'),
-  getOptionalJson('./environment.json'),
+  optionalRequire('./variables'),
+  optionalRequire('../bundle/environment'),
   process.env
 )
 

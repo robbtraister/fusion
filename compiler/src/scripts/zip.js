@@ -8,43 +8,51 @@ const yazl = require('yazl')
 
 const debug = require('debug')('fusion:compiler:zip')
 
-async function zip (zipFile, zipDirMap) {
-  if (!(zipDirMap instanceof Object)) {
-    zipDirMap = {'.': zipDirMap}
-  }
+const promises = require('../utils/promises')
 
-  debug(`zipping ${Object.values(zipDirMap)} to ${zipFile}`)
-  const zipfile = new yazl.ZipFile()
-  const output = fs.createWriteStream(zipFile)
+async function zip (zipDirMap) {
+  const zipFile = await promises.tempFile()
 
-  await new Promise((resolve, reject) => {
-    output.on('close', resolve)
-    output.on('error', reject)
-    zipfile.on('error', reject)
-
-    zipfile.outputStream.pipe(output)
-
-    function addDir (zipDir, prefix) {
-      debug(`adding ${zipDir} to ${zipFile}`)
-      return new Promise((resolve, reject) => {
-        glob('**/*', {cwd: zipDir, nodir: true}, (err, files) => {
-          if (err) {
-            reject(err)
-          } else {
-            files.forEach((f) => zipfile.addFile(path.resolve(zipDir, f), prefix ? path.join(prefix, f) : f))
-            resolve()
-          }
-        })
-      })
+  try {
+    if (!(zipDirMap instanceof Object)) {
+      zipDirMap = {'.': zipDirMap}
     }
 
-    Promise.all(Object.keys(zipDirMap).map((prefix) => addDir(zipDirMap[prefix], prefix)))
-      .then(() => { zipfile.end() })
-  })
+    debug(`zipping ${Object.values(zipDirMap)} to ${zipFile}`)
+    const zipfile = new yazl.ZipFile()
+    const output = fs.createWriteStream(zipFile)
 
-  debug(`zipped ${Object.values(zipDirMap)} to ${zipFile}`)
+    await new Promise((resolve, reject) => {
+      output.on('close', resolve)
+      output.on('error', reject)
+      zipfile.on('error', reject)
 
-  return zipFile
+      zipfile.outputStream.pipe(output)
+
+      function addDir (zipDir, prefix) {
+        debug(`adding ${zipDir} to ${zipFile}`)
+        return new Promise((resolve, reject) => {
+          glob('**/*', {cwd: zipDir, nodir: true}, (err, files) => {
+            if (err) {
+              reject(err)
+            } else {
+              files.forEach((f) => zipfile.addFile(path.resolve(zipDir, f), prefix ? path.join(prefix, f) : f))
+              resolve()
+            }
+          })
+        })
+      }
+
+      Promise.all(Object.keys(zipDirMap).map((prefix) => addDir(zipDirMap[prefix], prefix)))
+        .then(() => { zipfile.end() })
+    })
+
+    debug(`zipped ${Object.values(zipDirMap)} to ${zipFile}`)
+
+    return zipFile
+  } catch (e) {
+    promises.remove(zipFile)
+  }
 }
 
 module.exports = zip

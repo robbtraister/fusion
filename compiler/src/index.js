@@ -1,14 +1,9 @@
 'use strict'
 
-const Compiler = require('./compiler')
-
-const main = (region, environment, bundleName) => {
-  return new Compiler(region, environment, bundleName)
-    .compile()
-}
+const compile = require('./compile')
 
 module.exports.handler = (event, context, callback) => {
-  main(process.env.REGION, process.env.ENVIRONMENT, event.bundle)
+  compile(event.bundle)
     .then((result) => { callback(null, result) })
     .catch((err) => {
       console.error(err)
@@ -17,7 +12,7 @@ module.exports.handler = (event, context, callback) => {
 }
 
 if (module === require.main) {
-  main('localhost', 'test.zip')
+  compile('test.zip')
     .then(console.log)
     .catch(console.error)
 }

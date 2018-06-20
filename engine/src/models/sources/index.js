@@ -1,7 +1,7 @@
 'use strict'
 
 const mockRequire = require('mock-require')
-mockRequire('fusion:environment', require.resolve('../../../environment'))
+mockRequire('fusion:environment', require('../../../environment').variables)
 
 const url = require('url')
 
@@ -58,8 +58,10 @@ const getSourceFetcher = function getSourceFetcher (source) {
       return Promise.resolve()
         .then(() => resolve(key))
         .then((contentUri) => {
-          debugFetch(contentUri)
-          return request(url.resolve(contentBase, contentUri))
+          const contentUrl = url.resolve(contentBase, contentUri)
+          // don't log content credentials
+          debugFetch(url.format(Object.assign(url.parse(contentUrl), {auth: null})))
+          return request(contentUrl)
         })
         .then((data) => JSON.parse(data))
         .catch((err) => {

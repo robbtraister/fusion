@@ -56,7 +56,7 @@ const getLambdaEngine = function getLambdaEngine () {
               resolve(json.body)
             }
           } else {
-            reject(json.body)
+            reject(json)
           }
         } else {
           reject(data)

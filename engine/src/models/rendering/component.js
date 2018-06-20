@@ -7,7 +7,7 @@ const {
 const {
   compileDocument,
   compileRenderable
-} = require('../../react/server/render')
+} = require('../../react')
 
 const getAllRenderables = function getAllRenderables (rendering) {
   const children = [].concat(

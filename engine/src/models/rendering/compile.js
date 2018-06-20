@@ -7,9 +7,9 @@ const promisify = require('util').promisify
 const MemoryFS = require('memory-fs')
 const webpack = require('webpack')
 
-const debugTimer = require('debug')('fusion:timer:react:compile:pack')
+const debugTimer = require('debug')('fusion:models:rendering:compile:timer')
 
-const generateSource = require('../../react/server/compile/source')
+const { generateSource } = require('../../react')
 
 const {
   componentDistRoot,

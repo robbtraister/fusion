@@ -48,7 +48,6 @@ configRouter.get('/content/sources', (req, res, next) => {
       }))
   ])
     .then(([bundleSources, jgeSources]) => {
-      console.log(jgeSources)
       const bundleIds = bundleSources.map(s => s.service)
       return bundleSources.concat(jgeSources.filter(jge => !bundleIds.includes(jge.service)))
     })

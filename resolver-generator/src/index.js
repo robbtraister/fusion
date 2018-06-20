@@ -7,12 +7,13 @@ const main = (resolver, envVars, region) => {
     .generate()
 }
 
-module.exports.handler = (event, callback) => {
-  const bucket = event.s3.bucket.name
-  const resolverPath = event.s3.object.key
-  
+module.exports.handler = (event, context, callback) => {
+  const s3event = event.Records[0].s3
+  const bucket = s3event.bucket.name
+  const resolverPath = s3event.object.key
+
   // TODO: Figure out how we pass region
-  const region = event.s3.region || 'us-east-1'
+  const region = event.Records[0].awsRegion || 'us-east-1'
 
   main(bucket, resolverPath, region)
     .then((result) => callback(null, result))
@@ -23,7 +24,7 @@ module.exports.handler = (event, callback) => {
 }
 
 if (module === require.main) {
-  main('pagebuilder-fusion-resolver-service', 'environments/foo-sandbox/resolvers.json')
+  main('pagebuilder-fusion', 'environments/foo-sandbox/resolvers.json')
     .then(console.log)
     .catch(console.error)
 }

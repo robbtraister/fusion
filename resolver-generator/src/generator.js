@@ -4,7 +4,7 @@ const fs = require('fs')
 const path = require('path')
 const promisify = require('util').promisify
 
-const debug = require('debug')('fusion:resolver-generator:upload')
+const debug = require('debug')('fusion:resolver-generator')
 
 const S3 = require('aws-sdk').S3
 
@@ -53,7 +53,7 @@ class Generator {
       await zip(await zipFilePromise, await rootDirPromise)
       await this.upload(await zipFilePromise)
  
-      //await deploy(this.contextName)
+      await deploy(this.contextName)
     } finally  {
       await Promise.all([
        promises.remove(await rootDirPromise),

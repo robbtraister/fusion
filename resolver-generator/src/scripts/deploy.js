@@ -19,29 +19,29 @@ const updateFunctionCode = promisify(lambda.updateFunctionCode.bind(lambda))
 const updateFunctionConfiguration = promisify(lambda.updateFunctionConfiguration.bind(lambda))
 
 async function create (contextName, envVars) {
-  debug(`Redeploying resolver lambda for ${contextName}`)
+  debug(`creating resolver lambda for ${contextName}`)
   try {
     const result = await createFunction(
       Object.assign(
         {
           FunctionName: resolverName(contextName),
-          Code: resolverCode(contextName, versionId),
-          Publish: true
+          Publish: true,
+          Code: resolverCode(contextName)
         },
         resolverConfig(contextName, envVars)
       )
     )
 
-    debug(`created lambda for ${contextName} using ${versionId}`)
+    debug(`created lambda for ${contextName}`)
     return result
   } catch (e) {
-    debug(`error creating lambda for ${contextName} using ${versionId}: ${e}`)
+    debug(`error creating lambda for ${contextName}: ${e}`)
     throw e
   }
 }
 
-async function updateCode (contextName, versionId) {
-  debug(`updating code for ${contextName} using ${versionId}`)
+async function updateCode (contextName) {
+  debug(`updating code for ${contextName}`)
   try {
     const result = await updateFunctionCode(
       Object.assign(
@@ -49,14 +49,14 @@ async function updateCode (contextName, versionId) {
           FunctionName: resolverName(contextName),
           Publish: true
         },
-        resolverCode(contextName, versionId)
+        resolverCode(contextName)
       )
     )
 
-    debug(`updated code for ${contextName} using ${versionId}`)
+    debug(`updated code for ${contextName}`)
     return result
   } catch (e) {
-    debug(`error updating code for ${contextName} using ${versionId}: ${e}`)
+    debug(`error updating code for ${contextName}: ${e}`)
     throw e
   }
 }
@@ -81,16 +81,16 @@ async function updateConfig (contextName, envVars) {
   }
 }
 
-async function update (contextName, versionId, envVars) {
-  await updateConfig(contextName, envVars)
-  return updateCode(contextName, versionId)
+async function update (contextName) {
+  await updateConfig(contextName)
+  return updateCode(contextName)
 }
 
-async function deploy (contextName, versionId, envVars) {
+async function deploy (contextName) {
   try {
-    return await create(contextName, versionId, envVars)
+    return await create(contextName)
   } catch (e) {
-    return update(contextName, versionId, envVars)
+    return update(contextName)
   }
 }
 

@@ -6,7 +6,6 @@ const { version } = require('../../resolver/package.json')
 
 const resolverKey = (environment) => `environments/${environment}/resolver.zip`
 const resolverName = (environment) => `fusion-resolver-${environment}`
-// TODO find the correct role for resolver
 const resolverRole = (environment) => `arn:aws:iam::397853141546:role/${resolverName(environment)}`
 
 const resolverCode = (contextName) => { 
@@ -23,8 +22,7 @@ const resolverConfig = (contextName, envVars) => ({
     Variables: Object.assign(
       envVars || {},
       {
-        NODE_ENV: 'production',
-        FUSION_RELEASE: version
+        NODE_ENV: 'production'
       }
     )
   },

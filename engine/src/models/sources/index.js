@@ -102,6 +102,7 @@ const getSource = function getSource (sourceName) {
       }
 
       return {
+        clear: () => {},
         fetch,
         filter: getSchemaFilter(source.schemaName)
       }

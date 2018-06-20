@@ -77,7 +77,7 @@ function escapeContent (content) {
   return JSON.stringify(content).replace(/<\/script>/g, '<\\/script>')
 }
 
-function getFusionScript (globalContent, contentCache, refreshContent, arcSite) {
+function getFusionScript (globalContent, contentCache, outputType, arcSite, refreshContent) {
   const condensedCache = {}
   Object.keys(contentCache)
     .forEach(sourceName => {
@@ -90,6 +90,7 @@ function getFusionScript (globalContent, contentCache, refreshContent, arcSite) 
 
   return `window.Fusion=window.Fusion||{};` +
     `Fusion.contextPath='${contextPath}';` +
+    `Fusion.outputType='${outputType}';` +
     (arcSite ? `Fusion.arcSite='${arcSite}';` : '') +
     `Fusion.refreshContent=${onDemand ? 'false' : !!refreshContent};` +
     `Fusion.globalContent=${escapeContent(globalContent || {})};` +
@@ -99,17 +100,21 @@ function getFusionScript (globalContent, contentCache, refreshContent, arcSite) 
 const render = function render ({Component, requestUri, content, _website}) {
   const renderHTML = () => new Promise((resolve, reject) => {
     try {
-      const html = ReactDOM.renderToStaticMarkup(
-        React.createElement(
-          Component,
-          {
-            arcSite: _website,
-            contextPath,
-            globalContent: content ? content.document : null,
-            requestUri
-          }
-        )
+      const elementTic = timer.tic()
+      const element = React.createElement(
+        Component,
+        {
+          arcSite: _website,
+          contextPath,
+          globalContent: content ? content.document : null,
+          outputType: Component.outputType,
+          requestUri
+        }
       )
+      debugTimer(`create element`, elementTic.toc())
+      const htmlTic = timer.tic()
+      const html = ReactDOM.renderToStaticMarkup(element)
+      debugTimer(`render html`, htmlTic.toc())
       resolve(html)
     } catch (e) {
       reject(e)
@@ -166,6 +171,18 @@ const compileRenderable = function compileRenderable ({renderable, outputType}) 
     })
 }
 
+const outputTypeCache = {}
+const getOutputTypeComponent = function getOutputTypeComponent (outputType) {
+  try {
+    outputTypeCache[outputType] = outputTypeCache[outputType] || unpack(require(`${componentDistRoot}/output-types/${outputType}`))
+    return outputTypeCache[outputType]
+  } catch (e) {
+    const err = new Error(`Could not find output-type: ${outputType}`)
+    err.statusCode = 400
+    throw err
+  }
+}
+
 const compileDocument = function compileDocument ({rendering, outputType, name}) {
   let tic
   return rendering.getJson()
@@ -178,15 +195,7 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
 
           tic = timer.tic()
 
-          const OutputType = (() => {
-            try {
-              return unpack(require(`${componentDistRoot}/output-types/${outputType}`))
-            } catch (e) {
-              const err = new Error(`Could not find output-type: ${outputType}`)
-              err.statusCode = 400
-              throw err
-            }
-          })()
+          const OutputType = getOutputTypeComponent(outputType)
 
           const Component = (props) => {
             return React.createElement(
@@ -377,7 +386,7 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
                     'script',
                     {
                       type: 'application/javascript',
-                      dangerouslySetInnerHTML: { __html: getFusionScript(props.globalContent, Template.contentCache, refreshContent, props.arcSite) }
+                      dangerouslySetInnerHTML: { __html: getFusionScript(props.globalContent, Template.contentCache, outputType, props.arcSite, refreshContent) }
                     }
                   )
                 }),

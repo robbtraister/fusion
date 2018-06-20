@@ -14,7 +14,7 @@ const Rendering = require('../models/rendering')
 
 const {
   render
-} = require('../react/server/render')
+} = require('../react')
 
 const timer = require('../timer')
 

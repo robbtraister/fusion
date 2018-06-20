@@ -15,12 +15,13 @@ const {
   contextPath
 } = require('../environment')
 
+const {
+  clientEntries
+} = require('../src/react')
+
 module.exports = [
   {
-    entry: {
-      admin: require.resolve('../src/react/client/admin'),
-      react: require.resolve('../src/react/client')
-    },
+    entry: clientEntries,
     mode,
     module: {
       rules: [

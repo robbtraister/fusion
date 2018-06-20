@@ -24,6 +24,10 @@ This is the base context path of the application. In the client, you could calcu
 
 This is the full data object used as the global content for the rendered page.
 
+-   outputType
+
+The output type that was used when rendering this page.
+
 -   requestUri
 
 This is the uri that was requested to initiate this rendering. In the client, you could access this using window.location, but this property exists to provide similar server-side access.

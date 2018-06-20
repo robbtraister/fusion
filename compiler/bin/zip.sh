@@ -9,8 +9,6 @@
   cd ../engine
   rm -rf node_modules dist
   npm install --production
-  # aws-sdk is still depended on by dynamoose, so manually delete it
-  rm -rf ./node_modules/aws-sdk
 
   zip ../compiler/dist/engine.zip -r ./
 

@@ -8,7 +8,7 @@ const glob = require('glob')
 // const CleanWebpackPlugin = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OnBuildWebpackPlugin = require('on-build-webpack')
-// const ManifestPlugin = require('webpack-manifest-plugin')
+const ManifestPlugin = require('webpack-manifest-plugin')
 
 const babelLoader = require('./shared/loaders/babel-loader')
 const cssLoader = require('./shared/loaders/css-loader')
@@ -121,8 +121,8 @@ module.exports = (Object.keys(entry).length)
       },
       optimization,
       output: {
-        filename: `[name].js`,
-        path: path.resolve(componentDistRoot, 'output-types'),
+        filename: `output-types/[name].js`,
+        path: componentDistRoot,
         libraryTarget: 'commonjs2'
       },
       plugins: [
@@ -136,7 +136,7 @@ module.exports = (Object.keys(entry).length)
         //     watch: true
         //   }
         // )
-        // new ManifestPlugin()
+        new ManifestPlugin({fileName: 'manifest.output-types.json'})
       ],
       resolve
     }

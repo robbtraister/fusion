@@ -70,6 +70,7 @@ module.exports = (Template) => {
           contextPath: props.contextPath,
           getContent: getContentGenerator(contentCache, props.arcSite),
           globalContent: props.globalContent,
+          outputType: props.outputType,
           requestUri: props.requestUri
         })
       },

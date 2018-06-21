@@ -1,3 +1,3 @@
 'use strict'
 
-module.exports = f => /\/__tests?__\//.test(f)
+module.exports = f => /(\/_+(tests?|snapshots?)_+\/|\.test\.js|\.snap$)/.test(f)

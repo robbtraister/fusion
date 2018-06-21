@@ -50,9 +50,13 @@ const getLambdaEngine = function getLambdaEngine () {
         if (data.StatusCode === 200) {
           const json = JSON.parse(data.Payload)
           if (json.statusCode === 200) {
-            resolve(json.body)
+            try {
+              resolve(JSON.parse(json.body))
+            } catch (e) {
+              resolve(json.body)
+            }
           } else {
-            reject(json.body)
+            reject(json)
           }
         } else {
           reject(data)

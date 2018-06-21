@@ -153,7 +153,7 @@ cat <<EOB
   }
 
   map \$request_uri \$context_free_uri {
-    ~^${CONTEXT_PATH}/(.*)      /\$1;
+    ~*^${CONTEXT_PATH}/(.*)     /\$1;
     default                     \$request_uri;
   }
 
@@ -189,9 +189,14 @@ fi
 cat <<EOB
   }
 
+  map \$http_user_agent \$defaultOutputType {
+    ~*(phone|mobile)            'mobile';
+    default                     'default';
+  }
+
   map \$arg_outputType \$outputType {
     default                     \$arg_outputType;
-    ''                          'default';
+    ''                          \$defaultOutputType;
   }
 
   server {

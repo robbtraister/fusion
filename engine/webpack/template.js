@@ -3,6 +3,8 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
 
+const cssLoader = require('./shared/loaders/css-loader')
+
 const externals = require('./shared/externals')
 const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
@@ -23,7 +25,8 @@ module.exports = (entry) =>
           {
             test: /\.css$/,
             use: [
-              MiniCssExtractPlugin.loader
+              MiniCssExtractPlugin.loader,
+              cssLoader
             ]
           }
         ]

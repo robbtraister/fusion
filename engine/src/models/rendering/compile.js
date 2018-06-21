@@ -19,7 +19,7 @@ const {
 const timer = require('../../timer')
 const getConfigs = require('../../../webpack/template.js')
 
-const sourceFile = path.resolve(`${componentSrcRoot}/template.jsx`)
+const sourceFile = path.resolve(`${componentSrcRoot}/template.js`)
 const destFile = path.resolve(`${componentDistRoot}/template.js`)
 const manifestFile = path.resolve(`${componentDistRoot}/manifest.json`)
 
@@ -102,6 +102,7 @@ const compileSource = function compileSource (src) {
               cssFile: null
             }
         })
+        .catch(() => ({}))
     ]))
     .then(([js, {cssFile, css}]) => ({js, cssFile, css}))
 }

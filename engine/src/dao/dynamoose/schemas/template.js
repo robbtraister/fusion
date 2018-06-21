@@ -1,3 +1,3 @@
 'use strict'
 
-module.exports = require('./rendering.js').generate('template')
+module.exports = require('./rendering.js')

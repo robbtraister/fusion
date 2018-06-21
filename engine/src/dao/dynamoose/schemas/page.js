@@ -1,3 +1,3 @@
 'use strict'
 
-module.exports = require('./rendering.js').generate('page')
+module.exports = require('./rendering.js')

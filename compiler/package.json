@@ -17,6 +17,6 @@
     "yazl": "^2.4.3"
   },
   "devDependencies": {
-    "aws-sdk": "^2.252.1"
+    "aws-sdk": "^2.260.1"
   }
 }

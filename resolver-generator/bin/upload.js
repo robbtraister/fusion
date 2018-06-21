@@ -41,7 +41,7 @@ async function updateGeneratorCode () {
     const result = await updateFunctionCode(
         {
           FunctionName: 'fusion-resolver-generator',
-          //Publish: true,
+          Publish: true,
           S3Bucket,
           S3Key: S3ResolverGeneratorKey
         }

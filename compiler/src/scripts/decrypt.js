@@ -2,6 +2,8 @@
 
 const path = require('path')
 
+const debug = require('debug')('fusion:compiler:decrypt')
+
 const kms = require('../aws/kms')
 
 const {
@@ -22,7 +24,11 @@ async function decryptValue (value) {
 
   try {
     value.replace(secretMask, function (match, prop) {
-      secretMap[prop] = secretMap[prop] || kms.decrypt(prop).catch(() => prop)
+      debug(`decrypting value: ${prop}`)
+      secretMap[prop] = secretMap[prop] || kms.decrypt(prop).catch((err) => {
+        debug(`failed to decrypt value [${prop}]: ${err}`)
+        return prop
+      })
     })
 
     const keys = Object.keys(secretMap)
@@ -38,10 +44,12 @@ async function decryptValue (value) {
 
 async function decryptFile (fp) {
   try {
+    debug(`decrypting file: ${fp}`)
     const ciphertext = await readFile(fp)
-    const plaintext = await decryptValue(ciphertext)
+    const plaintext = await decryptValue(ciphertext.toString())
     return writeFile(fp, plaintext)
   } catch (e) {
+    debug(`failed to decrypt file [${fp}]: ${e}`)
     // file probably doesn't exist
   }
 }

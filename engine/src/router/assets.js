@@ -23,7 +23,7 @@ const staticHandler = (isDev)
   : (location) => (req, res, next) =>
     fetchFile(`${location || ''}${req.path}`)
       .then(src => { res.send(src) })
-      .catch(next)
+      .catch(() => next())
 
 distRouter.use('/engine', staticHandler('/engine'))
 distRouter.all(/\.css$/, staticHandler())

@@ -37,7 +37,7 @@ components
 
 // this should probably be in bundle, but the bundle volume is generally mapped as read-only
 // so just put it in the root
-const combinedSrcFile = path.resolve(__dirname, '../combined.jsx')
+const combinedSrcFile = path.resolve(__dirname, '../combined.js')
 fs.writeFileSync(combinedSrcFile,
   `
 const unpack = require('./src/react/shared/unpack')

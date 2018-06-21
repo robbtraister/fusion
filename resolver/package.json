@@ -20,7 +20,7 @@
     "serverless-http": "^1.6.0"
   },
   "devDependencies": {
-    "aws-sdk": "^2.245.1",
-    "serverless-offline": "^3.23.1"
+    "aws-sdk": "^2.261.1",
+    "serverless-offline": "^3.25.4"
   }
 }

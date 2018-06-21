@@ -2,7 +2,7 @@
 
 const fs = require('fs')
 
-const { componentSrcRoot } = require('../../../../environment')
+const { componentDistRoot } = require('../../../../environment')
 
 function componentImport (fp, name) {
   return name.startsWith(`['features']`)
@@ -11,16 +11,16 @@ function componentImport (fp, name) {
 }
 
 const componentFiles = [
-  (componentName, outputType) => outputType ? `${componentName}/${outputType}.jsx` : null,
-  (componentName, outputType) => `${componentName}/default.jsx`,
-  (componentName, outputType) => `${componentName}/index.jsx`,
-  (componentName, outputType) => `${componentName}.jsx`
+  (componentName, outputType) => outputType ? `${componentName}/${outputType}.js` : null,
+  (componentName, outputType) => `${componentName}/default.js`,
+  (componentName, outputType) => `${componentName}/index.js`,
+  (componentName, outputType) => `${componentName}.js`
 ]
 
 const getComponentFile = function getComponentFile (type, id, outputType) {
   for (let i = 0; i < componentFiles.length; i++) {
     try {
-      const key = componentFiles[i](`${componentSrcRoot}/${type}/${id}`, outputType)
+      const key = componentFiles[i](`${componentDistRoot}/${type}/${id}`, outputType)
       fs.accessSync(key, fs.constants.R_OK)
       return key
     } catch (e) {}

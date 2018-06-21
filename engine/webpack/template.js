@@ -3,7 +3,7 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
 
-const babelLoader = require('./shared/loaders/babel-loader')
+// const babelLoader = require('./shared/loaders/babel-loader')
 const cssLoader = require('./shared/loaders/css-loader')
 const sassLoader = require('./shared/loaders/sass-loader')
 
@@ -24,13 +24,13 @@ module.exports = (entry) =>
       mode,
       module: {
         rules: [
-          {
-            test: /\.jsx?$/i,
-            exclude: /node_modules/,
-            use: [
-              babelLoader
-            ]
-          },
+          // {
+          //   test: /\.jsx?$/i,
+          //   exclude: /node_modules/,
+          //   use: [
+          //     babelLoader
+          //   ]
+          // },
           {
             test: /\.css$/,
             use: [

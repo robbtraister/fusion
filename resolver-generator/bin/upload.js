@@ -37,14 +37,14 @@ async function upload (fp) {
 
 async function updateGeneratorCode () {
   debug(`updating resolver-generator lambda with latest code`)
-  try{
+  try {
     const result = await updateFunctionCode(
-        {
-          FunctionName: 'fusion-resolver-generator',
-          Publish: true,
-          S3Bucket,
-          S3Key: S3ResolverGeneratorKey
-        }
+      {
+        FunctionName: 'fusion-resolver-generator',
+        Publish: true,
+        S3Bucket,
+        S3Key: S3ResolverGeneratorKey
+      }
     )
     debug(`updated resolver-generator lambda to version ${result.Version}`)
     return result

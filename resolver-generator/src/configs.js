@@ -8,7 +8,7 @@ const resolverKey = (environment) => `environments/${environment}/resolver.zip`
 const resolverName = (environment) => `fusion-resolver-${environment}`
 const resolverRole = (environment) => `arn:aws:iam::397853141546:role/${resolverName(environment)}`
 
-const resolverCode = (contextName) => { 
+const resolverCode = (contextName) => {
   const code = {
     S3Bucket,
     S3Key: resolverKey(contextName)

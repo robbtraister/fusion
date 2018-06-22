@@ -18,6 +18,7 @@ const getComponent = (componentType, componentName, outputType) => {
     Fusion.Components[componentType][`${componentName}/${outputType}`],
     Fusion.Components[componentType][`${componentName}/default`],
     Fusion.Components[componentType][`${componentName}/index`],
+    Fusion.Components[componentType][componentName]
   ].filter(c => c).shift()
 
   return (Component && componentType === 'features')

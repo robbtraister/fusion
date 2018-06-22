@@ -32,7 +32,7 @@ class Generator {
 
     // parse the environment from the resolver path
     // i.e. resolver path would be environment/${environment}/resolvers.json
-    this.contextName = this.resolverPath.match(`^environments/([\\w-]+)/resolvers.json`)[1]
+    this.contextName = this.resolverPath.match('^environments/([\\w-]+)/resolvers.json')[1]
     debug(`Generating new resolver service for ${this.contextName}`)
 
     this.region = region || 'us-east-1'

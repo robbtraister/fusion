@@ -2,7 +2,7 @@
 
 const S3Bucket = 'pagebuilder-fusion'
 
-const S3ResolverGeneratorKey = `resolver-generator/generator.zip`
+const S3ResolverGeneratorKey = `resolver/generator.zip`
 
 const resolverGeneratorArtifact = () => ({
   ACL: 'private',

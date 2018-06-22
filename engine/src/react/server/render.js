@@ -84,7 +84,9 @@ function getFusionScript (globalContent, contentCache, outputType, arcSite, refr
       condensedCache[sourceName] = {}
       Object.keys(contentCache[sourceName])
         .forEach(key => {
-          condensedCache[sourceName][key] = {cached: contentCache[sourceName][key].filtered}
+          if (contentCache[sourceName][key].filtered) {
+            condensedCache[sourceName][key] = {cached: contentCache[sourceName][key].filtered}
+          }
         })
     })
 

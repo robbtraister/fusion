@@ -34,10 +34,15 @@ function HOC (Component) {
     const combinedProps = Object.assign({}, props, context)
     delete combinedProps.getContent
     delete combinedProps.setContent
-    return React.createElement(
+
+    const element = React.createElement(
       Comp,
       combinedProps
     )
+
+    return (Component.static)
+      ? React.createElement('div', { id: props.id, className: 'fusion:static' }, element)
+      : element
   }
 
   const elementGenerator = (Component.prototype instanceof React.Component)
@@ -50,7 +55,11 @@ function HOC (Component) {
               ...Object.keys(contents)
                 .map(key => {
                   const content = contents[key]
-                  return {[key]: this.getContent(content.source, content.key, content.query)}
+                  return {[key]: this.getContent(
+                    content.source || content.contentService,
+                    content.key || content.contentConfigValues,
+                    content.query
+                  )}
                 })
             )
           )
@@ -69,7 +78,7 @@ function HOC (Component) {
             )
           }
 
-          const content = context.getContent(...args)
+          const content = context.getContent.apply(this, args)
 
           return {
             cached: content.cached && appendLocalEdits(content.cached),

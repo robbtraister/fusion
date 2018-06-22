@@ -2,6 +2,8 @@
 
 const fs = require('fs')
 
+const unpack = require('../../shared/unpack')
+
 const { componentDistRoot } = require('../../../../environment')
 
 function fileExists (fp) {
@@ -20,23 +22,30 @@ function componentCss (fp, name) {
 }
 
 function componentImport (fp, name) {
-  return name.startsWith(`['features']`)
-    ? `Fusion.Components${name} = Consumer(unpack(require('${fp}')))`
-    : `Fusion.Components${name} = unpack(require('${fp}'))`
+  return (fp === 'fusion:static')
+    ? `Fusion.Components${name} = unpack(require('${require.resolve('./static')}'))`
+    : name.startsWith(`['features']`)
+      ? `Fusion.Components${name} = Consumer(unpack(require('${fp}')))`
+      : `Fusion.Components${name} = unpack(require('${fp}'))`
 }
 
 const componentFiles = [
-  (componentName, outputType) => outputType ? `${componentName}/${outputType}.js` : null,
-  (componentName, outputType) => `${componentName}/default.js`,
-  (componentName, outputType) => `${componentName}/index.js`,
-  (componentName, outputType) => `${componentName}.js`
+  (componentName, outputType) => outputType ? `${componentName}/${outputType}` : null,
+  (componentName, outputType) => `${componentName}/default`,
+  (componentName, outputType) => `${componentName}`
 ]
 
 const getComponentFile = function getComponentFile (type, id, outputType) {
   for (let i = 0; i < componentFiles.length; i++) {
     const key = componentFiles[i](`${componentDistRoot}/${type}/${id}`, outputType)
-    if (fileExists(key)) {
-      return key
+    try {
+      const component = unpack(require(key))
+      if (component) {
+        return (component.static)
+          ? 'fusion:static'
+          : key
+      }
+    } catch (e) {
     }
   }
   return null

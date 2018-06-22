@@ -25,7 +25,10 @@ const getContentGenerator = function getContentGenerator (contentCache) {
           }
         }
       )
-        .then(resp => resp.json())
+        .then(resp => (resp.status === 304)
+          ? cached
+          : resp.json()
+        )
         .catch(() => cached)
 
     const getSourceContent = (key, filter) => {

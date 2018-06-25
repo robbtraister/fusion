@@ -153,7 +153,7 @@ cat <<EOB
   }
 
   map \$request_uri \$context_free_uri {
-    ~^${CONTEXT_PATH}/(.*)      /\$1;
+    ~*^${CONTEXT_PATH}/(.*)     /\$1;
     default                     \$request_uri;
   }
 
@@ -189,9 +189,14 @@ fi
 cat <<EOB
   }
 
+  map \$http_user_agent \$defaultOutputType {
+    ~*(phone|mobile)            'mobile';
+    default                     'default';
+  }
+
   map \$arg_outputType \$outputType {
     default                     \$arg_outputType;
-    ''                          'default';
+    ''                          \$defaultOutputType;
   }
 
   server {
@@ -361,6 +366,9 @@ then
     location ${CONTEXT_PATH}/app/info {
       proxy_pass                ${PB_ADMIN};
     }
+    location ${CONTEXT_PATH}/content/api {
+      proxy_pass                ${PB_ADMIN};
+    }
 EOB
 fi
 
@@ -391,13 +399,13 @@ cat <<EOB
     }
 
     # admin rewrites
-    location = ${CONTEXT_PATH}/content/api/content-config {
-      rewrite                   (.*) ${API_PREFIX}/configs/content/sources;
-    }
-
-    location ~ ^${CONTEXT_PATH}/admin/api/(chain|feature|layout)-config/?$ {
-      rewrite                   ^${CONTEXT_PATH}/admin/api/(chain|feature|layout)-config/? ${API_PREFIX}/configs/\$1s;
-    }
+    # location = ${CONTEXT_PATH}/content/api/content-config {
+    #   rewrite                   (.*) ${API_PREFIX}/configs/content/sources;
+    # }
+    #
+    # location ~ ^${CONTEXT_PATH}/admin/api/(chain|feature|layout)-config/?$ {
+    #   rewrite                   ^${CONTEXT_PATH}/admin/api/(chain|feature|layout)-config/? ${API_PREFIX}/configs/\$1s;
+    # }
 
     location ${API_PREFIX} {
       return                    404;

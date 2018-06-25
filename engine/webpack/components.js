@@ -14,7 +14,6 @@ const externals = require('./shared/externals')
 const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
-const isTest = require('./shared/is-test')
 
 const components = require('./shared/components')
 
@@ -26,7 +25,6 @@ const {
 const entry = {}
 const types = {}
 components
-  .filter(f => !isTest(f))
   .forEach(f => {
     const name = f.substr(componentSrcRoot.length + 1)
     const type = name.split('/').shift()

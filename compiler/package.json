@@ -12,11 +12,10 @@
   "dependencies": {
     "debug": "^3.1.0",
     "glob": "^7.1.2",
-    "mime-types": "^2.1.18",
     "yauzl": "^2.9.2",
     "yazl": "^2.4.3"
   },
   "devDependencies": {
-    "aws-sdk": "^2.252.1"
+    "aws-sdk": "^2.261.1"
   }
 }

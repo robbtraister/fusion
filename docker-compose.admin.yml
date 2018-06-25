@@ -47,6 +47,7 @@ services:
       dockerfile: serverless.Dockerfile
       args:
         LAMBDA: engine
+    command: 'start:dev'
     depends_on:
       - data
     environment:

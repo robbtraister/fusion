@@ -17,6 +17,8 @@ const unpack = require('../shared/unpack')
 
 const timer = require('../../timer')
 
+const getSource = require('../../models/sources')
+
 const {
   fetchFile
 } = require('../../assets/io')
@@ -25,7 +27,6 @@ const {
   componentDistRoot,
   contextPath,
   isDev,
-  onDemand,
   version
 } = require('../../../environment')
 
@@ -77,14 +78,19 @@ function escapeContent (content) {
   return JSON.stringify(content).replace(/<\/script>/g, '<\\/script>')
 }
 
-function getFusionScript (globalContent, contentCache, outputType, arcSite, refreshContent) {
+function getFusionScript (globalContent, contentCache, outputType, arcSite) {
+  const now = +new Date()
   const condensedCache = {}
   Object.keys(contentCache)
     .forEach(sourceName => {
-      condensedCache[sourceName] = {}
+      const source = getSource(sourceName)
+      condensedCache[sourceName] = {
+        entries: {},
+        expiresAt: now + ((source && source.ttl) || 300000)
+      }
       Object.keys(contentCache[sourceName])
         .forEach(key => {
-          condensedCache[sourceName][key] = {cached: contentCache[sourceName][key].filtered}
+          condensedCache[sourceName].entries[key] = {cached: contentCache[sourceName][key].filtered}
         })
     })
 
@@ -92,7 +98,7 @@ function getFusionScript (globalContent, contentCache, outputType, arcSite, refr
     `Fusion.contextPath='${contextPath}';` +
     `Fusion.outputType='${outputType}';` +
     (arcSite ? `Fusion.arcSite='${arcSite}';` : '') +
-    `Fusion.refreshContent=${onDemand ? 'false' : !!refreshContent};` +
+    `Fusion.lastModified=${now};` +
     `Fusion.globalContent=${escapeContent(globalContent || {})};` +
     `Fusion.contentCache=${escapeContent(condensedCache)}`
 }
@@ -370,23 +376,13 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
                  * Each of the following are equivalent in JSX
                  *   {props.fusion}
                  *   {props.fusion()}
-                 *   {props.fusion(true)}
-                 *   {props.fusion({refreshContent: true})}
-                 *
-                 * To disable client-side content refresh
-                 *   {props.fusion(false)}
-                 *   {props.fusion({refreshContent: false})}
                  */
-                fusion: propFunction(function (refreshContent) {
-                  if (typeof refreshContent === 'object') {
-                    refreshContent = refreshContent.refreshContent
-                  }
-                  refreshContent = refreshContent === undefined ? true : !!refreshContent
+                fusion: propFunction(function () {
                   return React.createElement(
                     'script',
                     {
                       type: 'application/javascript',
-                      dangerouslySetInnerHTML: { __html: getFusionScript(props.globalContent, Template.contentCache, outputType, props.arcSite, refreshContent) }
+                      dangerouslySetInnerHTML: { __html: getFusionScript(props.globalContent, Template.contentCache, outputType, props.arcSite) }
                     }
                   )
                 }),

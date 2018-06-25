@@ -32,7 +32,12 @@ class Generator {
 
     // parse the environment from the resolver path
     // i.e. resolver path would be environment/${environment}/resolvers.json
-    this.contextName = this.resolverPath.match('^environments/([\\w-]+)/resolvers.json')[1]
+    const resolverMatch = this.resolverPath.match('^environments/([\\w-]+)/resolvers.json')
+    if (resolverMatch) {
+      this.contextName = resolverMatch[1]
+    } else {
+      throw new Error(`Unable to parse contextName from S3 event with path: ${JSON.stringify(this.resolverPath)}`)
+    }
     debug(`Generating new resolver service for ${this.contextName}`)
 
     this.region = region || 'us-east-1'

@@ -12,7 +12,6 @@ module.exports.handler = (event, context, callback) => {
   const bucket = s3event.bucket.name
   const resolverPath = s3event.object.key
 
-  // TODO: Figure out how we pass region
   const region = event.Records[0].awsRegion || 'us-east-1'
 
   main(bucket, resolverPath, region)

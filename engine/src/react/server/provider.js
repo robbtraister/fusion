@@ -11,7 +11,6 @@ const getContentGenerator = function getContentGenerator (contentCache, arcSite)
   contentCache = contentCache || {}
 
   return function getContent (sourceName, ...args) {
-    console.log(this)
     const sourceCache = contentCache[sourceName] = contentCache[sourceName] || {}
     const sourcePromise = getSource(sourceName)
 

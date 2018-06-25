@@ -20,7 +20,7 @@ const {
 
 const s3 = new S3({region})
 
-const fetchFromFS = (name) => {
+const fetchFromFS = async function (name) {
   const fp = path.resolve(distRoot, name)
   return new Promise((resolve, reject) => {
     fs.readFile(fp, (err, data) => {
@@ -29,7 +29,7 @@ const fetchFromFS = (name) => {
   })
 }
 
-const fetchFromS3 = (name) => {
+const fetchFromS3 = async function fetchFromS3 (name) {
   return new Promise((resolve, reject) => {
     s3.getObject({
       Bucket: getBucket(),
@@ -45,7 +45,7 @@ const fetchFromS3 = (name) => {
     }))
 }
 
-const pushToFS = function pushToFS (name, src) {
+const pushToFS = async function pushToFS (name, src) {
   const filePath = path.resolve(`${distRoot}/${name}`)
   return new Promise((resolve, reject) => {
     childProcess.exec(`mkdir -p ${path.dirname(filePath)}`, (err) => {
@@ -59,7 +59,7 @@ const pushToFS = function pushToFS (name, src) {
     }))
 }
 
-const pushToS3 = function pushToS3 (name, src, ContentType) {
+const pushToS3 = async function pushToS3 (name, src, ContentType) {
   return new Promise((resolve, reject) => {
     zlib.gzip(src, (err, buf) => {
       err ? reject(err) : resolve(buf)

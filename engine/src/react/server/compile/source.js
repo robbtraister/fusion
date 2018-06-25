@@ -2,7 +2,22 @@
 
 const fs = require('fs')
 
-const { componentSrcRoot } = require('../../../../environment')
+const { componentDistRoot } = require('../../../../environment')
+
+function fileExists (fp) {
+  try {
+    fs.accessSync(fp, fs.constants.R_OK)
+    return true
+  } catch (e) {}
+  return false
+}
+
+function componentCss (fp, name) {
+  const cssFilePath = fp.replace(/\.js$/, '.css')
+  return fileExists(cssFilePath)
+    ? `require('${cssFilePath}')`
+    : ''
+}
 
 function componentImport (fp, name) {
   return name.startsWith(`['features']`)
@@ -11,19 +26,18 @@ function componentImport (fp, name) {
 }
 
 const componentFiles = [
-  (componentName, outputType) => outputType ? `${componentName}/${outputType}.jsx` : null,
-  (componentName, outputType) => `${componentName}/default.jsx`,
-  (componentName, outputType) => `${componentName}/index.jsx`,
-  (componentName, outputType) => `${componentName}.jsx`
+  (componentName, outputType) => outputType ? `${componentName}/${outputType}.js` : null,
+  (componentName, outputType) => `${componentName}/default.js`,
+  (componentName, outputType) => `${componentName}/index.js`,
+  (componentName, outputType) => `${componentName}.js`
 ]
 
 const getComponentFile = function getComponentFile (type, id, outputType) {
   for (let i = 0; i < componentFiles.length; i++) {
-    try {
-      const key = componentFiles[i](`${componentSrcRoot}/${type}/${id}`, outputType)
-      fs.accessSync(key, fs.constants.R_OK)
+    const key = componentFiles[i](`${componentDistRoot}/${type}/${id}`, outputType)
+    if (fileExists(key)) {
       return key
-    } catch (e) {}
+    }
   }
   return null
 }
@@ -142,6 +156,7 @@ const unpack = require('${require.resolve('../../shared/unpack')}')
 window.Fusion = window.Fusion || {}
 Fusion.Components = Fusion.Components || {}
 ${Object.keys(types).map(t => `Fusion.Components.${t} = Fusion.Components.${t} || {}`)}
+${Object.keys(components).map(k => componentCss(k, components[k])).join('\n')}
 ${Object.keys(components).map(k => componentImport(k, components[k])).join('\n')}
 Fusion.Template = function (props) {
   return React.createElement(React.Fragment, {}, ${Template})

@@ -7,7 +7,6 @@
     "build:all": "webpack --config ./webpack.config.js",
     "build:all:production": "NODE_ENV=production npm run build:all -- --mode production -p",
     "build:combined": "webpack --config ./webpack/combined.js",
-    "build:combined:default": "webpack --config ./webpack/combined-default.js",
     "build:combined:production": "NODE_ENV=production npm run build:combined -- --mode production -p",
     "build:components": "webpack --config ./webpack/components.js",
     "build:components:production": "NODE_ENV=production npm run build:components -- --mode production -p",

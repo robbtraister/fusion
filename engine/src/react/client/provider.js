@@ -5,6 +5,8 @@
 const React = require('react')
 
 Fusion.context = React.createContext('fusion')
+const now = +new Date()
+const lastModified = new Date(Fusion.lastModified || null).toUTCString()
 
 const JSONNormalize = require('../../utils/normalize')
 
@@ -15,20 +17,30 @@ const getContentGenerator = function getContentGenerator (contentCache) {
     const sourceCache = contentCache[source] = contentCache[source] || {}
 
     const fetchContent = (source, keyString, filter, cached) =>
-      window.fetch(`${Fusion.contextPath || ''}/api/v3/content/fetch/${source}?key=${encodeURIComponent(keyString)}` + (filter ? `&query=${encodeURIComponent(filter)}` : '') + (Fusion.arcSite ? `&_website=${encodeURIComponent(Fusion.arcSite)}` : ''))
-        .then(resp => resp.json())
+      window.fetch(
+        `${Fusion.contextPath || ''}/api/v3/content/fetch/${source}?key=${encodeURIComponent(keyString)}` + (filter ? `&query=${encodeURIComponent(filter)}` : '') + (Fusion.arcSite ? `&_website=${encodeURIComponent(Fusion.arcSite)}` : ''),
+        {
+          headers: {
+            'If-Modified-Since': lastModified
+          }
+        }
+      )
+        .then(resp => (resp.status === 304)
+          ? cached
+          : resp.json()
+        )
         .catch(() => cached)
 
     const getSourceContent = (key, filter) => {
       filter = filter ? filter.replace(/\s+/g, ' ').trim() : null
 
       const keyString = JSONNormalize.stringify(key)
-      const keyCache = sourceCache[keyString] = sourceCache[keyString] || {}
+      const keyCache = sourceCache.entries[keyString] = sourceCache.entries[keyString] || {}
       const cached = keyCache.cached
 
       keyCache.fetched = keyCache.fetched || {}
       const fetched = keyCache.fetched[filter] = keyCache.fetched[filter] || (
-        (Fusion.refreshContent || cached === undefined)
+        (cached === undefined || sourceCache.expiresAt < now)
           ? fetchContent(source, keyString, filter, cached)
           : Promise.resolve(cached)
       )
@@ -49,13 +61,16 @@ const getContentGenerator = function getContentGenerator (contentCache) {
   }
 }
 
+const contextMatch = (Fusion.contextPath) ? window.location.pathname.match(`^${Fusion.contextPath}(.*)`) : null
+const requestPath = (contextMatch) ? contextMatch[1] : window.location.pathname
+
 const value = {
   arcSite: Fusion.arcSite,
   contextPath: Fusion.contextPath,
   getContent: getContentGenerator(Fusion.contentCache),
   globalContent: Fusion.globalContent,
   outputType: Fusion.outputType,
-  requestUri: window.location.pathname + window.location.search
+  requestUri: requestPath + window.location.search
 }
 
 module.exports = (props) => React.createElement(

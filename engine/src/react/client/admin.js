@@ -15,10 +15,10 @@ const Consumer = require('../shared/consumer')
 
 const getComponent = (componentType, componentName, outputType) => {
   const Component = [
-    Fusion.Component[componentType][`${componentName}/${outputType}`],
-    Fusion.Component[componentType][`${componentName}/default`],
-    Fusion.Component[componentType][`${componentName}/index`],
-    Fusion.Component[componentType][componentName]
+    Fusion.Components[componentType][`${componentName}/${outputType}`],
+    Fusion.Components[componentType][`${componentName}/default`],
+    Fusion.Components[componentType][`${componentName}/index`],
+    Fusion.Components[componentType][componentName]
   ].filter(c => c).shift()
 
   return (Component && componentType === 'features')

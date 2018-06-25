@@ -23,6 +23,7 @@ const staticHandler = (isDev)
   : (location) => (req, res, next) =>
     fetchFile(`${location || ''}${req.path}`)
       .then(src => { res.send(src) })
+      .catch(() => next())
 
 distRouter.use('/engine', staticHandler('/engine'))
 distRouter.all(/\.css$/, staticHandler())
@@ -34,10 +35,9 @@ function getTypeRouter (routeType, allowPost) {
   const typeRouter = express.Router()
 
   typeRouter.get('/:id/:outputType.js',
-    bodyParser.json({limit: bodyLimit}),
     (req, res, next) => {
-      const id = req.body.id || req.params.id
-      const type = req.body.type || routeType
+      const id = req.params.id
+      const type = routeType
 
       new Rendering(type, id)
         .getScript(req.params.outputType || defaultOutputType)

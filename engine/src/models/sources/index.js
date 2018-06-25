@@ -51,6 +51,8 @@ const getSourceFetcher = function getSourceFetcher (source) {
       ? source.resolve
       : getJsonResolver(source)
 
+  const mutate = source.mutate || ((json) => json)
+
   return resolve
     ? function fetch (key) {
       // start with an empty Promise so that this.resolve can return a static value or a Promise
@@ -64,6 +66,7 @@ const getSourceFetcher = function getSourceFetcher (source) {
           return request(contentUrl)
         })
         .then((data) => JSON.parse(data))
+        .then(mutate)
         .catch((err) => {
           // console.log(err.response)
           if (err.response) {

@@ -32,7 +32,7 @@ const getRelativeUri = function getRelativeUri ({componentType, id, outputType =
 }
 
 const getS3Key = function getS3Key (name) {
-  return `${getKeyBase()}/dist/${name}`
+  return `${getKeyBase()}/dist/${name.replace(/^\//, '')}`
 }
 
 const getS3Url = function getS3Url ({componentType, id, outputType}) {

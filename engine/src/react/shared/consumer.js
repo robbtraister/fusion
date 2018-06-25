@@ -83,11 +83,9 @@ function HOC (Component) {
           Object.keys(contents).forEach(key => {
             const content = contents[key]
             if (isClient) {
-              if (Fusion.refreshContent || content.cached === undefined) {
-                // this case is only necessary on the client
-                // on the server, we will wait for the content to hydrate and manually re-render
-                content.fetched.then(data => { this.setState({[key]: data}) })
-              }
+              // this case is only necessary on the client
+              // on the server, we will wait for the content to hydrate and manually re-render
+              content.fetched.then(data => { this.setState({[key]: data}) })
             }
 
             // this case is only possible if content was fetched server-side

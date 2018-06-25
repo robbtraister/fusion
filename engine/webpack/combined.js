@@ -14,7 +14,6 @@ const externals = require('./shared/externals')
 const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
-const isTest = require('./shared/is-test')
 
 const components = require('./shared/components')
 
@@ -28,7 +27,6 @@ const {
 const entry = {}
 const types = {}
 components
-  .filter(f => !isTest(f))
   .forEach(f => {
     const name = f.substr(componentSrcRoot.length + 1)
     const type = name.split('/').shift()
@@ -39,7 +37,7 @@ components
 
 // this should probably be in bundle, but the bundle volume is generally mapped as read-only
 // so just put it in the root
-const combinedSrcFile = path.resolve(__dirname, '../combined.jsx')
+const combinedSrcFile = path.resolve(__dirname, '../combined.js')
 fs.writeFileSync(combinedSrcFile,
   `
 const unpack = require('./src/react/shared/unpack')

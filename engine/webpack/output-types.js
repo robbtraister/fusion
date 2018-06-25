@@ -3,8 +3,6 @@
 const childProcess = require('child_process')
 const path = require('path')
 
-const glob = require('glob')
-
 // const CleanWebpackPlugin = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OnBuildWebpackPlugin = require('on-build-webpack')
@@ -19,19 +17,12 @@ const externals = require('./shared/externals')
 const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
-const isTest = require('./shared/is-test')
 
 const {
-  componentDistRoot,
-  componentSrcRoot
+  componentDistRoot
 } = require('../environment')
 
-const outputTypeSrcRoot = path.resolve(`${componentSrcRoot}/output-types`)
-
-const entry = {}
-glob.sync(`${outputTypeSrcRoot}/*.{hbs,js,jsx,vue}`)
-  .filter(f => !isTest(f))
-  .forEach(fp => { entry[path.parse(fp).name] = fp })
+const entry = require('./shared/output-types')
 
 // Compile twice.
 // First pass will extract css into a separate file suitable for references

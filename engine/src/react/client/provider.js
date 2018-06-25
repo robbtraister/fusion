@@ -61,13 +61,16 @@ const getContentGenerator = function getContentGenerator (contentCache) {
   }
 }
 
+const contextMatch = (Fusion.contextPath) ? window.location.pathname.match(`^${Fusion.contextPath}(.*)`) : null
+const requestPath = (contextMatch) ? contextMatch[1] : window.location.pathname
+
 const value = {
   arcSite: Fusion.arcSite,
   contextPath: Fusion.contextPath,
   getContent: getContentGenerator(Fusion.contentCache),
   globalContent: Fusion.globalContent,
   outputType: Fusion.outputType,
-  requestUri: window.location.pathname + window.location.search
+  requestUri: requestPath + window.location.search
 }
 
 module.exports = (props) => React.createElement(

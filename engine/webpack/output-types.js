@@ -114,6 +114,7 @@ module.exports = (Object.keys(entry).length)
       output: {
         filename: `output-types/[name].js`,
         path: componentDistRoot,
+        libraryExport: 'default',
         libraryTarget: 'commonjs2'
       },
       plugins: [
@@ -127,9 +128,13 @@ module.exports = (Object.keys(entry).length)
         //     watch: true
         //   }
         // )
-        new ManifestPlugin({fileName: 'manifest.output-types.json'})
+        new ManifestPlugin({fileName: 'output-types.json'})
       ],
-      resolve
+      resolve,
+      target: 'node',
+      watchOptions: {
+        ignored: /node_modules/
+      }
     }
   ]
   : null

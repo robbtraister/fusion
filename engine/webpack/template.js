@@ -3,6 +3,7 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
 
+// const babelLoader = require('./shared/loaders/babel-loader')
 const cssLoader = require('./shared/loaders/css-loader')
 
 const externals = require('./shared/externals')
@@ -22,6 +23,13 @@ module.exports = (entry) =>
       mode,
       module: {
         rules: [
+          // {
+          //   test: /\.jsx?$/i,
+          //   exclude: /node_modules/,
+          //   use: [
+          //     babelLoader
+          //   ]
+          // },
           {
             test: /\.css$/,
             use: [
@@ -44,6 +52,10 @@ module.exports = (entry) =>
           filename: '[contenthash].css'
         })
       ],
-      resolve
+      resolve,
+      target: 'web',
+      watchOptions: {
+        ignored: /node_modules/
+      }
     }
     : null

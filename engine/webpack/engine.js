@@ -61,6 +61,9 @@ module.exports = [
       ])
     ],
     resolve,
-    target: 'web'
+    target: 'web',
+    watchOptions: {
+      ignored: /node_modules/
+    }
   }
 ]

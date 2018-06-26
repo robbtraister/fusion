@@ -14,7 +14,10 @@ const getContentGenerator = function getContentGenerator (contentCache) {
   contentCache = contentCache || {}
 
   return function getContent (source, ...args) {
-    const sourceCache = contentCache[source] = contentCache[source] || {}
+    const sourceCache = contentCache[source] = contentCache[source] || {
+      entries: {},
+      expiresAt: 0
+    }
 
     const fetchContent = (source, keyString, filter, cached) =>
       window.fetch(

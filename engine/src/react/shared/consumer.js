@@ -48,9 +48,11 @@ function HOC (Component) {
           this.setContent(
             Object.assign({},
               ...Object.keys(contents)
-                .map(key => {
-                  const content = contents[key]
-                  return {[key]: this.getContent(content.source, content.key, content.query)}
+                .map(stateKey => {
+                  const content = contents[stateKey]
+                  const contentSource = content.source || content.contentService
+                  const contentKey = content.key || content.contentConfigValues
+                  return contentSource ? {[stateKey]: this.getContent(contentSource, contentKey, content.query)} : {}
                 })
             )
           )

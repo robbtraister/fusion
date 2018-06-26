@@ -50,6 +50,8 @@ services:
     command: 'start:dev'
     depends_on:
       - data
+    env_file:
+      - .env
     environment:
       <<: *_environment
       CONTENT_BASE:

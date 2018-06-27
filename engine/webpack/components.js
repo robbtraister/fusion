@@ -18,6 +18,8 @@ const resolve = require('./shared/resolve')
 
 const components = require('./shared/components')
 
+// console.log(components)
+
 const {
   componentDistRoot,
   componentSrcRoot,
@@ -25,22 +27,11 @@ const {
   isDev
 } = require('../environment')
 
-const entry = {}
-const types = {}
-components
-  .forEach(f => {
-    const name = f.substr(componentSrcRoot.length + 1)
-    const type = name.split('/').shift()
-    types[type] = true
-    const parts = path.parse(name)
-    entry[path.join(parts.dir, parts.name)] = f
-  })
-
 const plugins = [
   new MiniCssExtractPlugin({
     filename: '[name].css'
   }),
-  new ManifestPlugin({fileName: 'components.json'})
+  new ManifestPlugin({fileName: 'manifest.json'})
 ]
 
 if (isDev) {
@@ -52,50 +43,61 @@ if (isDev) {
   )
 }
 
-module.exports = (Object.keys(entry).length)
-  ? {
-    devtool: false,
-    entry,
-    externals,
-    mode,
-    module: {
-      rules: [
-        {
-          test: /\.jsx?$/i,
-          exclude: /node_modules/,
-          use: [
-            babelLoader
-          ]
-        },
-        {
-          test: /\.css$/,
-          use: [
-            MiniCssExtractPlugin.loader,
-            cssLoader
-          ]
-        },
-        {
-          test: /\.s[ac]ss$/,
-          use: [
-            MiniCssExtractPlugin.loader,
-            cssLoader,
-            sassLoader
-          ]
-        }
-      ]
-    },
-    optimization,
-    output: {
-      filename: `[name].js`,
-      path: componentDistRoot,
-      libraryExport: 'default',
-      libraryTarget: 'commonjs2'
-    },
-    plugins,
-    resolve,
-    target: 'web',
-    watchOptions: {
-      ignored: /node_modules/
+module.exports = Object.keys(components).map((type) => {
+  const entry = {}
+
+  components[type]
+    .forEach((fp) => {
+      const name = path.relative(path.resolve(componentSrcRoot, type), fp)
+      const parts = path.parse(name)
+      entry[path.join(parts.dir, parts.name)] = fp
+    })
+
+  return (Object.keys(entry).length)
+    ? {
+      devtool: false,
+      entry,
+      externals,
+      mode,
+      module: {
+        rules: [
+          {
+            test: /\.jsx?$/i,
+            exclude: /node_modules/,
+            use: [
+              babelLoader
+            ]
+          },
+          {
+            test: /\.css$/,
+            use: [
+              MiniCssExtractPlugin.loader,
+              cssLoader
+            ]
+          },
+          {
+            test: /\.s[ac]ss$/,
+            use: [
+              MiniCssExtractPlugin.loader,
+              cssLoader,
+              sassLoader
+            ]
+          }
+        ]
+      },
+      optimization,
+      output: {
+        filename: `[name].js`,
+        path: path.resolve(componentDistRoot, type),
+        libraryExport: 'default',
+        libraryTarget: 'commonjs2'
+      },
+      plugins,
+      resolve,
+      target: 'web',
+      watchOptions: {
+        ignored: /node_modules/
+      }
     }
-  }
-  : null
+    : null
+})

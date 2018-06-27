@@ -4,6 +4,7 @@ const path = require('path')
 
 // const CleanWebpackPlugin = require('clean-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
+const ManifestPlugin = require('webpack-manifest-plugin')
 
 const babelLoader = require('./shared/loaders/babel-loader')
 const mode = require('./shared/mode')
@@ -52,6 +53,7 @@ module.exports = [
       //     watch: true
       //   }
       // ),
+      new ManifestPlugin({fileName: 'manifest.json'}),
       new CopyWebpackPlugin([
         {
           from: require.resolve('../src/react/client/preview.html'),

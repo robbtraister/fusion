@@ -4,9 +4,9 @@ const childProcess = require('child_process')
 const path = require('path')
 
 // const CleanWebpackPlugin = require('clean-webpack-plugin')
+const ManifestPlugin = require('webpack-manifest-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OnBuildWebpackPlugin = require('on-build-webpack')
-const ManifestPlugin = require('webpack-manifest-plugin')
 
 const babelLoader = require('./shared/loaders/babel-loader')
 const cssLoader = require('./shared/loaders/css-loader')
@@ -112,8 +112,8 @@ module.exports = (Object.keys(entry).length)
       },
       optimization,
       output: {
-        filename: `output-types/[name].js`,
-        path: componentDistRoot,
+        filename: `[name].js`,
+        path: path.resolve(componentDistRoot, 'output-types'),
         libraryExport: 'default',
         libraryTarget: 'commonjs2'
       },
@@ -128,7 +128,7 @@ module.exports = (Object.keys(entry).length)
         //     watch: true
         //   }
         // )
-        new ManifestPlugin({fileName: 'output-types.json'})
+        new ManifestPlugin({fileName: 'manifest.json'})
       ],
       resolve,
       target: 'node',

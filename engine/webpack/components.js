@@ -89,7 +89,6 @@ module.exports = Object.keys(components).map((type) => {
       output: {
         filename: `[name].js`,
         path: path.resolve(componentDistRoot, type),
-        libraryExport: 'default',
         libraryTarget: 'commonjs2'
       },
       plugins,

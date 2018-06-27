@@ -114,7 +114,6 @@ module.exports = (Object.keys(entry).length)
       output: {
         filename: `[name].js`,
         path: path.resolve(componentDistRoot, 'output-types'),
-        libraryExport: 'default',
         libraryTarget: 'commonjs2'
       },
       plugins: [

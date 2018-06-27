@@ -14,8 +14,7 @@ const { componentDistRoot } = require('../../../../environment')
 const componentFiles = [
   (componentType, componentName, outputType) => outputType ? `${componentDistRoot}/${componentType}/${componentName}/${outputType}.js` : null,
   (componentType, componentName, outputType) => `${componentDistRoot}/${componentType}/${componentName}/default.js`,
-  (componentType, componentName, outputType) => `${componentDistRoot}/${componentType}/${componentName}/index.js`,
-  (componentType, componentName, outputType) => `${componentDistRoot}/${componentType}/${componentName}.js`
+  (componentType, componentName, outputType) => `${componentDistRoot}/${componentType}/${componentName}/index.js`
 ]
 
 const TimedComponent = (Component) => (props) => {

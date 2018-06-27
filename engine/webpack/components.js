@@ -21,7 +21,6 @@ const components = require('./shared/components')
 
 const {
   componentDistRoot,
-  componentSrcRoot,
   distRoot,
   isDev
 } = require('../environment')
@@ -34,10 +33,7 @@ module.exports = Object.keys(components).map((type) => {
       const component = components[type][componentName]
       Object.keys(component)
         .forEach((outputType) => {
-          const fp = component[outputType]
-          const name = path.relative(path.resolve(componentSrcRoot, type), fp)
-          const parts = path.parse(name)
-          entry[path.join(parts.dir, parts.name)] = fp
+          entry[`${componentName}/${outputType}`] = component[outputType]
         })
     })
 

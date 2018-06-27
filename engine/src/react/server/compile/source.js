@@ -28,8 +28,7 @@ function componentImport (fp, name) {
 const componentFiles = [
   (componentName, outputType) => outputType ? `${componentName}/${outputType}.js` : null,
   (componentName, outputType) => `${componentName}/default.js`,
-  (componentName, outputType) => `${componentName}/index.js`,
-  (componentName, outputType) => `${componentName}.js`
+  (componentName, outputType) => `${componentName}/index.js`
 ]
 
 const getComponentFile = function getComponentFile (type, id, outputType) {

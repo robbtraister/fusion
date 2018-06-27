@@ -16,12 +16,12 @@ const {
 } = require('../environment')
 
 const {
-  clientEntries
+  clientEntries: entry
 } = require('../src/react')
 
 module.exports = [
   {
-    entry: clientEntries,
+    entry,
     mode,
     module: {
       rules: [

@@ -6,6 +6,7 @@ const path = require('path')
 const ManifestPlugin = require('webpack-manifest-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OnBuildWebpackPlugin = require('on-build-webpack')
+const WrapperPlugin = require('wrapper-webpack-plugin')
 
 const babelLoader = require('./shared/loaders/babel-loader')
 const cssLoader = require('./shared/loaders/css-loader')
@@ -18,8 +19,6 @@ const resolve = require('./shared/resolve')
 
 const components = require('./shared/components')
 
-// console.log(components)
-
 const {
   componentDistRoot,
   componentSrcRoot,
@@ -27,31 +26,43 @@ const {
   isDev
 } = require('../environment')
 
-const plugins = [
-  new MiniCssExtractPlugin({
-    filename: '[name].css'
-  }),
-  new ManifestPlugin({fileName: 'manifest.json'})
-]
-
-if (isDev) {
-  plugins.push(
-    new OnBuildWebpackPlugin(function (stats) {
-      childProcess.execSync(`rm -rf '${path.resolve(distRoot, 'page')}'`)
-      childProcess.execSync(`rm -rf '${path.resolve(distRoot, 'template')}'`)
-    })
-  )
-}
-
 module.exports = Object.keys(components).map((type) => {
   const entry = {}
 
-  components[type]
-    .forEach((fp) => {
-      const name = path.relative(path.resolve(componentSrcRoot, type), fp)
-      const parts = path.parse(name)
-      entry[path.join(parts.dir, parts.name)] = fp
+  Object.keys(components[type])
+    .forEach((componentName) => {
+      const component = components[type][componentName]
+      Object.keys(component)
+        .forEach((outputType) => {
+          const fp = component[outputType]
+          const name = path.relative(path.resolve(componentSrcRoot, type), fp)
+          const parts = path.parse(name)
+          entry[path.join(parts.dir, parts.name)] = fp
+        })
     })
+
+  const plugins = [
+    new WrapperPlugin({
+      header: 'var module=module||{};module.exports=',
+      footer (fileName) {
+        const componentName = fileName.replace(/\.js$/, '').split('/').slice(0, type === 'features' ? 2 : 1).join('/')
+        return `if(typeof window!=='undefined'&&window.Fusion&&window.Fusion.isAdmin){window.Fusion.Components=window.Fusion.Components||{};window.Fusion.Components.${type}=window.Fusion.Components.${type}||{};window.Fusion.Components.${type}['${componentName}']=module.exports}`
+      }
+    }),
+    new MiniCssExtractPlugin({
+      filename: '[name].css'
+    }),
+    new ManifestPlugin({fileName: 'manifest.json'})
+  ]
+
+  if (isDev) {
+    plugins.push(
+      new OnBuildWebpackPlugin(function (stats) {
+        childProcess.execSync(`rm -rf '${path.resolve(distRoot, 'page')}'`)
+        childProcess.execSync(`rm -rf '${path.resolve(distRoot, 'template')}'`)
+      })
+    )
+  }
 
   return (Object.keys(entry).length)
     ? {
@@ -88,8 +99,7 @@ module.exports = Object.keys(components).map((type) => {
       optimization,
       output: {
         filename: `[name].js`,
-        path: path.resolve(componentDistRoot, type),
-        libraryTarget: 'commonjs2'
+        path: path.resolve(componentDistRoot, type)
       },
       plugins,
       resolve,

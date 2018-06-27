@@ -2,7 +2,7 @@
 
 const debugTimer = require('debug')('fusion:timer:react:component')
 
-const React = require('react')
+const React = global.react = require('react')
 
 const Consumer = require('../../shared/consumer')
 const unpack = require('../../shared/unpack')

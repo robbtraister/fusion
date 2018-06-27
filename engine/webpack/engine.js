@@ -3,13 +3,16 @@
 const path = require('path')
 
 // const CleanWebpackPlugin = require('clean-webpack-plugin')
-const CopyWebpackPlugin = require('copy-webpack-plugin')
+const HandlebarsPlugin = require('handlebars-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
 
 const babelLoader = require('./shared/loaders/babel-loader')
 const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
+const outputTypes = require('./shared/output-types')
 const resolve = require('./shared/resolve')
+
+const components = require('./shared/components')
 
 const {
   distRoot,
@@ -54,13 +57,34 @@ module.exports = [
       //   }
       // ),
       new ManifestPlugin({fileName: 'manifest.json'}),
-      new CopyWebpackPlugin([
-        {
-          from: require.resolve('../src/react/client/preview.html'),
-          to: path.resolve(distRoot, 'engine', '[name].[ext]'),
-          transform: (content) => content.toString().replace(/\$\{CONTEXT_PATH\}/g, contextPath)
-        }
-      ])
+      ...Object.keys(outputTypes)
+        .map((outputType) => {
+          const scripts = []
+          const styles = []
+
+          Object.keys(components)
+            .forEach((componentType) => {
+              Object.keys(components[componentType])
+                .forEach((componentName) => {
+                  const component = components[componentType][componentName]
+                  const componentOutputType = [outputType, 'default', 'index'].find(ot => (ot in component))
+                  if (componentOutputType) {
+                    scripts.push(`${componentType}/${componentName}/${componentOutputType}.js`)
+                    styles.push(`${componentType}/${componentName}/${componentOutputType}.css`)
+                  }
+                })
+            })
+
+          return new HandlebarsPlugin({
+            entry: require.resolve('../src/react/client/preview.html.hbs'),
+            output: path.resolve(distRoot, 'engine', 'preview', `${outputType}.html`),
+            data: {
+              contextPath,
+              scripts,
+              styles
+            }
+          })
+        })
     ],
     resolve,
     target: 'web',

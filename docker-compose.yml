@@ -38,6 +38,7 @@ services:
       - '27017:27017'
     volumes:
       - './data/db:/data/db:rw'
+      - './data/dumps:/data/dumps:rw'
       - './data/restore:/data/restore:rw'
 
   engine:

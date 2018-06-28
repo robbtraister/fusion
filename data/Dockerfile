@@ -5,7 +5,7 @@ RUN apt-get update && \
                     netcat
 
 WORKDIR /data
-COPY run.sh ./
+COPY *.sh ./
 
 VOLUME /data/restore
 

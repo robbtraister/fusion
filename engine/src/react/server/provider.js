@@ -34,7 +34,9 @@ const getContentGenerator = function getContentGenerator (contentCache, arcSite)
       keyCache.fetched = keyCache.fetched
         .then(data => keyCache.source.filter(query, data))
         .then(filtered => {
-          keyCache.filtered = keyCache.cached ? _.merge(keyCache.filtered, filtered) : null
+          if (!this.static) {
+            keyCache.filtered = keyCache.cached ? _.merge(keyCache.filtered, filtered) : null
+          }
           return keyCache.cached
         })
 

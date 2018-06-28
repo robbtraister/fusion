@@ -51,7 +51,7 @@ const getSourceFetcher = function getSourceFetcher (source) {
       ? source.resolve
       : getJsonResolver(source)
 
-  const mutate = source.mutate || ((json) => json)
+  const transform = source.transform || source.mutate || ((json) => json)
 
   return resolve
     ? function fetch (key) {
@@ -66,7 +66,7 @@ const getSourceFetcher = function getSourceFetcher (source) {
           return request(contentUrl)
         })
         .then((data) => JSON.parse(data))
-        .then(mutate)
+        .then(transform)
         .catch((err) => {
           // console.log(err.response)
           if (err.response) {

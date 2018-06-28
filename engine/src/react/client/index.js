@@ -50,6 +50,12 @@ const render = () => {
         }
       }
 
+      Fusion.elementCache = {}
+      const staticElements = window.document.getElementsByClassName('fusion:static')
+      Array.prototype.slice.call(staticElements).forEach(elem => {
+        Fusion.elementCache[elem.id] = elem.innerHTML
+      })
+
       const method = 'render' // Fusion.isFresh ? 'hydrate' : 'render'
       ReactDOM[method](
         React.createElement(

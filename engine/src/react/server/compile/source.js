@@ -159,15 +159,15 @@ function generateSource (renderable, outputType) {
   const Template = renderableItem(renderable)
 
   const contents = `'use strict'
-const React=require('react')
-const Consumer=require('${require.resolve('../../shared/consumer')}')
-const unpack=require('${require.resolve('../../shared/unpack')}')
-window.Fusion=window.Fusion||{}
-Fusion.Components=Fusion.Components||{}
-${Object.keys(types).map(t => `Fusion.Components.${t}=Fusion.Components.${t}||{}`)}
+const React = require('react')
+const Consumer = require('${require.resolve('../../shared/consumer')}')
+const unpack = require('${require.resolve('../../shared/unpack')}')
+window.Fusion = window.Fusion || {}
+Fusion.Components = Fusion.Components || {}
+${Object.keys(types).map(t => `Fusion.Components.${t} = Fusion.Components.${t} || {}`)}
 ${Object.keys(components).map(k => componentCss(k, components[k])).join('\n')}
 ${Object.keys(components).map(k => componentImport(k, components[k])).join('\n')}
-Fusion.Template=function (props) {
+Fusion.Template = function (props) {
   return React.createElement(React.Fragment, {}, ${Template})
 }
 module.exports = Fusion.Template

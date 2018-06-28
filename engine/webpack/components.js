@@ -6,7 +6,6 @@ const path = require('path')
 const ManifestPlugin = require('webpack-manifest-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OnBuildWebpackPlugin = require('on-build-webpack')
-const WrapperPlugin = require('wrapper-webpack-plugin')
 
 const babelLoader = require('./shared/loaders/babel-loader')
 const cssLoader = require('./shared/loaders/css-loader')
@@ -38,14 +37,6 @@ module.exports = Object.keys(components).map((type) => {
     })
 
   const plugins = [
-    new WrapperPlugin({
-      test: /\.js$/,
-      header: 'var module=module||{};module.exports=',
-      footer (fileName) {
-        const componentName = fileName.replace(/\.js$/, '').split('/').slice(0, type === 'features' ? 2 : 1).join('/')
-        return `if(typeof window!=='undefined'&&window.Fusion&&window.Fusion.isAdmin){window.Fusion.Components=window.Fusion.Components||{};window.Fusion.Components.${type}=window.Fusion.Components.${type}||{};window.Fusion.Components.${type}['${componentName}']=module.exports}`
-      }
-    }),
     new MiniCssExtractPlugin({
       filename: '[name].css'
     }),
@@ -96,7 +87,8 @@ module.exports = Object.keys(components).map((type) => {
       optimization,
       output: {
         filename: `[name].js`,
-        path: path.resolve(componentDistRoot, type)
+        path: path.resolve(componentDistRoot, type),
+        libraryTarget: 'commonjs2'
       },
       plugins,
       resolve,

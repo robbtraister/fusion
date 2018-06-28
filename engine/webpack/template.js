@@ -23,6 +23,7 @@ module.exports = (entry) =>
       mode,
       module: {
         rules: [
+          // since we are using pre-compiled components, we don't need to re-babelify
           // {
           //   test: /\.jsx?$/i,
           //   exclude: /node_modules/,

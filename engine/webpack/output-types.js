@@ -3,7 +3,6 @@
 const childProcess = require('child_process')
 const path = require('path')
 
-// const CleanWebpackPlugin = require('clean-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OnBuildWebpackPlugin = require('on-build-webpack')
@@ -69,16 +68,6 @@ module.exports = (Object.keys(entry).length)
         libraryTarget: 'commonjs2'
       },
       plugins: [
-        // each entry is watched independently, so we can't reliably clean all components
-        // new CleanWebpackPlugin(
-        //   [
-        //     'output-types/**/*.css'
-        //   ],
-        //   {
-        //     root: componentDistRoot,
-        //     watch: true
-        //   }
-        // ),
         new MiniCssExtractPlugin({
           filename: 'output-types/[name].css'
         }),
@@ -117,16 +106,6 @@ module.exports = (Object.keys(entry).length)
         libraryTarget: 'commonjs2'
       },
       plugins: [
-        // each entry is watched independently, so we can't reliably clean all components
-        // new CleanWebpackPlugin(
-        //   [
-        //     'output-types/**/*.js'
-        //   ],
-        //   {
-        //     root: componentDistRoot,
-        //     watch: true
-        //   }
-        // )
         new ManifestPlugin({fileName: 'manifest.json'})
       ],
       resolve,

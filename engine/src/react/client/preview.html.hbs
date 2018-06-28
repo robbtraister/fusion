@@ -10,10 +10,10 @@
     </script>
     <script type="application/javascript" src="{{contextPath}}/dist/engine/admin.js"></script>
     {{# each scripts as |script| }}
-    <script type="application/javascript" src="{{contextPath}}/dist/components/{{script}}"></script>
+    <script type="application/javascript" src="{{../contextPath}}/dist/components/{{script}}"></script>
     {{/ each }}
     {{# each styles as |style| }}
-    <link type="text/css" rel="stylesheet" href="{{contextPath}}/dist/components/{{style}}">
+    <link type="text/css" rel="stylesheet" href="{{../contextPath}}/dist/components/{{style}}">
     {{/ each }}
   </head>
   <body>

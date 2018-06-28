@@ -39,6 +39,7 @@ module.exports = Object.keys(components).map((type) => {
 
   const plugins = [
     new WrapperPlugin({
+      test: /\.js$/,
       header: 'var module=module||{};module.exports=',
       footer (fileName) {
         const componentName = fileName.replace(/\.js$/, '').split('/').slice(0, type === 'features' ? 2 : 1).join('/')

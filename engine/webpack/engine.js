@@ -38,9 +38,7 @@ module.exports = [
     optimization,
     output: {
       filename: `[name].js`,
-      path: path.resolve(distRoot, 'engine'),
-      library: 'react',
-      libraryTarget: 'var'
+      path: path.resolve(distRoot, 'engine')
     },
     plugins: [
       new ManifestPlugin({fileName: 'manifest.json'}),

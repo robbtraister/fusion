@@ -168,6 +168,13 @@ const render = function render ({Component, requestUri, content, _website}) {
 }
 
 const compileRenderable = function compileRenderable ({renderable, outputType}) {
+  if (isDev) {
+    // clear cache to ensure we load the latest
+    Object.keys(require.cache)
+      .filter((fp) => fp.startsWith(componentDistRoot))
+      .forEach((fp) => { delete require.cache[fp] })
+  }
+
   let tic = timer.tic()
   return Promise.resolve(compileComponent(renderable, outputType))
     .then(Feature => {
@@ -181,11 +188,9 @@ const compileRenderable = function compileRenderable ({renderable, outputType}) 
     })
 }
 
-const outputTypeCache = {}
 const getOutputTypeComponent = function getOutputTypeComponent (outputType) {
   try {
-    outputTypeCache[outputType] = outputTypeCache[outputType] || unpack(require(`${componentDistRoot}/output-types/${outputType}`))
-    return outputTypeCache[outputType]
+    return unpack(require(`${componentDistRoot}/output-types/${outputType}`))
   } catch (e) {
     const err = new Error(`Could not find output-type: ${outputType}`)
     err.statusCode = 400

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>React Admin</title>
+    <script type="application/javascript">
+      window.Fusion=window.Fusion||{}
+      Fusion.isAdmin=true
+      Fusion.contextPath='{{contextPath}}'
+      Fusion.contentCache={}
+    </script>
+    <script type="application/javascript" src="{{contextPath}}/dist/engine/admin.js"></script>
+    <script type="application/javascript" src="{{contextPath}}/dist/components/combinations/{{outputType}}.js"></script>
+    <link type="text/css" rel="stylesheet" href="{{contextPath}}/dist/components/combinations/{{outputType}}.css" />
+  </head>
+  <body>
+    <div id="fusion-app"></div>
+  </body>
+</html>

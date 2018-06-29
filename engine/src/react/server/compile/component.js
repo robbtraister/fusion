@@ -2,7 +2,7 @@
 
 const debugTimer = require('debug')('fusion:timer:react:component')
 
-const React = require('react')
+const React = global.react = require('react')
 
 const Consumer = require('../../shared/consumer')
 const unpack = require('../../shared/unpack')
@@ -14,8 +14,7 @@ const { componentDistRoot } = require('../../../../environment')
 const componentFiles = [
   (componentType, componentName, outputType) => outputType ? `${componentDistRoot}/${componentType}/${componentName}/${outputType}.js` : null,
   (componentType, componentName, outputType) => `${componentDistRoot}/${componentType}/${componentName}/default.js`,
-  (componentType, componentName, outputType) => `${componentDistRoot}/${componentType}/${componentName}/index.js`,
-  (componentType, componentName, outputType) => `${componentDistRoot}/${componentType}/${componentName}.js`
+  (componentType, componentName, outputType) => `${componentDistRoot}/${componentType}/${componentName}/index.js`
 ]
 
 const TimedComponent = (Component) => (props) => {

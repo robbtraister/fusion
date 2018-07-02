@@ -10,32 +10,39 @@ const lastModified = new Date(Fusion.lastModified || null).toUTCString()
 
 const JSONNormalize = require('../../utils/normalize')
 
+const fetchContent = (sourceName, keyString, filter, cached) =>
+  window.fetch(
+    `${Fusion.contextPath || ''}/api/v3/content/fetch/${sourceName}?key=${encodeURIComponent(keyString)}` + (filter ? `&query=${encodeURIComponent(filter)}` : '') + (Fusion.arcSite ? `&_website=${encodeURIComponent(Fusion.arcSite)}` : ''),
+    {
+      headers: {
+        'If-Modified-Since': lastModified
+      }
+    }
+  )
+    .then(resp => (resp.status === 304)
+      ? cached
+      : resp.json()
+    )
+    .catch(() => cached)
+
 const getContentGenerator = function getContentGenerator (contentCache) {
   contentCache = contentCache || {}
 
-  return function getContent (source, ...args) {
-    const sourceCache = contentCache[source] = contentCache[source] || {
+  return function getContent (sourceName, ...args) {
+    const sourceCache = contentCache[sourceName] = contentCache[sourceName] || {
       entries: {},
       expiresAt: 0
     }
 
-    const fetchContent = (source, keyString, filter, cached) =>
-      window.fetch(
-        `${Fusion.contextPath || ''}/api/v3/content/fetch/${source}?key=${encodeURIComponent(keyString)}` + (filter ? `&query=${encodeURIComponent(filter)}` : '') + (Fusion.arcSite ? `&_website=${encodeURIComponent(Fusion.arcSite)}` : ''),
-        {
-          headers: {
-            'If-Modified-Since': lastModified
-          }
-        }
-      )
-        .then(resp => (resp.status === 304)
-          ? cached
-          : resp.json()
-        )
-        .catch(() => cached)
-
     const getSourceContent = (key, filter) => {
-      filter = filter ? filter.replace(/\s+/g, ' ').trim() : null
+      filter = (filter)
+        ? filter
+          .replace(/\s+/g, ' ')
+          .replace(/ *{ */g, '{')
+          .replace(/ *} */g, '}')
+          .replace(/ *, */g, ',')
+          .trim()
+        : null
 
       const keyString = JSONNormalize.stringify(key)
       const keyCache = sourceCache.entries[keyString] = sourceCache.entries[keyString] || {}
@@ -44,7 +51,7 @@ const getContentGenerator = function getContentGenerator (contentCache) {
       keyCache.fetched = keyCache.fetched || {}
       const fetched = keyCache.fetched[filter] = keyCache.fetched[filter] || (
         (cached === undefined || sourceCache.expiresAt < now)
-          ? fetchContent(source, keyString, filter, cached)
+          ? fetchContent(sourceName, keyString, filter, cached)
           : Promise.resolve(cached)
       )
 

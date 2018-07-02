@@ -51,19 +51,46 @@ function HOC (Component) {
       class ComponentConsumer extends Component {
         fetchContent (contents) {
           this.setContent(
-            Object.assign({},
+            Object.assign(
               ...Object.keys(contents)
-                .map(stateKey => {
-                  const content = contents[stateKey]
-                  const contentSource = content.source || content.contentService
-                  const contentKey = content.key || content.contentConfigValues
-                  return contentSource ? {[stateKey]: this.getContent(contentSource, contentKey, content.query)} : {}
-                })
+                .map(stateKey => ({[stateKey]: this.getContent(contents[stateKey])}))
             )
           )
         }
 
-        getContent (...args) {
+        getContent (sourceOrConfig, key, filter, inherit) {
+          const isConfig = (sourceOrConfig instanceof Object)
+
+          inherit = (isConfig)
+            ? sourceOrConfig.inherit
+            : inherit
+
+          if (inherit) {
+            return {
+              cached: this.props.globalContent,
+              fetched: Promise.resolve(this.props.globalContent)
+            }
+          }
+
+          const sourceName = (isConfig)
+            ? sourceOrConfig.sourceName || sourceOrConfig.source || sourceOrConfig.contentService
+            : sourceOrConfig
+
+          if (!sourceName) {
+            return {
+              cached: null,
+              fetched: Promise.resolve(null)
+            }
+          }
+
+          key = (isConfig)
+            ? sourceOrConfig.key || sourceOrConfig.contentConfigValues
+            : key
+
+          filter = (isConfig)
+            ? sourceOrConfig.filter || sourceOrConfig.query
+            : filter
+
           const localEdits = Object.assign({}, this.props.localEdits || {})
           const localEditItems = localEdits.items || {}
           delete localEdits.items
@@ -76,7 +103,7 @@ function HOC (Component) {
             )
           }
 
-          const content = context.getContent.apply(this, args)
+          const content = context.getContent.call(this, sourceName, key, filter)
 
           return {
             cached: content.cached && appendLocalEdits(content.cached),
@@ -96,7 +123,7 @@ function HOC (Component) {
             }
 
             // this case is only possible if content was fetched server-side
-            // content can only be fetched server-side if requested prior to mounting (.e.g, constructor or componentWillMount)
+            // content can only be fetched server-side if requested prior to mounting (e.g., constructor or componentWillMount)
             // prior to mounting, we should set state directly, not using the `setState` method
             this.state[key] = content.cached
           })

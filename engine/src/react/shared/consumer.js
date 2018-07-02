@@ -6,6 +6,8 @@ const React = require('react')
 
 const isClient = typeof window !== 'undefined'
 
+const splitKey = (key) => key.split(/[.．]/g)
+
 function assign (target, keys, value) {
   const k = keys.shift()
   if (keys.length > 0) {
@@ -17,13 +19,20 @@ function assign (target, keys, value) {
   return target
 }
 
+function getProperty (target, keys) {
+  const k = keys.shift()
+  return (keys.length > 0)
+    ? getProperty(target && target[k], keys)
+    : target ? target[k] : undefined
+}
+
 function merge (base, ...args) {
   const result = Object.assign({}, base)
   args
     .filter((edits) => edits)
     .forEach((edits) => {
       Object.keys(edits).forEach((key) => {
-        assign(result, key.split(/[.．]/g), edits[key])
+        assign(result, splitKey(key), edits[key])
       })
     })
   return result
@@ -86,6 +95,10 @@ function HOC (Component) {
           key = (isConfig)
             ? sourceOrConfig.key || sourceOrConfig.contentConfigValues
             : key
+
+          key = JSON.parse(JSON.stringify(key).replace(/\{\{([^}]+)\}\}/g, (match, propName) => {
+            return getProperty(this.props, splitKey(propName)) || match
+          }))
 
           filter = (isConfig)
             ? sourceOrConfig.filter || sourceOrConfig.query

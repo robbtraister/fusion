@@ -4,7 +4,7 @@ const fs = require('fs')
 
 const unpack = require('../../shared/unpack')
 
-const { componentDistRoot } = require('../../../../environment')
+const { components } = require('../../../../environment/bundle')
 
 function fileExists (fp) {
   try {
@@ -29,24 +29,17 @@ function componentImport (fp, name) {
       : `Fusion.Components${name} = unpack(require('${fp}'))`
 }
 
-const componentFiles = [
-  (componentName, outputType) => outputType ? `${componentName}/${outputType}` : null,
-  (componentName, outputType) => `${componentName}/default`,
-  (componentName, outputType) => `${componentName}`
-]
-
 const getComponentFile = function getComponentFile (type, id, outputType) {
-  for (let i = 0; i < componentFiles.length; i++) {
-    const key = componentFiles[i](`${componentDistRoot}/${type}/${id}`, outputType)
-    try {
-      const component = unpack(require(key))
-      if (component) {
-        return (component.static)
-          ? 'fusion:static'
-          : key
-      }
-    } catch (e) {
+  try {
+    const componentConfig = components[type][id]
+    const componentOutputType = componentConfig[outputType] || componentConfig.default
+    const component = unpack(require(componentOutputType.dist))
+    if (component) {
+      return (component.static)
+        ? 'fusion:static'
+        : componentOutputType.dist
     }
+  } catch (e) {
   }
   return null
 }

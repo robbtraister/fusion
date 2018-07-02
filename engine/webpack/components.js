@@ -16,86 +16,88 @@ const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
 
-const components = require('./shared/components')
-
 const {
   componentDistRoot,
   distRoot,
   isDev
 } = require('../environment')
 
-module.exports = Object.keys(components).map((type) => {
-  const entry = {}
+const { components } = require('../environment/bundle')
 
-  Object.keys(components[type])
-    .forEach((componentName) => {
-      const component = components[type][componentName]
-      Object.keys(component)
-        .forEach((outputType) => {
-          entry[`${componentName}/${outputType}`] = component[outputType]
-        })
-    })
+module.exports = Object.keys(components)
+  .filter(type => type !== 'outputTypes')
+  .map((type) => {
+    const entry = {}
 
-  const plugins = [
-    new MiniCssExtractPlugin({
-      filename: '[name].css'
-    }),
-    new ManifestPlugin({fileName: 'manifest.json'})
-  ]
-
-  if (isDev) {
-    plugins.push(
-      new OnBuildWebpackPlugin(function (stats) {
-        childProcess.execSync(`rm -rf '${path.resolve(distRoot, 'page')}'`)
-        childProcess.execSync(`rm -rf '${path.resolve(distRoot, 'template')}'`)
+    Object.keys(components[type])
+      .forEach((componentName) => {
+        const component = components[type][componentName]
+        Object.keys(component)
+          .forEach((outputType) => {
+            entry[`${componentName}/${outputType}`] = component[outputType].src
+          })
       })
-    )
-  }
 
-  return (Object.keys(entry).length)
-    ? {
-      devtool: false,
-      entry,
-      externals,
-      mode,
-      module: {
-        rules: [
-          {
-            test: /\.jsx?$/i,
-            exclude: /node_modules/,
-            use: [
-              babelLoader
-            ]
-          },
-          {
-            test: /\.css$/,
-            use: [
-              MiniCssExtractPlugin.loader,
-              cssLoader
-            ]
-          },
-          {
-            test: /\.s[ac]ss$/,
-            use: [
-              MiniCssExtractPlugin.loader,
-              cssLoader,
-              sassLoader
-            ]
-          }
-        ]
-      },
-      optimization,
-      output: {
-        filename: `[name].js`,
-        path: path.resolve(componentDistRoot, type),
-        libraryTarget: 'commonjs2'
-      },
-      plugins,
-      resolve,
-      target: 'web',
-      watchOptions: {
-        ignored: /node_modules/
-      }
+    const plugins = [
+      new MiniCssExtractPlugin({
+        filename: '[name].css'
+      }),
+      new ManifestPlugin({fileName: 'manifest.json'})
+    ]
+
+    if (isDev) {
+      plugins.push(
+        new OnBuildWebpackPlugin(function (stats) {
+          childProcess.execSync(`rm -rf '${path.resolve(distRoot, 'page')}'`)
+          childProcess.execSync(`rm -rf '${path.resolve(distRoot, 'template')}'`)
+        })
+      )
     }
-    : null
-})
+
+    return (Object.keys(entry).length)
+      ? {
+        devtool: false,
+        entry,
+        externals,
+        mode,
+        module: {
+          rules: [
+            {
+              test: /\.jsx?$/i,
+              exclude: /node_modules/,
+              use: [
+                babelLoader
+              ]
+            },
+            {
+              test: /\.css$/,
+              use: [
+                MiniCssExtractPlugin.loader,
+                cssLoader
+              ]
+            },
+            {
+              test: /\.s[ac]ss$/,
+              use: [
+                MiniCssExtractPlugin.loader,
+                cssLoader,
+                sassLoader
+              ]
+            }
+          ]
+        },
+        optimization,
+        output: {
+          filename: `[name].js`,
+          path: path.resolve(componentDistRoot, type),
+          libraryTarget: 'commonjs2'
+        },
+        plugins,
+        resolve,
+        target: 'web',
+        watchOptions: {
+          ignored: /node_modules/
+        }
+      }
+      : null
+  })

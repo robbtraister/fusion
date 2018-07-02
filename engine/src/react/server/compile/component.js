@@ -9,13 +9,7 @@ const unpack = require('../../shared/unpack')
 
 const timer = require('../../../timer')
 
-const { componentDistRoot } = require('../../../../environment')
-
-const componentFiles = [
-  (componentType, componentName, outputType) => outputType ? `${componentDistRoot}/${componentType}/${componentName}/${outputType}.js` : null,
-  (componentType, componentName, outputType) => `${componentDistRoot}/${componentType}/${componentName}/default.js`,
-  (componentType, componentName, outputType) => `${componentDistRoot}/${componentType}/${componentName}/index.js`
-]
+const { components } = require('../../../../environment/bundle')
 
 const TimedComponent = (Component) => (props) => {
   const tic = timer.tic()
@@ -25,15 +19,15 @@ const TimedComponent = (Component) => (props) => {
 }
 
 const loadComponent = function loadComponent (componentType, componentName, outputType) {
-  for (let i = 0; i < componentFiles.length; i++) {
-    try {
-      const Component = unpack(require(componentFiles[i](componentType, componentName, outputType)))
-      const ConsumerComponent = (componentType === 'features')
-        ? Consumer(Component)
-        : Component
-      return TimedComponent(ConsumerComponent)
-    } catch (e) {}
-  }
+  try {
+    const componentConfig = components[componentType][componentName]
+    const componentOutputType = componentConfig[outputType] || componentConfig.default
+    const Component = unpack(require(componentOutputType.dist))
+    const ConsumerComponent = (componentType === 'features')
+      ? Consumer(Component)
+      : Component
+    return TimedComponent(ConsumerComponent)
+  } catch (e) {}
   return null
 }
 

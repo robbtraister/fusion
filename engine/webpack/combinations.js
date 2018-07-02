@@ -15,14 +15,14 @@ const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
 
-const components = require('./shared/components')
-const outputTypes = Object.keys(require('./shared/output-types'))
-
-const componentTypes = Object.keys(components)
-
 const {
   componentDistRoot
 } = require('../environment')
+
+const { components } = require('../environment/bundle')
+
+const componentTypes = Object.keys(components).filter(ot => ot !== 'outputTypes')
+const outputTypes = Object.keys(components.outputTypes)
 
 // this should probably be in bundle, but the bundle volume is generally mapped as read-only
 // so just put it in the root
@@ -42,7 +42,7 @@ ${[].concat(
       return Object.keys(typedComponents)
         .map(componentName => {
           const component = typedComponents[componentName]
-          const componentOutputType = [outputType, 'default', 'index'].find(ot => (ot in component))
+          const componentOutputType = component[outputType] || component.default
           return componentOutputType
             ? `Components['${componentType}']['${componentName}'] = unpack(require('${component[componentOutputType]}'))`
             : ''

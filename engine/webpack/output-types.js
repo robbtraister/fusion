@@ -21,7 +21,13 @@ const {
   componentDistRoot
 } = require('../environment')
 
-const entry = require('./shared/output-types')
+const { components } = require('../environment/bundle')
+
+const entry = Object.assign(
+  ...Object.keys(components.outputTypes)
+    .map(key => components.outputTypes[key])
+    .map(outputType => ({[outputType.componentName]: outputType.src}))
+)
 
 // Compile twice.
 // First pass will extract css into a separate file suitable for references

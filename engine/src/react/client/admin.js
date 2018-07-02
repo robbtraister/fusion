@@ -13,13 +13,8 @@ const ReactDOM = require('react-dom')
 const Provider = require('./provider')
 const Consumer = require('../shared/consumer')
 
-const getComponent = (componentType, componentName, outputType) => {
-  const Component = [
-    Fusion.Components[componentType][`${componentName}/${outputType}`],
-    Fusion.Components[componentType][`${componentName}/default`],
-    Fusion.Components[componentType][`${componentName}/index`],
-    Fusion.Components[componentType][componentName]
-  ].filter(c => c).shift()
+const getComponent = (componentType, componentName) => {
+  const Component = Fusion.Components[componentType][componentName]
 
   return (Component && componentType === 'features')
     ? Consumer(Component)

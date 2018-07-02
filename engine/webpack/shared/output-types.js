@@ -1,20 +1,11 @@
 'use strict'
 
-const path = require('path')
-
-const glob = require('glob')
-
-const isTest = require('./is-test')
-
 const {
-  componentSrcRoot
-} = require('../../environment')
+  components
+} = require('../../environment/bundle')
 
-const outputTypeSrcRoot = path.resolve(`${componentSrcRoot}/output-types`)
-
-const outputTypes = {}
-glob.sync(`${outputTypeSrcRoot}/*.{hbs,js,jsx,vue}`)
-  .filter(f => !isTest(f))
-  .forEach(fp => { outputTypes[path.parse(fp).name] = fp })
-
-module.exports = outputTypes
+module.exports = Object.assign(
+  ...Object.keys(components.outputTypes)
+    .map(key => components.outputTypes[key])
+    .map(outputType => ({[outputType.componentName]: outputType.src}))
+)

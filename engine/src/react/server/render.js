@@ -30,6 +30,8 @@ const {
   version
 } = require('../../../environment')
 
+const { components } = require('../../../environment/bundle')
+
 const fileExists = (fp) => {
   try {
     fs.accessSync(fp, fs.constants.R_OK)
@@ -39,15 +41,16 @@ const fileExists = (fp) => {
   }
 }
 
+const outputTypeCssFileExists = (outputType) => fileExists(path.resolve(componentDistRoot, 'output-types', `${outputType}.css`))
 const outputTypeHasCss = (isDev)
   // don't cache it in dev because it might change
-  ? (outputType) => fileExists(path.resolve(componentDistRoot, 'output-types', `${outputType}.css`))
+  ? outputTypeCssFileExists
   // cache it in prod because it won't change
   : (() => {
     const _outputTypeHasCss = {}
     return (outputType) => {
       if (!_outputTypeHasCss.hasOwnProperty(outputType)) {
-        _outputTypeHasCss[outputType] = fileExists(path.resolve(componentDistRoot, 'output-types', `${outputType}.css`))
+        _outputTypeHasCss[outputType] = outputTypeCssFileExists(outputType)
       }
       return _outputTypeHasCss[outputType]
     }
@@ -190,7 +193,7 @@ const compileRenderable = function compileRenderable ({renderable, outputType}) 
 
 const getOutputTypeComponent = function getOutputTypeComponent (outputType) {
   try {
-    return unpack(require(`${componentDistRoot}/output-types/${outputType}`))
+    return unpack(require(components.outputTypes[outputType].dist))
   } catch (e) {
     const err = new Error(`Could not find output-type: ${outputType}`)
     err.statusCode = 400

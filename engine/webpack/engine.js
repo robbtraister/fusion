@@ -8,13 +8,14 @@ const ManifestPlugin = require('webpack-manifest-plugin')
 const babelLoader = require('./shared/loaders/babel-loader')
 const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
-const outputTypes = require('./shared/output-types')
 const resolve = require('./shared/resolve')
 
 const {
   distRoot,
   contextPath
 } = require('../environment')
+
+const { components } = require('../environment/bundle')
 
 const {
   clientEntries: entry
@@ -44,7 +45,7 @@ module.exports = [
     },
     plugins: [
       new ManifestPlugin({fileName: 'manifest.json'}),
-      ...Object.keys(outputTypes)
+      ...Object.keys(components.outputTypes)
         .map((outputType) => {
           return new HandlebarsPlugin({
             entry: require.resolve('../src/react/client/preview.html.hbs'),

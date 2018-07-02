@@ -6,25 +6,50 @@ const React = require('react')
 
 const isClient = typeof window !== 'undefined'
 
-const splitKey = (key) => key.split(/[.．]/g)
+const splitIndexes = (key) => {
+  // pull off the last numbered index
+  const indexed = key.match(/^(.*)\[(\d+)\]$/)
+  return (indexed)
+    ? splitIndexes(indexed[1]).concat(indexed[2])
+    : [key]
+}
+const splitKey = (key) => {
+  const keys = key.split(/[.．]/g)
+  return [].concat(...keys.map(splitIndexes))
+}
 
-function assign (target, keys, value) {
-  const k = keys.shift()
-  if (keys.length > 0) {
-    target[k] = target[k] || {}
-    assign(target[k], keys, value)
-  } else {
-    target[k] = value
+const setProperty = (() => {
+  function _setProperty (target, keys, value) {
+    const k = keys.shift()
+    if (keys.length > 0) {
+      target[k] = target[k] || {}
+      _setProperty(target[k], keys, value)
+    } else {
+      target[k] = value
+    }
+    return target
   }
-  return target
-}
+  return function setProperty (target, key, value) {
+    return _setProperty(target, (key instanceof Array) ? key : splitKey(key), value)
+  }
+})()
 
-function getProperty (target, keys) {
-  const k = keys.shift()
-  return (keys.length > 0)
-    ? getProperty(target && target[k], keys)
-    : target ? target[k] : undefined
-}
+const getProperty = (() => {
+  function _getProperty (target, keys) {
+    const k = keys.shift()
+    try {
+      target = target[k]
+    } catch (e) {
+      return undefined
+    }
+    return (keys.length > 0)
+      ? _getProperty(target, keys)
+      : target
+  }
+  return function getProperty (target, key) {
+    return _getProperty(target, (key instanceof Array) ? key : splitKey(key))
+  }
+})()
 
 function merge (base, ...args) {
   const result = Object.assign({}, base)
@@ -32,7 +57,7 @@ function merge (base, ...args) {
     .filter((edits) => edits)
     .forEach((edits) => {
       Object.keys(edits).forEach((key) => {
-        assign(result, splitKey(key), edits[key])
+        setProperty(result, key, edits[key])
       })
     })
   return result
@@ -97,7 +122,7 @@ function HOC (Component) {
             : key
 
           key = JSON.parse(JSON.stringify(key).replace(/\{\{([^}]+)\}\}/g, (match, propName) => {
-            return getProperty(this.props, splitKey(propName)) || match
+            return getProperty(this.props, propName) || match
           }))
 
           filter = (isConfig)

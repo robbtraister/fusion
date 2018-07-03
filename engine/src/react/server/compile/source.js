@@ -32,7 +32,7 @@ function componentImport (fp, name) {
 const getComponentFile = function getComponentFile (type, id, outputType) {
   try {
     const componentConfig = components[type][id]
-    const componentOutputType = componentConfig[outputType] || componentConfig.default
+    const componentOutputType = componentConfig.outputTypes[outputType] || componentConfig.outputTypes.default
     const component = unpack(require(componentOutputType.dist))
     if (component) {
       return (component.static)

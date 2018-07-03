@@ -9,6 +9,7 @@ try {
   const glob = require('glob')
 
   const {
+    // apiPrefix,
     componentDistRoot,
     componentSrcRoot
   } = require('..')
@@ -21,12 +22,12 @@ try {
   const isNotTest = (f) => !isTest(f)
 
   const createComponentEntry = (src, componentType, componentName, outputType) => {
+    const p = `${componentType}/${componentName}${outputType ? `/${outputType}` : ''}.js`
     return {
-      componentType,
-      componentName,
       outputType,
       src,
-      dist: `${componentDistRoot}/${componentType}/${componentName}${outputType ? `/${outputType}` : ''}.js`
+      dist: `${componentDistRoot}/${p}`
+      // uri: `${apiPrefix}/dist/components/${p}`
     }
   }
 
@@ -40,11 +41,15 @@ try {
       .map(fp => {
         const parts = path.parse(fp)
         const componentName = parts.dir.split('/').concat(parts.name).slice(-wildcardLevels).join('/')
-        componentMap[componentName] = componentMap[componentName] || {}
+        componentMap[componentName] = componentMap[componentName] || {
+          type,
+          id: componentName
+        }
         if (outputTypes) {
-          componentMap[componentName].default = createComponentEntry(fp, type, componentName, 'default')
+          componentMap[componentName].outputTypes = componentMap[componentName].outputTypes || {}
+          componentMap[componentName].outputTypes.default = createComponentEntry(fp, type, componentName, 'default')
         } else {
-          componentMap[componentName] = createComponentEntry(fp, type, componentName)
+          Object.assign(componentMap[componentName], createComponentEntry(fp, type, componentName))
         }
       })
 
@@ -57,8 +62,12 @@ try {
           const parts = path.parse(fp)
           const outputType = parts.name
           const componentName = parts.dir.split('/').slice(-wildcardLevels).join('/')
-          componentMap[componentName] = componentMap[componentName] || {}
-          componentMap[componentName][outputType] = createComponentEntry(fp, type, componentName, outputType)
+          componentMap[componentName] = componentMap[componentName] || {
+            type,
+            id: componentName,
+            outputTypes: {}
+          }
+          componentMap[componentName].outputTypes[outputType] = createComponentEntry(fp, type, componentName, outputType)
         })
     }
 

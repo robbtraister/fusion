@@ -26,7 +26,7 @@ const { components } = require('../environment/bundle')
 const entry = Object.assign(
   ...Object.keys(components.outputTypes)
     .map(key => components.outputTypes[key])
-    .map(outputType => ({[outputType.componentName]: outputType.src}))
+    .map(outputType => ({[outputType.name]: outputType.src}))
 )
 
 // Compile twice.

@@ -21,7 +21,7 @@ const TimedComponent = (Component) => (props) => {
 const loadComponent = function loadComponent (componentType, componentName, outputType) {
   try {
     const componentConfig = components[componentType][componentName]
-    const componentOutputType = componentConfig[outputType] || componentConfig.default
+    const componentOutputType = componentConfig.outputTypes[outputType] || componentConfig.outputTypes.default
     const Component = unpack(require(componentOutputType.dist))
     const ConsumerComponent = (componentType === 'features')
       ? Consumer(Component)

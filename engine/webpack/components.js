@@ -24,6 +24,8 @@ const {
 
 const { components } = require('../environment/bundle')
 
+// console.log(JSON.stringify(components, null, 2))
+
 module.exports = Object.keys(components)
   .filter(type => type !== 'outputTypes')
   .map((type) => {
@@ -32,9 +34,9 @@ module.exports = Object.keys(components)
     Object.keys(components[type])
       .forEach((componentName) => {
         const component = components[type][componentName]
-        Object.keys(component)
+        Object.keys(component.outputTypes)
           .forEach((outputType) => {
-            entry[`${componentName}/${outputType}`] = component[outputType].src
+            entry[`${componentName}/${outputType}`] = component.outputTypes[outputType].src
           })
       })
 

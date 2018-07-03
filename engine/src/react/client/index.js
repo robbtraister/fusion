@@ -13,7 +13,7 @@ if (!Fusion.contextPath) {
 }
 
 const React = window.react = require('react')
-window.PropTypes = require('prop-types')
+window.PropTypes = require('../shared/prop-types')
 
 // support fragments in preact
 React.Fragment = React.Fragment || 'div'

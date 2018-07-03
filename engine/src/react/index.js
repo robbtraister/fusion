@@ -1,5 +1,10 @@
 'use strict'
 
+const mockRequire = require('mock-require')
+const FusionPropTypes = require('./shared/prop-types')
+mockRequire('PropTypes', FusionPropTypes)
+mockRequire('prop-types', FusionPropTypes)
+
 const clientEntries = {
   admin: require.resolve('./client/admin'),
   react: require.resolve('./client')

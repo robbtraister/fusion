@@ -4,7 +4,8 @@
 
 window.Fusion = window.Fusion || {}
 
-const React = require('react')
+const React = window.React = require('react')
+window.PropTypes = require('../shared/prop-types')
 
 // support fragments in preact
 React.Fragment = React.Fragment || 'div'

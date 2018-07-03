@@ -4,9 +4,6 @@ const debugTimer = require('debug')('fusion:timer:react:component')
 
 const React = require('react')
 
-const mockRequire = require('mock-require')
-mockRequire('PropTypes', 'prop-types')
-
 const Consumer = require('../../shared/consumer')
 const unpack = require('../../shared/unpack')
 

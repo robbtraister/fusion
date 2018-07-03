@@ -44,7 +44,7 @@ const handler = (isDev)
     const s3 = new S3({region})
 
     const Bucket = getBucket()
-    const Key = `environments/${environment}/resolvers-test.json`
+    const Key = `environments/${environment}/resolvers.json`
 
     return (req, res, next) => {
       new Promise((resolve, reject) => {

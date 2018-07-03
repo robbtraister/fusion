@@ -12,7 +12,8 @@ if (!Fusion.contextPath) {
   }
 }
 
-const React = require('react')
+const React = window.react = require('react')
+window.PropTypes = require('prop-types')
 
 // support fragments in preact
 React.Fragment = React.Fragment || 'div'

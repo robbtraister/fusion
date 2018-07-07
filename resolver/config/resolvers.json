@@ -1,138 +1,205 @@
 {
-  "environment": "staging",
+  "environment": "mlb-test",
   "pages": [
     {
-      "_id" : "pGuO0J1JYgzIgq",
-      "uri" : "/404-not-found",
-      "name" : "404 Error Page",
-      "published" : "vpchrb2JYgzIgq",
-      "sites" : []
+      "_id": "puLRzA1yer5Cgq",
+      "uri": "/homepage/",
+      "name": "homepage",
+      "versions": {
+        "vClAVZ1yer5Cgq": {
+          "id": "vClAVZ1yer5Cgq",
+          "name": "homepage",
+          "head": "r02dmt8pWbz3tq",
+          "stage": "r0185I4EbIy3tq",
+          "drafts": {
+            "Milind Gangwani": "r3mDuz1mxJaTyq",
+            "Michael Williams": "r02WVM2GSJDhOq",
+            "Matthew Monahan": "rWwdZ12AZg7nGq",
+            "Patrick Cullen": "r0eZfy1OVCHWsq",
+            "Clancy Ryan": "rUJyPz1LvyWWxq",
+            "Ilissa Blech": "r0X5QtqUQ903iq",
+            "Haroon Ghafoori": "rAQYHf2bU9N1nq",
+            "Rasheeda Alexander": "rSafjj2CekuKmq",
+            "Robert Antonucci": "r0oYffk3sRoQpq",
+            "Liza Floyd": "rQvyos1993rLkq",
+            "Jessica Robins": "rLrpvB1QkKfNgq",
+            "Joseph Blair": "rJwcMa1hUppEmq",
+            "Luke Mason": "r0obevSa7vuvNq",
+            "Mary Sargent": "r0Os18vAmgRCDq",
+            "Melissa Steffan": "r5tlu31y4oN3hq",
+            "Skylar Banks": "r0riXjLbibmetq",
+            "Zach Perry": "r0AzcaxYTnf0xq",
+            "Robb Traister": "rYpDCj1qTHF1xq",
+            "Sara Carothers": "ro1TEd2pSID5kq",
+            "Susan Tyler": "rCaV6F1vlEI8jq",
+            "Tania Lee": "r0Zl3i3hWnYtkq",
+            "Dave Ness": "r0oDftymOtNPhq",
+            "Matthew Nelson": "r0X1BNkj0tD7lq",
+            "Ian Weir": "r0i3OhIY3JR3mq",
+            "Chris Nguyen": "rHpAjK17ZcnkKq"
+          },
+          "_pt": "puLRzA1yer5Cgq"
+        },
+        "vKmUT118JdDghq": {
+          "id": "vKmUT118JdDghq",
+          "name": "homepage-breaking-news",
+          "head": "r0iYdPHJmAwLUq",
+          "stage": "r0iYdPHJmAwLUq",
+          "drafts": {
+            "Local User": "r0sGjtSwnAwLUq",
+            "Ilissa Blech": "rSmFhB1E7FFUhq",
+            "Haroon Ghafoori": "r0927QcCN0nfIq",
+            "Rasheeda Alexander": "rPsHni1bWLrrhq",
+            "Natasha Shields": "rkZEU42FyxAIjq",
+            "Robert Antonucci": "rcbBkD1ynzWSyq",
+            "Liza Floyd": "r3C01b2c0p0mhq",
+            "Luke Mason": "rMdzmQ1GxrwmOq",
+            "Skylar Banks": "rgx3dc2fXYyltq",
+            "Zach Perry": "rT02Uv1XkVzKHq",
+            "Robb Traister": "rAM3a61wMtEwNq",
+            "Sara Carothers": "r0cTE6augaA5kq",
+            "Tania Lee": "r0xIyaLGesohOq",
+            "Matthew Nelson": "rR3d7J12nvBUhq",
+            "Laura Elsner": "rareo41OD9nvCq",
+            "Chris Nguyen": "r2rfEc2GVAZqQq"
+          },
+          "_pt": "puLRzA1yer5Cgq"
+        },
+        "v0PIZ8C8fOyhhq": {
+          "id": "v0PIZ8C8fOyhhq",
+          "name": "homepage-weekend",
+          "head": "rOw5191iUWAhhq",
+          "stage": "rOw5191iUWAhhq",
+          "drafts": {
+            "Ilissa Blech": "rKPRpB1SbaOUhq",
+            "Natasha Shields": "rV7tqi2BkVsIjq",
+            "Liza Floyd": "r0F4SsXBjamdlq",
+            "Jessica Robins": "r02j5tVndxyplq",
+            "Sara Carothers": "rcPd3a24DnOhhq",
+            "Matthew Nelson": "r0Zl0NFGW0Bhhq"
+          },
+          "_pt": "puLRzA1yer5Cgq"
+        }
+      },
+      "meta": {
+        "site": ""
+      },
+      "published": "vKmUT118JdDghq",
+      "sites": []
     },
     {
-      "_id" : "pdhHhQ1hVAO1iq",
-      "uri" : "/video-features",
-      "name" : "Video Features",
-      "published" : "vKtXRg2hVAO1iq",
-      "sites" : []
-    },
-    {
-      "_id" : "puLRzA1yer5Cgq",
-      "uri" : "/homepage",
-      "name" : "homepage",
-      "published" : "vKmUT118JdDghq",
-      "sites" : []
-    },
-    {
-      "_id" : "poodt31SjmYyiq",
-      "uri" : "/about",
-      "name" : "About",
-      "published" : "vPBUBS1UjmYyiq",
-      "sites" : []
-    },
-    {
-      "_id" : "poodt31SjmYyir",
-      "uri" : "/about",
-      "name" : "About-Foo",
-      "published" : "vPBUBS1UjmYyir",
-      "sites" : ["foo"]
-    },
-    {
-      "_id" : "poodt31SjmYyis",
-      "uri" : "/about-foo-bar",
-      "name" : "About-Foo-Bar",
-      "published" : "vPBUBS1UjmYyis",
-      "sites" : ["foo", "bar"]
+      "_id": "pP77Fi1osfmRUq",
+      "uri": "/homepage/es/",
+      "name": "es homepage",
+      "versions": {
+        "v0xNft2mQfmRUq": {
+          "id": "v0xNft2mQfmRUq",
+          "name": "es homepage",
+          "head": "r0jsyczvas7SUq",
+          "stage": "r0jsyczvas7SUq",
+          "drafts": {
+
+          },
+          "_pt": "pP77Fi1osfmRUq"
+        }
+      },
+      "meta": {
+
+      },
+      "published": "v0xNft2mQfmRUq",
+      "sites": [
+
+      ]
     }
   ],
   "resolvers": [
     {
-      "_id" : "video",
-      "pattern" : "^/video/.*",
-      "params" : [],
-      "page" : "video-leaf-template",
-      "contentSourceId" : "video-api",
-      "contentConfigMapping" : {
-          "canonical_url" : {
-              "type" : "pattern",
-              "index" : 1
-          }
-      },
-      "testUri" : []
-    },
-    {
-      "_id" : "content-mapped-template-article",
-      "pattern" : "^/content-mapped-template(/[\\w\\-\\/]+/[0-9]{4}/[0-9]{1,2}/[0-9]{1,2}/[\\w\\-]+/)",
-      "params" : [],
-      "page" : "article-template",
-      "contentSourceId" : "content-api",
-      "contentConfigMapping" : {
-          "canonical_url" : {
-              "type" : "pattern",
-              "index" : 1
-          },
-          "published" : {
-              "type" : "static",
-              "value" : "true"
-          }
-      },
-      "content2pageMapping" : {
-          "field" : "foo",
-          "mapping" : {
-            "bar" : "other-article-template"
-          }
-      }
-    },
-    {
-      "_id" : "article-with-params",
-      "pattern" : "^/article-with-params(/[\\w\\-\\/]+/[0-9]{4}/[0-9]{1,2}/[0-9]{1,2}/[\\w\\-]+/)",
+      "_id": "news",
+      "priority": 10,
+      "pattern": "^(/([^/]+))?/news/?$",
       "params": [
-        {
-          "name": "req",
-          "value": "foo.*",
-          "required": true
-        },
-        {
-          "name": "not-req",
-          "value": "bar.*",
-          "required": false
-        },
-        {
-          "name": "not-zoo",
-          "value": "zoo.*",
-          "required": false
-        }
+
       ],
-      "page" : "article-template",
-      "contentSourceId" : "content-api",
-      "contentConfigMapping" : {
-          "canonical_url" : {
-              "type" : "pattern",
-              "index" : 1
-          },
-          "published" : {
-              "type" : "static",
-              "value" : "true"
-          }
+      "sites": [
+
+      ],
+      "page": "news",
+      "contentSourceId": "team",
+      "contentConfigMapping": {
+        "team": {
+          "type": "pattern",
+          "index": 2
+        }
       },
-      "testUri" : []
+      "testUri": [
+
+      ]
     },
     {
-      "_id" : "article",
-      "pattern" : "^(/[\\w\\-\\/]+/[0-9]{4}/[0-9]{1,2}/[0-9]{1,2}/[\\w\\-]+/)",
-      "params" : [],
-      "page" : "article-template",
-      "contentSourceId" : "content-api",
-      "contentConfigMapping" : {
-          "canonical_url" : {
-              "type" : "pattern",
-              "index" : 1
-          },
-          "published" : {
-              "type" : "static",
-              "value" : "true"
-          }
+      "_id": "stats",
+      "priority": 10,
+      "pattern": "^(/([^/]+))?/stats/?$",
+      "params": [
+
+      ],
+      "sites": [
+
+      ],
+      "page": "stats",
+      "contentSourceId": "team",
+      "contentConfigMapping": {
+        "team": {
+          "type": "pattern",
+          "index": 2
+        }
       },
-      "testUri" : []
+      "testUri": [
+
+      ]
+    },
+    {
+      "_id": "anniversary",
+      "priority": 10,
+      "pattern": "^(/([^/]+))?/anniversary/?$",
+      "params": [
+
+      ],
+      "sites": [
+
+      ],
+      "page": "anniversary",
+      "contentSourceId": "team",
+      "contentConfigMapping": {
+        "team": {
+          "type": "pattern",
+          "index": 2
+        }
+      },
+      "testUri": [
+
+      ]
+    },
+    {
+      "_id": "esnews",
+      "priority": 1,
+      "pattern": "^(/([^/]+))?/esnews/?$",
+      "params": [
+
+      ],
+      "sites": [
+
+      ],
+      "page": "esnews",
+      "contentSourceId": "team",
+      "contentConfigMapping": {
+        "team": {
+          "type": "pattern",
+          "index": 2
+        }
+      },
+      "testUri": [
+
+      ]
     }
   ]
 }

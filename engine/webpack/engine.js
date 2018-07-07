@@ -15,7 +15,7 @@ const {
   contextPath
 } = require('../environment')
 
-const { components } = require('../environment/bundle')
+const { components } = require('../environment/manifest')
 
 const {
   clientEntries: entry
@@ -42,7 +42,7 @@ module.exports = [
       path: path.resolve(distRoot, 'engine')
     },
     plugins: [
-      new ManifestPlugin({fileName: 'manifest.json'}),
+      new ManifestPlugin({fileName: 'webpack.manifest.json'}),
       ...Object.keys(components.outputTypes)
         .map((outputType) => {
           return new HandlebarsPlugin({

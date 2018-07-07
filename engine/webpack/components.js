@@ -1,6 +1,7 @@
 'use strict'
 
 const childProcess = require('child_process')
+const fs = require('fs')
 const path = require('path')
 
 const ManifestPlugin = require('webpack-manifest-plugin')
@@ -22,9 +23,9 @@ const {
   isDev
 } = require('../environment')
 
-const { components } = require('../environment/bundle')
+const { components } = require('../environment/manifest')
 
-// console.log(JSON.stringify(components, null, 2))
+const getCustomFields = require('../src/react/shared/custom-fields')
 
 module.exports = Object.keys(components)
   .filter(type => type !== 'outputTypes')
@@ -44,7 +45,19 @@ module.exports = Object.keys(components)
       new MiniCssExtractPlugin({
         filename: '[name].css'
       }),
-      new ManifestPlugin({fileName: 'manifest.json'})
+      new ManifestPlugin({fileName: 'webpack.manifest.json'}),
+      new OnBuildWebpackPlugin(function (stats) {
+        Object.values(components[type])
+          .forEach(component => {
+            try {
+              component.customFields = getCustomFields(component)
+            } catch (e) {
+              console.error(e)
+              process.exit(-1)
+            }
+          })
+        fs.writeFile(`${componentDistRoot}/${type}/fusion.manifest.json`, JSON.stringify(components[type], null, 2), () => {})
+      })
     ]
 
     if (isDev) {
@@ -60,7 +73,7 @@ module.exports = Object.keys(components)
       ? {
         devtool: false,
         entry,
-        externals,
+        externals: externals.node,
         mode,
         module: {
           rules: [
@@ -96,7 +109,7 @@ module.exports = Object.keys(components)
         },
         plugins,
         resolve,
-        target: 'web',
+        target: 'node',
         watchOptions: {
           ignored: /node_modules/
         }

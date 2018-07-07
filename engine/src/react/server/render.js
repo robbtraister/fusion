@@ -30,7 +30,7 @@ const {
   version
 } = require('../../../environment')
 
-const { components } = require('../../../environment/bundle')
+const { components } = require('../../../environment/manifest')
 
 const fileExists = (fp) => {
   try {

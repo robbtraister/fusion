@@ -21,7 +21,7 @@ const getConfigs = require('../../../webpack/template.js')
 
 const sourceFile = path.resolve(`${componentSrcRoot}/template.js`)
 const destFile = path.resolve(`${componentDistRoot}/template.js`)
-const manifestFile = path.resolve(`${componentDistRoot}/manifest.json`)
+const manifestFile = path.resolve(`${componentDistRoot}/webpack.manifest.json`)
 
 const getMemoryFS = function getMemoryFS () {
   const memFs = new MemoryFS()

@@ -4,7 +4,7 @@ const fs = require('fs')
 
 const unpack = require('../../shared/unpack')
 
-const { components } = require('../../../../environment/bundle')
+const { components } = require('../../../../environment/manifest')
 
 function fileExists (fp) {
   try {
@@ -23,10 +23,10 @@ function componentCss (fp, name) {
 
 function componentImport (fp, name) {
   return (fp === 'fusion:static')
-    ? `Fusion.Components${name} = unpack(require('${require.resolve('./static')}'))`
+    ? `Fusion.components${name} = require('${require.resolve('./static')}')`
     : name.startsWith(`['features']`)
-      ? `Fusion.Components${name} = Consumer(unpack(require('${fp}')))`
-      : `Fusion.Components${name} = unpack(require('${fp}'))`
+      ? `Fusion.components${name} = Consumer(unpack(require('${fp}')))`
+      : `Fusion.components${name} = unpack(require('${fp}'))`
 }
 
 const getComponentFile = function getComponentFile (type, id, outputType) {
@@ -64,7 +64,7 @@ function generateSource (renderable, outputType) {
 
     const componentName = getComponentName('features', type)
     if (componentName) {
-      const component = `Fusion.Components${componentName}`
+      const component = `Fusion.components${componentName}`
       const contentConfig = config.contentConfig || {}
       const customFields = config.customFields || {}
       const localEdits = config.localEdits || {}
@@ -87,7 +87,7 @@ function generateSource (renderable, outputType) {
   function chain (config) {
     const componentName = getComponentName('chains', config.chainConfig.id || config.chainConfig)
     const component = (componentName)
-      ? `Fusion.Components${componentName}`
+      ? `Fusion.components${componentName}`
       : `'div'`
 
     const props = {
@@ -116,7 +116,7 @@ function generateSource (renderable, outputType) {
   function layout (config) {
     const componentName = getComponentName('layouts', config.layout)
     const component = (componentName)
-      ? `Fusion.Components${componentName}`
+      ? `Fusion.components${componentName}`
       : `'div'`
 
     const props = {
@@ -156,8 +156,8 @@ const React = require('react')
 const Consumer = require('${require.resolve('../../shared/consumer')}')
 const unpack = require('${require.resolve('../../shared/unpack')}')
 window.Fusion = window.Fusion || {}
-Fusion.Components = Fusion.Components || {}
-${Object.keys(types).map(t => `Fusion.Components.${t} = Fusion.Components.${t} || {}`)}
+Fusion.components = Fusion.components || {}
+${Object.keys(types).map(t => `Fusion.components.${t} = Fusion.components.${t} || {}`)}
 ${Object.keys(components).map(k => componentCss(k, components[k])).join('\n')}
 ${Object.keys(components).map(k => componentImport(k, components[k])).join('\n')}
 Fusion.Template = function (props) {

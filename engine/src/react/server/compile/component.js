@@ -9,7 +9,7 @@ const unpack = require('../../shared/unpack')
 
 const timer = require('../../../timer')
 
-const { components } = require('../../../../environment/bundle')
+const { components } = require('../../../../environment/manifest')
 
 const TimedComponent = (Component) => (props) => {
   const tic = timer.tic()

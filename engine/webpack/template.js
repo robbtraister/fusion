@@ -19,7 +19,7 @@ module.exports = (entry) =>
   (Object.keys(entry).length)
     ? {
       entry,
-      externals,
+      externals: externals.web,
       mode,
       module: {
         rules: [
@@ -48,7 +48,7 @@ module.exports = (entry) =>
         libraryTarget: 'assign'
       },
       plugins: [
-        new ManifestPlugin(),
+        new ManifestPlugin({fileName: 'webpack.manifest.json'}),
         new MiniCssExtractPlugin({
           filename: '[contenthash].css'
         })

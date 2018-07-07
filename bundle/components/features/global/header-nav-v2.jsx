@@ -1,6 +1,7 @@
 'use strict'
 
 const React = require('react')
+const PropTypes = require('prop-types')
 
 const Search = require('../utilities/search.jsx')
 
@@ -117,6 +118,15 @@ class HeaderNavV2 extends React.Component {
       {this.props.customFields.makeNavigationBarSticky && <div className='min-height-45' />}
     </React.Fragment>
   }
+}
+
+HeaderNavV2.propTypes = {
+  customFields: PropTypes.shape({
+    logo: PropTypes.string.tag({test: 'some value'}),
+    makeNavigationBarSticky: PropTypes.bool,
+    menuLabel: PropTypes.string,
+    pushContent: PropTypes.bool
+  })
 }
 
 module.exports = HeaderNavV2

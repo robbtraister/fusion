@@ -21,11 +21,10 @@ const {
   componentDistRoot
 } = require('../environment')
 
-const { components } = require('../environment/bundle')
+const { components } = require('../environment/manifest')
 
 const entry = Object.assign(
-  ...Object.keys(components.outputTypes)
-    .map(key => components.outputTypes[key])
+  ...Object.values(components.outputTypes)
     .map(outputType => ({[outputType.id]: outputType.src}))
 )
 
@@ -39,7 +38,7 @@ module.exports = (Object.keys(entry).length)
   ? [
     {
       entry,
-      externals,
+      externals: externals.node,
       mode,
       module: {
         rules: [
@@ -86,7 +85,7 @@ module.exports = (Object.keys(entry).length)
     },
     {
       entry,
-      externals,
+      externals: externals.node,
       mode,
       module: {
         rules: [
@@ -112,7 +111,7 @@ module.exports = (Object.keys(entry).length)
         libraryTarget: 'commonjs2'
       },
       plugins: [
-        new ManifestPlugin({fileName: 'manifest.json'})
+        new ManifestPlugin({fileName: 'webpack.manifest.json'})
       ],
       resolve,
       target: 'node',

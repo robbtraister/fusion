@@ -13,13 +13,13 @@ if (!Fusion.contextPath) {
 }
 
 const React = window.react = require('react')
-window.PropTypes = require('../shared/prop-types')
+const ReactDOM = window.ReactDOM = require('react-dom')
+window.PropTypes = require('../shared/prop-types/fusion')
+
+const Provider = require('./provider')
 
 // support fragments in preact
 React.Fragment = React.Fragment || 'div'
-const ReactDOM = require('react-dom')
-
-const Provider = require('./provider')
 
 let did404 = false
 const notFound = window.notFound = () => {

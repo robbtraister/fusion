@@ -12,11 +12,16 @@ if (!Fusion.contextPath) {
   }
 }
 
-const React = window.react = require('react')
-const ReactDOM = window.ReactDOM = require('react-dom')
-window.PropTypes = require('../shared/prop-types/fusion')
+Fusion.components = Fusion.components || {}
+Fusion.components.Consumer = require('../shared/components/consumer')
+Fusion.components.Static = require('../shared/components/static')
+Fusion.unpack = require('../shared/unpack')
 
 const Provider = require('./provider')
+
+const React = window.react = require('react')
+const ReactDOM = window.ReactDOM = require('react-dom')
+window.PropTypes = require('../shared/prop-types')
 
 // support fragments in preact
 React.Fragment = React.Fragment || 'div'

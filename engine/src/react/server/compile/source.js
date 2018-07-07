@@ -23,10 +23,10 @@ function componentCss (fp, name) {
 
 function componentImport (fp, name) {
   return (fp === 'fusion:static')
-    ? `Fusion.components${name} = require('${require.resolve('./static')}')`
+    ? `Fusion.components${name} = Fusion.components.Static`
     : name.startsWith(`['features']`)
-      ? `Fusion.components${name} = Consumer(unpack(require('${fp}')))`
-      : `Fusion.components${name} = unpack(require('${fp}'))`
+      ? `Fusion.components${name} = Fusion.components.Consumer(Fusion.unpack(require('${fp}')))`
+      : `Fusion.components${name} = Fusion.unpack(require('${fp}'))`
 }
 
 const getComponentFile = function getComponentFile (type, id, outputType) {
@@ -153,8 +153,6 @@ function generateSource (renderable, outputType) {
 
   const contents = `'use strict'
 const React = require('react')
-const Consumer = require('${require.resolve('../../shared/consumer')}')
-const unpack = require('${require.resolve('../../shared/unpack')}')
 window.Fusion = window.Fusion || {}
 Fusion.components = Fusion.components || {}
 ${Object.keys(types).map(t => `Fusion.components.${t} = Fusion.components.${t} || {}`)}

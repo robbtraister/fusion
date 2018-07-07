@@ -4,15 +4,19 @@
 
 window.Fusion = window.Fusion || {}
 
+Fusion.components = Fusion.components || {}
+const Consumer = Fusion.components.Consumer = require('../shared/components/consumer')
+Fusion.components.Static = require('../shared/components/static')
+Fusion.unpack = require('../shared/unpack')
+
+const Provider = require('./provider')
+
 const React = window.React = require('react')
 const ReactDOM = window.ReactDOM = require('react-dom')
-window.PropTypes = require('../shared/prop-types/fusion')
+window.PropTypes = require('../shared/prop-types')
 
 // support fragments in preact
 React.Fragment = React.Fragment || 'div'
-
-const Provider = require('./provider')
-const Consumer = require('../shared/consumer')
 
 const getComponent = (componentType, componentName) => {
   const Component = Fusion.components[componentType][componentName]

@@ -1,5 +1,7 @@
 'use strict'
 
+require('../mock-requires')
+
 const {
   binaryContentTypes,
   port

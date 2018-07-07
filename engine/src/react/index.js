@@ -1,8 +1,5 @@
 'use strict'
 
-// ensure the prop-types extensions are loaded/enabled
-require('./shared/prop-types')
-
 const clientEntries = {
   admin: require.resolve('./client/admin'),
   react: require.resolve('./client')

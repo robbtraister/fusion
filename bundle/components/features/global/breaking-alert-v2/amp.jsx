@@ -1,6 +1,7 @@
 'use strict'
 
 import React from 'react'
+import PropTypes from 'prop-types'
 
 const BreakingAlertV2 = (props) => {
   const parentPage = (props.customFields.autoLink || '').split(',')[1]
@@ -26,7 +27,7 @@ const BreakingAlertV2 = (props) => {
       <div className='bar-text'>
         {(props.isAdmin || props.customFields.barText) &&
           (props.customFields.barLink
-            ? <a className='event-item' href={props.barLink} {...linkEditableAttributes} {...contentEditableAttributes}>{props.customFields.barText}</a>
+            ? <a className='event-item' href={props.customFields.barLink} {...linkEditableAttributes} {...contentEditableAttributes}>{props.customFields.barText}</a>
             : <div className='event-item' {...contentEditableAttributes}>{props.customFields.barText}</div>
           )
         }
@@ -36,6 +37,15 @@ const BreakingAlertV2 = (props) => {
       <i className='fa fa-close bar-close-btn' />
     </div>
   </div>
+}
+
+BreakingAlertV2.propTypes = {
+  customFields: PropTypes.shape({
+    autoLink: PropTypes.string,
+    barText: PropTypes.string,
+    barLink: PropTypes.string,
+    textColor: PropTypes.string
+  })
 }
 
 export default BreakingAlertV2

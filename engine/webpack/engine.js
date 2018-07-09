@@ -6,15 +6,19 @@ const HandlebarsPlugin = require('handlebars-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
 
 const babelLoader = require('./shared/loaders/babel-loader')
+
+const target = 'web'
+
 const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
-const outputTypes = require('./shared/output-types')
 const resolve = require('./shared/resolve')
 
 const {
   distRoot,
   contextPath
 } = require('../environment')
+
+const { components } = require('../environment/manifest')
 
 const {
   clientEntries: entry
@@ -38,13 +42,11 @@ module.exports = [
     optimization,
     output: {
       filename: `[name].js`,
-      path: path.resolve(distRoot, 'engine'),
-      library: 'react',
-      libraryTarget: 'var'
+      path: path.resolve(distRoot, 'engine')
     },
     plugins: [
-      new ManifestPlugin({fileName: 'manifest.json'}),
-      ...Object.keys(outputTypes)
+      new ManifestPlugin({fileName: 'webpack.manifest.json'}),
+      ...Object.keys(components.outputTypes)
         .map((outputType) => {
           return new HandlebarsPlugin({
             entry: require.resolve('../src/react/client/preview.html.hbs'),
@@ -57,7 +59,7 @@ module.exports = [
         })
     ],
     resolve,
-    target: 'web',
+    target,
     watchOptions: {
       ignored: /node_modules/
     }

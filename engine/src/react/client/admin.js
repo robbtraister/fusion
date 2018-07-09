@@ -4,22 +4,22 @@
 
 window.Fusion = window.Fusion || {}
 
-const React = require('react')
+Fusion.components = Fusion.components || {}
+const Consumer = Fusion.components.Consumer = require('../shared/components/consumer')
+Fusion.components.Static = require('../shared/components/static')
+Fusion.unpack = require('../shared/unpack')
+
+const Provider = require('./provider')
+
+const React = window.React = require('react')
+const ReactDOM = window.ReactDOM = require('react-dom')
+window.PropTypes = require('../shared/prop-types')
 
 // support fragments in preact
 React.Fragment = React.Fragment || 'div'
-const ReactDOM = require('react-dom')
 
-const Provider = require('./provider')
-const Consumer = require('../shared/consumer')
-
-const getComponent = (componentType, componentName, outputType) => {
-  const Component = [
-    Fusion.Components[componentType][`${componentName}/${outputType}`],
-    Fusion.Components[componentType][`${componentName}/default`],
-    Fusion.Components[componentType][`${componentName}/index`],
-    Fusion.Components[componentType][componentName]
-  ].filter(c => c).shift()
+const getComponent = (componentType, componentName) => {
+  const Component = Fusion.components[componentType][componentName]
 
   return (Component && componentType === 'features')
     ? Consumer(Component)

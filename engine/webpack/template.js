@@ -6,7 +6,9 @@ const ManifestPlugin = require('webpack-manifest-plugin')
 // const babelLoader = require('./shared/loaders/babel-loader')
 const cssLoader = require('./shared/loaders/css-loader')
 
-const externals = require('./shared/externals')
+const target = 'web'
+
+const externals = require('./shared/externals')[target]
 const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
@@ -48,13 +50,13 @@ module.exports = (entry) =>
         libraryTarget: 'assign'
       },
       plugins: [
-        new ManifestPlugin(),
+        new ManifestPlugin({fileName: 'webpack.manifest.json'}),
         new MiniCssExtractPlugin({
           filename: '[contenthash].css'
         })
       ],
       resolve,
-      target: 'web',
+      target,
       watchOptions: {
         ignored: /node_modules/
       }

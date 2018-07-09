@@ -1,6 +1,7 @@
 'use strict'
 
 const childProcess = require('child_process')
+const fs = require('fs')
 const path = require('path')
 
 const ManifestPlugin = require('webpack-manifest-plugin')
@@ -12,7 +13,9 @@ const cssLoader = require('./shared/loaders/css-loader')
 const ignoreLoader = require('./shared/loaders/ignore-loader')
 const sassLoader = require('./shared/loaders/sass-loader')
 
-const externals = require('./shared/externals')
+const target = 'node'
+
+const externals = require('./shared/externals')[target]
 const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
@@ -21,7 +24,12 @@ const {
   componentDistRoot
 } = require('../environment')
 
-const entry = require('./shared/output-types')
+const { components } = require('../environment/manifest')
+
+const entry = Object.assign(
+  ...Object.values(components.outputTypes)
+    .map(outputType => ({[outputType.id]: outputType.src}))
+)
 
 // Compile twice.
 // First pass will extract css into a separate file suitable for references
@@ -76,7 +84,8 @@ module.exports = (Object.keys(entry).length)
           childProcess.execSync(`rm -rf ${path.resolve(componentDistRoot, 'junk')}`)
         })
       ],
-      resolve
+      resolve,
+      target
     },
     {
       entry,
@@ -106,10 +115,13 @@ module.exports = (Object.keys(entry).length)
         libraryTarget: 'commonjs2'
       },
       plugins: [
-        new ManifestPlugin({fileName: 'manifest.json'})
+        new ManifestPlugin({fileName: 'webpack.manifest.json'}),
+        new OnBuildWebpackPlugin(function (stats) {
+          fs.writeFile(`${componentDistRoot}/output-types/fusion.manifest.json`, JSON.stringify(components.outputTypes, null, 2), () => {})
+        })
       ],
       resolve,
-      target: 'node',
+      target,
       watchOptions: {
         ignored: /node_modules/
       }

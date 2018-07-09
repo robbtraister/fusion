@@ -26,7 +26,9 @@ const getContentGenerator = function getContentGenerator (contentCache, arcSite)
             return source.fetch(Object.assign({}, key, {'arc-site': arcSite}))
           })
           .then(data => { keyCache.cached = data })
-          .catch(() => { keyCache.cached = null })
+          .catch(() => {
+            keyCache.cached = null
+          })
           .then(() => keyCache.cached),
         source: undefined
       }

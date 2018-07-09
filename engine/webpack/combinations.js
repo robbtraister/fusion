@@ -10,19 +10,21 @@ const babelLoader = require('./shared/loaders/babel-loader')
 const cssLoader = require('./shared/loaders/css-loader')
 const sassLoader = require('./shared/loaders/sass-loader')
 
-const externals = require('./shared/externals')
+const target = 'web'
+
+const externals = require('./shared/externals')[target]
 const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
 
-const components = require('./shared/components')
-const outputTypes = Object.keys(require('./shared/output-types'))
-
-const componentTypes = Object.keys(components)
-
 const {
   componentDistRoot
 } = require('../environment')
+
+const { components } = require('../environment/manifest')
+
+const componentTypes = Object.keys(components).filter(ot => ot !== 'outputTypes')
+const outputTypes = Object.keys(components.outputTypes)
 
 // this should probably be in bundle, but the bundle volume is generally mapped as read-only
 // so just put it in the root
@@ -34,22 +36,21 @@ const config = (outputType) => {
   fs.writeFileSync(combinationSrcFile,
     `
 const unpack = require('../src/react/shared/unpack')
-const Components = {}
-${componentTypes.map(componentType => `Components['${componentType}'] = Components['${componentType}'] || {}`).join('\n')}
+const components = {}
+${componentTypes.map(componentType => `components['${componentType}'] = components['${componentType}'] || {}`).join('\n')}
 ${[].concat(
     ...componentTypes.map(componentType => {
       const typedComponents = components[componentType]
-      return Object.keys(typedComponents)
-        .map(componentName => {
-          const component = typedComponents[componentName]
-          const componentOutputType = [outputType, 'default', 'index'].find(ot => (ot in component))
+      return Object.values(typedComponents)
+        .map(component => {
+          const componentOutputType = component[outputType] || component.default
           return componentOutputType
-            ? `Components['${componentType}']['${componentName}'] = unpack(require('${component[componentOutputType]}'))`
+            ? `components['${componentType}']['${component.id}'] = unpack(require('${component[componentOutputType]}'))`
             : ''
         })
     })
   ).join('\n')}
-module.exports = Components
+module.exports = components
 `
   )
 
@@ -90,7 +91,7 @@ module.exports = Components
     output: {
       filename: `[name].js`,
       path: path.resolve(componentDistRoot, 'combinations'),
-      library: `window.Fusion=window.Fusion||{};window.Fusion.Components`,
+      library: `window.Fusion=window.Fusion||{};window.Fusion.components`,
       libraryTarget: 'assign'
     },
     plugins: [
@@ -99,7 +100,7 @@ module.exports = Components
       })
     ],
     resolve,
-    target: 'web',
+    target,
     watchOptions: {
       ignored: /node_modules/
     }

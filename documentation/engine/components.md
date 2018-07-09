@@ -34,18 +34,16 @@ An object defining the content source as configured in the PageBuilder Admin. Ta
 Can be used with Fusion content fetching as:
 
 ```js
+import Consumer from 'fusion:consumer'
+
 @Consumer
 class Story extends React.Component {
   constructor (props) {
     super(props)
 
-    if (props.contentConfig && props.contentConfig.contentService && props.contentConfig.contentConfigValues) {
-      this.setContent({
-        story: this.getContent(props.contentConfig.contentService, props.contentConfig.contentConfigValues, query)
-      })
-    } else {
-      this.state = {story: null}
-    }
+    this.fetchContent({
+      story: props.contentConfig
+    })
   }
 
   render () {

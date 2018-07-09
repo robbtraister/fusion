@@ -15,71 +15,34 @@ const {
   sourcesRoot
 } = require('../../environment')
 
-const FIELD_TYPE_MAP = {
-  // react-prop-type: pb-classic-field-type
-  'bool': 'boolean',
-  'oneOf': 'select',
-  'string': 'text',
-  'number': 'number'
+const loadConfigs = require('../configs')
+
+const getConfigs = (type) => {
+  try {
+    return require(`${componentDistRoot}/${type}/fusion.configs.json`)
+  } catch (e) {
+    return loadConfigs(type)
+  }
 }
 
-function transformCustomFields (customFields) {
-  return (customFields)
-    ? Object.keys(customFields)
-      .map(id => {
-        const customField = customFields[id]
-        const typeInfo = customField.type.split('.')
-        const fieldType = FIELD_TYPE_MAP[typeInfo[0]] || 'text'
-        const options = (fieldType === 'select')
-          ? {
-            selectOptions: customField.args
-          }
-          : {}
-        return Object.assign(
-          {},
-          customField.tags || {},
-          {
-            id,
-            fieldType,
-            isRequired: typeInfo.length > 1 && typeInfo[typeInfo.length - 1] === 'isRequired'
-          },
-          options
-        )
-      })
-    : null
-}
-
-function transformComponentConfigs (manifest) {
-  return Object.keys(manifest)
-    .map(id => ({
-      id,
-      customFields: transformCustomFields(manifest[id].customFields) || []
-    }))
-}
-
-function componentConfigHandler (type) {
-  const manifestFile = `${componentDistRoot}/${type}/fusion.manifest.json`
-  const loadManifest = () => transformComponentConfigs(require(manifestFile))
+const getConfigHandler = (type) => {
   return (isDev)
     ? (req, res, next) => {
-      // in dev mode, always reload the latest in case webpack has recompiled
-      delete require.cache[manifestFile]
-      res.send(loadManifest())
+      res.send(getConfigs(type))
     }
     : (() => {
-      const configs = loadManifest()
+      const configs = getConfigs(type)
       return (req, res, next) => {
         res.send(configs)
       }
     })()
 }
-
 const configRouter = express.Router()
 
-configRouter.get('/chains', componentConfigHandler('chains'))
-configRouter.get('/features', componentConfigHandler('features'))
-configRouter.get('/layouts', componentConfigHandler('layouts'))
-configRouter.get('/output-types', componentConfigHandler('output-types'))
+configRouter.get('/chains', getConfigHandler('chains'))
+configRouter.get('/features', getConfigHandler('features'))
+configRouter.get('/layouts', getConfigHandler('layouts'))
+configRouter.get('/output-types', getConfigHandler('output-types'))
 
 function transformContentConfigs (manifest) {
   // if (manifest.pattern) {

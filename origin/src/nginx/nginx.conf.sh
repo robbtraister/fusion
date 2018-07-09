@@ -322,7 +322,31 @@ fi
 cat <<EOB
     }
 
-    location ~ ^${API_PREFIX}/(configs|content|generate|render|resolvers)(/.*|$) {
+    location ~ ^${API_PREFIX}/(configs)(/.*|$) {
+      proxy_intercept_errors    on;
+      error_page                400 403 404 418 = @engine;
+
+      set                       \$p /components\$2/fusion.configs.json;
+EOB
+
+if [ "${IS_PROD}" ]
+then
+  cat <<EOB
+      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/dist\$p;
+      proxy_pass                \$target;
+EOB
+else
+  cat <<EOB
+  add_header   "Content-Type" "text/html";
+      root                      /etc/nginx/dist;
+      try_files                 \$p =418;
+EOB
+fi
+
+cat <<EOB
+    }
+
+    location ~ ^${API_PREFIX}/(content|generate|render|resolvers)(/.*|$) {
       error_page                418 = @engine;
       return                    418;
     }
@@ -406,6 +430,7 @@ cat <<EOB
     # location ~ ^${CONTEXT_PATH}/admin/api/(chain|feature|layout)-config/?$ {
     #   rewrite                   ^${CONTEXT_PATH}/admin/api/(chain|feature|layout)-config/? ${API_PREFIX}/configs/\$1s;
     # }
+    #
 
     location ${API_PREFIX} {
       return                    404;

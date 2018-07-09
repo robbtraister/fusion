@@ -10,7 +10,9 @@ const babelLoader = require('./shared/loaders/babel-loader')
 const cssLoader = require('./shared/loaders/css-loader')
 const sassLoader = require('./shared/loaders/sass-loader')
 
-const externals = require('./shared/externals')
+const target = 'web'
+
+const externals = require('./shared/externals')[target]
 const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
@@ -57,7 +59,7 @@ module.exports = components
     entry: {
       [outputType]: combinationSrcFile
     },
-    externals: externals.web,
+    externals,
     mode,
     module: {
       rules: [
@@ -98,7 +100,7 @@ module.exports = components
       })
     ],
     resolve,
-    target: 'web',
+    target,
     watchOptions: {
       ignored: /node_modules/
     }

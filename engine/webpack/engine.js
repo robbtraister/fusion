@@ -6,6 +6,9 @@ const HandlebarsPlugin = require('handlebars-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
 
 const babelLoader = require('./shared/loaders/babel-loader')
+
+const target = 'web'
+
 const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
@@ -56,7 +59,7 @@ module.exports = [
         })
     ],
     resolve,
-    target: 'web',
+    target,
     watchOptions: {
       ignored: /node_modules/
     }

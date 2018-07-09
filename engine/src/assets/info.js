@@ -1,11 +1,7 @@
 'use strict'
 
-const path = require('path')
-
-const { glob } = require('../utils/promises')
-
 const {
-  componentSrcRoot,
+  componentDistRoot,
   contextPath,
   defaultOutputType,
   environment,
@@ -22,8 +18,7 @@ const getKeyBase = function getKeyBase () {
 
 let _outputTypes
 const getOutputTypes = function getOutputTypes () {
-  _outputTypes = _outputTypes || glob(`${componentSrcRoot}/output-types/**/*.{hbs,js,jsx,vue}`)
-    .then((result) => result.map((fp) => path.parse(fp).name))
+  _outputTypes = _outputTypes || Object.keys(require(`${componentDistRoot}/output-types/fusion.manifest.json`))
   return _outputTypes
 }
 

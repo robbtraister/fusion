@@ -6,7 +6,9 @@ const ManifestPlugin = require('webpack-manifest-plugin')
 // const babelLoader = require('./shared/loaders/babel-loader')
 const cssLoader = require('./shared/loaders/css-loader')
 
-const externals = require('./shared/externals')
+const target = 'web'
+
+const externals = require('./shared/externals')[target]
 const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
@@ -19,7 +21,7 @@ module.exports = (entry) =>
   (Object.keys(entry).length)
     ? {
       entry,
-      externals: externals.web,
+      externals,
       mode,
       module: {
         rules: [
@@ -54,7 +56,7 @@ module.exports = (entry) =>
         })
       ],
       resolve,
-      target: 'web',
+      target,
       watchOptions: {
         ignored: /node_modules/
       }

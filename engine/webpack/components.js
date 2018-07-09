@@ -12,7 +12,9 @@ const babelLoader = require('./shared/loaders/babel-loader')
 const cssLoader = require('./shared/loaders/css-loader')
 const sassLoader = require('./shared/loaders/sass-loader')
 
-const externals = require('./shared/externals')
+const target = 'node'
+
+const externals = require('./shared/externals')[target]
 const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
@@ -73,7 +75,7 @@ module.exports = Object.keys(components)
       ? {
         devtool: false,
         entry,
-        externals: externals.node,
+        externals,
         mode,
         module: {
           rules: [
@@ -109,7 +111,7 @@ module.exports = Object.keys(components)
         },
         plugins,
         resolve,
-        target: 'node',
+        target,
         watchOptions: {
           ignored: /node_modules/
         }

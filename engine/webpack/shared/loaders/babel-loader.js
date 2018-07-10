@@ -9,7 +9,8 @@ module.exports = {
       'react'
     ],
     plugins: [
-      'transform-decorators-legacy'
+      'transform-decorators-legacy',
+      'transform-object-rest-spread'
     ],
     comments: false
   }

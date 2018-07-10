@@ -4,6 +4,7 @@ const debugTimer = require('debug')('fusion:timer:react:component')
 
 const React = require('react')
 
+const isStatic = require('../is-static')
 const unpack = require('../../shared/unpack')
 
 const timer = require('../../../timer')
@@ -22,7 +23,7 @@ const loadComponent = function loadComponent (componentType, componentName, outp
     const componentConfig = components[componentType][componentName]
     const componentOutputType = componentConfig.outputTypes[outputType] || componentConfig.outputTypes.default
     const OriginalComponent = unpack(require(componentOutputType.dist))
-    const Component = (OriginalComponent.static)
+    const Component = (isStatic(OriginalComponent, outputType))
       ? (props) => React.createElement('div', { id: props.id, className: 'fusion:static' }, React.createElement(OriginalComponent, props))
       : OriginalComponent
     return TimedComponent(Component)

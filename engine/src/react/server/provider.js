@@ -3,11 +3,13 @@
 const _ = require('lodash')
 const React = require('react')
 
+const isStatic = require('./is-static')
+
 const JSONNormalize = require('../../utils/normalize')
 
 const getSource = require('../../models/sources')
 
-const getContentGenerator = function getContentGenerator (contentCache, arcSite) {
+const getContentGenerator = function getContentGenerator (contentCache, arcSite, outputType) {
   contentCache = contentCache || {}
 
   return function getContent (sourceName, ...args) {
@@ -36,7 +38,7 @@ const getContentGenerator = function getContentGenerator (contentCache, arcSite)
       keyCache.fetched = keyCache.fetched
         .then(data => keyCache.source.filter(query, data))
         .then(filtered => {
-          if (!this.static) {
+          if (!isStatic(this, outputType)) {
             keyCache.filtered = keyCache.cached ? _.merge(keyCache.filtered, filtered) : null
           }
           return keyCache.cached
@@ -72,7 +74,7 @@ module.exports = (Template) => {
         value: Object.assign({}, props, {
           arcSite: props.arcSite,
           contextPath: props.contextPath,
-          getContent: getContentGenerator(contentCache, props.arcSite),
+          getContent: getContentGenerator(contentCache, props.arcSite, props.outputType),
           globalContent: props.globalContent,
           outputType: props.outputType,
           requestUri: props.requestUri

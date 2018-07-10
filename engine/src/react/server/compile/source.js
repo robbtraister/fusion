@@ -2,6 +2,8 @@
 
 const fs = require('fs')
 
+const isStatic = require('../is-static')
+
 const unpack = require('../../shared/unpack')
 
 const { components } = require('../../../../environment/manifest')
@@ -31,9 +33,9 @@ const getComponentFile = function getComponentFile (type, id, outputType) {
   try {
     const componentConfig = components[type][id]
     const componentOutputType = componentConfig.outputTypes[outputType] || componentConfig.outputTypes.default
-    const component = unpack(require(componentOutputType.dist))
-    if (component) {
-      return (component.static)
+    const Component = unpack(require(componentOutputType.dist))
+    if (Component) {
+      return (isStatic(Component, outputType))
         ? 'fusion:static'
         : componentOutputType.dist
     }

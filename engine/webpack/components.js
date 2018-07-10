@@ -29,6 +29,8 @@ const { components } = require('../environment/manifest')
 
 const getCustomFields = require('../src/react/shared/custom-fields')
 
+const loadConfigs = require('../src/configs')
+
 module.exports = Object.keys(components)
   .filter(type => type !== 'outputTypes')
   .map((type) => {
@@ -58,7 +60,9 @@ module.exports = Object.keys(components)
               process.exit(-1)
             }
           })
-        fs.writeFile(`${componentDistRoot}/${type}/fusion.manifest.json`, JSON.stringify(components[type], null, 2), () => {})
+        fs.writeFile(`${componentDistRoot}/${type}/fusion.manifest.json`, JSON.stringify(components[type], null, 2), () => {
+          fs.writeFile(`${componentDistRoot}/${type}/fusion.configs.json`, JSON.stringify(loadConfigs(type), null, 2), () => {})
+        })
       })
     ]
 

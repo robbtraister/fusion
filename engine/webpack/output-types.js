@@ -26,6 +26,8 @@ const {
 
 const { components } = require('../environment/manifest')
 
+const loadConfigs = require('../src/configs')
+
 const entry = Object.assign(
   ...Object.values(components.outputTypes)
     .map(outputType => ({[outputType.id]: outputType.src}))
@@ -117,7 +119,9 @@ module.exports = (Object.keys(entry).length)
       plugins: [
         new ManifestPlugin({fileName: 'webpack.manifest.json'}),
         new OnBuildWebpackPlugin(function (stats) {
-          fs.writeFile(`${componentDistRoot}/output-types/fusion.manifest.json`, JSON.stringify(components.outputTypes, null, 2), () => {})
+          fs.writeFile(`${componentDistRoot}/output-types/fusion.manifest.json`, JSON.stringify(components.outputTypes, null, 2), () => {
+            fs.writeFile(`${componentDistRoot}/output-types/fusion.configs.json`, JSON.stringify(loadConfigs('output-types'), null, 2), () => {})
+          })
         })
       ],
       resolve,

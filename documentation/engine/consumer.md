@@ -6,7 +6,7 @@ If you want to know more about React context: [https://reactjs.org/docs/context.
 
 ## Consumer
 
-~The first thing that you need to do is designate your component as a consumer of the data you need. There is a single consumer wrapper that includes all of the globally provided data and can be accessed simply by requiring in `consumer`. It should be used as a higher-order component (HOC), as follows~ For simplicity, all features will be designated as Consumers and have the hooks injected automatically.
+The first thing that you need to do is designate your component as a consumer of the data you need. There is a single consumer wrapper that includes all of the globally provided data and can be accessed simply by requiring in `fusion:consumer`. It should be used as a higher-order component (HOC), as follows.
 
 Features will have access to the following properties and, if a class, instance methods. Instance methods are only available for class components and will be accessed directly on `this` (e.g., `this.getContent()`)
 
@@ -51,6 +51,9 @@ For convenience, `getContent` may also be called with a single object instead of
 If you are using this for server-rendered content, you should make sure to fetch the content from within the constructor (or componentWillMount, which is also executed during server-side-rendering), as well as set state using the return value.
 
 ```jsx
+import Consumer from 'fusion:consumer'
+
+@Consumer
 class MyComponent extends React.Component {
   constructor (props) {
     super(props)
@@ -71,6 +74,9 @@ If you are fetching content asynchronously from the client only, you should eith
 Also, if using only asynchronous client-side fetching, there is no need to set `this.state` on initial call as the client-side cache will not be pre-populated with any server-rendered data. In this case, you can just access the fetched result directly.
 
 ```jsx
+import Consumer from 'fusion:consumer'
+
+@Consumer
 class MyComponent extends React.Component {
   componentDidMount () {
     this.getContent('content-api', {uri: '/some/data'}, '{type version}')
@@ -87,6 +93,9 @@ class MyComponent extends React.Component {
 or
 
 ```jsx
+import Consumer from 'fusion:consumer'
+
+@Consumer
 class MyComponent extends React.Component {
   constructor (props) {
     super(props)
@@ -107,6 +116,9 @@ class MyComponent extends React.Component {
 You can fetch multiple pieces of content by making multiple calls to getContent.
 
 ```jsx
+import Consumer from 'fusion:consumer'
+
+@Consumer
 class MyComponent extends React.Component {
   constructor (props) {
     super(props)
@@ -134,6 +146,9 @@ class MyComponent extends React.Component {
 The `setContent` method is syntactic sugar for setting both the `cached` data to the initial state property and calling setState on the resolved `fetched` Promise. It is used as follows:
 
 ```jsx
+import Consumer from 'fusion:consumer'
+
+@Consumer
 class MyComponent extends React.Component {
   constructor (props) {
     super(props)
@@ -155,6 +170,9 @@ class MyComponent extends React.Component {
 The `fetchContent` method is second-level syntactic sugar that incorporates both `setContent` and `getContent`. It can be used as follows:
 
 ```jsx
+import Consumer from 'fusion:consumer'
+
+@Consumer
 class MyComponent extends React.Component {
   constructor (props) {
     super(props)

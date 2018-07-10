@@ -69,14 +69,10 @@ function HOC (Component) {
     delete combinedProps.getContent
     delete combinedProps.setContent
 
-    const element = React.createElement(
+    return React.createElement(
       Comp,
       combinedProps
     )
-
-    return (Component.static)
-      ? React.createElement('div', { id: props.id, className: 'fusion:static' }, element)
-      : element
   }
 
   const elementGenerator = (Component.prototype instanceof React.Component)

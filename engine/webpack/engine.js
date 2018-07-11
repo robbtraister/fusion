@@ -24,10 +24,6 @@ const {
 
 const { components } = require('../environment/manifest')
 
-const {
-  clientEntries: entry
-} = require('../src/react')
-
 const variablesSrcDir = path.resolve(__dirname, '../generated')
 childProcess.execSync(`mkdir -p '${variablesSrcDir}'`)
 const variablesSrcFile = path.resolve(variablesSrcDir, `variables.js`)
@@ -80,7 +76,10 @@ module.exports = (siteName) => {
 `)
 
 module.exports = {
-  entry,
+  entry: {
+    admin: require.resolve('../src/react/client/admin'),
+    react: require.resolve('../src/react/client')
+  },
   mode,
   module: {
     rules: [

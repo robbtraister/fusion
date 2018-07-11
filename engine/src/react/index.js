@@ -1,10 +1,5 @@
 'use strict'
 
-const clientEntries = {
-  admin: require.resolve('./client/admin'),
-  react: require.resolve('./client')
-}
-
 const {
   compileDocument,
   compileRenderable,
@@ -14,7 +9,6 @@ const {
 const generateSource = require('./server/compile/source')
 
 module.exports = {
-  clientEntries,
   compileDocument,
   compileRenderable,
   generateSource,

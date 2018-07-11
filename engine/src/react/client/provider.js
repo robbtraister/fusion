@@ -80,7 +80,8 @@ const value = {
   getContent: getContentGenerator(Fusion.contentCache),
   globalContent: Fusion.globalContent,
   outputType: Fusion.outputType,
-  requestUri: requestPath + window.location.search
+  requestUri: requestPath + window.location.search,
+  variables: Fusion.variables(Fusion.arcSite)
 }
 
 module.exports = (props) => React.createElement(

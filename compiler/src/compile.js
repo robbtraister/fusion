@@ -50,10 +50,10 @@ async function compile (bundleName) {
       await extractPromise
 
       await copySrcPromise
-      await Promise.all([
-        build(await rootDirPromise),
-        decrypt(path.resolve(await rootDirPromise, 'bundle'))
-      ])
+
+      await build(await rootDirPromise)
+      // don't decrypt until after build to ensure no secrets are compiled into client-side code
+      await decrypt(path.resolve(await rootDirPromise, 'bundle'))
 
       const zipFilePromise = await zip({
         bundle: path.resolve(await rootDirPromise, 'bundle'),

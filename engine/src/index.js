@@ -1,6 +1,6 @@
 'use strict'
 
-require('../mock-requires')
+require('../mock-requires/server')
 
 const {
   binaryContentTypes,

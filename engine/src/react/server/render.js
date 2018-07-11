@@ -13,7 +13,7 @@ const ReactDOM = require('react-dom/server')
 const compileComponent = require('./compile/component')
 const Provider = require('./provider')
 
-const unpack = require('../shared/unpack')
+const unpack = require('../../utils/unpack')
 
 const timer = require('../../timer')
 

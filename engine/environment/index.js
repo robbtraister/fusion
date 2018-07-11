@@ -12,7 +12,6 @@ const optionalRequire = (fp) => {
 
 const variables = Object.assign(
   // ordered by increasing precedence
-  optionalRequire('./variables'),
   optionalRequire('../bundle/environment'),
   process.env
 )
@@ -37,7 +36,9 @@ const version = variables.AWS_LAMBDA_FUNCTION_VERSION || '$LATEST'
 
 const bundleRoot = path.resolve(variables.BUNDLE_ROOT || `${__dirname}/../bundle`)
 const distRoot = path.resolve(`${bundleRoot}/../dist`)
+const generatedRoot = path.resolve(`${bundleRoot}/../generated`)
 const componentDistRoot = path.resolve(`${distRoot}/components`)
+const componentGeneratedRoot = path.resolve(`${generatedRoot}/components`)
 const componentSrcRoot = path.resolve(`${bundleRoot}/components`)
 const schemasRoot = path.resolve(variables.SCHEMAS_ROOT || `${bundleRoot}/content/schemas`)
 const sourcesRoot = path.resolve(variables.SOURCES_ROOT || `${bundleRoot}/content/sources`)
@@ -48,6 +49,7 @@ module.exports = {
   bodyLimit,
   bundleRoot,
   componentDistRoot,
+  componentGeneratedRoot,
   componentSrcRoot,
   contentBase,
   contextPath,
@@ -55,6 +57,7 @@ module.exports = {
   distRoot,
   environment,
   functionName,
+  generatedRoot,
   isDev,
   minify,
   mongoUrl,

@@ -178,7 +178,7 @@ cat <<EOB
   }
 
   map \$host \$environment {
-    default                     'localhost';
+    default                     '${ENVIRONMENT:-localhost}';
 EOB
 if [ "${IS_PROD}" ]
 then
@@ -287,6 +287,8 @@ cat <<EOB
     }
 
     location ~ ^(${CONTEXT_PATH}|${API_PREFIX})/(resources)(/.*|$) {
+      set                       \$p \$2\$3;
+
       proxy_intercept_errors    on;
       error_page                400 403 404 418 = @engine;
 
@@ -295,7 +297,6 @@ EOB
 if [ "${IS_PROD}" ]
 then
   cat <<EOB
-      set                       \$p \$2\$3;
       set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/\$p;
       proxy_pass                \$target;
 EOB
@@ -310,6 +311,8 @@ cat <<EOB
     }
 
     location ~ ^(${CONTEXT_PATH}|${API_PREFIX})/(assets|dist)(/.*|$) {
+      set                       \$p \$2\$3;
+
       proxy_intercept_errors    on;
       error_page                400 403 404 418 = @engine;
 
@@ -321,7 +324,6 @@ EOB
 if [ "${IS_PROD}" ]
 then
   cat <<EOB
-      set                       \$p \$2\$3;
       set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/\$p;
       proxy_pass                \$target;
 EOB
@@ -336,10 +338,10 @@ cat <<EOB
     }
 
     location ~ ^${API_PREFIX}/(configs)(/.*|$) {
+      set                       \$p /components\$2/fusion.configs.json;
+
       proxy_intercept_errors    on;
       error_page                400 403 404 418 = @engine;
-
-      set                       \$p /components\$2/fusion.configs.json;
 EOB
 
 if [ "${IS_PROD}" ]
@@ -350,7 +352,6 @@ then
 EOB
 else
   cat <<EOB
-  add_header   "Content-Type" "text/html";
       root                      /etc/nginx/dist;
       try_files                 \$p =418;
 EOB
@@ -371,6 +372,8 @@ cat <<EOB
     }
 
     location ~ ^${API_PREFIX}/(fuse|make)(/.*|$) {
+      set                       \$p \$2.html;
+
       error_page                400 403 404 418 = @resolver;
       proxy_intercept_errors    on;
 
@@ -383,7 +386,6 @@ then
 EOB
 else
   cat <<EOB
-      set                       \$p \$2.html;
       set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/html/\${outputType}\$p;
       proxy_pass                \$target;
 EOB

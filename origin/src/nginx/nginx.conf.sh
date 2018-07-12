@@ -217,7 +217,7 @@ then
     }
 EOB
 
-  for endpoint in $(node -e 'console.log(require("./private-endpoints.json").join(" "))')
+  for endpoint in $(node -e "console.log(require('$(dirname "$0")/private-endpoints.json').join(' '))")
   do
     cat <<EOB
     location ^~ $endpoint {

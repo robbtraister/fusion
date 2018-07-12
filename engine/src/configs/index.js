@@ -31,7 +31,7 @@ function transformCustomFields (customFields) {
           {
             id,
             fieldType,
-            isRequired: typeInfo.length > 1 && typeInfo[typeInfo.length - 1] === 'isRequired'
+            required: typeInfo.length > 1 && typeInfo[typeInfo.length - 1] === 'isRequired'
           },
           options
         )

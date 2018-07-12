@@ -97,7 +97,10 @@ function _stringify (v) {
       : JSON.stringify(v)
 }
 FusionPropTypes.stringify = function stringify (v, r, s) {
-  return JSON.stringify(JSON.parse(_stringify(v)), r, s)
+  const str = _stringify(v)
+  return (str)
+    ? JSON.stringify(JSON.parse(str), r, s)
+    : str
 }
 
 module.exports = FusionPropTypes

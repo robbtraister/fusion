@@ -1,14 +1,9 @@
 {
   "name": "fusion-origin",
-  "version": "0.1.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.261.1",
     "body-parser": "^1.18.3",

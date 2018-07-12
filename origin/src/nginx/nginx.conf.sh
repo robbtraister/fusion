@@ -212,7 +212,7 @@ then
       return 301 '\${http_x_forwarded_proto}s://\${host}\${request_uri}\${query_params}';
     }
 
-    if (\$request_method ~ ^(PUT|POST)$) {
+    if (\$request_method ~ ^(POST|PUT)$) {
       return 405;
     }
 EOB
@@ -313,7 +313,7 @@ cat <<EOB
       proxy_intercept_errors    on;
       error_page                400 403 404 418 = @engine;
 
-      if (\$request_method = 'POST' ) {
+      if (\$request_method ~ ^(POST|PUT)$) {
         return                  418;
       }
 EOB

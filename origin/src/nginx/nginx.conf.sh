@@ -398,13 +398,16 @@ if [ "${PB_ADMIN}" ]
 then
   cat <<EOB
     location ${CONTEXT_PATH}/admin {
-      proxy_pass                ${PB_ADMIN};
+      set                       \$target ${PB_ADMIN};
+      proxy_pass                \$target;
     }
     location ${CONTEXT_PATH}/app/info {
-      proxy_pass                ${PB_ADMIN};
+      set                       \$target ${PB_ADMIN};
+      proxy_pass                \$target;
     }
     location ${CONTEXT_PATH}/content/api {
-      proxy_pass                ${PB_ADMIN};
+      set                       \$target ${PB_ADMIN};
+      proxy_pass                \$target;
     }
 EOB
 fi

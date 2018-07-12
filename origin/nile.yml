@@ -85,6 +85,7 @@ environments:
         environment:
           <<: *_environment
           IS_ADMIN: 'true'
+          PB_ADMIN: 'http://$environment.pb.arc.pub'
         # volumes:
         # - '/var/fusion-origin/staging/uploads:/uploads'
     resources:

@@ -134,6 +134,7 @@ services:
       - admin
     environment:
       <<: *_environment
+      IS_ADMIN: 'true'
       PB_ADMIN: http://admin:8888
     networks:
       - fusion

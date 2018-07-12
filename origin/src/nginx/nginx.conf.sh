@@ -204,14 +204,27 @@ cat <<EOB
     server_name                 _;
 
 EOB
-if [ "${IS_PROD}" ]
+
+if [ "${IS_PROD}" ] && [ "${IS_ADMIN}" != 'true' ]
 then
   cat <<EOB
     if (\$http_x_forwarded_port = 80) {
       return 301 '\${http_x_forwarded_proto}s://\${host}\${request_uri}\${query_params}';
     }
 
+    if (\$request_method ~ ^(POST|PUT)$) {
+      return 405;
+    }
 EOB
+
+  for endpoint in $(node -e "console.log(require('$(dirname "$0")/private-endpoints.json').join(' '))")
+  do
+    cat <<EOB
+    location ^~ $endpoint {
+      return 403;
+    }
+EOB
+  done
 fi
 
 cat <<EOB
@@ -300,7 +313,7 @@ cat <<EOB
       proxy_intercept_errors    on;
       error_page                400 403 404 418 = @engine;
 
-      if (\$request_method = 'POST' ) {
+      if (\$request_method ~ ^(POST|PUT)$) {
         return                  418;
       }
 EOB

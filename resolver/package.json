@@ -1,16 +1,11 @@
 {
   "name": "fusion-resolver",
-  "version": "0.1.0",
-  "description": "",
   "main": "src/resolve.js",
   "scripts": {
     "predeploy": "npm install",
     "deploy": "sls deploy",
     "start": "sls --stage=localhost offline start"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "debug": "^3.1.0",
     "express": "^4.16.3",

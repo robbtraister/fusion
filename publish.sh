@@ -83,6 +83,12 @@ addGitTags () {
       then
         git checkout -b "release-${VERSION}" && \
         git push -u origin "release-${VERSION}"
+      else
+        # if using the generic "release" branch, make sure the release-X.X branch is updated
+        COMMIT=$(git rev-parse HEAD)
+        git checkout "release-${VERSION}" && \
+        git merge "${COMMIT}" && \
+        git push
       fi
     ); # allow the above to fail; ignore error
 

@@ -77,6 +77,7 @@ const requestPath = (contextMatch) ? contextMatch[1] : window.location.pathname
 const value = {
   arcSite: Fusion.arcSite,
   contextPath: Fusion.contextPath,
+  eventListeners: {},
   getContent: getContentGenerator(Fusion.contentCache),
   globalContent: Fusion.globalContent,
   outputType: Fusion.outputType,

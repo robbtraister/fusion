@@ -63,22 +63,45 @@ function merge (base, ...args) {
   return result
 }
 
+const createContextElement = (Comp, props, context) => {
+  const contextProps = Object.assign({}, context)
+  delete contextProps.eventListeners
+  delete contextProps.getContent
+
+  const combinedProps = Object.assign({}, props, context)
+
+  return React.createElement(
+    Comp,
+    combinedProps
+  )
+}
+
 function HOC (Component) {
-  const createElement = (Comp, props, context) => {
-    const combinedProps = Object.assign({}, props, context)
-    delete combinedProps.getContent
-    delete combinedProps.setContent
-
-    return React.createElement(
-      Comp,
-      combinedProps
-    )
-  }
-
   const elementGenerator = (Component.prototype instanceof React.Component)
     // if Component is a React Component class, wrap it with new class with context access and `getContent` instance method
     ? (props) => (context) => {
       class ComponentConsumer extends Component {
+        addEventListener (eventType, eventHandler) {
+          const listeners = context.eventListeners[eventType] = context.eventListeners[eventType] || []
+          listeners.push(eventHandler)
+        }
+
+        dispatchEvent (eventType, data) {
+          const listeners = context.eventListeners[eventType] || []
+          listeners.forEach((listener) => {
+            try {
+              listener(data)
+            } catch (e) {}
+          })
+        }
+
+        removeEventListener (eventType, eventHandler) {
+          const listeners = context.eventListeners[eventType] || null
+          if (listeners) {
+            context.eventListeners[eventType] = listeners.filter((listener) => listener !== eventHandler)
+          }
+        }
+
         fetchContent (contents) {
           this.setContent(
             Object.assign(
@@ -164,9 +187,9 @@ function HOC (Component) {
         }
       }
 
-      return createElement(ComponentConsumer, props, context)
+      return createContextElement(ComponentConsumer, props, context)
     }
-    : (props) => (context) => createElement(Component, props, context)
+    : (props) => (context) => createContextElement(Component, props, context)
 
   return (props) => React.createElement(
     Fusion.context.Consumer,

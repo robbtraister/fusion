@@ -2,7 +2,7 @@
 
 const S3Bucket = 'pagebuilder-fusion'
 
-const { version } = require('../../engine/package.json')
+const { version } = require('../../package.json')
 
 // the compiler must be accessible by version
 const Key = (type) => `${type}/${version}.zip`

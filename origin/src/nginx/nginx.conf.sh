@@ -441,14 +441,15 @@ cat <<EOB
     }
 
     # admin rewrites
-    # location = ${CONTEXT_PATH}/content/api/content-config {
-    #   rewrite                   (.*) ${API_PREFIX}/configs/content/sources;
-    # }
-    #
-    # location ~ ^${CONTEXT_PATH}/admin/api/(chain|feature|layout)-config/?$ {
-    #   rewrite                   ^${CONTEXT_PATH}/admin/api/(chain|feature|layout)-config/? ${API_PREFIX}/configs/\$1s;
-    # }
-    #
+    location = ${CONTEXT_PATH}/content/api/content-config {
+      rewrite                   (.*) ${API_PREFIX}/configs/content/sources;
+    }
+
+    location ~ ^${CONTEXT_PATH}/admin/api/(chain|feature|layout|output-type)(-config)?/?$ {
+      set                       \$type \$1;
+      rewrite                   (.*) ${API_PREFIX}/configs/\${type}s;
+    }
+    # end of admin rewrites
 
     location ${API_PREFIX} {
       return                    404;

@@ -43,9 +43,9 @@ ${[].concat(
       const typedComponents = components[componentType]
       return Object.values(typedComponents)
         .map(component => {
-          const componentOutputType = component[outputType] || component.default
+          const componentOutputType = component.outputTypes[outputType] || component.outputTypes.default
           return componentOutputType
-            ? `components['${componentType}']['${component.id}'] = unpack(require('${component[componentOutputType]}'))`
+            ? `components['${component.type}']['${component.id}'] = unpack(require('${componentOutputType.src}'))`
             : ''
         })
     })

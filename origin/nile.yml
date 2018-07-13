@@ -47,6 +47,7 @@ environments:
     <<: *_task
     labels:
       - all
+      - staging
     namespace: pagebuilder-arc2
     override:
       origin:
@@ -75,6 +76,7 @@ environments:
     <<: *_task
     labels:
       - all
+      - staging
     namespace: pagebuilder-arc2
     override:
       origin:

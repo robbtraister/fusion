@@ -5,39 +5,44 @@ APP_NAME=${APP_NAME:-'fusion'}
 NOTIFICATIONS_URL=${NOTIFICATIONS_URL:-'http://jenkins-bot.internal.arc.nile.works'}
 SLACK_CHANNEL=${SLACK_CHANNEL:-'fusion-notices'}
 
-TAG='latest'
+findNext () {
+  base="$1"
+  i="${2:-0}"
+
+  while [ true ]
+  do
+    if [ -z $(git tag | grep -Fx "${base}.${i}") ]
+    then
+      break
+    fi
+    i=$(expr ${i} + 1)
+  done
+
+  echo "${base}.${i}"
+}
+
 if [ "${RELEASE}" ]
 then
-  TAG='release'
+  VERSION=$(python -c "import json; print json.load(open('./package.json'))['version']")
+  TAG=$(findNext "${VERSION}")
+else
+  TAG='latest'
 fi
-
-version () {
-  if [ "${RELEASE}" ]
-  then
-    name=$1
-    version=$(python -c "import json; print json.load(open('./${name}/package.json'))['version']")
-    echo ${version:-latest}
-  else
-    echo 'latest'
-  fi
-}
 
 buildImage () {
   name=$1
-  v=$(version "$name")
   if [ -f "./${name}/Dockerfile" ]
   then
-    docker build -t "quay.io/washpost/fusion-${name}:${v}" -f "./${name}/Dockerfile" "./${name}"
+    docker build -t "quay.io/washpost/fusion-${name}:${TAG}" -f "./${name}/Dockerfile" "./${name}"
   else
-    docker build --build-arg "LAMBDA=${name}" -t "quay.io/washpost/fusion-${name}:${v}" -f ./serverless.Dockerfile .
+    docker build --build-arg "LAMBDA=${name}" -t "quay.io/washpost/fusion-${name}:${TAG}" -f ./serverless.Dockerfile .
   fi
 }
 
 pushImage () {
   name=$1 && \
-  v=$(version "$name") && \
-  docker tag "quay.io/washpost/fusion-${name}:${v}" "quay.io/washpost/fusion-${name}:${v}" && \
-  docker push "quay.io/washpost/fusion-${name}:${v}"
+  docker tag "quay.io/washpost/fusion-${name}:${TAG}" "quay.io/washpost/fusion-${name}:${TAG}" && \
+  docker push "quay.io/washpost/fusion-${name}:${TAG}"
 }
 
 notify () {
@@ -65,14 +70,25 @@ notifyBuildError () {
 
 build () {
   name=$1
-  v=$(version "$name")
-
-  (appName="${APP_NAME}-${name}" tag="${v}" notifyBuildStart)
 
   buildImage "${name}" || notifyBuildError "building ${name}"
   pushImage "${name}" || notifyBuildError "pushing ${name}"
+}
 
-  (appName="${APP_NAME}-${name}" tag="${v}" notify 'success' 'build completed')
+addGitTags () {
+  if [ "${RELEASE}" ]
+  then
+    (
+      if [ $(echo "${TAG}" | grep '\.0$') ] # ends in .0, so first release of this version
+      then
+        git checkout -b "release-${VERSION}" && \
+        git push -u origin "release-${VERSION}"
+      fi
+    ); # allow the above to fail; ignore error
+
+    git tag "${TAG}" && \
+    git push --tags
+  fi
 }
 
 notifyBuildStart
@@ -81,5 +97,7 @@ cd $(dirname "$0")
 build 'engine'
 build 'origin'
 build 'resolver'
+
+addGitTags
 
 notify 'success' 'build completed'

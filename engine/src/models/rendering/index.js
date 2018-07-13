@@ -8,9 +8,7 @@ const {
   version
 } = require('../../../environment')
 
-const model = (isDev)
-  ? require('../../dao/mongo')
-  : require('../../dao/dynamoose')
+const model = require('../../dao')
 
 const compileRendering = require('./compile')
 const getComponent = require('./component')

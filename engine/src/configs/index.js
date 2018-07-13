@@ -22,7 +22,10 @@ function transformCustomFields (customFields) {
         const fieldType = FIELD_TYPE_MAP[typeInfo[0]] || 'text'
         const options = (fieldType === 'select')
           ? {
-            selectOptions: customField.args
+            selectOptions: customField.args.map((value) => ({
+              value,
+              name: (customField.tags && customField.tags.labels && customField.tags.labels[value]) || value
+            }))
           }
           : {}
         return Object.assign(

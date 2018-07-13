@@ -69,6 +69,7 @@ configRouter.get('/content/sources', (req, res, next) => {
         delete s._id
         return s
       }))
+      .catch(() => [])
   ])
     .then(([bundleSources, jgeSources]) => {
       const bundleIds = bundleSources.map(s => s.service)

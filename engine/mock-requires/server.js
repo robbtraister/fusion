@@ -1,6 +1,6 @@
 'use strict'
 
-require('./client')
+require('./shared')
 
 const mockRequire = require('mock-require')
 

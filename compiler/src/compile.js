@@ -57,7 +57,8 @@ async function compile (bundleName) {
 
       const zipFilePromise = await zip({
         bundle: path.resolve(await rootDirPromise, 'bundle'),
-        dist: path.resolve(await rootDirPromise, 'dist')
+        dist: path.resolve(await rootDirPromise, 'dist'),
+        generated: path.resolve(await rootDirPromise, 'generated')
       })
 
       try {

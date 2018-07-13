@@ -11,7 +11,7 @@ Fusion.unpack = require('../shared/unpack')
 
 const Provider = require('./provider')
 
-const React = window.React = require('react')
+const React = window.react = require('react')
 const ReactDOM = window.ReactDOM = require('react-dom')
 window.PropTypes = require('../shared/prop-types')
 

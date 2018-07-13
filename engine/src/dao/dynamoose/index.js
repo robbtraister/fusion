@@ -27,11 +27,11 @@ const createModel = (modelName) => {
     },
 
     find () {
-      throw new Error('not implemented')
+      return Promise.reject(new Error('not implemented'))
     },
 
     findOne () {
-      throw new Error('not implemented')
+      return Promise.reject(new Error('not implemented'))
     },
 
     put (doc) {

@@ -2,8 +2,6 @@
 
 const {
   componentDistRoot,
-  contextPath,
-  defaultOutputType,
   environment,
   version
 } = require('../../environment')
@@ -22,23 +20,13 @@ const getOutputTypes = function getOutputTypes () {
   return _outputTypes
 }
 
-const getRelativeUri = function getRelativeUri ({componentType, id, outputType = defaultOutputType}) {
-  return `${contextPath}/dist/${componentType}/${id}.js?v=${version}&outputType=${outputType}`
-}
-
 const getS3Key = function getS3Key (name) {
   return `${getKeyBase()}/dist/${name.replace(/^\//, '')}`
-}
-
-const getS3Url = function getS3Url ({componentType, id, outputType}) {
-  return `https://${getBucket()}.s3.amazonaws.com/${getS3Key({componentType, id, outputType})})`
 }
 
 module.exports = {
   getBucket,
   getKeyBase,
   getOutputTypes,
-  getRelativeUri,
-  getS3Key,
-  getS3Url
+  getS3Key
 }

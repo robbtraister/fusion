@@ -99,6 +99,7 @@ services:
       - resolver
     environment:
       <<: *_environment
+      IS_ADMIN: 'true'
     networks:
       - fusion
     ports:

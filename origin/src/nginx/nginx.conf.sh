@@ -178,7 +178,7 @@ cat <<EOB
   }
 
   map \$host \$environment {
-    default                     'localhost';
+    default                     '${ENVIRONMENT:-localhost}';
 EOB
 if [ "${IS_PROD}" ]
 then
@@ -204,14 +204,27 @@ cat <<EOB
     server_name                 _;
 
 EOB
-if [ "${IS_PROD}" ]
+
+if [ "${IS_PROD}" ] && [ "${IS_ADMIN}" != 'true' ]
 then
   cat <<EOB
     if (\$http_x_forwarded_port = 80) {
       return 301 '\${http_x_forwarded_proto}s://\${host}\${request_uri}\${query_params}';
     }
 
+    if (\$request_method ~ ^(POST|PUT)$) {
+      return 405;
+    }
 EOB
+
+  for endpoint in $(node -e "console.log(require('$(dirname "$0")/private-endpoints.json').join(' '))")
+  do
+    cat <<EOB
+    location ^~ $endpoint {
+      return 403;
+    }
+EOB
+  done
 fi
 
 cat <<EOB
@@ -274,6 +287,8 @@ cat <<EOB
     }
 
     location ~ ^(${CONTEXT_PATH}|${API_PREFIX})/(resources)(/.*|$) {
+      set                       \$p \$2\$3;
+
       proxy_intercept_errors    on;
       error_page                400 403 404 418 = @engine;
 
@@ -282,7 +297,6 @@ EOB
 if [ "${IS_PROD}" ]
 then
   cat <<EOB
-      set                       \$p \$2\$3;
       set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/\$p;
       proxy_pass                \$target;
 EOB
@@ -297,10 +311,12 @@ cat <<EOB
     }
 
     location ~ ^(${CONTEXT_PATH}|${API_PREFIX})/(assets|dist)(/.*|$) {
+      set                       \$p \$2\$3;
+
       proxy_intercept_errors    on;
       error_page                400 403 404 418 = @engine;
 
-      if (\$request_method = 'POST' ) {
+      if (\$request_method ~ ^(POST|PUT)$) {
         return                  418;
       }
 EOB
@@ -308,7 +324,6 @@ EOB
 if [ "${IS_PROD}" ]
 then
   cat <<EOB
-      set                       \$p \$2\$3;
       set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/\$p;
       proxy_pass                \$target;
 EOB
@@ -323,10 +338,10 @@ cat <<EOB
     }
 
     location ~ ^${API_PREFIX}/(configs)(/.*|$) {
+      set                       \$p /components\$2/fusion.configs.json;
+
       proxy_intercept_errors    on;
       error_page                400 403 404 418 = @engine;
-
-      set                       \$p /components\$2/fusion.configs.json;
 EOB
 
 if [ "${IS_PROD}" ]
@@ -337,7 +352,6 @@ then
 EOB
 else
   cat <<EOB
-  add_header   "Content-Type" "text/html";
       root                      /etc/nginx/dist;
       try_files                 \$p =418;
 EOB
@@ -358,6 +372,8 @@ cat <<EOB
     }
 
     location ~ ^${API_PREFIX}/(fuse|make)(/.*|$) {
+      set                       \$p \$2.html;
+
       error_page                400 403 404 418 = @resolver;
       proxy_intercept_errors    on;
 
@@ -370,7 +386,6 @@ then
 EOB
 else
   cat <<EOB
-      set                       \$p \$2.html;
       set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/html/\${outputType}\$p;
       proxy_pass                \$target;
 EOB
@@ -385,13 +400,16 @@ if [ "${PB_ADMIN}" ]
 then
   cat <<EOB
     location ${CONTEXT_PATH}/admin {
-      proxy_pass                ${PB_ADMIN};
+      set                       \$target ${PB_ADMIN};
+      proxy_pass                \$target;
     }
     location ${CONTEXT_PATH}/app/info {
-      proxy_pass                ${PB_ADMIN};
+      set                       \$target ${PB_ADMIN};
+      proxy_pass                \$target;
     }
     location ${CONTEXT_PATH}/content/api {
-      proxy_pass                ${PB_ADMIN};
+      set                       \$target ${PB_ADMIN};
+      proxy_pass                \$target;
     }
 EOB
 fi

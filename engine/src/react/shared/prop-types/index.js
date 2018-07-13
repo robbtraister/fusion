@@ -2,45 +2,46 @@
 
 const PropTypes = require('../../../../node_modules/prop-types')
 
-const taggablePrimitive = (propType, type) => {
-  const isRequiredName = `${type}.isRequired`
+const taggablePrimitive = (propType, typeName, complexArgs, isRequired) => {
+  const propTypeCopy = (...args) => propType(...args)
 
-  propType.type = type
+  const isRequiredName = `${typeName}.isRequired`
 
-  propType.tag = (tags) => {
-    const instance = (...args) => propType(...args)
-    instance.type = type
-    instance.args = propType.args
+  propTypeCopy.type = typeName
+  propTypeCopy.args = complexArgs
+
+  propTypeCopy.tag = (tags) => {
+    const instance = (...args) => propTypeCopy(...args)
+    instance.type = typeName
+    instance.args = complexArgs
     instance.tags = tags
-    if (propType.isRequired) {
+    if (!isRequired && propType.isRequired) {
       instance.isRequired = (...args) => propType.isRequired(...args)
       instance.isRequired.type = isRequiredName
-      instance.isRequired.args = propType.args
+      instance.isRequired.args = complexArgs
       instance.isRequired.tags = tags
     }
     return instance
   }
 
   // in production, propType is just a placeholder function, so make sure we aren't recursing infinitely
-  if (propType.isRequired && propType.isRequired !== propType) {
-    propType.isRequired.type = isRequiredName
-    propType.isRequired.args = propType.args
-    taggablePrimitive(propType.isRequired, isRequiredName)
+  if (!isRequired && propType.isRequired) {
+    propTypeCopy.isRequired = taggablePrimitive(propType.isRequired, isRequiredName, complexArgs, true)
   }
 
-  return propType
+  return propTypeCopy
 }
 
-const taggableComplex = (propType, type) => (args) => {
-  const f = propType(args)
-  f.args = args
-  return taggablePrimitive(f, type)
+const taggableComplex = (propType, typeName) => (complexArgs) => {
+  // we need to make a new function even for complex types, because in production mode, all types share an empty shim
+  const f = (...args) => propType(complexArgs)(...args)
+  return taggablePrimitive(f, typeName, complexArgs)
 }
 
-const taggable = (propType, type) => {
-  return (propType.name === 'bound checkType')
-    ? taggablePrimitive(propType, type)
-    : taggableComplex(propType, type)
+const taggable = (propType, typeName) => {
+  return (propType.isRequired) // (['shim', 'bound checkType'].includes(propType.name))
+    ? taggablePrimitive(propType, typeName)
+    : taggableComplex(propType, typeName)
 }
 
 const FusionPropTypes = Object.assign(
@@ -83,7 +84,7 @@ FusionPropTypes.contentConfig = (contentType) => {
 // The basic JSON.stringify function ignores functions
 // but functions can have properties, just like any other object
 // this implementation exposes the properties of functions (while still ignoring their source)
-function _stringify (v) {
+function _stringify (v, i) {
   return (v instanceof Array)
     ? `[${v.map(_stringify).join(',')}]`
     : (v instanceof Object)
@@ -91,13 +92,16 @@ function _stringify (v) {
         Object.keys(v)
           .filter(k => !['isRequired', 'tag'].includes(k))
           .filter(k => v[k] !== undefined)
-          .map(k => `"${k}":${_stringify(v[k])}`)
+          .map(k => `"${k}":${_stringify(v[k], (i || 0) + 1)}`)
           .join(',')
       }}`
       : JSON.stringify(v)
 }
 FusionPropTypes.stringify = function stringify (v, r, s) {
-  return JSON.stringify(JSON.parse(_stringify(v)), r, s)
+  const str = _stringify(v)
+  return (str)
+    ? JSON.stringify(JSON.parse(str), r, s)
+    : str
 }
 
 module.exports = FusionPropTypes

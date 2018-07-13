@@ -1,34 +1,46 @@
 'use strict'
 
+const url = require('url')
+
 const bodyParser = require('body-parser')
 const express = require('express')
 
 const Rendering = require('../models/rendering')
 
 const {
-  fetchFile
-} = require('../assets/io')
-
-const {
   bodyLimit,
   defaultOutputType,
   distRoot,
-  isDev
+  isDev,
+  version
 } = require('../../environment')
 
 const distRouter = express.Router()
 
-const staticHandler = (isDev)
-  ? (location) => express.static(`${distRoot}${location || ''}`)
-  : (location) => (req, res, next) =>
-    fetchFile(`${location || ''}${req.path}`)
-      .then(src => { res.send(src) })
-      .catch(() => next())
+const staticHandler = (location) => express.static(`${distRoot}${location || ''}`)
+const redirectHandler = (location) => {
+  const useStatic = staticHandler(location)
+  return (req, res, next) => {
+    if (req.query.v === version) {
+      useStatic(req, res, next)
+    } else {
+      const urlParts = url.parse(req.originalUrl, true)
+      delete urlParts.search
+      urlParts.query.v = version
+      res.redirect(url.format(urlParts))
+    }
+  }
+}
 
-distRouter.use('/engine', staticHandler('/engine'))
-distRouter.all(/\.css$/, staticHandler())
+const assetHandler = (isDev)
+  ? staticHandler
+  : redirectHandler
+
+distRouter.use('/engine', assetHandler('/engine'))
+distRouter.all(/\.css$/, assetHandler())
 
 // if POSTed, we will re-generate
+// don't redirect to S3 in case we have to generate
 distRouter.get(/\.js$/, staticHandler())
 
 function getTypeRouter (routeType, allowPost) {
@@ -47,7 +59,7 @@ function getTypeRouter (routeType, allowPost) {
   )
 
   if (allowPost) {
-    typeRouter.post(['/', '/:id'],
+    const writeHandlers = [
       bodyParser.json({limit: bodyLimit}),
       (req, res, next) => {
         const id = req.params.id || req.body.id
@@ -58,7 +70,11 @@ function getTypeRouter (routeType, allowPost) {
           .then(() => { res.sendStatus(200) })
           .catch(next)
       }
-    )
+    ]
+
+    typeRouter.route(['/', '/:id'])
+      .post(writeHandlers)
+      .put(writeHandlers)
   }
 
   return typeRouter

@@ -30,6 +30,7 @@ const glob = require('glob')
 const {
   // apiPrefix,
   componentDistRoot,
+  componentGeneratedRoot,
   componentSrcRoot,
   isDev
 } = require('.')
@@ -99,7 +100,7 @@ function getComponentManifest (type) {
     if (isDev) {
       throw new Error('only read manifest from file in production')
     }
-    return require(`${componentDistRoot}/${type}/fusion.manifest.json`)
+    return require(`${componentGeneratedRoot}/${type}/fusion.manifest.json`)
   } catch (e) {
     const outputTypes = getComponentType('output-types')
 

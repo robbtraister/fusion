@@ -1,6 +1,6 @@
 'use strict'
 
-require('./mock-requires')
+require('./mock-requires/client')
 
 module.exports = [].concat(
   require('./webpack/engine'),

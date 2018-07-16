@@ -1,8 +1,5 @@
 'use strict'
 
-const mockRequire = require('mock-require')
-mockRequire('fusion:environment', require('../../../environment').variables)
-
 const url = require('url')
 
 const request = require('request-promise-native')

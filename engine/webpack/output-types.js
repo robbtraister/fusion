@@ -119,8 +119,10 @@ module.exports = (Object.keys(entry).length)
       plugins: [
         new ManifestPlugin({fileName: 'webpack.manifest.json'}),
         new OnBuildWebpackPlugin(function (stats) {
-          fs.writeFile(`${componentDistRoot}/output-types/fusion.manifest.json`, JSON.stringify(components.outputTypes, null, 2), () => {
-            fs.writeFile(`${componentDistRoot}/output-types/fusion.configs.json`, JSON.stringify(loadConfigs('output-types'), null, 2), () => {})
+          childProcess.exec(`mkdir -p '${componentDistRoot}/output-types'`, () => {
+            fs.writeFile(`${componentDistRoot}/output-types/fusion.manifest.json`, JSON.stringify(components.outputTypes, null, 2), () => {
+              fs.writeFile(`${componentDistRoot}/output-types/fusion.configs.json`, JSON.stringify(loadConfigs('output-types'), null, 2), () => {})
+            })
           })
         })
       ],

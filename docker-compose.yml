@@ -67,6 +67,7 @@ services:
       - '${FUSION_REPO:-./bundle}:/workdir/engine/bundle:rw'
       - './engine/src:/workdir/engine/src:ro'
       - './dist:/workdir/engine/dist:rw'
+      - './generated:/workdir/engine/generated:rw'
 
   resolver:
     image: quay.io/washpost/fusion-resolver

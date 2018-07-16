@@ -78,7 +78,8 @@ module.exports = (Template) => {
           getContent: getContentGenerator(contentCache, props.arcSite, props.outputType),
           globalContent: props.globalContent,
           outputType: props.outputType,
-          requestUri: props.requestUri
+          requestUri: props.requestUri,
+          variables: props.variables
         })
       },
       React.createElement(Template)

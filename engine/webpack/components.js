@@ -60,8 +60,10 @@ module.exports = Object.keys(components)
               process.exit(-1)
             }
           })
-        fs.writeFile(`${componentDistRoot}/${type}/fusion.manifest.json`, JSON.stringify(components[type], null, 2), () => {
-          fs.writeFile(`${componentDistRoot}/${type}/fusion.configs.json`, JSON.stringify(loadConfigs(type), null, 2), () => {})
+        childProcess.exec(`mkdir -p '${componentDistRoot}/output-types'`, () => {
+          fs.writeFile(`${componentDistRoot}/${type}/fusion.manifest.json`, JSON.stringify(components[type], null, 2), () => {
+            fs.writeFile(`${componentDistRoot}/${type}/fusion.configs.json`, JSON.stringify(loadConfigs(type), null, 2), () => {})
+          })
         })
       })
     ]
@@ -69,8 +71,8 @@ module.exports = Object.keys(components)
     if (isDev) {
       plugins.push(
         new OnBuildWebpackPlugin(function (stats) {
-          childProcess.execSync(`rm -rf '${path.resolve(distRoot, 'page')}'`)
-          childProcess.execSync(`rm -rf '${path.resolve(distRoot, 'template')}'`)
+          childProcess.exec(`rm -rf '${path.resolve(distRoot, 'page')}'`)
+          childProcess.exec(`rm -rf '${path.resolve(distRoot, 'template')}'`)
         })
       )
     }

@@ -7,7 +7,8 @@ window.Fusion = window.Fusion || {}
 Fusion.components = Fusion.components || {}
 Fusion.components.Consumer = require('../shared/components/consumer')
 Fusion.components.Static = require('../shared/components/static')
-Fusion.unpack = require('../shared/unpack')
+Fusion.unpack = require('../../utils/unpack')
+Fusion.variables = require('fusion:variables')
 
 const Provider = require('./provider')
 

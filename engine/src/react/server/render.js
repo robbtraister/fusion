@@ -13,11 +13,13 @@ const ReactDOM = require('react-dom/server')
 const compileComponent = require('./compile/component')
 const Provider = require('./provider')
 
-const unpack = require('../shared/unpack')
+const unpack = require('../../utils/unpack')
 
 const timer = require('../../timer')
 
 const getSource = require('../../models/sources')
+
+const fusionVariables = require('fusion:variables')
 
 const {
   fetchFile
@@ -121,7 +123,8 @@ const render = function render ({Component, requestUri, content, _website}) {
           contextPath,
           globalContent: content ? content.document : null,
           outputType: Component.outputType,
-          requestUri
+          requestUri,
+          variables: fusionVariables(_website)
         }
       )
       debugTimer(`create element`, elementTic.toc())
@@ -180,10 +183,10 @@ const compileRenderable = function compileRenderable ({renderable, outputType}) 
 
   let tic = timer.tic()
   return Promise.resolve(compileComponent(renderable, outputType))
-    .then(Feature => {
+    .then((Renderable) => {
       debugTimer(`compile(${renderable._id || renderable.id})`, tic.toc())
       tic = timer.tic()
-      return Provider(Feature)
+      return Provider(Renderable)
     })
     .then((Component) => {
       debugTimer('provider wrapping', tic.toc())

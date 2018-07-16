@@ -14,7 +14,7 @@
     "build:output-types:production": "NODE_ENV=production npm run build:output-types -- --mode production -p",
     "deploy": "sls deploy",
     "install:bundle": "if [ -f ./bundle/package.json ]; then (cd ./bundle && npm install --production); fi",
-    "prebuild:all": "rm -rf \"${BUNDLE_ROOT:-./bundle}/../dist/\"*",
+    "prebuild:all": "rm -rf \"${BUNDLE_ROOT:-./bundle}/../dist/\"* && rm -rf \"${BUNDLE_ROOT:-./bundle}/../generated/\"*",
     "predeploy": "npm install && npm run build:all:production",
     "prestart": "npm run watch:all &",
     "start": "sls --stage=localhost offline start",

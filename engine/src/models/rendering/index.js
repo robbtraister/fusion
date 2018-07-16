@@ -25,12 +25,12 @@ const {
   pushFile
 } = require('../../assets/io')
 
-const fetchCssFile = (isDev)
+const fetchCssHash = (isDev)
   ? (name, outputType = defaultOutputType) => fetchFile(`${name}/${outputType}.css.json`)
     .then((json) => JSON.parse(json))
   : (name, outputType = defaultOutputType) => model('hash').get(`${name}/${outputType}/${version}`)
 
-const pushCssFile = (isDev)
+const pushCssHash = (isDev)
   ? (name, outputType = defaultOutputType, cssFile) => pushFile(`${name}/${outputType}.css.json`, JSON.stringify({cssFile}))
   : (name, outputType = defaultOutputType, cssFile) => model('hash').put({id: `${name}/${outputType}/${version}`, version, cssFile})
 
@@ -58,7 +58,7 @@ class Rendering {
 
   // Lazy load all the things (YpAGNI)
 
-  getJson () {
+  async getJson () {
     this.jsonPromise = this.jsonPromise ||
       (
         (this.json)
@@ -68,7 +68,7 @@ class Rendering {
     return this.jsonPromise
   }
 
-  compile (outputType = defaultOutputType) {
+  async compile (outputType = defaultOutputType) {
     debug(`get compilation: ${this.name}[${outputType}]`)
     this.compilations[outputType] = this.compilations[outputType] ||
       this.getJson()
@@ -81,8 +81,8 @@ class Rendering {
 
             if (cssFile && css) {
               pushFile(cssFile, css, 'text/css')
-              pushCssFile(this.name, outputType, cssFile)
             }
+            pushCssHash(this.name, outputType, cssFile || null)
           }
 
           return {js, css, cssFile}
@@ -90,9 +90,8 @@ class Rendering {
     return this.compilations[outputType]
   }
 
-  compileAll () {
-    return getOutputTypes()
-      .then((outputTypes) => Promise.all(outputTypes.map(outputType => this.compile(outputType))))
+  async compileAll () {
+    return Promise.all(getOutputTypes().map(outputType => this.compile(outputType)))
   }
 
   getComponent (outputType = defaultOutputType, child) {
@@ -106,16 +105,16 @@ class Rendering {
     return this.component
   }
 
-  getCssFile (outputType = defaultOutputType) {
+  async getCssFile (outputType = defaultOutputType) {
     debug(`get css file: ${this.name}[${outputType}]`)
     this.cssFile = this.cssFile ||
-      fetchCssFile(this.name, outputType)
+      fetchCssHash(this.name, outputType)
         .catch(() => this.compile(outputType))
         .then(({cssFile}) => cssFile)
     return this.cssFile
   }
 
-  getStyles (outputType = defaultOutputType) {
+  async getStyles (outputType = defaultOutputType) {
     debug(`get styles: ${this.name}[${outputType}]`)
     this.css = this.css ||
       this.getCssFile(outputType)
@@ -124,14 +123,14 @@ class Rendering {
     return this.css
   }
 
-  getScript (outputType = defaultOutputType) {
+  async getScript (outputType = defaultOutputType) {
     debug(`get script: ${this.name}[${outputType}]`)
     this.js = this.js ||
       this.compile(outputType).then(({js}) => js)
     return this.js
   }
 
-  publish (propagate) {
+  async publish (propagate) {
     return (
       (this.json)
         ? Promise.all([this.compileAll()]

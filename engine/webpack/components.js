@@ -124,3 +124,4 @@ module.exports = Object.keys(components)
       }
       : null
   })
+  .filter(c => c)

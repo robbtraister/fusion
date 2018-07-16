@@ -6,6 +6,7 @@ window.Fusion = window.Fusion || {}
 
 Fusion.components = Fusion.components || {}
 Fusion.components.Consumer = require('../shared/components/consumer')
+Fusion.components.Layout = require('../shared/components/layout')
 Fusion.components.Static = require('../shared/components/static')
 Fusion.unpack = require('../../utils/unpack')
 Fusion.variables = require('fusion:variables')

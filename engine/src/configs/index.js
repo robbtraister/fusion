@@ -50,6 +50,17 @@ function transformComponentConfigs (manifest) {
     }))
 }
 
+function transformSections (manifest) {
+  if (manifest.sections instanceof Array) {
+    // ignore
+  } else if (manifest.sections instanceof Object) {
+    manifest.sections = Object.keys(manifest.sections).map((id) => ({id, cssClass: manifest.sections[id]}))
+  } else {
+    manifest.sections = []
+  }
+  return manifest
+}
+
 const getManifestFile = (type) => `${componentDistRoot}/${type}/fusion.manifest.json`
 
 function getConfigs (type) {

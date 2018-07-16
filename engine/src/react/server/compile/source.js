@@ -99,11 +99,11 @@ function generateSource (renderable, outputType) {
   }
 
   function section (config, index) {
-    const component = `'section'`
+    const component = `React.Fragment`
     const props = {
-      key: index,
-      type: 'section',
-      id: index
+      key: index
+      // type: 'section',
+      // id: index
     }
     return `React.createElement(${component}, ${JSON.stringify(props)}, [${config.renderableItems.map(renderableItem).filter(ri => ri).join(',')}])`
   }

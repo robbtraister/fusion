@@ -34,6 +34,8 @@ This is the uri that was requested to initiate this rendering. In the client, yo
 
 ### Instance Methods
 
+#### Content
+
 -   getContent(sourceName, key, [filter], [inherit])
 
 The `getContent` method will fetch content and return an object with two properties, `cached` and `fetched`. The first property, `cached`, will contain the synchronous data as already pre-fetched on the server. The second property, `fetched`, will be a Promise object that resolves to freshly re-fetched content.
@@ -196,3 +198,19 @@ class MyComponent extends React.Component {
   }
 }
 ```
+
+#### Messaging
+
+The following methods work much like the standard DOM methods of the same name. The difference is that you do not invoke them on an event target, but on the consumer itself. The events will be shared across the entire fusion context, so be careful with your naming.
+
+-   addEventListener(eventName, eventHandler)
+
+`eventName` is a string to identify the event type. `eventHandler` is a function that accepts a single argument.
+
+-   dispatchEvent(eventName, eventData)
+
+`eventName` is a string to identify the event type. `eventData` is the argument to pass when calling `eventHandler`
+
+-   removeEventListener(eventName, eventHandler)
+
+`eventName` is a string to identify the event type. `eventHandler` is a function, and must be the exact function instance used when `addEventListener` was called.

@@ -24,6 +24,8 @@ const mapRequest = function mapRequest (req) {
     LogType,
     Payload: JSON.stringify({
       method: req.method,
+      // serverless-http uses `httpMethod` property
+      httpMethod: req.method,
       headers: req.headers,
       body: req.body,
       cookies: req.cookies,

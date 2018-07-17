@@ -138,7 +138,7 @@ class Rendering {
             // if this is the first version to receive this rendering
             (propagate)
               ? [
-                putJson(this.type, this.json),
+                putJson(this.type, Object.assign({id: this.id}, this.json)),
                 publishToOtherVersions(`/dist/${this.type}/${this.id}`, this.json)
               ]
               : []

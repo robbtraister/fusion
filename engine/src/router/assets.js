@@ -62,7 +62,7 @@ function getTypeRouter (routeType, allowPost) {
     const writeHandlers = [
       bodyParser.json({limit: bodyLimit}),
       (req, res, next) => {
-        const id = req.params.id || req.body.id
+        const id = req.params.id || req.body.id || req.body._id
         const type = req.body.type || routeType
 
         new Rendering(type, id, req.body)

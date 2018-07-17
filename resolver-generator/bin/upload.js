@@ -88,7 +88,6 @@ async function main () {
   try {
     return await createGeneratorFunction()
   } catch (e) {
-    console.error(e)
     return updateGeneratorCode()
   }
 }

@@ -6,7 +6,7 @@ module.exports = new dynamoose.Schema(
   {
     id: {
       type: String,
-      rangeKey: true
+      hashKey: true
     }
   },
   { useDocumentTypes: true }

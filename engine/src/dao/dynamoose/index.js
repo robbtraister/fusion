@@ -23,7 +23,7 @@ const createModel = (modelName) => {
 
   return {
     get (id) {
-      return _model.get({id})
+      return _model.get((id instanceof Object) ? id : {id})
     },
 
     find () {
@@ -36,7 +36,8 @@ const createModel = (modelName) => {
 
     put (doc) {
       return new Promise((resolve, reject) => {
-        _model.create(Object.assign({}, doc), (err, data) => (err ? reject(err) : resolve(data)))
+        const obj = new _model(doc)
+        obj.put({}, (err, data) => (err ? reject(err) : resolve(data)))
       })
     }
   }

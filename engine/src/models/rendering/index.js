@@ -28,11 +28,11 @@ const {
 const fetchCssHash = (isDev)
   ? (name, outputType = defaultOutputType) => fetchFile(`${name}/${outputType}.css.json`)
     .then((json) => JSON.parse(json))
-  : (name, outputType = defaultOutputType) => model('hash').get(`${name}/${outputType}/${version}`)
+  : (name, outputType = defaultOutputType) => model('hash').get({version, id: `${name}/${outputType}`})
 
 const pushCssHash = (isDev)
   ? (name, outputType = defaultOutputType, cssFile) => pushFile(`${name}/${outputType}.css.json`, JSON.stringify({cssFile}))
-  : (name, outputType = defaultOutputType, cssFile) => model('hash').put({id: `${name}/${outputType}/${version}`, version, cssFile})
+  : (name, outputType = defaultOutputType, cssFile) => model('hash').put({id: `${name}/${outputType}`, version, cssFile})
 
 const getJson = (isDev)
   ? (type, id) => model(type).get(id)

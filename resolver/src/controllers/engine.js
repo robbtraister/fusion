@@ -25,6 +25,7 @@ const getLambdaEngine = function getLambdaEngine () {
   const lambda = new AWS.Lambda(Object.assign({region}))
 
   return function lambdaEngineHandler ({method, uri, data, version}) {
+    const METHOD = (method || 'GET').toUpperCase()
     const parts = url.parse(uri, true)
     return new Promise((resolve, reject) => {
       lambda.invoke({
@@ -32,11 +33,12 @@ const getLambdaEngine = function getLambdaEngine () {
         InvocationType: 'RequestResponse',
         LogType: 'None',
         Payload: JSON.stringify({
-          method: (method || 'GET').toUpperCase(),
+          method: METHOD,
+          httpMethod: METHOD,
           headers: {
             'Content-Type': 'application/json'
           },
-          body: data,
+          body: data && JSON.stringify(data),
           path: parts.pathname,
           queryStringParameters: parts.query,
           protocol: 'http'

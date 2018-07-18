@@ -3,8 +3,16 @@
 const React = require('react')
 
 const Layout = (sections) => {
+  if (
+    (sections instanceof React.Component) ||
+    (sections instanceof Function)
+  ) {
+    // we tried to construct a component that is already a component
+    return sections
+  }
+
   if ((sections instanceof Array)) {
-    // do nothing
+    // do nothing; use as-is
   } else if ((sections instanceof Object)) {
     sections = Object.keys(sections).map((id) => ({id, cssClass: sections[id]}))
   } else {

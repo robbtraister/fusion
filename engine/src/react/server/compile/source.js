@@ -25,7 +25,9 @@ function componentCss (fp, name) {
 function componentImport (fp, name) {
   return (fp === 'fusion:static')
     ? `Fusion.components${name} = Fusion.components.Static`
-    : `Fusion.components${name} = Fusion.unpack(require('${fp}'))`
+    : (name.startsWith(`['layouts']`))
+      ? `Fusion.components${name} = Fusion.components.Layout(Fusion.unpack(require('${fp}')))`
+      : `Fusion.components${name} = Fusion.unpack(require('${fp}'))`
 }
 
 const getComponentFile = function getComponentFile (type, id, outputType) {

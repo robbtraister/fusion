@@ -5,6 +5,7 @@ const debugTimer = require('debug')('fusion:timer:react:component')
 const React = require('react')
 
 const isStatic = require('../is-static')
+const Layout = require('../../shared/components/layout')
 const unpack = require('../../../utils/unpack')
 
 const timer = require('../../../timer')
@@ -22,7 +23,10 @@ const loadComponent = function loadComponent (componentType, componentName, outp
   try {
     const componentConfig = components[componentType][componentName]
     const componentOutputType = componentConfig.outputTypes[outputType] || componentConfig.outputTypes.default
-    const OriginalComponent = unpack(require(componentOutputType.dist))
+    const UnpackedComponent = unpack(require(componentOutputType.dist))
+    const OriginalComponent = (componentType === 'layouts')
+      ? Layout(UnpackedComponent)
+      : UnpackedComponent
     const Component = (isStatic(OriginalComponent, outputType))
       ? (props) => React.createElement('div', { id: props.id, className: 'fusion:static' }, React.createElement(OriginalComponent, props))
       : OriginalComponent

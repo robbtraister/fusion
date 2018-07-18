@@ -1,8 +1,6 @@
 'use strict'
 
-import Layout from 'fusion:layout'
-
-const sections = [
+export default [
   {
     id: 'nav',
     cssClass: 'col-xs-12'
@@ -44,8 +42,6 @@ const sections = [
     cssClass: ''
   }
 ]
-
-export default Layout(sections)
 //
 // const Section = (props) =>
 //   <section id={props.id} className={props.cssClass}>{props.children}</section>

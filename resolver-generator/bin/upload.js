@@ -14,12 +14,15 @@ const lambda = new AWS.Lambda({region: 'us-east-1'})
 
 const {
   S3Bucket,
-  S3ResolverGeneratorKey,
+  S3ResolverGeneratorKey: S3Key,
   resolverGeneratorArtifact
 } = require('./configs')
 
 const awsUpload = promisify(s3.upload.bind(s3))
+const createFunction = promisify(lambda.createFunction.bind(lambda))
 const updateFunctionCode = promisify(lambda.updateFunctionCode.bind(lambda))
+
+const FunctionName = 'fusion-generator'
 
 async function upload (fp) {
   debug(`uploading ${fp}`)
@@ -35,15 +38,41 @@ async function upload (fp) {
   return result
 }
 
+async function createGeneratorFunction () {
+  try {
+    return await createFunction({
+      FunctionName,
+      Publish: true,
+      Code: {
+        S3Bucket,
+        S3Key
+      },
+      Environment: {
+        Variables: {
+          DEBUG: 'fusion:*'
+        }
+      },
+      Handler: 'resolver-generator/src/index.handler',
+      MemorySize: 512,
+      Role: 'arn:aws:iam::397853141546:role/fusion-generator',
+      Runtime: 'nodejs8.10',
+      Timeout: 60
+    })
+  } catch (e) {
+    debug(`error creating generator lambda: ${e}`)
+    throw e
+  }
+}
+
 async function updateGeneratorCode () {
   debug(`updating resolver-generator lambda with latest code`)
   try {
     const result = await updateFunctionCode(
       {
-        FunctionName: 'fusion-resolver-generator',
+        FunctionName,
         Publish: true,
         S3Bucket,
-        S3Key: S3ResolverGeneratorKey
+        S3Key
       }
     )
     debug(`updated resolver-generator lambda to version ${result.Version}`)
@@ -56,7 +85,11 @@ async function updateGeneratorCode () {
 
 async function main () {
   await upload(path.resolve(__dirname, '../dist/resolver-generator.zip'))
-  return updateGeneratorCode()
+  try {
+    return await createGeneratorFunction()
+  } catch (e) {
+    return updateGeneratorCode()
+  }
 }
 
 module.exports = main

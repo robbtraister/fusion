@@ -44,12 +44,16 @@ const isNotTest = (f) => !isTest(f)
 
 const createComponentEntry = (src, componentType, componentName, outputType) => {
   const p = `${componentType}/${componentName}${outputType ? `/${outputType}` : ''}.js`
-  return {
-    outputType,
-    src,
-    dist: `${componentDistRoot}/${p}`
-    // uri: `${apiPrefix}/dist/components/${p}`
-  }
+  return Object.assign(
+    (outputType)
+      ? {outputType}
+      : {},
+    {
+      src,
+      dist: `${componentDistRoot}/${p}`
+      // uri: `${apiPrefix}/dist/components/${p}`
+    }
+  )
 }
 
 const getComponentType = (type, outputTypes) => {
@@ -76,7 +80,7 @@ const getComponentType = (type, outputTypes) => {
 
   if (outputTypes) {
     const outputTypeArray = (outputTypes instanceof Array) ? outputTypes : [outputTypes]
-    const outputTypeFiles = glob.sync(`${typeSrcRoot}/{${outputTypeArray.join(',')}}.{hbs,js,jsx,vue}`)
+    const outputTypeFiles = glob.sync(`${typeSrcRoot}/{${outputTypeArray.join(',')},}.{hbs,js,jsx,vue}`)
     outputTypeFiles
       .filter(isNotTest)
       .forEach(fp => {
@@ -92,7 +96,12 @@ const getComponentType = (type, outputTypes) => {
       })
   }
 
-  return componentMap
+  return Object.assign(
+    {},
+    ...Object.keys(componentMap)
+      .sort()
+      .map(k => ({[k]: componentMap[k]}))
+  )
 }
 
 function getComponentManifest (type) {

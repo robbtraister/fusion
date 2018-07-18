@@ -6,13 +6,11 @@ module.exports = new dynamoose.Schema(
   {
     id: {
       type: String,
-      hashKey: true
+      rangeKey: true
     },
     version: {
       type: String,
-      index: {
-        global: false
-      }
+      hashKey: true
     },
     cssFile: {
       type: String

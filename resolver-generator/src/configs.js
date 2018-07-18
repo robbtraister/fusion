@@ -22,7 +22,8 @@ const resolverConfig = (contextName, envVars) => ({
     Variables: Object.assign(
       envVars || {},
       {
-        NODE_ENV: 'production'
+        NODE_ENV: 'production',
+        ENVIRONMENT: contextName
       }
     )
   },

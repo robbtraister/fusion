@@ -32,7 +32,7 @@ const getNestedValue = function getNestedValue (target, field) {
 
 const getRenderingResolver = function getRenderingResolver (resolver) {
   const getId = (resolver.type === 'page')
-    ? (content) => resolver._id // Pages
+    ? (content) => resolver._id || resolver.id // Pages
     : (content) => { // Templates
       const contentPageMapping = resolver.content2pageMapping
       if (contentPageMapping) {

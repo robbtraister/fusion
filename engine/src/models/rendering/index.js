@@ -25,19 +25,23 @@ const {
   pushFile
 } = require('../../assets/io')
 
+// return the full object (not just cssFile value) because if it doesn't exist, we need to calculate it
+// the calculation returns an object with a cssFile property
+// for simplicity, we'll just unwrap that property from whatever we get
 const fetchCssHash = (isDev)
   ? (name, outputType = defaultOutputType) => fetchFile(`${name}/${outputType}.css.json`)
     .then((json) => JSON.parse(json))
-  : (name, outputType = defaultOutputType) => model('hash').get(`${name}/${outputType}/${version}`)
+  : (name, outputType = defaultOutputType) => model('hash').get({version, id: `${name}/${outputType}`})
 
 const pushCssHash = (isDev)
   ? (name, outputType = defaultOutputType, cssFile) => pushFile(`${name}/${outputType}.css.json`, JSON.stringify({cssFile}))
-  : (name, outputType = defaultOutputType, cssFile) => model('hash').put({id: `${name}/${outputType}/${version}`, version, cssFile})
+  : (name, outputType = defaultOutputType, cssFile) => model('hash').put({id: `${name}/${outputType}`, version, cssFile})
 
 const getJson = (isDev)
   ? (type, id) => model(type).get(id)
     .then((data) => (type === 'rendering')
       ? data
+      // if page/template, we need to get the actual rendering object
       : model('rendering').get(data.versions[data.published].head)
     )
   : (type, id) => model(type).get(id)
@@ -74,6 +78,7 @@ class Rendering {
       this.getJson()
         .then((json) => compileRendering({name: this.name, rendering: json, outputType}))
         .then(({js, css, cssFile}) => {
+          // using a raw rendering object is only for local dev, so don't publish the result
           if (this.type !== 'rendering') {
             if (outputType && js) {
               pushFile(`${this.name}/${outputType}.js`, js, 'application/javascript')
@@ -138,7 +143,7 @@ class Rendering {
             // if this is the first version to receive this rendering
             (propagate)
               ? [
-                putJson(this.type, this.json),
+                putJson(this.type, Object.assign({}, this.json, {id: this.id})),
                 publishToOtherVersions(`/dist/${this.type}/${this.id}`, this.json)
               ]
               : []

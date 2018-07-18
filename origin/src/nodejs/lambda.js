@@ -9,8 +9,6 @@ const AWS = require('aws-sdk')
  * Assumes the following express.js middlewares have been added:
  * - https://github.com/expressjs/cookie-parser
  * - https://www.npmjs.org/package/body-parser
- *   - app.use(bodyParser.json()); // for parsing application/json
- *   - app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
  *
  * @param req
  * @returns {{FunctionName, Payload}}
@@ -24,8 +22,10 @@ const mapRequest = function mapRequest (req) {
     LogType,
     Payload: JSON.stringify({
       method: req.method,
+      // serverless-http uses `httpMethod` property
+      httpMethod: req.method,
       headers: req.headers,
-      body: req.body,
+      body: req.body && req.body.toString(),
       cookies: req.cookies,
       path: parts.pathname,
       protocol: req.protocol,

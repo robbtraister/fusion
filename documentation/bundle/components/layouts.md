@@ -4,7 +4,7 @@ Layouts consist of multiple named sections that are used to segment content and 
 
 ## Definitions
 
-In fusion, layouts can be defined in many ways, each of which requires some way of identifying the individual sections.
+In fusion, layouts can be defined in many ways, each of which requires some way of identifying the individual sections for the admin UI.
 
 ### Layout Component
 

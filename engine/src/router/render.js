@@ -51,9 +51,14 @@ function getTypeRouter (routeType) {
 
       const type = payload.rendering.type || routeType
 
-      return new Rendering(type, payload.rendering.id)
-        .getComponent(outputType, payload.rendering.child)
-        .then(Component => render(Object.assign({}, payload, {Component})))
+      const rendering = new Rendering(type, payload.rendering.id)
+      return Promise.all([
+        rendering.getComponent(outputType, payload.rendering.child),
+        rendering.getContent()
+      ])
+        // template will already have content populated by resolver
+        // use Object.assign to default to the resolver content
+        .then(([Component, content]) => render(Object.assign({content}, payload, {Component})))
         .then(data => { res.send(`${outputType ? '<!DOCTYPE html>' : ''}${data}`) })
         .then(() => {
           debugTimer('complete response', tic.toc())

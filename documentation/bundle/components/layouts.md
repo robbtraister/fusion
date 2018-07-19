@@ -83,7 +83,7 @@ export default [
 
 If you want to customize the HTML of a layout, you may provide a standard React component (either class or functional). In this case, the component will receive an array as the children prop with the same number of elements as the layout has sections.
 
-You will, however, need to let Fusion know what sections to expect to be rendered by your layout. To do this, your component should set the `.sections` property. The value of this property can be similar to any of the arguments described for the Layout function above.
+You will, however, need to let Fusion know what sections to expect to be rendered by your layout. To do this, your component should set the `.sections` property. The value of this property can be similar to any of the arguments described for the Layout function above (though any cssClass values will be ignored since your component controls rendering).
 
 ```jsx
 import React from 'react'

@@ -35,7 +35,7 @@ async function compile (bundleName) {
   const rootDir = await promises.tempDir()
 
   try {
-    const copySrcPromise = copy(path.resolve(__dirname, '../../engine'), rootDir)
+    const copySrcPromise = copy(path.resolve(__dirname, '../../engine/*'), rootDir)
 
     const downloadFilePromise = download(bundleKey(bundleName))
 

@@ -13,7 +13,7 @@ const {
 } = require('./info')
 
 const {
-  distRoot,
+  bundleDistRoot,
   isDev,
   region
 } = require('../../environment')
@@ -21,7 +21,7 @@ const {
 const s3 = new S3({region})
 
 const fetchFromFS = async function (name) {
-  const fp = path.resolve(distRoot, name)
+  const fp = path.resolve(bundleDistRoot, name)
   return new Promise((resolve, reject) => {
     fs.readFile(fp, (err, data) => {
       err ? reject(err) : resolve(data.toString())
@@ -46,7 +46,7 @@ const fetchFromS3 = async function fetchFromS3 (name) {
 }
 
 const pushToFS = async function pushToFS (name, src) {
-  const filePath = path.resolve(`${distRoot}/${name}`)
+  const filePath = path.resolve(`${bundleDistRoot}/${name}`)
   return new Promise((resolve, reject) => {
     childProcess.exec(`mkdir -p ${path.dirname(filePath)}`, (err) => {
       err ? reject(err) : resolve()

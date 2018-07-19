@@ -1,7 +1,7 @@
 'use strict'
 
 const {
-  bundleRoot
+  bundleSrcRoot
 } = require('../../../environment')
 
 module.exports = {
@@ -15,7 +15,7 @@ module.exports = {
     plugins: [
       ['root-import', {
         rootPathPrefix: '~',
-        rootPathSuffix: bundleRoot
+        rootPathSuffix: bundleSrcRoot
       }],
       'transform-decorators-legacy',
       'transform-object-rest-spread'

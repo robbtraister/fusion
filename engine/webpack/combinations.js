@@ -18,6 +18,7 @@ const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
 
 const {
+  bundleGeneratedRoot,
   componentDistRoot
 } = require('../environment')
 
@@ -26,14 +27,14 @@ const { components } = require('../environment/manifest')
 const componentTypes = Object.keys(components).filter(ot => ot !== 'outputTypes')
 const outputTypes = Object.keys(components.outputTypes)
 
-const combinationSrcDir = path.resolve(__dirname, '../generated/combinations')
+const combinationSrcDir = path.resolve(bundleGeneratedRoot, 'combinations')
 childProcess.execSync(`mkdir -p '${combinationSrcDir}'`)
 
 const config = (outputType) => {
   const combinationSrcFile = path.resolve(combinationSrcDir, `${outputType}.js`)
   fs.writeFileSync(combinationSrcFile,
     `
-const unpack = require('../../src/utils/unpack')
+const unpack = require('${require.resolve('../src/utils/unpack')}')
 const components = {}
 ${componentTypes.map(componentType => `components['${componentType}'] = components['${componentType}'] || {}`).join('\n')}
 ${[].concat(

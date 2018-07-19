@@ -20,8 +20,8 @@ const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
 
 const {
+  bundleDistRoot,
   componentDistRoot,
-  distRoot,
   isDev
 } = require('../environment')
 
@@ -71,8 +71,8 @@ module.exports = Object.keys(components)
     if (isDev) {
       plugins.push(
         new OnBuildWebpackPlugin(function (stats) {
-          childProcess.exec(`rm -rf '${path.resolve(distRoot, 'page')}'`)
-          childProcess.exec(`rm -rf '${path.resolve(distRoot, 'template')}'`)
+          childProcess.exec(`rm -rf '${path.resolve(bundleDistRoot, 'page')}'`)
+          childProcess.exec(`rm -rf '${path.resolve(bundleDistRoot, 'template')}'`)
         })
       )
     }

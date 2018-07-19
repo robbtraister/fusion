@@ -12,8 +12,8 @@ Example:
         "outputTypes": {
           "default": {
             "outputType": "default",
-            "src": "/workdir/engine/bundle/components/chains/default-chain.jsx",
-            "dist": "/workdir/engine/dist/components/chains/default-chain/default.js"
+            "src": "/workdir/engine/bundle/src/components/chains/default-chain.jsx",
+            "dist": "/workdir/engine/bundle/dist/components/chains/default-chain/default.js"
           }
         }
       }

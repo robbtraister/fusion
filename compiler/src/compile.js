@@ -31,34 +31,29 @@ async function extractZip (fpPromise, destPromise) {
   return dest
 }
 
-async function getBundleDir (tempDirPromise) {
-  const tempDir = await tempDirPromise
-  return promises.mkdirp(path.resolve(tempDir, 'bundle'))
-}
-
 async function compile (bundleName) {
-  const rootDirPromise = promises.tempDir()
+  const rootDir = await promises.tempDir()
 
   try {
-    const copySrcPromise = copy(path.resolve(__dirname, '../../engine/*'), rootDirPromise)
+    const copySrcPromise = copy(path.resolve(__dirname, '../../engine'), rootDir)
 
     const downloadFilePromise = download(bundleKey(bundleName))
 
     try {
-      const extractPromise = extractZip(await downloadFilePromise, getBundleDir(rootDirPromise))
+      const bundleDir = path.resolve(rootDir, 'bundle')
+      const bundleSrcDir = path.resolve(bundleDir, 'src')
+      const extractPromise = extractZip(await downloadFilePromise, bundleSrcDir)
 
       await extractPromise
 
       await copySrcPromise
 
-      await build(await rootDirPromise)
+      await build(rootDir)
       // don't decrypt until after build to ensure no secrets are compiled into client-side code
-      await decrypt(path.resolve(await rootDirPromise, 'bundle'))
+      await decrypt(bundleSrcDir)
 
       const zipFilePromise = await zip({
-        bundle: path.resolve(await rootDirPromise, 'bundle'),
-        dist: path.resolve(await rootDirPromise, 'dist'),
-        generated: path.resolve(await rootDirPromise, 'generated')
+        bundle: bundleDir
       })
 
       try {
@@ -72,7 +67,7 @@ async function compile (bundleName) {
       promises.remove(await downloadFilePromise)
     }
   } finally {
-    promises.remove(await rootDirPromise)
+    promises.remove(rootDir)
   }
 }
 

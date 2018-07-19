@@ -18,19 +18,20 @@ const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
 
 const {
-  distRoot,
+  bundleDistRoot,
+  bundleGeneratedRoot: variablesSrcDir,
+  bundleSrcRoot,
   contextPath
 } = require('../environment')
 
 const { components } = require('../environment/manifest')
 
-const variablesSrcDir = path.resolve(__dirname, '../generated')
 childProcess.execSync(`mkdir -p '${variablesSrcDir}'`)
 const variablesSrcFile = path.resolve(variablesSrcDir, `variables.js`)
 
 const globalFile = (() => {
   try {
-    const globalFile = require.resolve('../bundle/variables')
+    const globalFile = require.resolve(`${bundleSrcRoot}/variables`)
     require(globalFile)
     return globalFile
   } catch (e) {
@@ -40,7 +41,7 @@ const globalFile = (() => {
 
 const siteFiles = Object.assign(
   {},
-  ...glob.sync(`${__dirname}/../bundle/variables/sites/*`)
+  ...glob.sync(`${bundleSrcRoot}/variables/sites/*`)
     .filter(fp => {
       try {
         require(fp)
@@ -95,7 +96,7 @@ module.exports = {
   optimization,
   output: {
     filename: `[name].js`,
-    path: path.resolve(distRoot, 'engine')
+    path: path.resolve(bundleDistRoot, 'engine')
   },
   plugins: [
     new ManifestPlugin({fileName: 'webpack.manifest.json'}),
@@ -103,7 +104,7 @@ module.exports = {
       .map((outputType) => {
         return new HandlebarsPlugin({
           entry: require.resolve('../src/react/client/preview.html.hbs'),
-          output: path.resolve(distRoot, 'engine', 'preview', `${outputType}.html`),
+          output: path.resolve(bundleDistRoot, 'engine', 'preview', `${outputType}.html`),
           data: {
             contextPath,
             outputType

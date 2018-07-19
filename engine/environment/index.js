@@ -10,9 +10,11 @@ const optionalRequire = (fp) => {
   }
 }
 
+const bundleRoot = path.resolve(`${__dirname}/../bundle`)
+
 const variables = Object.assign(
   // ordered by increasing precedence
-  optionalRequire('../bundle/environment'),
+  optionalRequire(path.join(bundleRoot, 'environment')),
   process.env
 )
 
@@ -34,30 +36,31 @@ const port = variables.PORT || 8080
 const region = variables.REGION || 'us-east-1'
 const version = variables.AWS_LAMBDA_FUNCTION_VERSION || '$LATEST'
 
-const bundleRoot = path.resolve(variables.BUNDLE_ROOT || `${__dirname}/../bundle`)
-const distRoot = path.resolve(`${bundleRoot}/../dist`)
-const generatedRoot = path.resolve(`${bundleRoot}/../generated`)
-const componentDistRoot = path.resolve(`${distRoot}/components`)
-const componentGeneratedRoot = path.resolve(`${generatedRoot}/components`)
-const componentSrcRoot = path.resolve(`${bundleRoot}/components`)
-const schemasRoot = path.resolve(variables.SCHEMAS_ROOT || `${bundleRoot}/content/schemas`)
-const sourcesRoot = path.resolve(variables.SOURCES_ROOT || `${bundleRoot}/content/sources`)
+const bundleDistRoot = path.resolve(`${bundleRoot}/dist`)
+const bundleGeneratedRoot = path.resolve(`${bundleRoot}/generated`)
+const bundleSrcRoot = path.resolve(`${bundleRoot}/src`)
+const componentDistRoot = path.resolve(`${bundleDistRoot}/components`)
+const componentGeneratedRoot = path.resolve(`${bundleGeneratedRoot}/components`)
+const componentSrcRoot = path.resolve(`${bundleSrcRoot}/components`)
+const schemasRoot = path.resolve(variables.SCHEMAS_ROOT || `${bundleSrcRoot}/content/schemas`)
+const sourcesRoot = path.resolve(variables.SOURCES_ROOT || `${bundleSrcRoot}/content/sources`)
 
 module.exports = {
   apiPrefix,
   binaryContentTypes,
   bodyLimit,
   bundleRoot,
+  bundleDistRoot,
+  bundleGeneratedRoot,
+  bundleSrcRoot,
   componentDistRoot,
   componentGeneratedRoot,
   componentSrcRoot,
   contentBase,
   contextPath,
   defaultOutputType,
-  distRoot,
   environment,
   functionName,
-  generatedRoot,
   isDev,
   minify,
   mongoUrl,

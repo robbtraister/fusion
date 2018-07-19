@@ -1,7 +1,7 @@
 'use strict'
 
-const PropTypes = require('./prop-types')
-const unpack = require('../../utils/unpack')
+const PropTypes = require('../react/shared/prop-types')
+const unpack = require('../utils/unpack')
 
 function getCustomFields (componentConfig) {
   const customFields = Object.values(componentConfig.outputTypes)

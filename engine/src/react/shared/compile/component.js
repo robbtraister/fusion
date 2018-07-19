@@ -62,11 +62,11 @@ const componentGenerator = function componentGenerator (loadComponent) {
 
   const section = function section (config, outputType, index) {
     return () => React.createElement(
-      'section',
+      React.Fragment,
       {
-        key: index,
-        type: 'section',
-        id: index
+        key: index
+        // type: 'section',
+        // id: index
       },
       renderAll(config.renderableItems, outputType)
     )

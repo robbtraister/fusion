@@ -1,8 +1,6 @@
 'use strict'
 
-const React = require('react')
-
-const sections = [
+export default [
   {
     id: 'nav',
     cssClass: 'col-xs-12'
@@ -44,13 +42,13 @@ const sections = [
     cssClass: ''
   }
 ]
-
-const Section = (props) =>
-  <section id={props.id} className={props.cssClass}>{props.children}</section>
-
-const HomepageWithBomb = (props) =>
-  <div id='pb-root'>
-    {sections.map((section, i) => <Section key={i} {...section} >{props.children[i]}</Section>)}
-  </div>
-
-module.exports = HomepageWithBomb
+//
+// const Section = (props) =>
+//   <section id={props.id} className={props.cssClass}>{props.children}</section>
+//
+// const HomepageWithBomb = (props) =>
+//   <div id='pb-root'>
+//     {sections.map((section, i) => <Section key={i} {...section} >{props.children[i]}</Section>)}
+//   </div>
+//
+// module.exports = HomepageWithBomb

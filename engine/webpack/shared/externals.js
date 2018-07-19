@@ -4,6 +4,7 @@ module.exports = {
   node: {
     'fusion:consumer': 'fusion:consumer',
     'fusion:environment': 'fusion:environment',
+    'fusion:layout': 'fusion:layout',
     'fusion:static': 'fusion:static',
     'fusion:variables': 'fusion:variables',
     'prop-types': 'prop-types',
@@ -19,6 +20,8 @@ module.exports = {
     'fusion:consumer': 'Fusion.components.Consumer',
     'Fusion.components.Consumer': 'Fusion.components.Consumer',
     'fusion:environment': '{}',
+    'fusion:layout': 'Fusion.components.Layout',
+    'Fusion.components.Layout': 'Fusion.components.Layout',
     'fusion:static': 'Fusion.components.Static',
     'Fusion.components.Static': 'Fusion.components.Static',
     'fusion:variables': 'Fusion.variables',

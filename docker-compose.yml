@@ -42,11 +42,7 @@ services:
       - '${FUSION_REPO:-.}/data/restore:/data/restore:rw'
 
   engine:
-    build:
-      context: .
-      dockerfile: serverless.Dockerfile
-      args:
-        LAMBDA: engine
+    build: engine
     command: 'start:dev'
     depends_on:
       - data

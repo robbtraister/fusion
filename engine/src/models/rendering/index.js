@@ -16,6 +16,8 @@ const {
   publishToOtherVersions
 } = require('./publish')
 
+const getSource = require('../sources')
+
 const {
   getOutputTypes
 } = require('../../assets/info')
@@ -99,40 +101,64 @@ class Rendering {
     return Promise.all(getOutputTypes().map(outputType => this.compile(outputType)))
   }
 
-  getComponent (outputType = defaultOutputType, child) {
+  async getComponent (outputType = defaultOutputType, child) {
     debug(`get component: ${this.name}${child ? `(${child})` : ''}[${outputType}]`)
-    this.component = this.component ||
+    if (child) {
+      return getComponent({rendering: this, outputType, child})
+    } else {
+      this.componentPromise = this.componentPromise ||
+        getComponent({rendering: this, outputType, name: this.name})
+      return this.componentPromise
+    }
+  }
+
+  async getContent () {
+    // I hate how this works, pulling content only for pages
+    // but that's what you get with legacy data
+    this.contentPromise = this.contentPromise ||
       (
-        (child)
-          ? getComponent({rendering: this, outputType, child})
-          : getComponent({rendering: this, outputType, name: this.name})
+        (this.type !== 'page')
+          ? Promise.resolve()
+          : this.getJson()
+            .then((json) => {
+              const configs = json.globalContentConfig
+              return (!configs)
+                ? null
+                : getSource(configs.contentService)
+                  .then((source) => source.fetch(configs.contentConfigValues))
+                  .then((document) => ({
+                    source: configs.contentService,
+                    key: configs.contentConfigValues,
+                    document
+                  }))
+            })
       )
-    return this.component
+    return this.contentPromise
   }
 
   async getCssFile (outputType = defaultOutputType) {
     debug(`get css file: ${this.name}[${outputType}]`)
-    this.cssFile = this.cssFile ||
+    this.cssFilePromise = this.cssFilePromise ||
       fetchCssHash(this.name, outputType)
         .catch(() => this.compile(outputType))
         .then(({cssFile}) => cssFile)
-    return this.cssFile
+    return this.cssFilePromise
   }
 
   async getStyles (outputType = defaultOutputType) {
     debug(`get styles: ${this.name}[${outputType}]`)
-    this.css = this.css ||
+    this.stylesPromise = this.stylesPromise ||
       this.getCssFile(outputType)
         .then((cssFile) => fetchFile(cssFile))
         .catch(() => this.compile(outputType).then(({css}) => css))
-    return this.css
+    return this.stylesPromise
   }
 
   async getScript (outputType = defaultOutputType) {
     debug(`get script: ${this.name}[${outputType}]`)
-    this.js = this.js ||
+    this.jsPromise = this.jsPromise ||
       this.compile(outputType).then(({js}) => js)
-    return this.js
+    return this.jsPromise
   }
 
   async publish (propagate) {

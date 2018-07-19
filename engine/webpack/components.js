@@ -27,8 +27,6 @@ const {
 
 const { components } = require('../environment/manifest')
 
-const getCustomFields = require('../src/react/shared/custom-fields')
-
 const loadConfigs = require('../src/configs')
 
 module.exports = Object.keys(components)
@@ -51,15 +49,6 @@ module.exports = Object.keys(components)
       }),
       new ManifestPlugin({fileName: 'webpack.manifest.json'}),
       new OnBuildWebpackPlugin(function (stats) {
-        Object.values(components[type])
-          .forEach(component => {
-            try {
-              component.customFields = getCustomFields(component)
-            } catch (e) {
-              console.error(e)
-              process.exit(-1)
-            }
-          })
         childProcess.exec(`mkdir -p '${componentDistRoot}/output-types'`, () => {
           fs.writeFile(`${componentDistRoot}/${type}/fusion.manifest.json`, JSON.stringify(components[type], null, 2), () => {
             fs.writeFile(`${componentDistRoot}/${type}/fusion.configs.json`, JSON.stringify(loadConfigs(type), null, 2), () => {})

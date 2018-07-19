@@ -43,9 +43,11 @@ ${[].concat(
       return Object.values(typedComponents)
         .map(component => {
           const componentOutputType = component.outputTypes[outputType] || component.outputTypes.default
-          return componentOutputType
-            ? `components['${componentType}']['${component.id}'] = unpack(require('${componentOutputType.src}'))`
-            : ''
+          return (!componentOutputType)
+            ? ''
+            : (componentType === 'layouts')
+              ? `components['${componentType}']['${component.id}'] = Fusion.components.Layout(unpack(require('${componentOutputType.src}')))`
+              : `components['${componentType}']['${component.id}'] = unpack(require('${componentOutputType.src}'))`
         })
     })
   ).join('\n')}

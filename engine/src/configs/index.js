@@ -5,6 +5,9 @@ const {
   isDev
 } = require('../../environment')
 
+const getCustomFields = require('./custom-fields')
+const getSections = require('./sections')
+
 const FIELD_TYPE_MAP = {
   // react-prop-type: pb-classic-field-type
   'bool': 'boolean',
@@ -13,7 +16,9 @@ const FIELD_TYPE_MAP = {
   'number': 'number'
 }
 
-function transformCustomFields (customFields) {
+function transformCustomFields (component) {
+  const customFields = getCustomFields(component)
+
   return (customFields)
     ? Object.keys(customFields)
       .map(id => {
@@ -46,7 +51,20 @@ function transformComponentConfigs (manifest) {
   return Object.keys(manifest)
     .map(id => ({
       id,
-      customFields: transformCustomFields(manifest[id].customFields) || []
+      customFields: transformCustomFields(manifest[id]) || []
+    }))
+}
+
+function transformSections (component) {
+  return getSections(component)
+    .map((id) => ({id}))
+}
+
+function transformLayoutConfigs (manifest) {
+  return Object.keys(manifest)
+    .map(id => ({
+      id,
+      sections: transformSections(manifest[id]) || []
     }))
 }
 
@@ -54,7 +72,13 @@ const getManifestFile = (type) => `${componentDistRoot}/${type}/fusion.manifest.
 
 function getConfigs (type) {
   const manifest = require(getManifestFile(type))
-  return transformComponentConfigs(manifest)
+
+  const transform = {
+    layouts: transformLayoutConfigs,
+    'output-types': (manifest) => Object.keys(manifest).map((id) => ({id}))
+  }[type] || transformComponentConfigs
+
+  return transform(manifest)
 }
 
 module.exports = (isDev)

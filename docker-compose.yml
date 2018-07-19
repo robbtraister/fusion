@@ -43,7 +43,7 @@ services:
 
   engine:
     build: engine
-    command: 'start:dev'
+    command: start:dev
     depends_on:
       - data
     env_file:
@@ -62,7 +62,7 @@ services:
       - './engine/src:/workdir/engine/src:ro'
       - '${FUSION_REPO:-./bundle}/dist:/workdir/engine/bundle/dist:rw'
       - '${FUSION_REPO:-./bundle}/generated:/workdir/engine/bundle/generated:rw'
-      - '${FUSION_REPO:-./bundle}/src:/workdir/engine/bundle/src:ro'
+      - '${FUSION_REPO:-./bundle}/src:/workdir/engine/bundle/src:rw'
 
   resolver:
     build:

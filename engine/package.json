@@ -15,6 +15,7 @@
     "deploy": "sls deploy",
     "install:bundle": "if [ -f ./bundle/src/package.json ]; then (cd ./bundle/src && npm install --production); fi",
     "prebuild:all": "rm -rf \"./bundle/dist/\"* && rm -rf \"./bundle/generated/\"*",
+    "prebuild:all:production": "npm run install:bundle",
     "predeploy": "npm install && npm run build:all:production",
     "prestart": "npm run watch:all &",
     "start": "sls --stage=localhost offline start",

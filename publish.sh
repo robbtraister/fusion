@@ -28,7 +28,7 @@ then
 else
   if [ "${BRANCH}" ]
   then
-    TAG=$(findNext "${BRANCH}")
+    TAG=$(findNext "${BRANCH}" 1)
   else
     TAG='latest'
   fi

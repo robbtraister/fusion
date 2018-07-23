@@ -1,5 +1,9 @@
 'use strict'
 
+const {
+  bundleSrcRoot
+} = require('../../environment')
+
 const express = require('express')
 
 const router = express.Router()
@@ -9,6 +13,6 @@ router.use('/content', require('./content'))
 router.use(['/assets', '/dist'], require('./assets'))
 router.use('/render', require('./render'))
 router.use('/resolvers', require('./resolvers'))
-router.use('/resources', express.static(`${__dirname}/../../bundle/resources`))
+router.use('/resources', express.static(`${bundleSrcRoot}/resources`))
 
 module.exports = router

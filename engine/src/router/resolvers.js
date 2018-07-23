@@ -12,6 +12,7 @@ const {
 } = require('../assets/info')
 
 const {
+  // bundleDistRoot,
   bodyLimit,
   environment,
   isDev,
@@ -20,7 +21,7 @@ const {
 
 const handler = (isDev)
   ? (() => {
-    // const filePath = path.resolve(`${distRoot}/resolvers.json`)
+    // const filePath = path.resolve(`${bundleDistRoot}/resolvers.json`)
     //
     // return (req, res, next) => {
     //   new Promise((resolve, reject) => {

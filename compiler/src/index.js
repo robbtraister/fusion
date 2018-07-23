@@ -12,7 +12,7 @@ module.exports.handler = (event, context, callback) => {
 }
 
 if (module === require.main) {
-  compile('test.zip')
+  compile('test bundle')
     .then(console.log)
     .catch(console.error)
 }

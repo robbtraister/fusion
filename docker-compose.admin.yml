@@ -25,7 +25,7 @@ networks:
 services:
   data:
     image: quay.io/washpost/mongo-localhost
-    build: ./data
+    # build: ./data
     environment:
       <<: *_environment
       WATCH: 'true'
@@ -37,17 +37,13 @@ services:
     ports:
       - '27017:27017'
     volumes:
-      - './data/db:/data/db:rw'
-      - './data/restore:/data/restore:rw'
+      - '${FUSION_REPO:-.}/data/db:/data/db:rw'
+      - '${FUSION_REPO:-.}/data/dumps:/data/dumps:rw'
+      - '${FUSION_REPO:-.}/data/restore:/data/restore:rw'
 
   engine:
-    image: quay.io/washpost/fusion-engine
-    build:
-      context: .
-      dockerfile: serverless.Dockerfile
-      args:
-        LAMBDA: engine
-    command: 'start:dev'
+    build: engine
+    command: start:dev
     depends_on:
       - data
     env_file:
@@ -64,13 +60,12 @@ services:
       - '9010:8080'
     volumes:
       # - '~/.aws:/root/.aws:ro'
-      - '${FUSION_REPO:-./bundle}:/workdir/engine/bundle:rw'
       - './engine/src:/workdir/engine/src:ro'
-      - './dist:/workdir/engine/dist:rw'
-      - './generated:/workdir/engine/generated:rw'
+      - '${FUSION_REPO:-./bundle}/dist:/workdir/engine/bundle/dist:rw'
+      - '${FUSION_REPO:-./bundle}/generated:/workdir/engine/bundle/generated:rw'
+      - '${FUSION_REPO:-./bundle}/src:/workdir/engine/bundle/src:rw'
 
   resolver:
-    image: quay.io/washpost/fusion-resolver
     build:
       context: .
       dockerfile: serverless.Dockerfile
@@ -127,7 +122,6 @@ services:
       - 8888:8888
 
   origin:
-    image: quay.io/washpost/fusion-origin
     build: ./origin
     depends_on:
       - engine
@@ -145,5 +139,5 @@ services:
     volumes:
       # - '~/.aws:/home/nginx/.aws:ro'
       - './origin/src:/etc/nginx/src:ro'
-      - './dist:/etc/nginx/dist:ro'
+      - '${FUSION_REPO:-./bundle}/dist:/etc/nginx/dist:ro'
       - '${FUSION_REPO:-./bundle}/resources:/etc/nginx/resources:ro'

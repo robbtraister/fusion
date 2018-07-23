@@ -1,11 +1,17 @@
 'use strict'
 
-require('./shared')
+const path = require('path')
 
 const mockRequire = require('mock-require')
 
-const FusionEnvironment = require('../environment').variables
+const {
+  bundleGeneratedRoot,
+  variables: FusionEnvironment
+} = require('../environment')
+
+require('./shared')
+
 mockRequire('fusion:environment', FusionEnvironment)
 
-const FusionVariables = require('../generated/variables')
+const FusionVariables = require(path.resolve(bundleGeneratedRoot, 'variables'))
 mockRequire('fusion:variables', FusionVariables)

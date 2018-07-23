@@ -9,15 +9,15 @@ const Rendering = require('../models/rendering')
 
 const {
   bodyLimit,
+  bundleDistRoot,
   defaultOutputType,
-  distRoot,
   isDev,
   version
 } = require('../../environment')
 
 const distRouter = express.Router()
 
-const staticHandler = (location) => express.static(`${distRoot}${location || ''}`)
+const staticHandler = (location) => express.static(`${bundleDistRoot}${location || ''}`)
 const redirectHandler = (location) => {
   const useStatic = staticHandler(location)
   return (req, res, next) => {

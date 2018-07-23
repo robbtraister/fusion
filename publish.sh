@@ -26,7 +26,12 @@ then
   VERSION=$(python -c "import json; print json.load(open('./package.json'))['version']")
   TAG=$(findNext "${VERSION}")
 else
-  TAG='latest'
+  if [ "${BRANCH}" ]
+  then
+    TAG=$(findNext "${BRANCH}" 1)
+  else
+    TAG='latest'
+  fi
 fi
 
 buildImage () {
@@ -91,7 +96,10 @@ addGitTags () {
         git push
       fi
     ); # allow the above to fail; ignore error
+  fi
 
+  if [ "${RELEASE}" ] || [ "${BRANCH}" ]
+  then
     git tag "${TAG}" && \
     git push --tags
   fi

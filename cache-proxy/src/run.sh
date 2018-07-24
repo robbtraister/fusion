@@ -7,7 +7,7 @@ compile() {
   
   # compile password file from env variables
   echo "computing credential file"
-  printenv | grep "CREDENTIAL" | sed s/=/:{PLAIN}/ | sed s/_CREDENTIAL// > ./conf/credentials
+  printenv | grep CACHE_PROXY_CREDENTIALS > ./conf/credentials
 }
 
 test() {

@@ -52,7 +52,8 @@ environments:
           awslogs-group: /nile/fusion-cache-proxy/staging
           awslogs-region: us-east-1
         environment:
-          STAGING_CREDENTIAL: "AQECAHhPwAyPK3nfERyAvmyWOWx9c41uht+ei4Zlv4NgrlmypwAAAMYwgcMGCSqGSIb3DQEHBqCBtTCBsgIBADCBrAYJKoZIhvcNAQcBMB4GCWCGSAFlAwQBLjARBAxCXUS4v6lvV9pgb8ACARCAfya5GUnQd88TqyJo8J9rDkGJLcYrBu4yqwSJ2xzH6HAfrc26YEngSR9ygt5iZ6r5UYuDDeenijP/3v8JrjSAtDZCcJTxFxKr0SCTpvkaOwnGe/FX+p9LbxJOQ7nnDurRL4T3dGG0mpoZHJrmO6Iir5wTFYzYMmZU5iQFmeXibrk="
+          CACHE_PROXY_CREDENTIALS: |
+            staging:%{AQECAHhPwAyPK3nfERyAvmyWOWx9c41uht+ei4Zlv4NgrlmypwAAAIQwgYEGCSqGSIb3DQEHBqB0MHICAQAwbQYJKoZIhvcNAQcBMB4GCWCGSAFlAwQBLjARBAzrrX9KLmpVvQCaktcCARCAQJt+/Ucft/DljaEuthLDHCdOv/UeDqPgGSEBnWYnatR53YMfikW5EVwu9rdKP/6AFPPuaZ4By/yeHSTjNrzD4lk=}
           <<: *_environment
     resources:
       - <<: *_resource

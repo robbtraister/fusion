@@ -70,7 +70,9 @@ const parseContentSourceParameters = function parseContentSourceParameters (reso
       }[param.type]
     })
 
-    return (requestUri) => Object.assign(...mappers.map(mapper => mapper(requestUri)))
+    if (mappers.length) {
+      return (requestUri) => Object.assign(...mappers.map(mapper => mapper(requestUri)))
+    }
   }
   return () => null
 }

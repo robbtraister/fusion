@@ -10,6 +10,8 @@ _fusion_cache_proxy: &_fusion_cache_proxy
   ports:
     - '8080'
   log_driver: awslogs
+  environment:
+    <<: *_environment
 
 _healthcheck: &_healthcheck
   healthcheck:
@@ -50,9 +52,9 @@ environments:
           awslogs-group: /nile/fusion-cache-proxy/staging
           awslogs-region: us-east-1
         environment:
+          <<: *_environment
           CACHE_PROXY_CREDENTIALS: |
             staging:%{AQECAHhPwAyPK3nfERyAvmyWOWx9c41uht+ei4Zlv4NgrlmypwAAAIQwgYEGCSqGSIb3DQEHBqB0MHICAQAwbQYJKoZIhvcNAQcBMB4GCWCGSAFlAwQBLjARBAzrrX9KLmpVvQCaktcCARCAQJt+/Ucft/DljaEuthLDHCdOv/UeDqPgGSEBnWYnatR53YMfikW5EVwu9rdKP/6AFPPuaZ4By/yeHSTjNrzD4lk=}
-          <<: *_environment
     resources:
       - <<: *_resource
         settings:

@@ -47,12 +47,15 @@ environments:
     namespace: pagebuilder-arc2
     override:
       fusion-cache-proxy:
-        <<: *_fusion_cache_proxy
+        image: quay.io/washpost/fusion-cache-proxy:{{.DeploymentId}}
+        ports:
+          - '8080'
+        log_driver: awslogs
         log_opt:
           awslogs-group: /nile/fusion-cache-proxy/staging
           awslogs-region: us-east-1
         environment:
-          <<: *_environment
+          PORT: "8080"
           CACHE_PROXY_CREDENTIALS: |
             staging:%{AQECAHhPwAyPK3nfERyAvmyWOWx9c41uht+ei4Zlv4NgrlmypwAAAIQwgYEGCSqGSIb3DQEHBqB0MHICAQAwbQYJKoZIhvcNAQcBMB4GCWCGSAFlAwQBLjARBAzrrX9KLmpVvQCaktcCARCAQJt+/Ucft/DljaEuthLDHCdOv/UeDqPgGSEBnWYnatR53YMfikW5EVwu9rdKP/6AFPPuaZ4By/yeHSTjNrzD4lk=}
     resources:

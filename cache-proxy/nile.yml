@@ -10,8 +10,6 @@ _fusion_cache_proxy: &_fusion_cache_proxy
   ports:
     - '8080'
   log_driver: awslogs
-  environment:
-    <<: *_environment
 
 _healthcheck: &_healthcheck
   healthcheck:

@@ -7,7 +7,7 @@ compile() {
   
   # compile password file from env variables
   echo "computing credential file"
-  printenv | grep CACHE_PROXY_CREDENTIALS > ./conf/credentials
+  echo $CACHE_PROXY_CREDENTIALS > ./conf/credentials
 }
 
 test() {

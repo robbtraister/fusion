@@ -164,6 +164,12 @@ cat <<EOB
 
       root /etc/nginx/src;
     }
+
+    location = /healthcheck {
+      access_log                off;
+      add_header                Content-Type text/html;
+      return                    200 'OK';
+    }
   }
 }
 EOB

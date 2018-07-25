@@ -39,7 +39,6 @@ _services: &_services
 environments:
   - name: staging
     <<: *_services
-    <<: *_task
     namespace: pagebuilder-arc2
     override:
       cache-proxy:

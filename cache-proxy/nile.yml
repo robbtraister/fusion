@@ -36,10 +36,6 @@ _services: &_services
         - containerName: cache-proxy
           containerPort: 8080
 
-_task: &_task
-  task:
-    taskRoleArn: arn:aws:iam::397853141546:role/fusion-cache-proxy
-
 environments:
   - name: staging
     <<: *_services

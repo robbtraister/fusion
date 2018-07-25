@@ -16,6 +16,6 @@ services:
       - '8081:8081'
     environment:
       CACHE_PROXY_CREDENTIALS: |
-        staging:$$apr1$$HI2e2Pjb$NPREZKmE63.NIVWxJwRIr/
+        staging:$apr1$HI2e2Pjb$NPREZKmE63.NIVWxJwRIr/
     volumes:
       - './src:/etc/nginx/src:ro'

@@ -33,7 +33,7 @@ _services: &_services
         minimumHealthyPercent: 50
       desiredCount: 2
       loadBalancers:
-        - containerName: fusion-cache-proxy
+        - containerName: cache-proxy
           containerPort: 8080
 
 _task: &_task
@@ -46,7 +46,7 @@ environments:
     <<: *_task
     namespace: pagebuilder-arc2
     override:
-      fusion-cache-proxy:
+      cache-proxy:
         image: quay.io/washpost/fusion-cache-proxy:{{.DeploymentId}}
         ports:
           - '8080'

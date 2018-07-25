@@ -29,38 +29,31 @@ const { components } = require('../environment/manifest')
 childProcess.execSync(`mkdir -p '${variablesSrcDir}'`)
 const variablesSrcFile = path.resolve(variablesSrcDir, `variables.js`)
 
-const globalFile = (() => {
+const getRequirable = (fp) => {
   try {
-    const globalFile = require.resolve(`${bundleSrcRoot}/variables`)
-    require(globalFile)
-    return globalFile
+    return require.resolve(fp)
   } catch (e) {
     return false
   }
-})()
+}
+
+const globalFile = getRequirable(`${bundleSrcRoot}/variables`)
 
 const siteFiles = Object.assign(
   {},
-  ...glob.sync(`${bundleSrcRoot}/variables/sites/*`)
-    .filter(fp => {
-      try {
-        require(fp)
-        return true
-      } catch (e) {
-        return false
-      }
-    })
+  ...glob.sync(`${bundleSrcRoot}/variables/sites/*.{js,json}`)
+    .filter(getRequirable)
     .map(fp => ({[path.parse(fp).name]: fp}))
 )
 
 fs.writeFileSync(variablesSrcFile,
   `
 const variables = {
-  global: ${globalFile ? `require('${globalFile}')` : '{}'},
+  global: ${globalFile ? `require('${path.relative(variablesSrcDir, globalFile)}')` : '{}'},
   sites: {
     ${
   Object.keys(siteFiles)
-    .map(name => `'${name}': require('${siteFiles[name]}')`).join(',\n    ')
+    .map(name => `'${name}': require('${path.relative(variablesSrcDir, siteFiles[name])}')`).join(',\n    ')
 }
   }
 }
@@ -76,53 +69,84 @@ module.exports = (siteName) => {
 }
 `)
 
-module.exports = {
-  entry: {
-    admin: require.resolve('../src/react/client/admin'),
-    react: require.resolve('../src/react/client')
-  },
-  mode,
-  module: {
-    rules: [
-      {
-        test: /\.jsx?$/i,
-        exclude: /node_modules/,
-        use: [
-          babelLoader
-        ]
-      }
-    ]
-  },
-  optimization,
-  output: {
-    filename: `[name].js`,
-    path: path.resolve(bundleDistRoot, 'engine')
-  },
-  plugins: [
-    new ManifestPlugin({fileName: 'webpack.manifest.json'}),
-    ...Object.keys(components.outputTypes)
-      .map((outputType) => {
-        return new HandlebarsPlugin({
-          entry: require.resolve('../src/react/client/preview.html.hbs'),
-          output: path.resolve(bundleDistRoot, 'engine', 'preview', `${outputType}.html`),
-          data: {
-            contextPath,
-            outputType
-          }
+module.exports = [
+  {
+    entry: {
+      admin: require.resolve('../src/react/client/admin'),
+      react: require.resolve('../src/react/client'),
+      variables: require.resolve(variablesSrcFile)
+    },
+    mode,
+    module: {
+      rules: [
+        {
+          test: /\.jsx?$/i,
+          exclude: /node_modules/,
+          use: [
+            babelLoader
+          ]
+        }
+      ]
+    },
+    optimization,
+    output: {
+      filename: `[name].js`,
+      path: path.resolve(bundleDistRoot, 'engine')
+    },
+    plugins: [
+      new ManifestPlugin({fileName: 'webpack.manifest.json'}),
+      ...Object.keys(components.outputTypes)
+        .map((outputType) => {
+          return new HandlebarsPlugin({
+            entry: require.resolve('../src/react/client/preview.html.hbs'),
+            output: path.resolve(bundleDistRoot, 'engine', 'preview', `${outputType}.html`),
+            data: {
+              contextPath,
+              outputType
+            }
+          })
         })
-      })
-  ],
-  resolve: Object.assign(
-    {},
-    resolve,
-    {
-      alias: {
-        'fusion:variables': variablesSrcFile
+    ],
+    resolve: Object.assign(
+      {},
+      resolve,
+      {
+        alias: {
+          'fusion:variables': variablesSrcFile
+        }
       }
+    ),
+    target,
+    watchOptions: {
+      ignored: /node_modules/
     }
-  ),
-  target,
-  watchOptions: {
-    ignored: /node_modules/
+  },
+  {
+    entry: {
+      variables: require.resolve(variablesSrcFile)
+    },
+    mode,
+    module: {
+      rules: [
+        {
+          test: /\.jsx?$/i,
+          exclude: /node_modules/,
+          use: [
+            babelLoader
+          ]
+        }
+      ]
+    },
+    optimization,
+    output: {
+      filename: `[name].js`,
+      path: path.resolve(bundleDistRoot),
+      libraryTarget: 'commonjs2'
+    },
+    resolve,
+    target,
+    watchOptions: {
+      ignored: /node_modules/
+    }
   }
-}
+]

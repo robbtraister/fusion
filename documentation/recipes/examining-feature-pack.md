@@ -1,4 +1,4 @@
-# Examining a Feature Pack
+# Examining the Feature Pack
 
 Now that we've created a Feature Pack skeleton, let's look inside to see what was created.
 

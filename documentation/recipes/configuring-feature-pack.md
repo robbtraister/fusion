@@ -1,9 +1,9 @@
-# Configuring a Fusion Feature Pack
+# Configuring a Feature Pack
 
 This section is for instructions regarding configuring a Fusion bundle and getting it running for the first time. 
 
 ## Before You Begin
-Sign up for an account at quay.io, either via your email address or via OAuth with Github. Once you have that, request access to the Washington Post team by providing your Quay username in #nile-support channel.
+Sign up for an account at [quay.io](https://quay.io/), either via your email address or via OAuth with Github. Once you have that, request access to the Washington Post team by providing your Quay username in #nile-support channel.
 
 Make sure you can access Quay from the command line by running `docker login quay.io`.
 You'll also want to [increase your local Docker instance's allocated memory](https://arcpublishing.atlassian.net/wiki/spaces/APF/pages/273186892).
@@ -18,7 +18,7 @@ CONTENT_BASE=https://redacted:redacted@api.sandbox.demo.arcpublishing.com
 ```
 
 - The DB_NAME variable should almost certainly be the name of the bundle you just created, unless you have configured a separate database on your own.
-- The CONTENT_BASE variable, you can get the API username and password you need from the Trident staging page to replace the "redacted" placeholders above. You'll need access to Trident first though.
+- For the CONTENT_BASE variable, you can get the API username and password you need from the Trident staging page to replace the "redacted" placeholders above. You'll need access to Trident first though.
 
 ## Populating the Admin Database
 

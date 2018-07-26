@@ -3,7 +3,7 @@
 This section is for instructions regarding configuring a Fusion bundle and getting it running for the first time. 
 
 ## Before You Begin
-Sign up for an account at quay.io. Quay is where The best thing to do is OAuth signup/signin through Github. Once you have that, request access to the Washington Post team by providing your Quay username in #nile-support channel.
+Sign up for an account at quay.io, either via your email address or via OAuth with Github. Once you have that, request access to the Washington Post team by providing your Quay username in #nile-support channel.
 
 Make sure you can access Quay from the command line by running `docker login quay.io`.
 You'll also want to [increase your local Docker instance's allocated memory](https://arcpublishing.atlassian.net/wiki/spaces/APF/pages/273186892).

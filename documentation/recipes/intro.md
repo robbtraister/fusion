@@ -1,5 +1,5 @@
 # Intro to Fusion
-Welcome to the documentation for PageBuilder's rendering engine, Fusion. This documentation includes specific APIs available in Fusion, as well as a series of "recipes" for getting up and running with the Fusion engine. These documents are updated frequently as features are added or changed in Fusion, so check back for updates!
+Welcome to the documentation for PageBuilder's rendering engine, Fusion. This documentation includes specific APIs available in Fusion, as well as a series of "recipes" for getting up and running. These documents are updated frequently as features are added or changed, so check back often!
 
 ## What is Fusion?
 In short, Fusion is an engine that dynamically crafts and serves webpages to your *readers*. Fusion was built to provide the following benefits:

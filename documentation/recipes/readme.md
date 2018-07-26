@@ -17,6 +17,7 @@
 | [Creating a Chain Component](./creating-chain-component.md) |
 | [Using Child and Shared Components](./using-child-shared-components.md) |
 | [Adding Custom Fields to a Component](./adding-custom-fields.md) |
+| [Event Handling and Interaction](./event-handling-interaction.md) |
 | [Isomorphic vs. Server vs. SPA Rendering](./isomorphic-server-spa-rendering.md) |
 
 | Using Data |

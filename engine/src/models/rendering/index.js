@@ -41,11 +41,17 @@ const pushCssHash = (isDev)
 
 const getJson = (isDev)
   ? (type, id) => model(type).get(id)
-    .then((data) => (type === 'rendering')
-      ? data
-      // if page/template, we need to get the actual rendering object
-      : model('rendering').get(data.versions[data.published].head)
-    )
+    .then((data) => {
+      if (!data) {
+        const e = new Error(`No rendering found: ${type}/${id}`)
+        e.statusCode = 404
+        throw e
+      }
+      return (type === 'rendering')
+        ? data
+        // if page/template, we need to get the actual rendering object
+        : model('rendering').get(data.versions[data.published].head)
+    })
   : (type, id) => model(type).get(id)
 
 const putJson = (isDev)

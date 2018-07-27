@@ -68,7 +68,7 @@ const createContextElement = (Comp, props, context) => {
   delete contextProps.eventListeners
   delete contextProps.getContent
 
-  const combinedProps = Object.assign({}, props, context)
+  const combinedProps = Object.assign({}, props, contextProps)
 
   return React.createElement(
     Comp,

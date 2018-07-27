@@ -8,6 +8,8 @@ RUN \
             openssl \
             pcre \
             zlib \
+            apache2-utils \
+            busybox-extras \
             && \
     rm -rf /var/cache/apk/* && \
     openssl version

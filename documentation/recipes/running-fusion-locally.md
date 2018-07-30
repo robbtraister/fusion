@@ -12,7 +12,7 @@ It's useful to have a working knowledge of Docker, its purpose, and some of the 
 
 ---
 
-## Running Fusion
+## Starting Fusion
 
 To start the Fusion engine with the Feature Pack you've created, simply run:
 
@@ -21,7 +21,7 @@ $ npm start
 ```
 in the command line from the root of your Feature Pack repo. This will start up the Fusion engine, as well as a PageBuilder Admin instance. It may take a while for this command to run the first time, as Docker needs to download copies of all the correct images before containerizing and starting them. In the future, this step should be much quicker as Docker will already have these images downloaded.
 
-## Using the Admin
+## Accessing the Admin
 
 You should see log messages showing up in your command line console - once they stop updating, try visiting [http://localhost/pb/admin](http://localhost/pb/admin) to see the PageBuilder Admin. If you previously [dropped a `.tar.gz` file into the `/data/restore` directory of your Feature Pack](./configuring-feature-pack.md#populating-the-admin-database), you should see the data from that database reflected in the Admin (for example, any pages, templates or resolvers in the DB should show up in the Admin). For now though, we'll assume you're starting your database from scratch without data.
 

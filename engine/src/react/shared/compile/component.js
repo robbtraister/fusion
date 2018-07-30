@@ -75,7 +75,7 @@ const componentGenerator = function componentGenerator (loadComponent) {
   const layout = function layout (rendering, outputType) {
     const Layout = loadComponent('layouts', rendering.layout, outputType)
 
-    return () => React.createElement(
+    const Component = () => React.createElement(
       Layout || 'div',
       {
         key: rendering.layout,
@@ -84,6 +84,10 @@ const componentGenerator = function componentGenerator (loadComponent) {
       },
       renderAll(rendering.layoutItems, outputType)
     )
+
+    Component.layout = rendering.layout
+
+    return Component
   }
 
   const renderableItem = function renderableItem (config, outputType, index) {

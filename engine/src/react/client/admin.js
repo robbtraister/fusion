@@ -30,7 +30,8 @@ function render (config) {
     React.createElement(
       Provider,
       {
-        isAdmin: true
+        isAdmin: true,
+        layout: config.layout
       },
       React.createElement(
         getElement(config),

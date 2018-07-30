@@ -44,7 +44,11 @@ const getJson = (isDev)
     .then((data) => (type === 'rendering')
       ? data
       // if page/template, we need to get the actual rendering object
-      : model('rendering').get(data.versions[data.published].head)
+      : (() => {
+        const version = data && data.published && data.versions && data.versions[data.published]
+        const head = version && version.head
+        return head && model('rendering').get(head)
+      })()
     )
   : (type, id) => model(type).get(id)
 
@@ -70,6 +74,14 @@ class Rendering {
         (this.json)
           ? Promise.resolve(this.json)
           : getJson(this.type, this.id)
+            .then(json => {
+              if (!json) {
+                const e = new Error(`No rendering found: ${this.type}/${this.id}`)
+                e.statusCode = 404
+                throw e
+              }
+              return json
+            })
       )
     return this.jsonPromise
   }

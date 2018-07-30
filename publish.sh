@@ -48,6 +48,13 @@ pushImage () {
   name=$1 && \
   docker tag "quay.io/washpost/fusion-${name}:${TAG}" "quay.io/washpost/fusion-${name}:${TAG}" && \
   docker push "quay.io/washpost/fusion-${name}:${TAG}"
+
+  if [ "${RELEASE}" ]
+  then
+    # make a minor image tag so users can stay updated without specifying a point release
+    docker tag "quay.io/washpost/fusion-${name}:${VERSION}" "quay.io/washpost/fusion-${name}:${VERSION}" && \
+    docker push "quay.io/washpost/fusion-${name}:${VERSION}"
+  fi
 }
 
 notify () {

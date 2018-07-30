@@ -88,7 +88,7 @@ const value = {
 module.exports = (props) => React.createElement(
   Fusion.context.Provider,
   {
-    value: Object.assign(value, {isAdmin: props.isAdmin})
+    value: {...value, ...props}
   },
   props.children
 )

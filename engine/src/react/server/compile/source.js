@@ -162,6 +162,7 @@ ${Object.keys(components).map(k => componentImport(k, components[k])).join('\n')
 Fusion.Template = function (props) {
   return React.createElement(React.Fragment, {}, ${Template})
 }
+Fusion.Template.layout = ${renderable.layout ? `'${renderable.layout}'` : 'null'}
 module.exports = Fusion.Template
 `
 

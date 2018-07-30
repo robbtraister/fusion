@@ -49,7 +49,7 @@ module.exports = Object.keys(components)
       }),
       new ManifestPlugin({fileName: 'webpack.manifest.json'}),
       new OnBuildWebpackPlugin(function (stats) {
-        childProcess.exec(`mkdir -p '${componentDistRoot}/output-types'`, () => {
+        childProcess.exec(`mkdir -p '${componentDistRoot}/${type}'`, () => {
           fs.writeFile(`${componentDistRoot}/${type}/fusion.manifest.json`, JSON.stringify(components[type], null, 2), () => {
             fs.writeFile(`${componentDistRoot}/${type}/fusion.configs.json`, JSON.stringify(loadConfigs(type), null, 2), () => {})
           })
@@ -111,6 +111,15 @@ module.exports = Object.keys(components)
           ignored: /node_modules/
         }
       }
-      : null
+      : (() => {
+        // if the type is empty, still create an empty config/manifest file
+        childProcess.exec(`mkdir -p '${componentDistRoot}/${type}'`, () => {
+          fs.writeFile(`${componentDistRoot}/${type}/fusion.manifest.json`, '{}', () => {
+            fs.writeFile(`${componentDistRoot}/${type}/fusion.configs.json`, '[]', () => {})
+          })
+        })
+
+        return null
+      })()
   })
   .filter(c => c)

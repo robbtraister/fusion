@@ -24,6 +24,10 @@ This is the base context path of the application. In the client, you could calcu
 
 This is the full data object used as the global content for the rendered page.
 
+-   layout
+
+The layout that was used when rendering this page.
+
 -   outputType
 
 The output type that was used when rendering this page.

@@ -68,7 +68,9 @@ const render = () => {
       ReactDOM[method](
         React.createElement(
           Provider,
-          {},
+          {
+            layout: Fusion.Template.layout
+          },
           React.createElement(
             Fusion.Template,
             Fusion.globalContent || {}

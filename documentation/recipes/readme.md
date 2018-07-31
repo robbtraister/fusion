@@ -7,7 +7,7 @@
 | [Examining the Feature Pack](./examining-feature-pack.md) |
 | [Configuring a Feature Pack](./configuring-feature-pack.md) |
 | [Running Fusion Locally](./running-fusion-locally.md) |
-| [Keeping Fusion Up to Date](./keeping-fusion-up-to-date.md) |
+| [Keeping Up to Date](./keeping-up-to-date.md) |
 
 | Writing Components |
 |---|

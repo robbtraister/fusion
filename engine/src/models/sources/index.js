@@ -101,10 +101,21 @@ const getSource = function getSource (sourceName) {
         throw new Error(`Could not load source: ${sourceName}`)
       }
 
+      if (source.params && source.params instanceof Object && !(source.params instanceof Array)) {
+        source.params = Object.keys(source.params)
+          .map((name) => ({
+            name,
+            type: source.params[name]
+          }))
+      }
+
       return {
         clear: () => {},
         fetch,
-        filter: getSchemaFilter(source.schemaName)
+        filter: getSchemaFilter(source.schemaName),
+        name: sourceName,
+        params: source.params || null,
+        pattern: source.pattern || null
       }
     })
 

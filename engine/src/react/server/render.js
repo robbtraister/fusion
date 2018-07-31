@@ -331,11 +331,9 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
                     ? cb(Component.inlines.styles.cached)
                     : React.createElement(
                       'style',
-                      {},
-                      [
-                        Component.inlines.styles.cached.outputTypeStyles,
-                        Component.inlines.styles.cached.templateStyles
-                      ]
+                      {
+                        dangerouslySetInnerHTML: { __html: `${Component.inlines.styles.cached.outputTypeStyles || ''}${Component.inlines.styles.cached.templateStyles || ''}` }
+                      }
                     )
                 }),
                 /*

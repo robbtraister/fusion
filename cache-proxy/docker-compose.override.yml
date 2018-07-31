@@ -1,0 +1,29 @@
+version: "2"
+
+networks:
+  fusion-cache:
+    driver: bridge
+    external: false
+    internal: false
+
+services:
+  cache:
+    image: memcached
+    networks:
+      - fusion-cache
+    ports:
+      - "11211:11211"
+  cache-proxy:
+    build: .
+    networks:
+      - fusion-cache
+    ports:
+      - '80:8080'
+      - '8081:8081'
+    environment:
+      CACHE_PROXY_CREDENTIALS: |
+        staging:password
+      CACHE_NODES: |
+        cache:11211
+    volumes:
+      - './src:/etc/nginx/src:ro'

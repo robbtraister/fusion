@@ -35,4 +35,13 @@ This documentation is primarily for *developers* of Fusion **Feature Packs**. It
 
 You can also read more documentation on [creating **content** in Arc](TODO: add link), or on [using PageBuilder Admin to change **configuration** options](TODO: add link).
 
+## What should I already know?
+
+This documentation doesn't cover how to use the other tools, libraries or frameworks that work in conjunction with Fusion. With that in mind, developers using this guide should have:
+
+- basic web development knowledge and/or experience (including command line familiarity)
+- proficiency with [JavaScript](https://developer.mozilla.org/en-US/docs/Web/javascript), [React](https://reactjs.org/docs/getting-started.html), [JSX](https://reactjs.org/docs/introducing-jsx.html) and modern best practices
+- working knowledge of [Docker](https://docs.docker.com/)
+- understanding of how to use PageBuilder Admin
+
 **Next: [Creating a Feature Pack](./create-feature-pack.md)**

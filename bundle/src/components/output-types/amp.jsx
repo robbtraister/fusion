@@ -2,6 +2,8 @@
 
 import React from 'react'
 
+import PropTypes from 'prop-types'
+
 require(`../../resources/css/bootstrap.min.css`)
 
 const OutputType = (props) =>
@@ -23,5 +25,11 @@ const OutputType = (props) =>
       </div>
     </body>
   </html>
+
+OutputType.propTypes = {
+  displayProperties: PropTypes.shape({
+    max: PropTypes.number
+  })
+}
 
 export default OutputType

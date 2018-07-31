@@ -29,6 +29,7 @@ const componentGenerator = function componentGenerator (loadComponent) {
           id,
           contentConfig: config.contentConfig || {},
           customFields: config.customFields || {},
+          displayProperties: (config.displayProperties || {})[outputType] || {},
           // we only need local edits for content consumers, which must be stateful
           localEdits: (Feature instanceof React.Component)
             ? config.localEdits || {}
@@ -54,7 +55,8 @@ const componentGenerator = function componentGenerator (loadComponent) {
       {
         key: config.id,
         type: config.chainConfig,
-        id: config.id
+        id: config.id,
+        displayProperties: (config.displayProperties || {})[outputType] || {}
       },
       renderAll(config.features, outputType)
     )

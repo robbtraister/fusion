@@ -29,6 +29,11 @@ RUN \
     wget --no-check-certificate -O nginx.tar.gz https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz && \
     tar zxvf nginx.tar.gz --strip-components 1 && \
     rm nginx.tar.gz && \
+    # download memc-nginx client
+    wget -O memc-nginx.tar.gz https://github.com/openresty/memc-nginx-module/archive/v0.19.tar.gz && \ 
+    mkdir ./memc-nginx && \
+    tar zxvf memc-nginx.tar.gz --strip-components 1 -C memc-nginx && \ 
+    rm memc-nginx.tar.gz && \
     # download nginx let module
     git clone --branch=master --single-branch --depth=1 https://github.com/arut/nginx-let-module ./modules/nginx-let && \
     rm -rf ./modules/nginx-let/.git && \
@@ -42,6 +47,7 @@ RUN \
                 --with-http_realip_module \
                 # --add-module=modules/nginx-let \
                 # --add-module=modules/nginx-statsd \
+                --add-module=./memc-nginx \
                 && \
     make -j2 && \
     make install && \
@@ -54,6 +60,7 @@ RUN \
        /etc/nginx/src \
        && \
     nginx -v && \
+
     # remove dev packages
     apk del ${DEV_PACKAGES} && \
     rm -rf /var/cache/apk/* && \

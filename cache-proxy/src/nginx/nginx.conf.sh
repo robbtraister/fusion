@@ -147,10 +147,24 @@ cat <<EOB
 EOB
 if [ "${IS_PROD}" ]
 then
-  cat <<EOB
+cat <<EOB
     ~^(?<subdomain>[^.]+)\.     \$subdomain;
 EOB
 fi
+
+cat <<EOB
+  }
+
+  upstream cache_cluster {
+EOB
+  # compile password file from env variables
+  for cache_node in $(echo $CACHE_NODES); 
+  do
+cat <<EOB
+      server $cache_node;
+EOB
+  done
+  
 cat <<EOB
   }
 
@@ -162,7 +176,7 @@ cat <<EOB
       auth_basic "Fusion Secure Cache";
       auth_basic_user_file /etc/nginx/conf/credentials;
 
-      root /etc/nginx/src;
+      memc_pass cache_cluster;
     }
 
     location = /healthcheck {

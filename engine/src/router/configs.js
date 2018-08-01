@@ -6,6 +6,8 @@ const express = require('express')
 
 const { glob } = require('../utils/promises')
 
+const getSource = require('../models/sources')
+
 const JGE = require('../models/sources/jge')
 
 const {
@@ -44,25 +46,44 @@ configRouter.get('/features', getConfigHandler('features'))
 configRouter.get('/layouts', getConfigHandler('layouts'))
 configRouter.get('/output-types', getConfigHandler('output-types'))
 
+function getPatternParams (p) {
+  const idMatcher = /\{([^}]+)\}/g
+  const result = []
+  while (true) {
+    const key = idMatcher.exec(p)
+    if (key) {
+      result.push(key[1])
+    } else {
+      break
+    }
+  }
+  return result
+}
+
 function transformContentConfigs (manifest) {
-  // if (manifest.pattern) {
-  //   const idMatcher = /\{([^}])\}/g
-  //   const ids = []
-  //   while (const id = idMatcher.exec(manifest.pattern)) {
-  //     ids.push(id)
-  //   }
-  // }
+  const idFields = (manifest.pattern)
+    ? getPatternParams(manifest.pattern)
+      .map((key) => ({key, type: 'text'}))
+    : null
+
   return {
-    service: manifest.service,
+    service: manifest.service || manifest.name,
     config: manifest.content || manifest.config || manifest.schemaName,
-    paramFields: manifest.params
+    idFields: idFields || [],
+    paramFields: manifest.params || []
   }
 }
 
 configRouter.get('/content/sources', (req, res, next) => {
   Promise.all([
     glob('**/*', {cwd: sourcesRoot})
-      .then(sources => sources.map(s => ({service: path.parse(s).name}))),
+      .then(sources => Promise.all(
+        sources.map(s =>
+          getSource(path.parse(s).name)
+            .catch(() => null)
+        )
+      ))
+      .then(sources => sources.filter(s => s)),
     JGE.find()
       .then(sources => sources.map(s => {
         s.service = s._id
@@ -72,7 +93,7 @@ configRouter.get('/content/sources', (req, res, next) => {
       .catch(() => [])
   ])
     .then(([bundleSources, jgeSources]) => {
-      const bundleIds = bundleSources.map(s => s.service)
+      const bundleIds = bundleSources.map(s => s.name)
       return bundleSources.concat(jgeSources.filter(jge => !bundleIds.includes(jge.service)))
     })
     .then(sources => sources.map(transformContentConfigs))

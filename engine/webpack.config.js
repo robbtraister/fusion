@@ -6,5 +6,6 @@ module.exports = [].concat(
   require('./webpack/engine'),
   require('./webpack/combinations'),
   require('./webpack/components'),
-  require('./webpack/output-types')
+  require('./webpack/output-types'),
+  require('./webpack/content-sources')
 )

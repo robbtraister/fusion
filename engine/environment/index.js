@@ -44,6 +44,7 @@ const componentGeneratedRoot = path.resolve(`${bundleGeneratedRoot}/components`)
 const componentSrcRoot = path.resolve(`${bundleSrcRoot}/components`)
 const schemasRoot = path.resolve(variables.SCHEMAS_ROOT || `${bundleSrcRoot}/content/schemas`)
 const sourcesRoot = path.resolve(variables.SOURCES_ROOT || `${bundleSrcRoot}/content/sources`)
+const sourcesDistRoot = path.resolve(`${bundleDistRoot}/content/sources`)
 
 module.exports = {
   apiPrefix,
@@ -69,6 +70,7 @@ module.exports = {
   region,
   schemasRoot,
   sourcesRoot,
+  sourcesDistRoot,
   variables,
   version
 }

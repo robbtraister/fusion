@@ -6,9 +6,11 @@ const request = require('request-promise-native')
 
 const debugFetch = require('debug')('fusion:content:sources:fetch')
 
+const unpack = require('../../utils/unpack')
+
 const {
   contentBase,
-  sourcesRoot
+  sourcesDistRoot
 } = require('../../../environment')
 
 const getSchemaFilter = require('./filter')
@@ -79,7 +81,7 @@ const getSourceFetcher = function getSourceFetcher (source) {
 
 const getBundleSource = function getBundleSource (sourceName) {
   try {
-    return Promise.resolve(require(`${sourcesRoot}/${sourceName}`))
+    return Promise.resolve(unpack(require(`${sourcesDistRoot}/${sourceName}`)))
   } catch (e) {
     return Promise.resolve(null)
   }
@@ -101,10 +103,21 @@ const getSource = function getSource (sourceName) {
         throw new Error(`Could not load source: ${sourceName}`)
       }
 
+      if (source.params && source.params instanceof Object && !(source.params instanceof Array)) {
+        source.params = Object.keys(source.params)
+          .map((name) => ({
+            name,
+            type: source.params[name]
+          }))
+      }
+
       return {
         clear: () => {},
         fetch,
-        filter: getSchemaFilter(source.schemaName)
+        filter: getSchemaFilter(source.schemaName),
+        name: sourceName,
+        params: source.params || null,
+        pattern: source.pattern || null
       }
     })
 

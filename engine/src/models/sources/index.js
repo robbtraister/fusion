@@ -6,6 +6,8 @@ const request = require('request-promise-native')
 
 const debugFetch = require('debug')('fusion:content:sources:fetch')
 
+const unpack = require('../../utils/unpack')
+
 const {
   contentBase,
   sourcesDistRoot
@@ -79,7 +81,7 @@ const getSourceFetcher = function getSourceFetcher (source) {
 
 const getBundleSource = function getBundleSource (sourceName) {
   try {
-    return Promise.resolve(require(`${sourcesDistRoot}/${sourceName}`))
+    return Promise.resolve(unpack(require(`${sourcesDistRoot}/${sourceName}`)))
   } catch (e) {
     return Promise.resolve(null)
   }

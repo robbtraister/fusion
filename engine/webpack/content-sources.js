@@ -61,7 +61,8 @@ module.exports = (Object.keys(entry).length)
       new ManifestPlugin({fileName: 'webpack.manifest.json'}),
       new OnBuildWebpackPlugin(function (stats) {
         fs.writeFile(`${sourcesDistRoot}/fusion.manifest.json`, JSON.stringify(entry, null, 2), () => {
-          // fs.writeFile(`${sourcesDistRoot}/fusion.configs.json`, JSON.stringify(loadConfigs('output-types'), null, 2), () => {})
+          // TODO: compute configs at compile-time (instead of on-demand) after disabling JGE option
+          // fs.writeFile(`${sourcesDistRoot}/fusion.configs.json`, JSON.stringify(entry, null, 2), () => {})
         })
       })
     ],

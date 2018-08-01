@@ -8,7 +8,7 @@ const debugFetch = require('debug')('fusion:content:sources:fetch')
 
 const {
   contentBase,
-  sourcesRoot
+  sourcesDistRoot
 } = require('../../../environment')
 
 const getSchemaFilter = require('./filter')
@@ -79,7 +79,7 @@ const getSourceFetcher = function getSourceFetcher (source) {
 
 const getBundleSource = function getBundleSource (sourceName) {
   try {
-    return Promise.resolve(require(`${sourcesRoot}/${sourceName}`))
+    return Promise.resolve(require(`${sourcesDistRoot}/${sourceName}`))
   } catch (e) {
     return Promise.resolve(null)
   }

@@ -13,8 +13,11 @@ const model = require('../src/dao/mongo')
 model('jge_config').find()
   .then((configs) => {
     configs.map((config) => {
+      console.log(`Extracting: ${config._id}`)
       fs.writeFileSync(`${sourcesRoot}/${config._id}.json`, JSON.stringify(config, null, 2))
+      console.log(`Successfully extracted: ${config._id}`)
     })
+    console.log(`Extraction complete.`)
   })
   .catch(console.error)
   .then(() => {

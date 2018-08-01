@@ -13,6 +13,7 @@
     "build:output-types": "webpack --config ./webpack/output-types.js",
     "build:output-types:production": "NODE_ENV=production npm run build:output-types -- --mode production -p",
     "deploy": "sls deploy",
+    "extract:jge": "node bin/extract",
     "install:bundle": "if [ -f ./bundle/src/package.json ]; then (cd ./bundle/src && npm install --production); fi",
     "prebuild:all": "rm -rf \"./bundle/dist/\"* && rm -rf \"./bundle/generated/\"*",
     "prebuild:all:production": "npm run install:bundle",

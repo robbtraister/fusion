@@ -172,12 +172,12 @@ cat <<EOB
   server {
     listen                      ${PORT:-8080};
     server_name                 'Fusion Secure Cache';
-    auth_basic "Fusion Secure Cache";
-    auth_basic_user_file /etc/nginx/conf/credentials;
+    auth_basic                  "Fusion Secure Cache";
+    auth_basic_user_file        /etc/nginx/conf/credentials;
 
     location /cache {
-      set                     \$memc_key \$arg_key;
-      memc_pass               cache_cluster;
+      set                       \$memc_key \$arg_key;
+      memc_pass                 cache_cluster;
     }
 
     location = /healthcheck {

@@ -5,7 +5,13 @@ const fs = require('fs')
 const isStatic = require('../is-static')
 const unpack = require('../../../utils/unpack')
 
+const {
+  minify
+} = require('../../../../environment')
+
 const { components } = require('../../../../environment/manifest')
+
+const srcFileType = (minify) ? 'src' : 'dist'
 
 function fileExists (fp) {
   try {
@@ -38,7 +44,7 @@ const getComponentFile = function getComponentFile (type, id, outputType) {
     if (Component) {
       return (isStatic(Component, outputType))
         ? 'fusion:static'
-        : componentOutputType.dist
+        : componentOutputType[srcFileType]
     }
   } catch (e) {
   }

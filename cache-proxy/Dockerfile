@@ -48,8 +48,6 @@ RUN \
                 # --add-module=modules/nginx-let \
                 # --add-module=modules/nginx-statsd \
                 --add-module=./memc-nginx \
-                --add-module=/path/to/ngx_devel_kit \
-                --add-module=/path/to/set-misc-nginx-module \
                 && \
     make -j2 && \
     make install && \

@@ -34,7 +34,7 @@ http {
   underscores_in_headers        on;
 
 
-  log_format simple             '\$status \$request_method \$uri\$query_params \$bytes_sent \$latency';
+  log_format simple             '\$status \$request_method \$uri\$query_params \$bytes_sent \$latency \$upstream_addr';
 
   access_log                    ./logs/access.log simple;
   error_log                     ./logs/error.log;
@@ -156,6 +156,7 @@ cat <<EOB
   }
 
   upstream cache_cluster {
+    hash \$memc_key;
 EOB
   # compile password file from env variables
   for cache_node in $(echo $CACHE_NODES); 
@@ -175,9 +176,8 @@ cat <<EOB
     auth_basic_user_file /etc/nginx/conf/credentials;
 
     location /cache {
-      set \$memc_key \$arg_key;
-
-      memc_pass cache_cluster;
+      set                     \$memc_key \$arg_key;
+      memc_pass               cache_cluster;
     }
 
     location = /healthcheck {

@@ -40,7 +40,25 @@ services:
       - '${FUSION_REPO:-.}/data/db:/data/db:rw'
       - '${FUSION_REPO:-.}/data/dumps:/data/dumps:rw'
       - '${FUSION_REPO:-.}/data/restore:/data/restore:rw'
-
+  cache:
+    image: memcached
+    networks:
+      - fusion
+    ports:
+      - "11211:11211"
+  cache-proxy:
+    image: quay.io/washpost/fusion-cache-proxy:memcache
+    depends_on:
+      - cache
+    networks:
+      - fusion
+    ports:
+      - "9030:8080"
+    environment:
+      CACHE_PROXY_CREDENTIALS: |
+        staging:password
+      CACHE_NODES: |
+        cache:11211
   engine:
     build: engine
     command: start:dev

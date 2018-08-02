@@ -45,4 +45,4 @@ This documentation doesn't cover how to use the other tools, libraries or framew
 - working knowledge of [Docker](https://docs.docker.com/)
 - understanding of how to use PageBuilder Admin
 
-**Next: [Creating a Feature Pack](./create-feature-pack.md)**
+**Next: [Creating a Feature Pack](./creating-feature-pack.md)**

@@ -26,10 +26,8 @@ const OutputType = (props) =>
     </body>
   </html>
 
-OutputType.propTypes = {
-  displayProperties: PropTypes.shape({
-    max: PropTypes.number
-  })
+OutputType.displayPropTypes = {
+  max: PropTypes.number
 }
 
 export default OutputType

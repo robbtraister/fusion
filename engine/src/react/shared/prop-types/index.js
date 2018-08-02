@@ -53,7 +53,7 @@ const FusionPropTypes = Object.assign(
     }))
 )
 
-FusionPropTypes.contentConfig = (contentType) => {
+FusionPropTypes.contentConfig = (options, ...moreSchemas) => {
   const instance = (props, propName, componentName) => {
     const prop = props[propName]
     if (prop) {
@@ -74,11 +74,13 @@ FusionPropTypes.contentConfig = (contentType) => {
     return instance(props, propName, componentName)
   }
 
-  instance.args = (contentType instanceof Object)
-    ? contentType
-    : {contentType}
+  const args = !(options instanceof Object)
+    ? {schemas: [options].concat(...moreSchemas)}
+    : (options instanceof Array)
+      ? {schemas: options.concat(...moreSchemas)}
+      : options
 
-  return taggablePrimitive(instance, 'contentConfig')
+  return taggablePrimitive(instance, 'contentConfig', args)
 }
 
 // The basic JSON.stringify function ignores functions

@@ -6,7 +6,7 @@ const {
 } = require('../../environment')
 
 const getCustomFields = require('./custom-fields')
-const getDisplayProperties = require('./display-properties')
+const getDisplayPropTypes = require('./display-prop-types')
 const getSections = require('./sections')
 
 const FIELD_TYPE_MAP = {
@@ -71,7 +71,7 @@ function transformOutputTypeConfigs (manifest) {
   return Object.keys(manifest)
     .map((id) => ({
       id,
-      displayProperties: transformPropTypes(getDisplayProperties(manifest[id])) || []
+      displayPropTypes: transformPropTypes(getDisplayPropTypes(manifest[id])) || []
     }))
 }
 

@@ -6,7 +6,7 @@ const fs = require('fs')
 const url = require('url')
 
 const {
-  sourcesRoot
+  sourcesSrcRoot
 } = require('../environment')
 
 const model = require('../src/dao/mongo')
@@ -21,7 +21,7 @@ model('jge_config').find()
           {auth: null}
         )
       )
-      fs.writeFileSync(`${sourcesRoot}/${config._id}.json`, JSON.stringify(config, null, 2))
+      fs.writeFileSync(`${sourcesSrcRoot}/${config._id}.json`, JSON.stringify(config, null, 2))
       console.log(`Successfully extracted: ${config._id}`)
     })
     console.log(`Extraction complete.`)

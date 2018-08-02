@@ -13,8 +13,8 @@ const JGE = require('../models/sources/jge')
 const {
   componentDistRoot,
   isDev,
-  schemasRoot,
-  sourcesRoot
+  schemasDistRoot,
+  sourcesDistRoot
 } = require('../../environment')
 
 const loadConfigs = require('../configs')
@@ -76,7 +76,7 @@ function transformContentConfigs (manifest) {
 
 configRouter.get('/content/sources', (req, res, next) => {
   Promise.all([
-    glob('**/*', {cwd: sourcesRoot})
+    glob('**/*', {cwd: sourcesDistRoot})
       .then(sources => Promise.all(
         sources.map(s =>
           getSource(path.parse(s).name)
@@ -101,7 +101,7 @@ configRouter.get('/content/sources', (req, res, next) => {
 })
 
 configRouter.get('/content/schemas', (req, res, next) => {
-  glob('**/*', {cwd: schemasRoot})
+  glob('**/*', {cwd: schemasDistRoot})
     .then(schemas => Object.assign(...schemas.map(s => {
       const id = path.parse(s).name
       return {[id]: id}

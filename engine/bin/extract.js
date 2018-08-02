@@ -3,6 +3,7 @@
 'use strict'
 
 const fs = require('fs')
+const url = require('url')
 
 const {
   sourcesRoot
@@ -14,6 +15,12 @@ model('jge_config').find()
   .then((configs) => {
     configs.map((config) => {
       console.log(`Extracting: ${config._id}`)
+      config.pattern = url.format(
+        Object.assign(
+          url.parse(config.pattern),
+          {auth: null}
+        )
+      )
       fs.writeFileSync(`${sourcesRoot}/${config._id}.json`, JSON.stringify(config, null, 2))
       console.log(`Successfully extracted: ${config._id}`)
     })

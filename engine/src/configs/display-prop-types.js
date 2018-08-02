@@ -1,5 +1,6 @@
 'use strict'
 
+const PropTypes = require('../react/shared/prop-types')
 const unpack = require('../utils/unpack')
 
 function getDisplayPropTypes (componentConfig) {
@@ -9,11 +10,8 @@ function getDisplayPropTypes (componentConfig) {
     if (!(displayPropTypes instanceof Object)) {
       throw new Error(`${componentConfig.type}/${componentConfig.id}: displayProps must be an Object`)
     }
-    if (displayPropTypes.type !== 'shape') {
-      throw new Error(`${componentConfig.type}/${componentConfig.id}: displayProps must be a shape`)
-    }
 
-    return displayPropTypes.args
+    return JSON.parse(PropTypes.stringify(displayPropTypes))
   }
 
   return null

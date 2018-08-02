@@ -30,7 +30,7 @@ The guide below will walk you through the structure of each directory and file i
     - `sources/`: This directory holds code used to define content sources used by your Feature Pack.
   - `environment/`: Directory for defining environment values available on the *server only*. These values can be encrypted at rest and used for secret values like credentials.
   - `resources/`: This directory is for static resources like images, CSS, fonts and more that don't need processing. Resources in this directory will be served at the web root with a `/pb/resources/` prefix in the URL path.
-  - `variables/`: This directory is meant for *non-secret* "runtime" properties whose values can differ on a per-site basis. They are available in components.
+  - `properties/`: This directory is meant for *non-secret* "runtime" properties whose values can differ on a per-site basis. They are available in components.
     - `sites/`: This directory holds the site-specific overrides of the default runtime properties.
     - `index.js{on}`: This file holds the default runtime properties. It can either export a JavaScript object or be a simple JSON file.
 - `/.dockerignore`: [Reference](https://docs.docker.com/engine/reference/builder/#dockerignore-file). Consider this read-only.

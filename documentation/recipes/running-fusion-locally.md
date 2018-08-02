@@ -5,13 +5,6 @@ Now that we've created and configured our Feature Pack repo, we're ready to run 
 ## Docker
 The Fusion engine and services that support it run in Docker containers that can be spun up for local development. To do so, you'll need to [download and install Docker](https://www.docker.com/community-edition) if you haven't already. Once you've installed Docker, you'll probably want to [allocate at least 4GB of RAM](https://arcpublishing.atlassian.net/wiki/spaces/APF/pages/273186892/Running+Fusion+with+the+Pagebuilder+Admin+times+out+doesn+t+work+makes+my+computer+sound+like+a+jet+engine) to it so it has the resources necessary to run all the services Fusion requires.
 
----
-**TIP**
-
-It's useful to have a working knowledge of Docker, its purpose, and some of the commands you can use to control it. Check out [Docker's Getting Started guide](https://docs.docker.com/get-started/) and [YouTube channel](https://www.youtube.com/user/dockerrun) to learn more, or any of the other excellent resources online.
-
----
-
 ## Starting Fusion
 
 To start the Fusion engine with the Feature Pack you've created, simply run:

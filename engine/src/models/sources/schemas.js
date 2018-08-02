@@ -2,13 +2,15 @@
 
 const { buildSchema, GraphQLSchema } = require('graphql')
 
-const { schemasRoot } = require('../../../environment')
+const { schemasDistRoot } = require('../../../environment')
+
+const unpack = require('../../utils/unpack')
 
 const schemaCache = {}
 const getSchema = function getSchema (schemaName) {
   if (!(schemaName in schemaCache)) {
     try {
-      const schema = require(`${schemasRoot}/${schemaName}`)
+      const schema = unpack(require(`${schemasDistRoot}/${schemaName}`))
 
       schemaCache[schemaName] = (schema instanceof GraphQLSchema)
         ? schema

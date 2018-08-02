@@ -1,3 +1,4 @@
 # Creating a Feature Component
 
-**Next: [Creating a Feature Pack](./create-feature-pack.md)**
+
+**Next: [Creating a Layout Component](./creating-layout-component.md)**

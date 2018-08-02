@@ -79,4 +79,4 @@ If you see an error message about the Output Type component not being found, or 
 
 ---
 
-**Next: [Creating a Feature Component](./create-feature-component.md)**
+**Next: [Creating a Feature Component](./creating-feature-component.md)**

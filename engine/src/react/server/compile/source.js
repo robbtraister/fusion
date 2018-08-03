@@ -128,7 +128,7 @@ function generateSource (renderable, outputType) {
 
     const props = {
       key: config.id || config._id,
-      type: 'rendering',
+      type: 'layout',
       id: config.id || config._id
     }
 

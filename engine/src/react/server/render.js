@@ -21,6 +21,8 @@ const getSource = require('../../models/sources')
 
 const fusionProperties = require('fusion:properties')
 
+const getTree = require('../shared/compile/tree')
+
 const {
   fetchFile
 } = require('../../assets/io')
@@ -110,6 +112,13 @@ function getFusionScript (globalContent, contentCache, outputType, arcSite) {
     `Fusion.lastModified=${now};` +
     `Fusion.globalContent=${escapeContent(globalContent || {})};` +
     `Fusion.contentCache=${escapeContent(condensedCache)}`
+}
+
+const getAncestors = function getAncestors (node) {
+  return (node && node.children)
+    ? node.children
+      .concat(...node.children.map(getAncestors))
+    : []
 }
 
 const render = function render ({Component, requestUri, content, _website}) {
@@ -218,11 +227,15 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
 
           const OutputType = getOutputTypeComponent(outputType)
 
+          const tree = getTree(json)
+
           const Component = (props) => {
             return React.createElement(
               OutputType,
               {
                 contextPath,
+                tree,
+                renderables: [tree].concat(...getAncestors(tree)),
                 /*
                  * Each of the following are equivalent in JSX
                  *   {props.metaTag}

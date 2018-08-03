@@ -75,6 +75,7 @@ function generateSource (renderable, outputType) {
       const contentConfig = config.contentConfig || {}
       const customFields = config.customFields || {}
       const localEdits = config.localEdits || {}
+      const displayProperties = (config.displayProperties || {})[outputType] || {}
 
       const props = {
         key,
@@ -82,6 +83,7 @@ function generateSource (renderable, outputType) {
         type,
         customFields,
         contentConfig,
+        displayProperties,
         localEdits
       }
 
@@ -97,10 +99,13 @@ function generateSource (renderable, outputType) {
       ? `Fusion.components${componentName}`
       : `'div'`
 
+    const displayProperties = (config.displayProperties || {})[outputType] || {}
+
     const props = {
       key: config.id,
       type: config.chainConfig,
-      id: config.id
+      id: config.id,
+      displayProperties
     }
 
     return `React.createElement(${component}, ${JSON.stringify(props)}, [${config.features.map(renderableItem).filter(ri => ri).join(',')}])`

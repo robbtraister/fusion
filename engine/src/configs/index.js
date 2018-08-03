@@ -6,6 +6,7 @@ const {
 } = require('../../environment')
 
 const getCustomFields = require('./custom-fields')
+const getDisplayPropTypes = require('./display-prop-types')
 const getSections = require('./sections')
 
 const FIELD_TYPE_MAP = {
@@ -17,28 +18,28 @@ const FIELD_TYPE_MAP = {
   'contentConfig': 'contentConfig'
 }
 
-function transformCustomFields (component) {
-  const customFields = getCustomFields(component)
-
-  return (customFields)
-    ? Object.keys(customFields)
+function transformPropTypes (propTypes) {
+  return (propTypes)
+    ? Object.keys(propTypes)
       .map(id => {
-        const customField = customFields[id]
-        const typeInfo = customField.type.split('.')
+        const propType = propTypes[id]
+        const typeInfo = propType.type.split('.')
         const fieldType = FIELD_TYPE_MAP[typeInfo[0]] || 'text'
+
         const options = (fieldType === 'contentConfig')
-          ? customField.args
+          ? propType.args
           : (fieldType === 'select')
             ? {
-              selectOptions: customField.args.map((value) => ({
+              selectOptions: propType.args.map((value) => ({
                 value,
-                name: (customField.tags && customField.tags.labels && customField.tags.labels[value]) || value
+                name: (propType.tags && propType.tags.labels && propType.tags.labels[value]) || value
               }))
             }
             : {}
+
         return Object.assign(
           {},
-          customField.tags || {},
+          propType.tags || {},
           {
             id,
             fieldType,
@@ -54,7 +55,7 @@ function transformComponentConfigs (manifest) {
   return Object.keys(manifest)
     .map(id => ({
       id,
-      customFields: transformCustomFields(manifest[id]) || []
+      customFields: transformPropTypes(getCustomFields(manifest[id])) || []
     }))
 }
 
@@ -71,6 +72,14 @@ function transformLayoutConfigs (manifest) {
     }))
 }
 
+function transformOutputTypeConfigs (manifest) {
+  return Object.keys(manifest)
+    .map((id) => ({
+      id,
+      displayPropTypes: transformPropTypes(getDisplayPropTypes(manifest[id])) || []
+    }))
+}
+
 const getManifestFile = (type) => `${componentDistRoot}/${type}/fusion.manifest.json`
 
 function getConfigs (type) {
@@ -78,7 +87,7 @@ function getConfigs (type) {
 
   const transform = {
     layouts: transformLayoutConfigs,
-    'output-types': (manifest) => Object.keys(manifest).map((id) => ({id}))
+    'output-types': transformOutputTypeConfigs
   }[type] || transformComponentConfigs
 
   return transform(manifest)

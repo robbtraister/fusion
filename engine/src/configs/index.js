@@ -13,7 +13,8 @@ const FIELD_TYPE_MAP = {
   'bool': 'boolean',
   'oneOf': 'select',
   'string': 'text',
-  'number': 'number'
+  'number': 'number',
+  'contentConfig': 'contentConfig'
 }
 
 function transformCustomFields (component) {
@@ -25,14 +26,16 @@ function transformCustomFields (component) {
         const customField = customFields[id]
         const typeInfo = customField.type.split('.')
         const fieldType = FIELD_TYPE_MAP[typeInfo[0]] || 'text'
-        const options = (fieldType === 'select')
-          ? {
-            selectOptions: customField.args.map((value) => ({
-              value,
-              name: (customField.tags && customField.tags.labels && customField.tags.labels[value]) || value
-            }))
-          }
-          : {}
+        const options = (fieldType === 'contentConfig')
+          ? customField.args
+          : (fieldType === 'select')
+            ? {
+              selectOptions: customField.args.map((value) => ({
+                value,
+                name: (customField.tags && customField.tags.labels && customField.tags.labels[value]) || value
+              }))
+            }
+            : {}
         return Object.assign(
           {},
           customField.tags || {},

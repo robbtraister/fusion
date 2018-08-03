@@ -19,7 +19,9 @@ const timer = require('../../timer')
 
 const getSource = require('../../models/sources')
 
-const fusionVariables = require('fusion:variables')
+const fusionProperties = require('fusion:properties')
+
+const getTree = require('../shared/compile/tree')
 
 const {
   fetchFile
@@ -112,6 +114,13 @@ function getFusionScript (globalContent, contentCache, outputType, arcSite) {
     `Fusion.contentCache=${escapeContent(condensedCache)}`
 }
 
+const getAncestors = function getAncestors (node) {
+  return (node && node.children)
+    ? node.children
+      .concat(...node.children.map(getAncestors))
+    : []
+}
+
 const render = function render ({Component, requestUri, content, _website}) {
   const renderHTML = () => new Promise((resolve, reject) => {
     try {
@@ -124,7 +133,7 @@ const render = function render ({Component, requestUri, content, _website}) {
           globalContent: content ? content.document : null,
           outputType: Component.outputType,
           requestUri,
-          variables: fusionVariables(_website)
+          siteProperties: fusionProperties(_website)
         }
       )
       debugTimer(`create element`, elementTic.toc())
@@ -156,7 +165,7 @@ const render = function render ({Component, requestUri, content, _website}) {
           })
       )
 
-      return contentPromises.length === 0
+      const htmlPromise = (contentPromises.length === 0)
         // if no feature content is requested, return original rendering
         ? Promise.resolve(html)
         // if feature content is requested, wait for it, then render again
@@ -170,6 +179,12 @@ const render = function render ({Component, requestUri, content, _website}) {
             debugTimer('second render', tic.toc())
             return html
           })
+
+      return htmlPromise
+        .then(html => (Component.transform)
+          ? Component.transform(html)
+          : html
+        )
     })
 }
 
@@ -218,11 +233,15 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
 
           const OutputType = getOutputTypeComponent(outputType)
 
+          const tree = getTree(json)
+
           const Component = (props) => {
             return React.createElement(
               OutputType,
               {
                 contextPath,
+                tree,
+                renderables: [tree].concat(...getAncestors(tree)),
                 /*
                  * Each of the following are equivalent in JSX
                  *   {props.metaTag}
@@ -331,11 +350,9 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
                     ? cb(Component.inlines.styles.cached)
                     : React.createElement(
                       'style',
-                      {},
-                      [
-                        Component.inlines.styles.cached.outputTypeStyles,
-                        Component.inlines.styles.cached.templateStyles
-                      ]
+                      {
+                        dangerouslySetInnerHTML: { __html: `${Component.inlines.styles.cached.outputTypeStyles || ''}${Component.inlines.styles.cached.templateStyles || ''}` }
+                      }
                     )
                 }),
                 /*
@@ -414,6 +431,7 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
           Component.inlines = Template.inlines
           // bubble up the Provider contentCache
           Component.contentCache = Template.contentCache
+          Component.transform = OutputType.transform
           debugTimer('output-type wrapping', tic.toc())
           return Component
         })

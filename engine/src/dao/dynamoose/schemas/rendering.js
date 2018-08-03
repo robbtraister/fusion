@@ -8,6 +8,9 @@ module.exports = new dynamoose.Schema(
       type: String,
       hashKey: true
     },
+    globalContentConfig: {
+      type: Object
+    },
     layout: {
       type: String
     },

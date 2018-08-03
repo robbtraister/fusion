@@ -13,5 +13,5 @@ require('./shared')
 
 mockRequire('fusion:environment', FusionEnvironment)
 
-const FusionVariables = require(path.resolve(bundleDistRoot, 'variables'))
-mockRequire('fusion:variables', FusionVariables)
+const FusionProperties = require(path.resolve(bundleDistRoot, 'properties'))
+mockRequire('fusion:properties', FusionProperties)

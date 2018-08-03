@@ -19,15 +19,15 @@ const resolve = require('./shared/resolve')
 
 const {
   bundleDistRoot,
-  bundleGeneratedRoot: variablesSrcDir,
+  bundleGeneratedRoot: propertiesSrcDir,
   bundleSrcRoot,
   contextPath
 } = require('../environment')
 
 const { components } = require('../environment/manifest')
 
-childProcess.execSync(`mkdir -p '${variablesSrcDir}'`)
-const variablesSrcFile = path.resolve(variablesSrcDir, `variables.js`)
+childProcess.execSync(`mkdir -p '${propertiesSrcDir}'`)
+const propertiesSrcFile = path.resolve(propertiesSrcDir, `properties.js`)
 
 const getRequirable = (fp) => {
   try {
@@ -37,23 +37,23 @@ const getRequirable = (fp) => {
   }
 }
 
-const globalFile = getRequirable(`${bundleSrcRoot}/variables`)
+const globalFile = getRequirable(`${bundleSrcRoot}/properties`)
 
 const siteFiles = Object.assign(
   {},
-  ...glob.sync(`${bundleSrcRoot}/variables/sites/*.{js,json}`)
+  ...glob.sync(`${bundleSrcRoot}/properties/sites/*.{js,json}`)
     .filter(getRequirable)
     .map(fp => ({[path.parse(fp).name]: fp}))
 )
 
-fs.writeFileSync(variablesSrcFile,
+fs.writeFileSync(propertiesSrcFile,
   `
-const variables = {
-  global: ${globalFile ? `require('${path.relative(variablesSrcDir, globalFile)}')` : '{}'},
+const properties = {
+  global: ${globalFile ? `require('${path.relative(propertiesSrcDir, globalFile)}')` : '{}'},
   sites: {
     ${
   Object.keys(siteFiles)
-    .map(name => `'${name}': require('${path.relative(variablesSrcDir, siteFiles[name])}')`).join(',\n    ')
+    .map(name => `'${name}': require('${path.relative(propertiesSrcDir, siteFiles[name])}')`).join(',\n    ')
 }
   }
 }
@@ -62,8 +62,8 @@ const siteCache = {}
 module.exports = (siteName) => {
   siteCache[siteName] = siteCache[siteName] || Object.assign(
     {},
-    variables.global || {},
-    variables.sites[siteName] || {}
+    properties.global || {},
+    properties.sites[siteName] || {}
   )
   return siteCache[siteName]
 }
@@ -74,7 +74,7 @@ module.exports = [
     entry: {
       admin: require.resolve('../src/react/client/admin'),
       react: require.resolve('../src/react/client'),
-      variables: require.resolve(variablesSrcFile)
+      properties: require.resolve(propertiesSrcFile)
     },
     mode,
     module: {
@@ -112,7 +112,7 @@ module.exports = [
       resolve,
       {
         alias: {
-          'fusion:variables': variablesSrcFile
+          'fusion:properties': propertiesSrcFile
         }
       }
     ),
@@ -123,7 +123,7 @@ module.exports = [
   },
   {
     entry: {
-      variables: require.resolve(variablesSrcFile)
+      properties: require.resolve(propertiesSrcFile)
     },
     mode,
     module: {

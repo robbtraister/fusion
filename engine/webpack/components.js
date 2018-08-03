@@ -12,9 +12,7 @@ const babelLoader = require('./shared/loaders/babel-loader')
 const cssLoader = require('./shared/loaders/css-loader')
 const sassLoader = require('./shared/loaders/sass-loader')
 
-const target = 'node'
-
-const externals = require('./shared/externals')[target]
+const externals = require('./shared/externals').node
 const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
@@ -22,7 +20,8 @@ const resolve = require('./shared/resolve')
 const {
   bundleDistRoot,
   componentDistRoot,
-  isDev
+  isDev,
+  minify
 } = require('../environment')
 
 const { components } = require('../environment/manifest')
@@ -106,7 +105,8 @@ module.exports = Object.keys(components)
         },
         plugins,
         resolve,
-        target,
+        // in dev mode, compiled components must be usable without babel
+        target: (minify) ? 'node' : 'web',
         watchOptions: {
           ignored: /node_modules/
         }

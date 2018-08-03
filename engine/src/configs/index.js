@@ -14,7 +14,8 @@ const FIELD_TYPE_MAP = {
   'bool': 'boolean',
   'oneOf': 'select',
   'string': 'text',
-  'number': 'number'
+  'number': 'number',
+  'contentConfig': 'contentConfig'
 }
 
 function transformPropTypes (propTypes) {
@@ -24,14 +25,18 @@ function transformPropTypes (propTypes) {
         const propType = propTypes[id]
         const typeInfo = propType.type.split('.')
         const fieldType = FIELD_TYPE_MAP[typeInfo[0]] || 'text'
-        const options = (fieldType === 'select')
-          ? {
-            selectOptions: propType.args.map((value) => ({
-              value,
-              name: (propType.tags && propType.tags.labels && propType.tags.labels[value]) || value
-            }))
-          }
-          : {}
+
+        const options = (fieldType === 'contentConfig')
+          ? propType.args
+          : (fieldType === 'select')
+            ? {
+              selectOptions: propType.args.map((value) => ({
+                value,
+                name: (propType.tags && propType.tags.labels && propType.tags.labels[value]) || value
+              }))
+            }
+            : {}
+
         return Object.assign(
           {},
           propType.tags || {},

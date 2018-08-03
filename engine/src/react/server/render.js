@@ -19,7 +19,7 @@ const timer = require('../../timer')
 
 const getSource = require('../../models/sources')
 
-const fusionVariables = require('fusion:variables')
+const fusionProperties = require('fusion:properties')
 
 const {
   fetchFile
@@ -124,7 +124,7 @@ const render = function render ({Component, requestUri, content, _website}) {
           globalContent: content ? content.document : null,
           outputType: Component.outputType,
           requestUri,
-          variables: fusionVariables(_website)
+          siteProperties: fusionProperties(_website)
         }
       )
       debugTimer(`create element`, elementTic.toc())

@@ -1,10 +1,6 @@
 'use strict'
 
-const url = require('url')
-
-const request = require('request-promise-native')
-
-const debugFetch = require('debug')('fusion:content:sources:fetch')
+const request = require('../../utils/contentFetcher')
 
 const unpack = require('../../utils/unpack')
 
@@ -58,12 +54,7 @@ const getSourceFetcher = function getSourceFetcher (source) {
       // this way, we get proper error handling in either case
       return Promise.resolve()
         .then(() => resolve(key))
-        .then((contentUri) => {
-          const contentUrl = url.resolve(contentBase, contentUri)
-          // don't log content credentials
-          debugFetch(url.format(Object.assign(url.parse(contentUrl), {auth: null})))
-          return request(contentUrl)
-        })
+        .then((contentUri) => request(contentBase, contentUri))
         .then((data) => JSON.parse(data))
         .then(transform)
         .catch((err) => {

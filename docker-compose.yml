@@ -64,6 +64,7 @@ services:
     command: start:dev
     depends_on:
       - data
+      - cache-proxy
     env_file:
       - .env
     environment:
@@ -72,6 +73,8 @@ services:
       MINIFY:
       # because we import ALL variables from .env, ignore PORT
       PORT: 8080
+      CACHE_PROXY: "http://staging:password@cache-proxy:8080/cache"
+      CACHE_PREFIX: local_0803
     networks:
       - fusion
     ports:

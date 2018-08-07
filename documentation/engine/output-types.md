@@ -22,6 +22,14 @@ Each of the following properties are provided as functions that accept further c
 
 The context path where the app is running. Should be used to prefix resource references. Default is `/pb`.
 
+-   `tree`
+
+A JSON map that represents the full component tree of the page to be rendered.
+
+-   `renderables`
+
+A flattened array of all component elements from `tree`. Suitable for direct access with `.find`, `.filter`, or `.map`.
+
 -   `metaTag([{name, default}])`
 
 This prop will insert meta tags into your rendered HTML. If name is provided, it will insert the single meta tag specified. If no name is given, it will insert all meta tags that are enabled in the admin.

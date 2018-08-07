@@ -108,7 +108,8 @@ const getSource = function getSource (sourceName) {
         filter: getSchemaFilter(source.schemaName),
         name: sourceName,
         params: source.params || null,
-        pattern: source.pattern || null
+        pattern: source.pattern || null,
+        schemaName: source.schemaName
       }
     })
 

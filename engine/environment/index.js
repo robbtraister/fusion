@@ -36,14 +36,20 @@ const port = variables.PORT || 8080
 const region = variables.REGION || 'us-east-1'
 const version = variables.AWS_LAMBDA_FUNCTION_VERSION || '$LATEST'
 
-const bundleDistRoot = path.resolve(`${bundleRoot}/dist`)
-const bundleGeneratedRoot = path.resolve(`${bundleRoot}/generated`)
-const bundleSrcRoot = path.resolve(`${bundleRoot}/src`)
-const componentDistRoot = path.resolve(`${bundleDistRoot}/components`)
-const componentGeneratedRoot = path.resolve(`${bundleGeneratedRoot}/components`)
-const componentSrcRoot = path.resolve(`${bundleSrcRoot}/components`)
-const schemasRoot = path.resolve(variables.SCHEMAS_ROOT || `${bundleSrcRoot}/content/schemas`)
-const sourcesRoot = path.resolve(variables.SOURCES_ROOT || `${bundleSrcRoot}/content/sources`)
+const bundleDistRoot = `${bundleRoot}/dist`
+const bundleGeneratedRoot = `${bundleRoot}/generated`
+const bundleSrcRoot = `${bundleRoot}/src`
+
+const componentDistRoot = `${bundleDistRoot}/components`
+const componentGeneratedRoot = `${bundleGeneratedRoot}/components`
+const componentSrcRoot = `${bundleSrcRoot}/components`
+
+const contentSrcRoot = `${bundleSrcRoot}/content`
+const contentDistRoot = `${bundleDistRoot}/content`
+const schemasSrcRoot = `${contentSrcRoot}/schemas`
+const schemasDistRoot = `${contentDistRoot}/schemas`
+const sourcesSrcRoot = `${contentSrcRoot}/sources`
+const sourcesDistRoot = `${contentDistRoot}/sources`
 
 module.exports = {
   apiPrefix,
@@ -57,6 +63,8 @@ module.exports = {
   componentGeneratedRoot,
   componentSrcRoot,
   contentBase,
+  contentSrcRoot,
+  contentDistRoot,
   contextPath,
   defaultOutputType,
   environment,
@@ -67,8 +75,10 @@ module.exports = {
   onDemand,
   port,
   region,
-  schemasRoot,
-  sourcesRoot,
+  schemasDistRoot,
+  schemasSrcRoot,
+  sourcesDistRoot,
+  sourcesSrcRoot,
   variables,
   version
 }

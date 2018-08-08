@@ -4,6 +4,8 @@
 
 docker-compose.override.yml
 
+**/.dist
+**/.generated
 **/dist
 **/generated
 **/node_modules

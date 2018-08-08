@@ -9,7 +9,7 @@ Fusion.components.Consumer = require('../shared/components/consumer')
 Fusion.components.Layout = require('../shared/components/layout')
 Fusion.components.Static = require('../shared/components/static')
 Fusion.unpack = require('../../utils/unpack')
-Fusion.variables = require('fusion:variables')
+Fusion.properties = require('fusion:properties')
 
 const Provider = require('./provider')
 
@@ -30,7 +30,8 @@ function render (config) {
     React.createElement(
       Provider,
       {
-        isAdmin: true
+        isAdmin: true,
+        layout: config.layout
       },
       React.createElement(
         getElement(config),

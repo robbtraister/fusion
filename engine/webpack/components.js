@@ -12,9 +12,7 @@ const babelLoader = require('./shared/loaders/babel-loader')
 const cssLoader = require('./shared/loaders/css-loader')
 const sassLoader = require('./shared/loaders/sass-loader')
 
-const target = 'node'
-
-const externals = require('./shared/externals')[target]
+const externals = require('./shared/externals').node
 const mode = require('./shared/mode')
 const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
@@ -22,7 +20,8 @@ const resolve = require('./shared/resolve')
 const {
   bundleDistRoot,
   componentDistRoot,
-  isDev
+  isDev,
+  minify
 } = require('../environment')
 
 const { components } = require('../environment/manifest')
@@ -49,7 +48,7 @@ module.exports = Object.keys(components)
       }),
       new ManifestPlugin({fileName: 'webpack.manifest.json'}),
       new OnBuildWebpackPlugin(function (stats) {
-        childProcess.exec(`mkdir -p '${componentDistRoot}/output-types'`, () => {
+        childProcess.exec(`mkdir -p '${componentDistRoot}/${type}'`, () => {
           fs.writeFile(`${componentDistRoot}/${type}/fusion.manifest.json`, JSON.stringify(components[type], null, 2), () => {
             fs.writeFile(`${componentDistRoot}/${type}/fusion.configs.json`, JSON.stringify(loadConfigs(type), null, 2), () => {})
           })
@@ -106,11 +105,21 @@ module.exports = Object.keys(components)
         },
         plugins,
         resolve,
-        target,
+        // in dev mode, compiled components must be usable without babel
+        target: (minify) ? 'node' : 'web',
         watchOptions: {
           ignored: /node_modules/
         }
       }
-      : null
+      : (() => {
+        // if the type is empty, still create an empty config/manifest file
+        childProcess.exec(`mkdir -p '${componentDistRoot}/${type}'`, () => {
+          fs.writeFile(`${componentDistRoot}/${type}/fusion.manifest.json`, '{}', () => {
+            fs.writeFile(`${componentDistRoot}/${type}/fusion.configs.json`, '[]', () => {})
+          })
+        })
+
+        return null
+      })()
   })
   .filter(c => c)

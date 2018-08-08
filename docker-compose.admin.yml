@@ -61,8 +61,8 @@ services:
     volumes:
       # - '~/.aws:/root/.aws:ro'
       - './engine/src:/workdir/engine/src:ro'
-      - '${FUSION_REPO:-./bundle}/dist:/workdir/engine/bundle/dist:rw'
-      - '${FUSION_REPO:-./bundle}/generated:/workdir/engine/bundle/generated:rw'
+      - '${FUSION_REPO:-./bundle}/.dist:/workdir/engine/bundle/dist:rw'
+      - '${FUSION_REPO:-./bundle}/.generated:/workdir/engine/bundle/generated:rw'
       - '${FUSION_REPO:-./bundle}/src:/workdir/engine/bundle/src:rw'
 
   resolver:
@@ -139,5 +139,5 @@ services:
     volumes:
       # - '~/.aws:/home/nginx/.aws:ro'
       - './origin/src:/etc/nginx/src:ro'
-      - '${FUSION_REPO:-./bundle}/dist:/etc/nginx/dist:ro'
+      - '${FUSION_REPO:-./bundle}/.dist:/etc/nginx/dist:ro'
       - '${FUSION_REPO:-./bundle}/resources:/etc/nginx/resources:ro'

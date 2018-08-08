@@ -3,6 +3,5 @@
 .dockerignore
 docker-compose*.yml
 Dockerfile
-nile.yml
 
 node_modules/

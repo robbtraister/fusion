@@ -5,7 +5,13 @@ const fs = require('fs')
 const isStatic = require('../is-static')
 const unpack = require('../../../utils/unpack')
 
+const {
+  minify
+} = require('../../../../environment')
+
 const { components } = require('../../../../environment/manifest')
+
+const srcFileType = (minify) ? 'src' : 'dist'
 
 function fileExists (fp) {
   try {
@@ -38,7 +44,7 @@ const getComponentFile = function getComponentFile (type, id, outputType) {
     if (Component) {
       return (isStatic(Component, outputType))
         ? 'fusion:static'
-        : componentOutputType.dist
+        : componentOutputType[srcFileType]
     }
   } catch (e) {
   }
@@ -69,6 +75,7 @@ function generateSource (renderable, outputType) {
       const contentConfig = config.contentConfig || {}
       const customFields = config.customFields || {}
       const localEdits = config.localEdits || {}
+      const displayProperties = (config.displayProperties || {})[outputType] || {}
 
       const props = {
         key,
@@ -76,6 +83,7 @@ function generateSource (renderable, outputType) {
         type,
         customFields,
         contentConfig,
+        displayProperties,
         localEdits
       }
 
@@ -91,10 +99,13 @@ function generateSource (renderable, outputType) {
       ? `Fusion.components${componentName}`
       : `'div'`
 
+    const displayProperties = (config.displayProperties || {})[outputType] || {}
+
     const props = {
       key: config.id,
       type: config.chainConfig,
-      id: config.id
+      id: config.id,
+      displayProperties
     }
 
     return `React.createElement(${component}, ${JSON.stringify(props)}, [${config.features.map(renderableItem).filter(ri => ri).join(',')}])`
@@ -122,7 +133,7 @@ function generateSource (renderable, outputType) {
 
     const props = {
       key: config.id || config._id,
-      type: 'rendering',
+      type: 'layout',
       id: config.id || config._id
     }
 
@@ -162,6 +173,7 @@ ${Object.keys(components).map(k => componentImport(k, components[k])).join('\n')
 Fusion.Template = function (props) {
   return React.createElement(React.Fragment, {}, ${Template})
 }
+Fusion.Template.layout = ${renderable.layout ? `'${renderable.layout}'` : 'null'}
 module.exports = Fusion.Template
 `
 

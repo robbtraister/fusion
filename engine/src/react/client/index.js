@@ -16,8 +16,8 @@ Fusion.components = Fusion.components || {}
 Fusion.components.Consumer = require('../shared/components/consumer')
 Fusion.components.Layout = require('../shared/components/layout')
 Fusion.components.Static = require('../shared/components/static')
+Fusion.properties = require('fusion:properties')
 Fusion.unpack = require('../../utils/unpack')
-Fusion.variables = require('fusion:variables')
 
 const Provider = require('./provider')
 
@@ -68,7 +68,9 @@ const render = () => {
       ReactDOM[method](
         React.createElement(
           Provider,
-          {},
+          {
+            layout: Fusion.Template.layout
+          },
           React.createElement(
             Fusion.Template,
             Fusion.globalContent || {}

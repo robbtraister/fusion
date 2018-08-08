@@ -82,13 +82,13 @@ const value = {
   globalContent: Fusion.globalContent,
   outputType: Fusion.outputType,
   requestUri: requestPath + window.location.search,
-  variables: Fusion.variables(Fusion.arcSite)
+  siteProperties: Fusion.properties(Fusion.arcSite)
 }
 
 module.exports = (props) => React.createElement(
   Fusion.context.Provider,
   {
-    value: Object.assign(value, {isAdmin: props.isAdmin})
+    value: {...value, ...props}
   },
   props.children
 )

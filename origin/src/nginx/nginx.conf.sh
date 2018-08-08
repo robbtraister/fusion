@@ -43,6 +43,31 @@ fi
 
 S3_HOST="http://${S3_BUCKET:-pagebuilder-fusion}.s3.amazonaws.com"
 
+engine () {
+  cat <<EOB
+      rewrite                   ^${API_PREFIX}(/|$)(.*) /\$2 break;
+      rewrite                   ^${CONTEXT_PATH}(/|$)(.*) /\$2 break;
+EOB
+
+  if [ "${HTTP_ENGINE}" ]
+  then
+    cat <<EOB
+      proxy_pass                ${HTTP_ENGINE};
+EOB
+  else
+
+    cat <<EOB
+      proxy_set_header          'X-FunctionName' '${LAMBDA_ENGINE}:\${version}';
+      proxy_set_header          'Content-Type' 'application/json';
+      proxy_pass                ${LAMBDA_PROXY:-http://0.0.0.0:${NODEJS_PORT:-8081}}\$uri\$query_params;
+EOB
+  fi
+
+  cat <<EOB
+      proxy_redirect            / ' ${API_PREFIX}/';
+EOB
+}
+
 cat <<EOB
 daemon off;
 pid ./nginx.pid;
@@ -71,6 +96,9 @@ http {
 
   # ELB/ALB is likely set to 60s; ensure we stay open at least that long
   keepalive_timeout             120;
+  send_timeout                  10;
+  proxy_read_timeout            10;
+  proxy_send_timeout            10;
 
   set_real_ip_from              0.0.0.0/0;
   real_ip_header                X-Forwarded-For;
@@ -229,26 +257,16 @@ fi
 
 cat <<EOB
     location @engine {
-      rewrite                   ^${API_PREFIX}(/|$)(.*) /\$2 break;
-      rewrite                   ^${CONTEXT_PATH}(/|$)(.*) /\$2 break;
 EOB
-
-if [ "${HTTP_ENGINE}" ]
-then
-  cat <<EOB
-      proxy_pass                ${HTTP_ENGINE};
-EOB
-else
-
-  cat <<EOB
-      proxy_set_header          'X-FunctionName' '${LAMBDA_ENGINE}:\${version}';
-      proxy_set_header          'Content-Type' 'application/json';
-      proxy_pass                ${LAMBDA_PROXY:-http://0.0.0.0:${NODEJS_PORT:-8081}}\$uri\$query_params;
-EOB
-fi
-
+      engine
 cat <<EOB
-      proxy_redirect            / ' ${API_PREFIX}/';
+    }
+
+    location @engine_LONGRUNNING {
+      proxy_read_timeout        60;
+EOB
+      engine
+cat <<EOB
     }
 
     location @resolver {
@@ -303,7 +321,7 @@ EOB
 else
   cat <<EOB
       root                      /etc/nginx/resources;
-      try_files                 \$3 =418;
+      try_files                 \$3 =404;
 EOB
 fi
 
@@ -314,7 +332,9 @@ cat <<EOB
       set                       \$p \$2\$3;
 
       proxy_intercept_errors    on;
-      error_page                400 403 404 418 = @engine;
+      error_page                400 403 404 = @engine;
+      # this endpoint includes template compilation, which can take a bit more time
+      error_page                418 = @engine_LONGRUNNING;
 
       if (\$request_method ~ ^(POST|PUT)$) {
         return                  418;
@@ -330,7 +350,7 @@ EOB
 else
   cat <<EOB
       root                      /etc/nginx/dist;
-      try_files                 \$3 =418;
+      try_files                 \$3 =404;
 EOB
 fi
 
@@ -353,7 +373,7 @@ EOB
 else
   cat <<EOB
       root                      /etc/nginx/dist;
-      try_files                 \$p =418;
+      try_files                 \$p =404;
 EOB
 fi
 

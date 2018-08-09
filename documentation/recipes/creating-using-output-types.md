@@ -19,6 +19,8 @@ To create our first Output Type component, we'll create a new file in the `/src/
 Here's the code for our first Output Type component:
 
 ```jsx
+/*    /src/components/output-types/default.jsx    */
+
 import React from 'react'
 
 export default (props) => {

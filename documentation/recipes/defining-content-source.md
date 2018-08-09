@@ -74,7 +74,7 @@ The `transform` function's only input is the data object it receives from the en
 
 Oftentimes, you will have multiple content sources that all share the same base domain. For example, if you are querying Arc's Content API, you may have a domain like `https://username:password@api.client-name.arcpublishing.com` that many of your content sources share. For this reason, Fusion allows you to define a special `CONTENT_BASE` environment variable that, when present, allows your `resolve` function to return a URL "path" rather than a fully qualified URL, and prefixes the `CONTENT_BASE` before those paths.
 
-For example, let's say I have my `CONTENT_BASE` environment variable set to the domain of this client's Content API endpoint, and I want to define a content source for "stories" at that endpoint. In that case, my `resolve` function might look like this:
+For example, let's say I have my `CONTENT_BASE` environment variable set to `https://username:password@api.client-name.arcpublishing.com`, and I want to define a content source for "stories" at that endpoint. In that case, my `resolve` function might look like this:
 
 ```jsx
 const resolve = function resolve (key) {

@@ -31,9 +31,9 @@ In the exported object above, we define all 3 pieces of data that we need for ou
 #### `resolve` property
 The `resolve` property is a function whose output is a URL which returns the JSON we want. It accepts a `key` argument, which is an object containing information about the specific request that is being made - this data either comes from a configuration option in PB Admin (for "global" content), or if you're fetching your own content you will provide it explicitly at "fetch" time.
 
-We're able to perform logic in our function to transform the URL however we want. In this example, if a `page` property exists in the `key` object that was passed to us, we want to append that page to the URL so we can get paginated results. However, if it doesn't exist, we don't want to append it. 
+We're able to perform logic in our function to transform the URL however we want. In this example, if a `page` property exists in the `key` object that was passed to us, we want to append that page param to the URL so we can get paginated results. However, if it doesn't exist, we don't want to append it. 
 
-Because this URL will typically require some sort of authentication to access, we have access to the `fusion:environment` here, which gives us decrypted access to "secret" environment variables. Here, we are interpolating an `OMDB_API_KEY` environment variable into the URL to authenticate our request. We'll discuss more about ["secrets" and environment variables](./using-environment-secrets.md) later.
+Because this URL will typically require some sort of authentication to access, we have access to the `fusion:environment` in content sources, which gives us decrypted access to "secret" environment variables. Here, we are interpolating an `OMDB_API_KEY` environment variable into the URL to authenticate our request. We'll discuss more about ["secrets" and environment variables](./using-environment-secrets.md) later.
 
 #### `schemaName` property
 `schemaName` is a string that identifies the name of a GraphQL schema. Every content source should have a GraphQL schema. The schema defines the shape of the JSON returned from the URL we produced in the `resolve` function. Without this schema, it will be more difficult to query for particular values in the returned JSON later on.
@@ -41,7 +41,7 @@ Because this URL will typically require some sort of authentication to access, w
 We'll discuss [how to define a GraphQL schema in the next article](using-graphql-schema.md).
 
 #### `params` property
-The `params` property will contain a list of parameter names and data types that this content source needs to make a request. For example, in this content source we have 2 params that we can use to make a request: the `movieQuery` param, and the `page` param. Given both of these pieces of data (as part of the `key` object in our resolve method), we are able to craft a URL (in our `resolve` function ) that gets us the data we want (e.g `https://www.omdbapi.com/?apikey=12345&s=Jurassic&page=3` will get us the 3rd page of search results for movies in OMDB that have the word "Jurassic" in the title).
+The `params` property will contain a list of parameter names and data types that this content source needs to make a request. For example, in this content source we have 2 params that we can use to make a request: the `movieQuery` param, and the `page` param. Given both of these pieces of data (as part of the `key` object in our resolve method), we are able to craft a URL (in our `resolve` function ) that gets us the data we want (e.g `https://www.omdbapi.com/?apikey=<apiKey>&s=Jurassic&page=3` will get us the 3rd page of search results for movies in OMDB that have the word "Jurassic" in the title).
 
 `params` can be defined either as an object (as seen above) or as an [array of objects](TODO: add link). If defined as an object, each key of the object will be the name of a param, and its value will be the data type of that param. The allowed data types are `text`, `number` and `site`.
 
@@ -49,7 +49,7 @@ We need this list of params enumerated so that we can tell PageBuilder Admin tha
 
 ## Defining a Content Source in JSON
 
-It's also possible to define a content source in JSON rather than JavaScript. This method of defining a content source should only be used if you don't need to perform any logic to craft your content source URL endpoint (other than interpolating variables, which you can still do with this method). This option exists mostly to support legacy PageBuilder content source configurations. More info about this option will be documented in the near future.
+It's also possible to define a content source in JSON rather than JavaScript. This method of defining a content source should only be used if you don't need to perform any logic to craft your content source URL endpoint (other than interpolating variables, which you can still do). This option exists mostly to support legacy PageBuilder content source configurations. More info about this option will be documented in the near future.
 
 ## The `transform` property
 
@@ -74,7 +74,7 @@ The `transform` function's only input is the data object it receives from the en
 
 Oftentimes, you will have multiple content sources that all share the same base domain. For example, if you are querying Arc's Content API, you may have a domain like `https://username:password@api.client-name.arcpublishing.com` that many of your content sources share. For this reason, Fusion allows you to define a special `CONTENT_BASE` environment variable that, when present, allows your `resolve` function to return a URL "path" rather than a fully qualified URL, and prefixes the `CONTENT_BASE` before those paths.
 
-For example, let's say I have my `CONTENT_BASE` environment variable set to `https://username:password@api.client-name.arcpublishing.com`, and I want to define a content source for "stories" at that endpoint. In that case, my `resolve` function might look like this:
+For example, let's say I have my `CONTENT_BASE` environment variable set to `https://username:password@api.client-name.arcpublishing.com`, and I want to define a content source for "stories" at that domain. In that case, my `resolve` function might look like this:
 
 ```jsx
 const resolve = function resolve (key) {

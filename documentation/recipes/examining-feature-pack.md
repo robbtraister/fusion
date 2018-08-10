@@ -4,7 +4,7 @@ Now that we've created a Feature Pack skeleton, let's look inside to see what wa
 
 ## Guidelines
 
-In general, you can think of the files and folders at the root level of the repo as being managed by Fusion itself, while the `/src/` directory is managed by the Feature Pack developer(s).
+In general, you can think of the files and folders at the root level of the repo as being managed by Fusion itself, while the `/src/` directory is managed by the Feature Pack developer (that's you!).
 
 While you probably don't want to remove or rename any files or directories in the Feature Pack that are listed here (Fusion expects them to be there), it's ok to add more files or directories inside the `/src/` folder as needed (for example, maybe a `/src/utils/` directory for utility functions).
 
@@ -36,9 +36,11 @@ The guide below will walk you through the structure of each directory and file i
 - `/.dockerignore`: [Reference](https://docs.docker.com/engine/reference/builder/#dockerignore-file). Consider this read-only.
 - `/.env`: This file is git-ignored and development environment specific. You'll [specify environment variables](TODO: add link) here used by Docker and Fusion.
 - `/.gitignore`: [Reference](https://git-scm.com/docs/gitignore)
-- `/docker-compose.no-admin.yml`: Config file to run Fusion locally *without* an admin service. Consider this read-only.
-- `/docker-compose.yml`: Standard config file for running Fusion locally. Consider this read-only.
+- `/docker-compose.extract.yml`: Docker config file for extracting content sources from local DB. Consider this read-only.
+- `/docker-compose.webpack.yml`: Docker config file to compile the source *without* actually running the app. Consider this read-only.
+- `/docker-compose.no-admin.yml`: Docker config file to run Fusion locally *without* an admin service. Consider this read-only.
+- `/docker-compose.yml`: Standard Docker config file for running Fusion locally. Consider this read-only.
 - `/engine.Dockerfile`: Further config options for the Fusion engine service. Consider this read-only.
-- `/package.json`: Manifest file with useful `npm` scripts. Consider this read-only.
+- `/package.json`: Manifest file containing useful `npm` scripts. Consider this read-only.
 
 **Next: [Configuring a Fusion Feature Pack](./configuring-feature-pack.md)**

@@ -8,7 +8,7 @@ If you're unfamiliar with [GraphQL](https://graphql.org/), you should spend some
 GraphQL's approach:
 - makes it easier to reason about your code and exactly how it depends on the content it fetches
 - gives you increased querying flexibility without the overhead of separate endpoints for separate data shapes, and
-- improves performance by allowing you to request only the data you need and nothing more
+- reduces payload size (thereby improving performance) by allowing you to request only the data you need and nothing more
 
 While GraphQL is often used on data retrieved from a database, there's no reason we can't use it on the JSON documents we'll be fetching from content sources - so that's exactly what we'll do.
 
@@ -16,7 +16,7 @@ While GraphQL is often used on data retrieved from a database, there's no reason
 
 In order to use GraphQL to perform a query, first GraphQL has to know what your data looks like - and for that, we need need to define a GraphQL schema. Your GraphQL schema should enumerate any fields (and their allowed types) in the JSON you wish to query against later on.
 
-The process of defining a schema involves looking at the expected JSON you'll receive from your endpoint, then listing and categorizing the data you care about. For example, the OMDB API "search" endpoint we are using in our `movie-db` content source returns the following JSON:
+The process of defining a schema involves looking at the expected JSON you'll receive from your endpoint, then listing and typing the data you care about. For example, the OMDB API "search" endpoint we are using in our `movie-db` content source returns the following JSON:
 
 ```json
 /*  https://www.omdbapi.com/?apikey=<apiKey>&s=Jurassic&page=1  */
@@ -67,7 +67,7 @@ Let's detail what's going on:
 
 For more details on GraphQL syntax and schemas check out [GraphQL's schema documentation](https://graphql.org/learn/schema/).
 
-Obviously the schema you define is entirely dependent upon the result you're expecting from your content source, so you'll need to craft them on a case-by-case basis. However, if you have multiple content sources that produce similar or identical data shapes (e.g. multiple content sources calling Arc's content API and returning [ANS](TODO: add link) documents), there's no reason you can't reuse the same schema for multiple content sources.
+Obviously the schema you define is entirely dependent upon the result you're expecting from your content source, so you'll need to craft schemas ([schemata?](https://english.stackexchange.com/questions/77764/plural-form-of-schema)) on a case-by-case basis. However, if you have multiple content sources that produce similar or identical data shapes (e.g. multiple content sources calling Arc's Content API and returning [ANS](TODO: add link) documents), there's no reason you can't reuse the same schema for multiple content sources.
 
 Now that we have our schema defined, we can use it to fetch and query data!
 

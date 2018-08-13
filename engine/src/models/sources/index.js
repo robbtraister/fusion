@@ -58,7 +58,6 @@ const getSourceFetcher = function getSourceFetcher (source) {
         .then((data) => JSON.parse(data))
         .then(transform)
         .catch((err) => {
-          // console.log(err.response)
           if (err.response) {
             const responseError = new Error(err.response.body)
             responseError.statusCode = err.response.statusCode

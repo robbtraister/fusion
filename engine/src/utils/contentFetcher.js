@@ -22,10 +22,17 @@ function pushToCache (cacheKey, cacheValue) {
   return request(options)
 }
 
+function clearCacheKey (cacheKey) {
+  const options = {
+    method: 'DELETE',
+    uri: cacheProxy + `?key` + cacheKey,
+  }
+  return request(options)
+}
+
 module.exports = function fetchContent (contentBase, contentUri) {
   const cacheKey = cachePrefix + '_' + contentUri
   const cacheProxyRequest = cacheProxy + `?key=` + cacheKey
-  debugFetch(`cache fetching with request  ${JSON.stringify(cacheProxyRequest)}`)
   let tic = timer.tic()
 
   return request(cacheProxyRequest)

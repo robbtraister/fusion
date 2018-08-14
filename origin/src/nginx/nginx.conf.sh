@@ -476,10 +476,11 @@ cat <<EOB
     }
 
     location ~ ^${CONTEXT_PATH}/api/v2/resolve/?$ {
-      if (\$request_uri ~ "^([^\?]*)(\?|\?.*&)uri=([^&]*)(.*)$") {
-        return                  302 " ${API_PREFIX}/resolve\$3\$2\$4";
+      if (\$arg_uri) {
+        set_unescape_uri        \$u \$arg_uri;
+        return                  302 " ${API_PREFIX}/resolve\$u";
       }
-      return 400;
+      return 400;# "Bad Request: 'uri' parameter is required for ${CONTEXT_PATH}/api/v2/resolve endpoint";
     }
     # end of admin rewrites
 

@@ -47,7 +47,7 @@ services:
     ports:
       - "11211:11211"
   cache-proxy:
-    image: quay.io/washpost/fusion-cache-proxy:memcache
+    build: cache-proxy
     depends_on:
       - cache
     networks:

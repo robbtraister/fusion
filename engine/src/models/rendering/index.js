@@ -174,13 +174,10 @@ class Rendering {
           .then(
             // if this is the first version to receive this rendering
             (propagate)
-              ? Promise.resolve()
-                .then(() => {
-                  // fire-and-forget the publish to other versions
-                  // it won't save lambda execution time, but it will end the HTTP request sooner
-                  publishToOtherVersions(uri, this.json)
-                  return putJson(this.type, Object.assign({}, this.json, {id: this.id}))
-                })
+              ? Promise.all([
+                putJson(this.type, Object.assign({}, this.json, {id: this.id})),
+                publishToOtherVersions(uri, this.json)
+              ])
               : Promise.resolve()
           )
         : Promise.reject(new Error('no rendering provided to publish'))

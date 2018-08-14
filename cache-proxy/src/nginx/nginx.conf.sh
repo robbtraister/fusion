@@ -158,7 +158,6 @@ cat <<EOB
   upstream cache_cluster {
     hash \$memc_key;
 EOB
-  # compile password file from env variables
   for cache_node in $(echo $CACHE_NODES); 
   do
 cat <<EOB
@@ -177,6 +176,10 @@ cat <<EOB
 
     location /cache {
       set                       \$memc_key \$arg_key;
+      set                       \$memc_exptime 300;
+      if (\$arg_ttl) {
+        set                     \$memc_exptime \$arg_ttl;
+      }
       memc_pass                 cache_cluster;
     }
 

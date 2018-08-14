@@ -36,9 +36,10 @@ Here, `siteName` and `twitter` are properties that only exist for AcmeFeed, and 
 
 ## Using properties
 
-Now, we're able to use our runtime properties in a component:
+Now, we're able to use our runtime properties in a component by using the `getProperties` method provided to us by `fusion:properties`. We just pass in the site name that we get from props like so:
 ```jsx
 /*  /src/components/features/my-component.jsx  */
+
 import React, { Component } from 'react'
 import Consumer from 'fusion:consumer'
 import getProperties from 'fusion:properties'
@@ -59,7 +60,7 @@ class MyComponent extends Component {
 
 export default MyComponent
 ```
-Now, when a user requests a webpage on AcmeFeed's website that contains this component, they'll see links to AcmeFeed's Twitter handle (`acmefeed`) and their contact email address (`editor@acmefeed.com`). If AcmeFeed hadn't had a contact email address, the email would have fallen back to the "global" value `contact@acmemedia.com`.
+Now, when a user requests a webpage on AcmeFeed's website that contains this component, they'll see links to AcmeFeed's Twitter handle (`acmefeed`) and their contact email address (`editor@acmefeed.com`). If AcmeFeed hadn't had a specific contact email address, that value would have fallen back to the "global" value `contact@acmemedia.com`.
 
 
  **Next: [Using Environment "Secrets"](./using-environment-secrets.md)**

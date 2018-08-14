@@ -71,4 +71,4 @@ Obviously the schema you define is entirely dependent upon the result you're exp
 
 Now that we have our schema defined, we can use it to fetch and query data!
 
-**Next: [Fetching Content](./fetching-content.md)**
+**Next: [Using Environment Variables and "Secrets"](./using-environment-secrets.md)**

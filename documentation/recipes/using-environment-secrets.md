@@ -32,7 +32,7 @@ There are a few different formats you can use for naming the environment variabl
 
 ---
 
-#### Encrypting our secrets
+#### Encrypting your secrets
 To encrypt our "secret" variables, we can install and use the `aws-promises` npm library to encrypt our secret locally.
 
 ```
@@ -59,11 +59,4 @@ Since this KMS key is assigned on a per-client, per-environment basis, Fusion wi
 
 Environment values will only be accessible during server execution, not in the client, as they will be exposed to users. To ensure this, `fusion:environment` will return an empty object in the client.
 
-## Runtime properties vs. environment variables
-
-Runtime properties and environment variables serve similar purposes, so it can be easy to get confused between which one you want to use in a given situation. But there are a few key distinctions between the two that can help determine which is the right tool for the job:
-
-- Environment variables can be encrypted locally and decrypted on the server. For this reason, they are ideal for "secret" variables like API credentials that you don't want to be exposed in plain text in your code repository. Runtime properties do not have this capability.
-- Runtime properties can be set on a "per-site" basis in multisite Fusion applications, meaning each site can have its own unique value for a given property. Environment variables, on the other hand, are universal across sites (not to be confused with environments).
-
- **Next: [Adding Styling to Components](./adding-styling.md)**
+ **Next: [Fetching Content](./fetching-content.md)**

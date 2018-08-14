@@ -24,9 +24,9 @@
 |---|
 | [Defining a Content Source](./defining-content-source.md) |
 | [Using a GraphQL Schema](./using-graphql-schema.md) |
+| [Using Environment "Secrets"](./using-environment-secrets.md) |
 | [Fetching Content](./fetching-content.md) |
 | [Using Runtime Properties](./using-runtime-properties.md) |
-| [Using Environment "Secrets"](./using-environment-secrets.md) |
 
 | Tidying Up |
 |---|

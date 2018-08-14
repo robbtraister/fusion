@@ -22,10 +22,10 @@ function pushToCache (cacheKey, cacheValue) {
   return request(options)
 }
 
-function clearCacheKey (cacheKey) {
+function clearCacheItem (key) {
   const options = {
     method: 'DELETE',
-    uri: cacheProxy + `?key` + cacheKey,
+    uri: cacheProxy + `?key` + key,
   }
   return request(options)
 }

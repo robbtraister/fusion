@@ -474,6 +474,13 @@ cat <<EOB
       set                       \$type \$1;
       rewrite                   (.*) ${API_PREFIX}/configs/\${type}s;
     }
+
+    location ~ ^${CONTEXT_PATH}/api/v2/resolve/?$ {
+      if (\$request_uri ~ "^([^\?]*)(\?|\?.*&)uri=([^&]*)(.*)$") {
+        return                  302 " ${API_PREFIX}/resolve\$3\$2\$4";
+      }
+      return 400;
+    }
     # end of admin rewrites
 
     location ${API_PREFIX} {

@@ -27,9 +27,15 @@ RUN \
     wget --no-check-certificate -O nginx.tar.gz https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz && \
     tar zxvf nginx.tar.gz --strip-components 1 && \
     rm nginx.tar.gz && \
+    # download ngx_devel_kit module
+    git clone --branch=master --single-branch --depth=1 https://github.com/simplresty/ngx_devel_kit ./modules/ngx_devel_kit && \
+    rm -rf ./modules/ngx_devel_kit/.git && \
     # download nginx let module
     git clone --branch=master --single-branch --depth=1 https://github.com/arut/nginx-let-module ./modules/nginx-let && \
     rm -rf ./modules/nginx-let/.git && \
+    # download nginx set-misc module
+    git clone --branch=master --single-branch --depth=1 https://github.com/openresty/set-misc-nginx-module ./modules/nginx-set-misc && \
+    rm -rf ./modules/nginx-set-misc/.git && \
     # download nginx statsd module
     git clone --branch=tags-12 --single-branch --depth=1 https://github.com/robbtraister/nginx-statsd ./modules/nginx-statsd && \
     rm -rf ./modules/nginx-statsd/.git && \
@@ -38,7 +44,9 @@ RUN \
                 --user=${USER} \
                 --group=${USER} \
                 --with-http_realip_module \
+                --add-module=modules/ngx_devel_kit \
                 # --add-module=modules/nginx-let \
+                --add-module=modules/nginx-set-misc \
                 # --add-module=modules/nginx-statsd \
                 && \
     make -j2 && \

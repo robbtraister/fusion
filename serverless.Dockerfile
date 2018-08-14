@@ -18,9 +18,9 @@ ARG LAMBDA
 
 WORKDIR /workdir/${LAMBDA}
 
-COPY ./package*.json ./
+COPY ./${LAMBDA}/package*.json ./
 RUN npm install
-COPY ./ ./
+COPY ./${LAMBDA}/ ./
 
 # This only existed to run webpack
 # Since this Dockerfile is only used for local development

@@ -13,14 +13,11 @@ const model = require('../../dao')
 const compileRendering = require('./compile')
 const getComponent = require('./component')
 const {
+  publishOutputTypes,
   publishToOtherVersions
 } = require('./publish')
 
 const getSource = require('../sources')
-
-const {
-  getOutputTypes
-} = require('../../assets/info')
 
 const {
   fetchFile,
@@ -109,10 +106,6 @@ class Rendering {
     return this.compilations[outputType]
   }
 
-  async compileAll () {
-    return Promise.all(getOutputTypes().map(outputType => this.compile(outputType)))
-  }
-
   async getComponent (outputType = defaultOutputType, child) {
     debug(`get component: ${this.name}${child ? `(${child})` : ''}[${outputType}]`)
     if (child) {
@@ -174,19 +167,22 @@ class Rendering {
   }
 
   async publish (propagate) {
+    const uri = `/dist/${this.type}/${this.id}`
     return (
       (this.json)
-        ? Promise.all([this.compileAll()]
-          .concat(
+        ? publishOutputTypes(uri, this.json)
+          .then(
             // if this is the first version to receive this rendering
             (propagate)
-              ? [
-                putJson(this.type, Object.assign({}, this.json, {id: this.id})),
-                publishToOtherVersions(`/dist/${this.type}/${this.id}`, this.json)
-              ]
-              : []
+              ? Promise.resolve()
+                .then(() => {
+                  // fire-and-forget the publish to other versions
+                  // it won't save lambda execution time, but it will end the HTTP request sooner
+                  publishToOtherVersions(uri, this.json)
+                  return putJson(this.type, Object.assign({}, this.json, {id: this.id}))
+                })
+              : Promise.resolve()
           )
-        )
         : Promise.reject(new Error('no rendering provided to publish'))
     )
   }

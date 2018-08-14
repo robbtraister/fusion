@@ -9,6 +9,10 @@ const {
   version
 } = require('../../../environment')
 
+const {
+  getOutputTypes
+} = require('../../assets/info')
+
 const lambda = new Lambda({region})
 
 const listVersions = function listVersions () {
@@ -25,7 +29,7 @@ const listOtherVerions = function listOtherVerions () {
     .then((versions) => versions.filter(v => v !== version))
 }
 
-const publishToVersion = function publishToVersion (uri, payload, version) {
+const postRequest = function postRequest (uri, payload, version) {
   return new Promise((resolve, reject) => {
     lambda.invoke(
       {
@@ -45,11 +49,19 @@ const publishToVersion = function publishToVersion (uri, payload, version) {
   })
 }
 
+const publishOutputTypes = function publishOutputTypes (uri, payload) {
+  return Promise.all(
+    getOutputTypes()
+      .map((outputType) => postRequest(`${uri}/${outputType}`, payload, version))
+  )
+}
+
 const publishToOtherVersions = function publishToOtherVersions (uri, payload) {
   return listOtherVerions()
-    .then(versions => Promise.all(versions.map(v => publishToVersion(uri, payload, v))))
+    .then(versions => Promise.all(versions.map(v => postRequest(uri, payload, v))))
 }
 
 module.exports = {
-  publishToOtherVersions: (isDev) ? publishToOtherVersions : () => Promise.resolve()
+  publishOutputTypes,
+  publishToOtherVersions: (isDev) ? () => Promise.resolve() : publishToOtherVersions
 }

@@ -29,13 +29,12 @@ const listOtherVerions = function listOtherVerions () {
     .then((versions) => versions.filter(v => v !== version))
 }
 
-const postRequest = function postRequest (uri, payload, version) {
+const invoke = function invoke (uri, payload, version, InvocationType = 'RequestResponse') {
   return new Promise((resolve, reject) => {
     lambda.invoke(
       {
         FunctionName: functionName,
-        // this InvocationType makes the request "fire and forget"
-        InvocationType: 'Event',
+        InvocationType: InvocationType || 'RequestResponse',
         Qualifier: version,
         Payload: JSON.stringify({
           method: 'POST',
@@ -52,13 +51,16 @@ const postRequest = function postRequest (uri, payload, version) {
 const publishOutputTypes = function publishOutputTypes (uri, payload) {
   return Promise.all(
     getOutputTypes()
-      .map((outputType) => postRequest(`${uri}/${outputType}`, payload, version))
+      .map((outputType) => invoke(`${uri}/${outputType}`, payload, version))
   )
 }
 
 const publishToOtherVersions = function publishToOtherVersions (uri, payload) {
   return listOtherVerions()
-    .then(versions => Promise.all(versions.map(v => postRequest(uri, payload, v))))
+    .then(versions => Promise.all(
+      // this InvocationType makes the request "fire and forget"
+      versions.map(v => invoke(uri, payload, v, 'Event'))
+    ))
 }
 
 module.exports = {

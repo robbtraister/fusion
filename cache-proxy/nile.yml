@@ -1,0 +1,69 @@
+name: fusion-cache-proxy
+type: ecs
+
+
+_environment: &_environment
+  PORT: '8080'
+
+_fusion_cache_proxy: &_fusion_cache_proxy
+  image: quay.io/washpost/fusion-cache-proxy:{{.DeploymentId}}
+  ports:
+    - '8080'
+  log_driver: awslogs
+  environment:
+    <<: *_environment
+
+_healthcheck: &_healthcheck
+  healthcheck:
+    interval: 30
+    path: '/healthcheck'
+    protocol: HTTP
+    timeout: 10
+    healthy_threshold_count: 2
+    unhealthy_threshold_count: 4
+
+_resource: &_resource
+  vendor: aws
+  resource: simple
+
+_services: &_services
+  services:
+    - deploymentConfiguration:
+        maximumPercent: 200
+        minimumHealthyPercent: 50
+      desiredCount: 2
+      loadBalancers:
+        - containerName: cache-proxy
+          containerPort: 8080
+
+environments:
+  - name: staging
+    <<: *_services
+    namespace: pagebuilder-arc2
+    override:
+      cache-proxy:
+        image: quay.io/washpost/fusion-cache-proxy:{{.DeploymentId}}
+        ports:
+          - '8080'
+        log_driver: awslogs
+        log_opt:
+          awslogs-group: /nile/fusion-cache-proxy/staging
+          awslogs-region: us-east-1
+        environment:
+          PORT: "8080"
+          CACHE_PROXY_CREDENTIALS: |
+            staging:%{AQECAHhPwAyPK3nfERyAvmyWOWx9c41uht+ei4Zlv4NgrlmypwAAAMYwgcMGCSqGSIb3DQEHBqCBtTCBsgIBADCBrAYJKoZIhvcNAQcBMB4GCWCGSAFlAwQBLjARBAx004Oqgxt5jnwj1rACARCAf+DSMPzrDHyG/bxRd1T+Jj2MjmcOjNB3gugnPMzgaPGW9TAJ6l3TQkO/Z/MgPugLLWG/p1rI9pSQ3mn8D0r3aIlr4xkzEJEWkX1nq03nDwMlFaBb4ieywpKO2Qq2oaYsIIGsOJaI529Snflz0aR4qZwDOTPlgAI4+gnGkAXAJRU=}
+          CACHE_NODES: |
+            fusion-memcached.hrnbpw.0001.use1.cache.amazonaws.com:11211
+            fusion-memcached.hrnbpw.0002.use1.cache.amazonaws.com:11211
+    resources:
+      - <<: *_resource
+        settings:
+          <<: *_healthcheck
+          scheme: internet-facing
+          domain: staging.fusion-cache.arcpublishing.com
+          parent_domain: fusion-cache.arcpublishing.com
+          subnets:
+            - subnet-1a8f9640
+            - subnet-9d4bafb2
+            - subnet-42943209

@@ -69,6 +69,6 @@ For more details on GraphQL syntax and schemas check out [GraphQL's schema docum
 
 Obviously the schema you define is entirely dependent upon the result you're expecting from your content source, so you'll need to craft schemas ([schemata?](https://english.stackexchange.com/questions/77764/plural-form-of-schema)) on a case-by-case basis. However, if you have multiple content sources that produce similar or identical data shapes (e.g. multiple content sources calling Arc's Content API and returning [ANS](TODO: add link) documents), there's no reason you can't reuse the same schema for multiple content sources.
 
-Now that we have our schema defined, we can use it to fetch and query data!
+Now that we have our schema defined, we just need to set the environment variables used in our content source before we can fetch data.
 
 **Next: [Using Environment Variables and "Secrets"](./using-environment-secrets.md)**

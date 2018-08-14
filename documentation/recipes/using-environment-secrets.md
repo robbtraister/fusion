@@ -15,12 +15,14 @@ In staging and/or production environments you'll define environment variables in
 Let's see how we can actually use environment variables in the sample Fusion app we've been building.
 
 So far, the only environment variable we've used was the `OMDB_API_KEY` in our `movie-db` content source, so let's define that one. The first thing we'll do is go to our `.env` file and add it there:
+
 ```bash
 #  /.env  #
 
 OMDB_API_KEY=a1b2c3d4e5
 ```
-Now when we restart and run the app locally, our `movie-db` content source should work!
+
+We now have everything we need for our content source to work locally!
 
 To get it working in staging/production environments, we'll need to first encrypt our secret variable, then create an `index.js` file in our `/src/environments/` directory.
 
@@ -38,11 +40,14 @@ To encrypt our "secret" variables, we can install and use the `aws-promises` npm
 ```
 $ npm i -g aws-promises
 ```
+
 Once we've installed the library, we'll need an AWS KMS (Key Management Service) key that should have been generated for our client (get this from your Arc client admin). Once you have that key, you can use it to encrypt a variable like so:
+
 ```
 $ encrypt a1b2c3d4e5 arn:aws:kms:us-east-1:9876543210:key/0312fd47-9577-42c0-834b-b89b724067da
 > AQECAHhPwAyPK3nfERyAvmyWOWx9c41uht+ei4Zlv4NgrlmypwAAAMYwgcMGCSqGSIb3DQEHBqCBtTCBsgIBADCBrAYJKoZIhvcNAQcBMB4GCWCGSAFlAwQBLjARBAxwBJdfzqcQUpox1xsCARCAf2aXwBJ3pBUP12HWB3cdBboV1/qN0HFEsjNycADYIq7XSANeDYOlu2/Dwt/52R16hK4dbVOt0ofNKKx0b3vtZRaH9bX1Dkx6TDhmo5g32H0aWpiUW6PQIp72/g2CW1nr26T0zxmkxmX9u8ufoQGBXRd1pOfT2EliUhMKabNeSyk=
 ```
+
 Here, `a1b2c3d4e5` is the plaintext variable we want to encrypt, and `arn:aws:kms:us-east-1:9876543210:key/0312fd47-9577-42c0-834b-b89b724067da` is the KMS key for this client. Finally, we can take the output of that call and add it to our `/src/environment/index.js` file:
 
 ```js
@@ -58,5 +63,7 @@ Since this KMS key is assigned on a per-client, per-environment basis, Fusion wi
 ## Restrictions
 
 Environment values will only be accessible during server execution, not in the client, as they will be exposed to users. To ensure this, `fusion:environment` will return an empty object in the client.
+
+Now that we have our content source and schema defined, and the credentials for our content source set up, we can finally fetch some data!
 
  **Next: [Fetching Content](./fetching-content.md)**

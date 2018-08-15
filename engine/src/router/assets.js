@@ -59,7 +59,7 @@ function getTypeRouter (routeType, allowPost) {
   )
 
   if (allowPost) {
-    const writeHandlers = [
+    const publishRenderingHandlers = [
       bodyParser.json({limit: bodyLimit}),
       (req, res, next) => {
         const id = req.params.id || req.body.id || req.body._id
@@ -73,8 +73,26 @@ function getTypeRouter (routeType, allowPost) {
     ]
 
     typeRouter.route(['/', '/:id'])
-      .post(writeHandlers)
-      .put(writeHandlers)
+      .post(publishRenderingHandlers)
+      .put(publishRenderingHandlers)
+
+    const publishOutputTypeHandlers = [
+      bodyParser.json({limit: bodyLimit}),
+      (req, res, next) => {
+        const id = req.params.id || req.body.id || req.body._id
+        const type = req.body.type || routeType
+        const outputType = req.params.outputType || defaultOutputType
+
+        new Rendering(type, id, req.body)
+          .compile(outputType)
+          .then(() => { res.sendStatus(200) })
+          .catch(next)
+      }
+    ]
+
+    typeRouter.route(['/:id/:outputType.js', '/:id/:outputType'])
+      .post(publishOutputTypeHandlers)
+      .put(publishOutputTypeHandlers)
   }
 
   return typeRouter

@@ -42,7 +42,7 @@ services:
       - '${FUSION_REPO:-.}/data/restore:/data/restore:rw'
 
   engine:
-    build: engine
+    build: ./engine
     command: start:dev
     depends_on:
       - data
@@ -66,11 +66,7 @@ services:
       - '${FUSION_REPO:-./bundle}/src:/workdir/engine/bundle/src:rw'
 
   resolver:
-    build:
-      context: .
-      dockerfile: serverless.Dockerfile
-      args:
-        LAMBDA: resolver
+    build: ./resolver
     depends_on:
       - data
       - engine
@@ -96,7 +92,7 @@ services:
       - 11211:11211
 
   admin:
-    image: quay.io/washpost/pagebuilder-nilev1:${PB_VERSION:-fusion-admin.2}
+    image: quay.io/washpost/pagebuilder-nilev1:${PB_VERSION:-fusion-admin.14}
     depends_on:
       - memcache
       - data

@@ -23,7 +23,7 @@ findNext () {
 
 if [ "${RELEASE}" ]
 then
-  VERSION=$(python -c "import json; print json.load(open('./package.json'))['version']")
+  VERSION=$(python -c "import json; print json.load(open('./version.json'))['version']")
   TAG=$(findNext "${VERSION}")
 else
   if [ "${BRANCH}" ]
@@ -36,12 +36,7 @@ fi
 
 buildImage () {
   name=$1
-  if [ -f "./${name}/Dockerfile" ]
-  then
-    docker build -t "quay.io/washpost/fusion-${name}:${TAG}" -f "./${name}/Dockerfile" "./${name}"
-  else
-    docker build --build-arg "LAMBDA=${name}" -t "quay.io/washpost/fusion-${name}:${TAG}" -f ./serverless.Dockerfile .
-  fi
+  docker build -t "quay.io/washpost/fusion-${name}:${TAG}" "./${name}"
 }
 
 pushImage () {

@@ -25,11 +25,11 @@ const Layout = (sections) => {
       {},
       sections.map((section, i) =>
         React.createElement(
-          'section',
+          section.element || 'section',
           {
             key: section.id,
             id: section.id,
-            className: section.cssClass
+            className: section.cssClass || section.className
           },
           props.children[i]
         )

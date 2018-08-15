@@ -48,7 +48,7 @@ $ encrypt a1b2c3d4e5 arn:aws:kms:us-east-1:9876543210:key/0312fd47-9577-42c0-834
 > AQECAHhPwAyPK3nfERyAvmyWOWx9c41uht+ei4Zlv4NgrlmypwAAAMYwgcMGCSqGSIb3DQEHBqCBtTCBsgIBADCBrAYJKoZIhvcNAQcBMB4GCWCGSAFlAwQBLjARBAxwBJdfzqcQUpox1xsCARCAf2aXwBJ3pBUP12HWB3cdBboV1/qN0HFEsjNycADYIq7XSANeDYOlu2/Dwt/52R16hK4dbVOt0ofNKKx0b3vtZRaH9bX1Dkx6TDhmo5g32H0aWpiUW6PQIp72/g2CW1nr26T0zxmkxmX9u8ufoQGBXRd1pOfT2EliUhMKabNeSyk=
 ```
 
-Here, `a1b2c3d4e5` is the plaintext variable we want to encrypt, and `arn:aws:kms:us-east-1:9876543210:key/0312fd47-9577-42c0-834b-b89b724067da` is the KMS key for this client. Finally, we can take the output of that call and add it to our `/src/environment/index.js` file:
+Here, `a1b2c3d4e5` is the plaintext data (the OMDB API key) we want to encrypt, and `arn:aws:kms:us-east-1:9876543210:key/0312fd47-9577-42c0-834b-b89b724067da` is the KMS key for this client. Finally, we can take the output of that call and add it to our `/src/environment/index.js` file:
 
 ```js
 /*  /src/environments/index.js  */

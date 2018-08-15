@@ -1,7 +1,6 @@
 name: fusion-cache-proxy
 type: ecs
 
-
 _environment: &_environment
   PORT: '8080'
 
@@ -42,13 +41,7 @@ environments:
     namespace: pagebuilder-arc2
     override:
       cache-proxy:
-        image: quay.io/washpost/fusion-cache-proxy:{{.DeploymentId}}
-        ports:
-          - '8080'
-        log_driver: awslogs
-        log_opt:
-          awslogs-group: /nile/fusion-cache-proxy/staging
-          awslogs-region: us-east-1
+        <<: *_fusion_cache_proxy
         environment:
           PORT: "8080"
           CACHE_PROXY_CREDENTIALS: |

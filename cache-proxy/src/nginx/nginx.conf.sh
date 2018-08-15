@@ -83,17 +83,6 @@ EOB
 fi
 
 cat <<EOB
-  # statsd_server               ${DATADOG_STATSD_HOST:-172.17.0.1}:${DATADOG_STATSD_PORT:-8125};
-
-  geo \$dollar {
-    default                     '\$';
-  }
-
-  map \$request_uri \$valid_request {
-    ~[\{\}]                     'false';
-    default                     'true';
-  }
-
   map \$http_x_forwarded_host \$host_header {
     ''                          \$host;
     default                     \$http_x_forwarded_host;
@@ -115,31 +104,6 @@ cat <<EOB
     '0000'                      '0';
     ~^0*(?<num>[^0].*)\$        \$num;
     default                     \$latency_padded;
-  }
-
-  map \$request_uri \$context_free_uri {
-    ~*^${CONTEXT_PATH}/(.*)     /\$1;
-    default                     \$request_uri;
-  }
-
-  map \$http_referer \$refererVersion {
-    ~(\?|&)v=([0-9]+)(&|$)      \$2;
-    default                     'production'; #'\${dollar}LATEST';
-  }
-
-  map \$cookie_version \$cookieVersion {
-    default                     \$cookie_version;
-    ''                          \$refererVersion;
-  }
-
-  map \$http_version \$headerVersion {
-    default                     \$http_version;
-    ''                          \$cookieVersion;
-  }
-
-  map \$arg_v \$version {
-    default                     \$arg_v;
-    ''                          \$headerVersion;
   }
 
   map \$arg_ttl \$cache_ttl {
@@ -181,11 +145,22 @@ cat <<EOB
 
     location /cache {
       set                       \$memc_key \$arg_key;
+      error_page                418 = @cacheput;
 
       if (\$request_method = PUT) {
-        set                      \$memc_exptime \$cache_ttl;
+        return 418;
       }
 
+      if (\$request_method = POST) {
+        return 418;
+      }
+
+      memc_pass                 cache_cluster;
+    }
+
+    location @cacheput {
+      set                       \$memc_key \$arg_key;
+      set                       \$memc_exptime \$cache_ttl;
       memc_pass                 cache_cluster;
     }
 

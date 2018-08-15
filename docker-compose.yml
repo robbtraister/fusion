@@ -47,7 +47,7 @@ services:
     ports:
       - "11211:11211"
   cache-proxy:
-    build: cache-proxy
+    build: ./cache-proxy
     depends_on:
       - cache
     networks:
@@ -59,6 +59,8 @@ services:
         staging:password
       CACHE_NODES: |
         cache:11211
+    volumes:
+      - './cache-proxy/src:/etc/nginx/src:ro'
   engine:
     build: engine
     command: start:dev

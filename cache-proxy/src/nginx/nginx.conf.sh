@@ -142,6 +142,11 @@ cat <<EOB
     ''                          \$headerVersion;
   }
 
+  map \$arg_ttl \$cache_ttl {
+    default                     300;
+    ~([\d]*)                    \$1;
+  }
+
   map \$host \$environment {
     default                     '${ENVIRONMENT:-localhost}';
 EOB
@@ -176,10 +181,11 @@ cat <<EOB
 
     location /cache {
       set                       \$memc_key \$arg_key;
-      set                       \$memc_exptime 300;
-      if (\$arg_ttl) {
-        set                     \$memc_exptime \$arg_ttl;
+
+      if (\$request_method = PUT) {
+        set                      \$memc_exptime \$cache_ttl;
       }
+
       memc_pass                 cache_cluster;
     }
 

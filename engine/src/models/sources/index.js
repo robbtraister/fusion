@@ -1,6 +1,9 @@
 'use strict'
 
-const request = require('../../utils/contentFetcher')
+const {
+  fetchContent,
+  clearContent
+} = require('../../utils/contentFetcher')
 
 const unpack = require('../../utils/unpack')
 
@@ -39,12 +42,36 @@ const getJsonResolver = function getJsonResolver (config) {
     : null
 }
 
+const getSourceResolver = function getSourceResolver (source) {
+  return (source instanceof Function)
+  ? source
+  : (source.resolve instanceof Function)
+    ? source.resolve
+    : getJsonResolver(source)
+}
+
+const getSourceClearer = function getSourceClearer (source) {
+  const resolve = getSourceResolver(source)
+  
+  return resolve
+    ? function clear (key) {
+      return Promise.resolve()
+        .then(() => resolve(key))
+        .then((contentUri) => clearContent(contentUri))
+        .catch((err) => {
+          if (err.response) {
+            const responseError = new Error(err.response.body)
+            responseError.statusCode = err.response.statusCode
+            throw responseError
+          }
+          throw err
+        })
+    }
+    : null
+}
+
 const getSourceFetcher = function getSourceFetcher (source) {
-  const resolve = (source instanceof Function)
-    ? source
-    : (source.resolve instanceof Function)
-      ? source.resolve
-      : getJsonResolver(source)
+  const resolve = getSourceResolver(source)
 
   const transform = source.transform || source.mutate || ((json) => json)
 
@@ -54,7 +81,7 @@ const getSourceFetcher = function getSourceFetcher (source) {
       // this way, we get proper error handling in either case
       return Promise.resolve()
         .then(() => resolve(key))
-        .then((contentUri) => request(contentBase, contentUri))
+        .then((contentUri) => fetchContent(contentBase, contentUri))
         .then((data) => JSON.parse(data))
         .then(transform)
         .catch((err) => {
@@ -102,7 +129,7 @@ const getSource = function getSource (sourceName) {
       }
 
       return {
-        clear: () => {},
+        clear: getSourceClearer(source),
         fetch,
         filter: getSchemaFilter(source.schemaName),
         name: sourceName,

@@ -15,23 +15,25 @@ const {
 
 function pushToCache (cacheKey, cacheValue) {
   const options = {
-    method: 'POST',
+    method: 'PUT',
     uri: cacheProxy + `?key=` + cacheKey,
     body: cacheValue
   }
   return request(options)
 }
 
-function clearCacheItem (key) {
+const clearContent = (key) => {
+  const cacheKey = cachePrefix + '_' + key
+
   const options = {
     method: 'DELETE',
-    uri: cacheProxy + `?key` + key,
+    uri: cacheProxy + `?key=` + cacheKey
   }
   return request(options)
 }
 
-module.exports = function fetchContent (contentBase, contentUri) {
-  const cacheKey = cachePrefix + '_' + contentUri
+const fetchContent = (contentBase, key) => {
+  const cacheKey = cachePrefix + '_' + key
   const cacheProxyRequest = cacheProxy + `?key=` + cacheKey
   let tic = timer.tic()
 
@@ -44,9 +46,9 @@ module.exports = function fetchContent (contentBase, contentUri) {
       return data
     })
     .catch(() => {
-      debugFetch(`Fetching from source` + url.format(Object.assign(url.parse(contentUri), {auth: null})))
+      debugFetch(`Fetching from source` + url.format(Object.assign(url.parse(key), {auth: null})))
       tic = timer.tic()
-      const contentUrl = url.resolve(contentBase, contentUri)
+      const contentUrl = url.resolve(contentBase, key)
       const dataPromise = request(contentUrl)
         .then((data) => {
           debugTimer(`Fetched from source ${cacheKey}`, tic.toc())
@@ -61,4 +63,9 @@ module.exports = function fetchContent (contentBase, contentUri) {
         })
       return dataPromise
     })
+}
+
+module.exports = {
+  fetchContent,
+  clearContent
 }

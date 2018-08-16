@@ -3,8 +3,14 @@
 - Feature Pack
   - components
     - feature
+      - `@Consumer` decorator
+      - custom fields
     - chain
     - layout
     - output type
-  - content sources
-  - variables/runtime properties
+  - content
+    - global content
+    - content sources
+    - GraphQL schema
+  - runtime properties
+  - environment variables

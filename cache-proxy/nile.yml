@@ -52,6 +52,7 @@ environments:
           CACHE_NODES: |
             fusion-memcached.hrnbpw.0001.use1.cache.amazonaws.com:11211
             fusion-memcached.hrnbpw.0002.use1.cache.amazonaws.com:11211
+            fusion-memcached.hrnbpw.0003.use1.cache.amazonaws.com:11211
     resources:
       - <<: *_resource
         settings:

@@ -5,6 +5,8 @@ const fs = require('fs')
 const path = require('path')
 const zlib = require('zlib')
 
+const debug = require('debug')('fusion:assets:io')
+
 const S3 = require('aws-sdk').S3
 
 const {
@@ -66,14 +68,21 @@ const pushToS3 = async function pushToS3 (name, src, ContentType) {
     })
   })
     .then((buf) => new Promise((resolve, reject) => {
+      const Bucket = getBucket()
+      const Key = `${getS3Key(name)}`
+      debug(`pushing ${buf.length} bytes to: ${Bucket}/${Key}`)
+
       s3.upload({
-        Bucket: getBucket(),
-        Key: `${getS3Key(name)}`,
+        Bucket,
+        Key,
         Body: buf,
         ACL: 'public-read',
         ContentType,
         ContentEncoding: 'gzip'
       }, (err, data) => {
+        if (err) {
+          console.error(err)
+        }
         err ? reject(err) : resolve(data)
       })
     }))

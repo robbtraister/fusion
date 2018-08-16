@@ -22,7 +22,6 @@ const resolveCacheRequestUri = (key) => {
 
 function getCacheKey (key) {
   const cacheKey = `${cachePrefix}_${url.format(Object.assign(url.parse(url.resolve(contentBase, key)), {auth: null}))}`
-  console.log(cacheKey)
   return crypto.createHash('DSA-SHA1').update(cacheKey).digest('hex')
 }
 

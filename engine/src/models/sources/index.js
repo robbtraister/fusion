@@ -3,12 +3,11 @@
 const {
   fetchContent,
   clearContent
-} = require('../../utils/contentFetcher')
+} = require('../../utils/content-fetcher')
 
 const unpack = require('../../utils/unpack')
 
 const {
-  contentBase,
   sourcesDistRoot
 } = require('../../../environment')
 
@@ -52,9 +51,9 @@ const getSourceResolver = function getSourceResolver (source) {
 
 const getSourceClearer = function getSourceClearer (source) {
   const resolve = getSourceResolver(source)
-  
+
   return resolve
-    ? function clear (key) {
+    ? (key) => {
       return Promise.resolve()
         .then(() => resolve(key))
         .then((contentUri) => clearContent(contentUri))
@@ -81,7 +80,7 @@ const getSourceFetcher = function getSourceFetcher (source) {
       // this way, we get proper error handling in either case
       return Promise.resolve()
         .then(() => resolve(key))
-        .then((contentUri) => fetchContent(contentBase, contentUri))
+        .then((contentUri) => fetchContent(contentUri))
         .then((data) => JSON.parse(data))
         .then(transform)
         .catch((err) => {

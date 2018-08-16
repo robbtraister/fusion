@@ -8,41 +8,50 @@ const debugFetch = require('debug')('fusion:content:sources:fetch')
 const debugTimer = require('debug')('fusion:timer:sources:fetch')
 const timer = require('../timer')
 
+const crypto = require('crypto')
+
 const {
+  contentBase,
   cacheProxy,
   cachePrefix
 } = require('../../environment')
 
-function pushToCache (cacheKey, cacheValue) {
+const resolveCacheRequestUri = (key) => {
+  return url.format(`${cacheProxy}?key=${getCacheKey(key)}`)
+}
+
+function getCacheKey (key) {
+  const cacheKey = `${cachePrefix}_${url.format(Object.assign(url.parse(url.resolve(contentBase, key)), {auth: null}))}`
+  console.log(cacheKey)
+  return crypto.createHash('DSA-SHA1').update(cacheKey).digest('hex')
+}
+
+function pushToCache (key, value) {
   const options = {
     method: 'PUT',
-    uri: cacheProxy + `?key=` + cacheKey,
-    body: cacheValue
+    uri: resolveCacheRequestUri(key),
+    body: value
   }
   return request(options)
 }
 
 const clearContent = (key) => {
-  const cacheKey = cachePrefix + '_' + key
-
   const options = {
     method: 'DELETE',
-    uri: cacheProxy + `?key=` + cacheKey
+    uri: resolveCacheRequestUri(key)
   }
   return request(options)
 }
 
-const fetchContent = (contentBase, key) => {
-  const cacheKey = cachePrefix + '_' + key
-  const cacheProxyRequest = cacheProxy + `?key=` + cacheKey
+const fetchContent = (key) => {
   let tic = timer.tic()
 
-  return request(cacheProxyRequest)
+  return request(resolveCacheRequestUri(key))
     .then((data) => {
       if (!data) {
         throw Error('data error from cache')
       }
-      debugTimer(`Fetch from cache ${cacheKey}`, tic.toc())
+      debugTimer(`Fetch from cache ${key}`, tic.toc())
       return data
     })
     .catch(() => {
@@ -51,15 +60,9 @@ const fetchContent = (contentBase, key) => {
       const contentUrl = url.resolve(contentBase, key)
       const dataPromise = request(contentUrl)
         .then((data) => {
-          debugTimer(`Fetched from source ${cacheKey}`, tic.toc())
-          tic = timer.tic()
-          return pushToCache(cacheKey, data)
-            .then(response => {
-              debugTimer(`Pushed to cache`, tic.toc())
-              if (response) {
-                return data
-              }
-            })
+          debugTimer(`Fetched from source ${key}`, tic.toc())
+          pushToCache(key, data)
+          return data
         })
       return dataPromise
     })

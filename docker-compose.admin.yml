@@ -92,7 +92,7 @@ services:
       - 11211:11211
 
   admin:
-    image: quay.io/washpost/pagebuilder-nilev1:${PB_VERSION:-fusion-admin.14}
+    image: quay.io/washpost/pagebuilder-nilev1:${PB_VERSION:-fusion-admin.15}
     depends_on:
       - memcache
       - data
@@ -107,13 +107,14 @@ services:
       PB_MONGODB_GARBAGE_COLLECTION: "false"
       PB_RENDERING_DEBUG: "true"
       PB_SYSTEM_LOG_CONFIG: "logback-info.xml"
+      PB_REPORTING_FUSION: http://origin/${CONTEXT_PATH:-pb}
     networks:
       - fusion
     volumes:
       # Docker will mount the folder defined in $PROJECT_REPO environment
       # variable inside the container as /assets so PageBuilder is agnostic
       # to the actual location of the assets and resources
-      - "${CLASSIC_REPO}:/assets"
+      - "${CLASSIC_REPO:-./.classic}:/assets"
     ports:
       - 8888:8888
 

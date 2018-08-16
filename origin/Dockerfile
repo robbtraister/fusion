@@ -30,15 +30,15 @@ RUN \
     # download ngx_devel_kit module
     git clone --branch=master --single-branch --depth=1 https://github.com/simplresty/ngx_devel_kit ./modules/ngx_devel_kit && \
     rm -rf ./modules/ngx_devel_kit/.git && \
-    # download nginx let module
-    git clone --branch=master --single-branch --depth=1 https://github.com/arut/nginx-let-module ./modules/nginx-let && \
-    rm -rf ./modules/nginx-let/.git && \
+    # # download nginx let module
+    # git clone --branch=master --single-branch --depth=1 https://github.com/arut/nginx-let-module ./modules/nginx-let && \
+    # rm -rf ./modules/nginx-let/.git && \
     # download nginx set-misc module
     git clone --branch=master --single-branch --depth=1 https://github.com/openresty/set-misc-nginx-module ./modules/nginx-set-misc && \
     rm -rf ./modules/nginx-set-misc/.git && \
-    # download nginx statsd module
-    git clone --branch=tags-12 --single-branch --depth=1 https://github.com/robbtraister/nginx-statsd ./modules/nginx-statsd && \
-    rm -rf ./modules/nginx-statsd/.git && \
+    # # download nginx statsd module
+    # git clone --branch=tags-12 --single-branch --depth=1 https://github.com/robbtraister/nginx-statsd ./modules/nginx-statsd && \
+    # rm -rf ./modules/nginx-statsd/.git && \
     # build nginx
     ./configure \
                 --user=${USER} \

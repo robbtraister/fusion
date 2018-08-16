@@ -83,10 +83,6 @@ EOB
 fi
 
 cat <<EOB
-  map \$http_x_forwarded_host \$host_header {
-    ''                          \$host;
-    default                     \$http_x_forwarded_host;
-  }
 
   map \$is_args \$query_params {
     '?'                         \$is_args\$args;
@@ -111,29 +107,16 @@ cat <<EOB
     ~([\d]*)                    \$1;
   }
 
-  map \$host \$environment {
-    default                     '${ENVIRONMENT:-localhost}';
-EOB
-if [ "${IS_PROD}" ]
-then
-cat <<EOB
-    ~^(?<subdomain>[^.]+)\.     \$subdomain;
-EOB
-fi
-
-cat <<EOB
-  }
-
   upstream cache_cluster {
     hash \$memc_key;
 EOB
-  for cache_node in $(echo $CACHE_NODES); 
+  for cache_node in $(echo $CACHE_NODES);
   do
 cat <<EOB
       server $cache_node;
 EOB
   done
-  
+
 cat <<EOB
   }
 
@@ -154,7 +137,7 @@ cat <<EOB
       if (\$request_method = POST) {
         return 418;
       }
-      
+
       memc_pass                 cache_cluster;
     }
 

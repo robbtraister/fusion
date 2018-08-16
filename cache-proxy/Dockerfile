@@ -30,16 +30,16 @@ RUN \
     tar zxvf nginx.tar.gz --strip-components 1 && \
     rm nginx.tar.gz && \
     # download memc-nginx client
-    wget -O memc-nginx.tar.gz https://github.com/openresty/memc-nginx-module/archive/v0.19.tar.gz && \ 
+    wget -O memc-nginx.tar.gz https://github.com/openresty/memc-nginx-module/archive/v0.19.tar.gz && \
     mkdir ./memc-nginx && \
-    tar zxvf memc-nginx.tar.gz --strip-components 1 -C memc-nginx && \ 
+    tar zxvf memc-nginx.tar.gz --strip-components 1 -C memc-nginx && \
     rm memc-nginx.tar.gz && \
-    # download nginx let module
-    git clone --branch=master --single-branch --depth=1 https://github.com/arut/nginx-let-module ./modules/nginx-let && \
-    rm -rf ./modules/nginx-let/.git && \
-    # download nginx statsd module
-    git clone --branch=tags-12 --single-branch --depth=1 https://github.com/robbtraister/nginx-statsd ./modules/nginx-statsd && \
-    rm -rf ./modules/nginx-statsd/.git && \
+    # # download nginx let module
+    # git clone --branch=master --single-branch --depth=1 https://github.com/arut/nginx-let-module ./modules/nginx-let && \
+    # rm -rf ./modules/nginx-let/.git && \
+    # # download nginx statsd module
+    # git clone --branch=tags-12 --single-branch --depth=1 https://github.com/robbtraister/nginx-statsd ./modules/nginx-statsd && \
+    # rm -rf ./modules/nginx-statsd/.git && \
     # build nginx
     ./configure \
                 --user=${USER} \

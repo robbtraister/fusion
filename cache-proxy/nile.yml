@@ -42,8 +42,11 @@ environments:
     override:
       cache-proxy:
         <<: *_fusion_cache_proxy
+        log_opt:
+          awslogs-group: /nile/fusion-cache-proxy/staging
+          awslogs-region: us-east-1
         environment:
-          PORT: "8080"
+          <<: *_environment
           CACHE_PROXY_CREDENTIALS: |
             staging:%{AQECAHhPwAyPK3nfERyAvmyWOWx9c41uht+ei4Zlv4NgrlmypwAAAMYwgcMGCSqGSIb3DQEHBqCBtTCBsgIBADCBrAYJKoZIhvcNAQcBMB4GCWCGSAFlAwQBLjARBAx004Oqgxt5jnwj1rACARCAf+DSMPzrDHyG/bxRd1T+Jj2MjmcOjNB3gugnPMzgaPGW9TAJ6l3TQkO/Z/MgPugLLWG/p1rI9pSQ3mn8D0r3aIlr4xkzEJEWkX1nq03nDwMlFaBb4ieywpKO2Qq2oaYsIIGsOJaI529Snflz0aR4qZwDOTPlgAI4+gnGkAXAJRU=}
           CACHE_NODES: |

@@ -1,9 +1,9 @@
 'use strict'
 
 const {
-  fetchContent,
-  clearContent
-} = require('../../utils/content-fetcher')
+  fetch: fetchThroughCache,
+  clear: clearFromCache
+} = require('./cache')
 
 const unpack = require('../../utils/unpack')
 
@@ -43,10 +43,10 @@ const getJsonResolver = function getJsonResolver (config) {
 
 const getSourceResolver = function getSourceResolver (source) {
   return (source instanceof Function)
-  ? source
-  : (source.resolve instanceof Function)
-    ? source.resolve
-    : getJsonResolver(source)
+    ? source
+    : (source.resolve instanceof Function)
+      ? source.resolve
+      : getJsonResolver(source)
 }
 
 const getSourceClearer = function getSourceClearer (source) {
@@ -56,7 +56,7 @@ const getSourceClearer = function getSourceClearer (source) {
     ? (key) => {
       return Promise.resolve()
         .then(() => resolve(key))
-        .then((contentUri) => clearContent(contentUri))
+        .then((contentUri) => clearFromCache(contentUri))
         .catch((err) => {
           if (err.response) {
             const responseError = new Error(err.response.body)
@@ -80,7 +80,7 @@ const getSourceFetcher = function getSourceFetcher (source) {
       // this way, we get proper error handling in either case
       return Promise.resolve()
         .then(() => resolve(key))
-        .then((contentUri) => fetchContent(contentUri))
+        .then((contentUri) => fetchThroughCache(contentUri))
         .then((data) => JSON.parse(data))
         .then(transform)
         .catch((err) => {

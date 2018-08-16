@@ -8,7 +8,7 @@ In fusion, layouts can be defined in many ways, each of which requires some way 
 
 ### Layout Component
 
-Fusion provides a default Layout function that may be accessed by importing `fusion:layout`. The fusion layout function accepts an array of section identifier objects, which are transformed into `section` DOM elements with `id` and `class` attributes defined by `id` and `cssClass` properties, respectively.
+Fusion provides a default Layout function that may be accessed by importing `fusion:layout`. The fusion layout function accepts an array of section identifier objects, which are transformed into `section` DOM elements with `id` and `class` attributes defined by `id` and `cssClass` (or `className`) properties, respectively. Optionally, you may also pass in an `element` property if you want a section to use a different DOM element.
 
 #### Array Configuration
 
@@ -26,7 +26,8 @@ export default Layout([
   },
   {
     id: 'bottom',
-    cssClass: 'bottom-section'
+    cssClass: 'bottom-section',
+    element: 'footer'
   }
 ])
 ```

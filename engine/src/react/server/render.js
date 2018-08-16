@@ -240,6 +240,7 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
               OutputType,
               {
                 contextPath,
+                version,
                 tree,
                 renderables: [tree].concat(...getAncestors(tree)),
                 /*
@@ -369,8 +370,8 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
                     fetched: rendering.getCssFile()
                       .then((templateCssFile) => {
                         Component.inlines.cssLinks.cached = {
-                          outputTypeHref: (outputTypeHasCss(outputType)) ? `${contextPath}/dist/components/output-types/${outputType}.css` : null,
-                          templateHref: (templateCssFile) ? `${contextPath}/dist/${templateCssFile}` : null
+                          outputTypeHref: (outputTypeHasCss(outputType)) ? `${contextPath}/dist/components/output-types/${outputType}.css?v=${version}` : null,
+                          templateHref: (templateCssFile) ? `${contextPath}/dist/${templateCssFile}?v=${version}` : null
                         }
                       })
                   }

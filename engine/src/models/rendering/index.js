@@ -13,14 +13,11 @@ const model = require('../../dao')
 const compileRendering = require('./compile')
 const getComponent = require('./component')
 const {
+  publishOutputTypes,
   publishToOtherVersions
 } = require('./publish')
 
 const getSource = require('../sources')
-
-const {
-  getOutputTypes
-} = require('../../assets/info')
 
 const {
   fetchFile,
@@ -92,25 +89,25 @@ class Rendering {
       this.getJson()
         .then((json) => compileRendering({name: this.name, rendering: json, outputType}))
         .then(({js, css, cssFile}) => {
+          const artifacts = []
+
           // using a raw rendering object is only for local dev, so don't publish the result
           if (this.type !== 'rendering') {
             if (outputType && js) {
-              pushFile(`${this.name}/${outputType}.js`, js, 'application/javascript')
+              artifacts.push(pushFile(`${this.name}/${outputType}.js`, js, 'application/javascript'))
             }
 
             if (cssFile && css) {
-              pushFile(cssFile, css, 'text/css')
+              artifacts.push(pushFile(cssFile, css, 'text/css'))
             }
-            pushCssHash(this.name, outputType, cssFile || null)
+
+            artifacts.push(pushCssHash(this.name, outputType, cssFile || null))
           }
 
-          return {js, css, cssFile}
+          // we have to wait for artifacts to be pushed so the lambda isn't frozen
+          return Promise.all(artifacts).then(() => ({js, css, cssFile}))
         })
     return this.compilations[outputType]
-  }
-
-  async compileAll () {
-    return Promise.all(getOutputTypes().map(outputType => this.compile(outputType)))
   }
 
   async getComponent (outputType = defaultOutputType, child) {
@@ -174,19 +171,19 @@ class Rendering {
   }
 
   async publish (propagate) {
+    const uri = `/dist/${this.type}/${this.id}`
     return (
       (this.json)
-        ? Promise.all([this.compileAll()]
-          .concat(
+        ? publishOutputTypes(uri, this.json)
+          .then(
             // if this is the first version to receive this rendering
             (propagate)
-              ? [
+              ? Promise.all([
                 putJson(this.type, Object.assign({}, this.json, {id: this.id})),
-                publishToOtherVersions(`/dist/${this.type}/${this.id}`, this.json)
-              ]
-              : []
+                publishToOtherVersions(uri, this.json)
+              ])
+              : Promise.resolve()
           )
-        )
         : Promise.reject(new Error('no rendering provided to publish'))
     )
   }

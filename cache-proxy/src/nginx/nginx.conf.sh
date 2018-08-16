@@ -144,7 +144,7 @@ cat <<EOB
     auth_basic_user_file        /etc/nginx/conf/credentials;
 
     location /cache {
-      set                       \$memc_key \$arg_key;
+      set                       \$memc_key "\${remote_user}:\${arg_key}";
       error_page                418 = @cacheput;
 
       if (\$request_method = PUT) {
@@ -154,12 +154,12 @@ cat <<EOB
       if (\$request_method = POST) {
         return 418;
       }
-
+      
       memc_pass                 cache_cluster;
     }
 
     location @cacheput {
-      set                       \$memc_key \$arg_key;
+      set                       \$memc_key "\${remote_user}:\${arg_key}";
       set                       \$memc_exptime \$cache_ttl;
       memc_pass                 cache_cluster;
     }

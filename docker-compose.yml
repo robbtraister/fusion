@@ -35,7 +35,7 @@ services:
           - db
           - database
     ports:
-      - '27017:27017'
+      - 27017:27017
     volumes:
       - '${FUSION_REPO:-.}/data/db:/data/db:rw'
       - '${FUSION_REPO:-.}/data/dumps:/data/dumps:rw'
@@ -46,7 +46,7 @@ services:
     networks:
       - fusion
     ports:
-      - '11211:11211'
+      - 11211:11211
 
   cache-proxy:
     build: ./cache-proxy
@@ -55,7 +55,7 @@ services:
     networks:
       - fusion
     ports:
-      - '9030:8080'
+      - 9030:8080
     environment:
       CACHE_PROXY_CREDENTIALS: |
         staging:password
@@ -83,7 +83,7 @@ services:
     networks:
       - fusion
     ports:
-      - '9010:8080'
+      - 9010:8080
     volumes:
       - './engine/src:/workdir/engine/src:ro'
       - '${FUSION_REPO:-./bundle}/.dist:/workdir/engine/bundle/dist:rw'
@@ -102,7 +102,7 @@ services:
     networks:
       - fusion
     ports:
-      - '9020:8080'
+      - 9020:8080
     volumes:
       - './resolver/config:/workdir/resolver/config:ro'
       - './resolver/src:/workdir/resolver/src:ro'
@@ -118,8 +118,8 @@ services:
     networks:
       - fusion
     ports:
-      - '80:8080'
-      - '8081:8081'
+      - 80:8080
+      - 8081:8081
     volumes:
       - './origin/src:/etc/nginx/src:ro'
       - '${FUSION_REPO:-./bundle}/.dist:/etc/nginx/dist:ro'

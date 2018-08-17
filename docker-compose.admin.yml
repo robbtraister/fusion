@@ -46,7 +46,7 @@ services:
     networks:
       - fusion
     ports:
-      - "11211:11211"
+      - '11211:11211'
 
   cache-proxy:
     build: ./cache-proxy
@@ -55,7 +55,7 @@ services:
     networks:
       - fusion
     ports:
-      - "9030:8080"
+      - '9030:8080'
     environment:
       CACHE_PROXY_CREDENTIALS: |
         staging:password

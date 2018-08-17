@@ -32,6 +32,7 @@ function formatUri (uri) {
   const resolvedUri = url.resolve(contentBase, uri)
   const sanitizedUri = sanitizeUri(resolvedUri)
   const cacheKey = getCacheKey(sanitizedUri)
+  debugFetch(`cache key: ${sanitizedUri} => ${cacheKey}`)
 
   return {
     cacheKey,
@@ -40,23 +41,21 @@ function formatUri (uri) {
   }
 }
 
-function getCacheEndpoint (key) {
-  return `${cacheProxyUrl}?key=${key}`
-}
-
 function makeCacheRequest ({method, key, value}) {
-  return request(
-    Object.assign(
-      {
-        method: method || 'GET',
-        uri: getCacheEndpoint(key)
-      },
-      // don't depend on existence of value, since you might want to push null/undefined
-      (method === 'PUT')
-        ? {body: value}
-        : {}
+  return (cacheProxyUrl)
+    ? request(
+      Object.assign(
+        {
+          method: method || 'GET',
+          uri: `${cacheProxyUrl}?key=${key}`
+        },
+        // don't depend on existence of value, since you might want to push null/undefined
+        (method === 'PUT')
+          ? {body: value}
+          : {}
+      )
     )
-  )
+    : Promise.resolve()
 }
 
 const clearContent = (key) => makeCacheRequest({key, method: 'DELETE'})
@@ -68,27 +67,34 @@ const fetch = (uri) => {
 
   const { cacheKey, resolvedUri, sanitizedUri } = formatUri(uri)
 
-  debugFetch(`Fetching from cache [${sanitizedUri}]`)
+  function fetchFromSource () {
+    debugFetch(`Fetching from source [${sanitizedUri}]`)
+    tic = timer.tic()
 
-  return fetchContent(cacheKey)
-    .then((data) => {
-      if (!data) {
-        throw new Error('data error from cache')
-      }
-      debugTimer(`Fetched from cache [${sanitizedUri}]`, tic.toc())
-      return data
-    })
-    .catch(() => {
-      debugFetch(`Fetching from source [${sanitizedUri}]`)
-      tic = timer.tic()
+    return request(resolvedUri)
+      .then((data) => {
+        debugTimer(`Fetched from source [${sanitizedUri}]`, tic.toc())
+        return pushContent(cacheKey, data)
+          .then(() => data)
+      })
+  }
 
-      return request(resolvedUri)
-        .then((data) => {
-          debugTimer(`Fetched from source [${sanitizedUri}]`, tic.toc())
-          return pushContent(cacheKey, data)
-            .then(() => data)
-        })
-    })
+  return (cacheProxyUrl)
+    ? Promise.resolve()
+      .then(() => {
+        debugFetch(`Fetching from cache [${sanitizedUri}]`)
+
+        return fetchContent(cacheKey)
+          .then((data) => {
+            if (!data) {
+              throw new Error('data error from cache')
+            }
+            debugTimer(`Fetched from cache [${sanitizedUri}]`, tic.toc())
+            return data
+          })
+          .catch(fetchFromSource)
+      })
+    : fetchFromSource()
 }
 
 module.exports = {

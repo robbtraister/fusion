@@ -56,4 +56,28 @@ contentRouter.route(['/clear', '/clear/:source', '/clear/:source/:key'])
   })
   .all((req, res, next) => { res.sendStatus(405) })
 
+contentRouter.route(['/update', '/update/:source', '/update/:source/:key'])
+  .post((req, res, next) => {
+    const sourceName = req.params.source || req.query.source
+    const keyString = req.params.key || req.query.key
+    const website = req.query._website
+
+    Promise.all([
+      getSource(sourceName),
+      new Promise((resolve, reject) => {
+        try {
+          resolve(JSON.parse(keyString))
+        } catch (e) {
+          reject(e)
+        }
+      })
+        .catch(() => ({key: keyString}))
+        .then((key) => Object.assign(key, {'arc-site': website}))
+    ])
+      .then(([source, key]) => source.update(key))
+      .then(() => { res.sendStatus(204) })
+      .catch(next)
+  })
+  .all((req, res, next) => { res.sendStatus(405) })
+
 module.exports = contentRouter

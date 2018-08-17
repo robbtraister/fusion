@@ -2,6 +2,7 @@
 
 const {
   fetch: fetchThroughCache,
+  update: updateCache,
   clear: clearFromCache
 } = require('./cache')
 
@@ -57,6 +58,26 @@ const getSourceClearer = function getSourceClearer (source) {
       return Promise.resolve()
         .then(() => resolve(key))
         .then((contentUri) => clearFromCache(contentUri))
+        .catch((err) => {
+          if (err.response) {
+            const responseError = new Error(err.response.body)
+            responseError.statusCode = err.response.statusCode
+            throw responseError
+          }
+          throw err
+        })
+    }
+    : null
+}
+
+const getSourceUpdater = function getSourceUpdater (source) {
+  const resolve = getSourceResolver(source)
+
+  return resolve
+    ? (key) => {
+      return Promise.resolve()
+        .then(() => resolve(key))
+        .then((contentUri) => updateCache(contentUri))
         .catch((err) => {
           if (err.response) {
             const responseError = new Error(err.response.body)
@@ -131,6 +152,7 @@ const getSource = function getSource (sourceName) {
         clear: getSourceClearer(source),
         fetch,
         filter: getSchemaFilter(source.schemaName),
+        update: getSourceUpdater(source),
         name: sourceName,
         params: source.params || null,
         pattern: source.pattern || null,

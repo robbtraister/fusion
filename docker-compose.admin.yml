@@ -45,8 +45,6 @@ services:
     image: memcached
     networks:
       - fusion
-    ports:
-      - '11211:11211'
 
   cache-proxy:
     build: ./cache-proxy
@@ -113,8 +111,6 @@ services:
     command: memcached -I 10m
     networks:
       - fusion
-    ports:
-      - 11211:11211
 
   admin:
     image: quay.io/washpost/pagebuilder-nilev1:${PB_VERSION:-fusion-admin.15}

@@ -45,8 +45,6 @@ services:
     image: memcached
     networks:
       - fusion
-    ports:
-      - 11211:11211
 
   cache-proxy:
     build: ./cache-proxy

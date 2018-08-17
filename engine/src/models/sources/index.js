@@ -75,12 +75,12 @@ const getSourceFetcher = function getSourceFetcher (source) {
   const transform = source.transform || source.mutate || ((json) => json)
 
   return resolve
-    ? function fetch (key) {
+    ? function fetch (key, forceSync) {
       // start with an empty Promise so that this.resolve can return a static value or a Promise
       // this way, we get proper error handling in either case
       return Promise.resolve()
         .then(() => resolve(key))
-        .then((contentUri) => fetchThroughCache(contentUri))
+        .then((contentUri) => fetchThroughCache(contentUri, forceSync))
         .then((data) => JSON.parse(data))
         .then(transform)
         .catch((err) => {

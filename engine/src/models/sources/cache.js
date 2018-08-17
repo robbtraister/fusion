@@ -62,7 +62,7 @@ const clearContent = (key) => makeCacheRequest({key, method: 'DELETE'})
 const fetchContent = (key) => makeCacheRequest({key})
 const pushContent = (key, value) => makeCacheRequest({key, value, method: 'PUT'})
 
-const fetch = (uri) => {
+const fetch = (uri, forceSync) => {
   let tic = timer.tic()
 
   const { cacheKey, resolvedUri, sanitizedUri } = formatUri(uri)
@@ -79,7 +79,7 @@ const fetch = (uri) => {
       })
   }
 
-  return (cacheProxyUrl)
+  return (cacheProxyUrl && forceSync !== true)
     ? Promise.resolve()
       .then(() => {
         debugFetch(`Fetching from cache [${sanitizedUri}]`)

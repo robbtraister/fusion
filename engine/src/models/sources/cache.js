@@ -79,28 +79,25 @@ const fetch = (uri, forceSync) => {
       })
   }
 
-  return (cacheProxyUrl)
-    ? (forceSync && forceSync === 'true')
-      ? fetchFromSource()
-      : Promise.resolve()
-        .then(() => {
-          debugFetch(`Fetching from cache [${sanitizedUri}]`)
+  return (cacheProxyUrl && forceSync !== 'true')
+    ? Promise.resolve()
+      .then(() => {
+        debugFetch(`Fetching from cache [${sanitizedUri}]`)
 
-          return fetchContent(cacheKey)
-            .then((data) => {
-              if (!data) {
-                throw new Error('data error from cache')
-              }
-              debugTimer(`Fetched from cache [${sanitizedUri}]`, tic.toc())
-              return data
-            })
-            .catch(fetchFromSource)
-        })
-    : fetchFromSource()
+        return fetchContent(cacheKey)
+          .then((data) => {
+            if (!data) {
+              throw new Error('data error from cache')
+            }
+            debugTimer(`Fetched from cache [${sanitizedUri}]`, tic.toc())
+            return data
+          })
+          .catch(fetchFromSource)
+      })
+  : fetchFromSource()
 }
 
 module.exports = {
   fetch,
-  update: (uri) => fetch(uri, 'true'),
   clear: (uri) => clearContent(formatUri(uri).cacheKey)
 }

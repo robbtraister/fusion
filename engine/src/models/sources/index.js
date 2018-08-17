@@ -2,7 +2,6 @@
 
 const {
   fetch: fetchThroughCache,
-  update: updateCache,
   clear: clearFromCache
 } = require('./cache')
 
@@ -70,38 +69,18 @@ const getSourceClearer = function getSourceClearer (source) {
     : null
 }
 
-const getSourceUpdater = function getSourceUpdater (source) {
-  const resolve = getSourceResolver(source)
-
-  return resolve
-    ? (key) => {
-      return Promise.resolve()
-        .then(() => resolve(key))
-        .then((contentUri) => updateCache(contentUri))
-        .catch((err) => {
-          if (err.response) {
-            const responseError = new Error(err.response.body)
-            responseError.statusCode = err.response.statusCode
-            throw responseError
-          }
-          throw err
-        })
-    }
-    : null
-}
-
 const getSourceFetcher = function getSourceFetcher (source) {
   const resolve = getSourceResolver(source)
 
   const transform = source.transform || source.mutate || ((json) => json)
 
   return resolve
-    ? function fetch (key) {
+    ? function fetch (key, forceSync) {
       // start with an empty Promise so that this.resolve can return a static value or a Promise
       // this way, we get proper error handling in either case
       return Promise.resolve()
         .then(() => resolve(key))
-        .then((contentUri) => fetchThroughCache(contentUri))
+        .then((contentUri) => fetchThroughCache(contentUri, forceSync))
         .then((data) => JSON.parse(data))
         .then(transform)
         .catch((err) => {
@@ -152,7 +131,6 @@ const getSource = function getSource (sourceName) {
         clear: getSourceClearer(source),
         fetch,
         filter: getSchemaFilter(source.schemaName),
-        update: getSourceUpdater(source),
         name: sourceName,
         params: source.params || null,
         pattern: source.pattern || null,

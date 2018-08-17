@@ -79,7 +79,7 @@ const fetch = (uri, forceSync) => {
       })
   }
 
-  return (cacheProxyUrl && forceSync !== 'true')
+  return (cacheProxyUrl && forceSync !== true)
     ? Promise.resolve()
       .then(() => {
         debugFetch(`Fetching from cache [${sanitizedUri}]`)
@@ -94,7 +94,7 @@ const fetch = (uri, forceSync) => {
           })
           .catch(fetchFromSource)
       })
-  : fetchFromSource()
+    : fetchFromSource()
 }
 
 module.exports = {

@@ -22,6 +22,8 @@ const binaryContentTypes = variables.BINARY_CONTENT_TYPES
   ? variables.BINARY_CONTENT_TYPES.split(/[,;]/)
   : require('./binary-content-types.json')
 const bodyLimit = '100mb'
+const cacheProxyUrl = variables.CACHE_PROXY_URL || ''
+const cachePrefix = variables.CACHE_PREFIX || ''
 const contentBase = variables.CONTENT_BASE || ''
 const contextPath = (variables.CONTEXT_PATH || 'pb').replace(/^\/*/, '/').replace(/\/+$/, '')
 const defaultOutputType = variables.DEFAULT_OUTPUT_TYPE || 'default'
@@ -59,6 +61,8 @@ module.exports = {
   bundleDistRoot,
   bundleGeneratedRoot,
   bundleSrcRoot,
+  cacheProxyUrl,
+  cachePrefix,
   componentDistRoot,
   componentGeneratedRoot,
   componentSrcRoot,

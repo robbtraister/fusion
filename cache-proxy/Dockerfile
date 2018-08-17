@@ -8,6 +8,8 @@ RUN \
             openssl \
             pcre \
             zlib \
+            apache2-utils \
+            busybox-extras \
             && \
     rm -rf /var/cache/apk/* && \
     openssl version
@@ -27,15 +29,14 @@ RUN \
     wget --no-check-certificate -O nginx.tar.gz https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz && \
     tar zxvf nginx.tar.gz --strip-components 1 && \
     rm nginx.tar.gz && \
-    # download ngx_devel_kit module
-    git clone --branch=master --single-branch --depth=1 https://github.com/simplresty/ngx_devel_kit ./modules/ngx_devel_kit && \
-    rm -rf ./modules/ngx_devel_kit/.git && \
+    # download memc-nginx client
+    wget -O memc-nginx.tar.gz https://github.com/openresty/memc-nginx-module/archive/v0.19.tar.gz && \
+    mkdir ./memc-nginx && \
+    tar zxvf memc-nginx.tar.gz --strip-components 1 -C memc-nginx && \
+    rm memc-nginx.tar.gz && \
     # # download nginx let module
     # git clone --branch=master --single-branch --depth=1 https://github.com/arut/nginx-let-module ./modules/nginx-let && \
     # rm -rf ./modules/nginx-let/.git && \
-    # download nginx set-misc module
-    git clone --branch=master --single-branch --depth=1 https://github.com/openresty/set-misc-nginx-module ./modules/nginx-set-misc && \
-    rm -rf ./modules/nginx-set-misc/.git && \
     # # download nginx statsd module
     # git clone --branch=tags-12 --single-branch --depth=1 https://github.com/robbtraister/nginx-statsd ./modules/nginx-statsd && \
     # rm -rf ./modules/nginx-statsd/.git && \
@@ -44,10 +45,9 @@ RUN \
                 --user=${USER} \
                 --group=${USER} \
                 --with-http_realip_module \
-                --add-module=modules/ngx_devel_kit \
                 # --add-module=modules/nginx-let \
-                --add-module=modules/nginx-set-misc \
                 # --add-module=modules/nginx-statsd \
+                --add-module=./memc-nginx \
                 && \
     make -j2 && \
     make install && \
@@ -60,6 +60,7 @@ RUN \
        /etc/nginx/src \
        && \
     nginx -v && \
+
     # remove dev packages
     apk del ${DEV_PACKAGES} && \
     rm -rf /var/cache/apk/* && \
@@ -76,18 +77,6 @@ RUN \
           ./logs \
           ./tmp
 
-COPY ./package*.json ./
-RUN \
-    apk add --update --no-cache \
-            nodejs-npm \
-            && \
-    npm install -g npm && \
-    npm install --production && \
-    npm cache clean --force && \
-    npm uninstall -g npm && \
-    rm -rf /var/cache/apk/* && \
-    node -v
-
 COPY ./src ./src
 RUN chown -R ${USER}:${USER} ./src
 
@@ -96,5 +85,4 @@ VOLUME /etc/nginx/tmp
 # Use nginx user
 USER ${USER}
 
-# Launch init to configure PB and start supervisord on startup
 CMD ./src/run.sh

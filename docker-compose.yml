@@ -41,11 +41,35 @@ services:
       - '${FUSION_REPO:-.}/data/dumps:/data/dumps:rw'
       - '${FUSION_REPO:-.}/data/restore:/data/restore:rw'
 
+  cache:
+    image: memcached
+    networks:
+      - fusion
+    ports:
+      - '11211:11211'
+
+  cache-proxy:
+    build: ./cache-proxy
+    depends_on:
+      - cache
+    networks:
+      - fusion
+    ports:
+      - '9030:8080'
+    environment:
+      CACHE_PROXY_CREDENTIALS: |
+        staging:password
+      CACHE_NODES: |
+        cache:11211
+    volumes:
+      - './cache-proxy/src:/etc/nginx/src:ro'
+
   engine:
     build: ./engine
     command: start:dev
     depends_on:
       - data
+      - cache-proxy
     env_file:
       - .env
     environment:
@@ -54,6 +78,8 @@ services:
       MINIFY:
       # because we import ALL variables from .env, ignore PORT
       PORT: 8080
+      CACHE_PROXY_URL: http://staging:password@cache-proxy:8080/cache
+      CACHE_PREFIX: '0803'
     networks:
       - fusion
     ports:

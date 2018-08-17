@@ -1,15 +1,13 @@
 'use strict'
 
-const url = require('url')
-
-const request = require('request-promise-native')
-
-const debugFetch = require('debug')('fusion:content:sources:fetch')
+const {
+  fetch: fetchThroughCache,
+  clear: clearFromCache
+} = require('./cache')
 
 const unpack = require('../../utils/unpack')
 
 const {
-  contentBase,
   sourcesDistRoot
 } = require('../../../environment')
 
@@ -43,12 +41,36 @@ const getJsonResolver = function getJsonResolver (config) {
     : null
 }
 
-const getSourceFetcher = function getSourceFetcher (source) {
-  const resolve = (source instanceof Function)
+const getSourceResolver = function getSourceResolver (source) {
+  return (source instanceof Function)
     ? source
     : (source.resolve instanceof Function)
       ? source.resolve
       : getJsonResolver(source)
+}
+
+const getSourceClearer = function getSourceClearer (source) {
+  const resolve = getSourceResolver(source)
+
+  return resolve
+    ? (key) => {
+      return Promise.resolve()
+        .then(() => resolve(key))
+        .then((contentUri) => clearFromCache(contentUri))
+        .catch((err) => {
+          if (err.response) {
+            const responseError = new Error(err.response.body)
+            responseError.statusCode = err.response.statusCode
+            throw responseError
+          }
+          throw err
+        })
+    }
+    : null
+}
+
+const getSourceFetcher = function getSourceFetcher (source) {
+  const resolve = getSourceResolver(source)
 
   const transform = source.transform || source.mutate || ((json) => json)
 
@@ -58,16 +80,10 @@ const getSourceFetcher = function getSourceFetcher (source) {
       // this way, we get proper error handling in either case
       return Promise.resolve()
         .then(() => resolve(key))
-        .then((contentUri) => {
-          const contentUrl = url.resolve(contentBase, contentUri)
-          // don't log content credentials
-          debugFetch(url.format(Object.assign(url.parse(contentUrl), {auth: null})))
-          return request(contentUrl)
-        })
+        .then((contentUri) => fetchThroughCache(contentUri))
         .then((data) => JSON.parse(data))
         .then(transform)
         .catch((err) => {
-          // console.log(err.response)
           if (err.response) {
             const responseError = new Error(err.response.body)
             responseError.statusCode = err.response.statusCode
@@ -112,7 +128,7 @@ const getSource = function getSource (sourceName) {
       }
 
       return {
-        clear: () => {},
+        clear: getSourceClearer(source),
         fetch,
         filter: getSchemaFilter(source.schemaName),
         name: sourceName,

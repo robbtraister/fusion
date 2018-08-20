@@ -85,7 +85,7 @@ function escapeContent (content) {
   return JSON.stringify(content).replace(/<\/script>/g, '<\\/script>')
 }
 
-function getFusionScript (globalContent, contentCache, outputType, arcSite) {
+function getFusionScript (globalContent, globalContentConfig, contentCache, outputType, arcSite) {
   const now = +new Date()
   const condensedCache = {}
   Object.keys(contentCache)
@@ -111,6 +111,7 @@ function getFusionScript (globalContent, contentCache, outputType, arcSite) {
     (arcSite ? `Fusion.arcSite='${arcSite}';` : '') +
     `Fusion.lastModified=${now};` +
     `Fusion.globalContent=${escapeContent(globalContent || {})};` +
+    `Fusion.globalContentConfig=${escapeContent(globalContentConfig || {})};` +
     `Fusion.contentCache=${escapeContent(condensedCache)}`
 }
 
@@ -131,6 +132,7 @@ const render = function render ({Component, requestUri, content, _website}) {
           arcSite: _website,
           contextPath,
           globalContent: content ? content.document : null,
+          globalContentConfig: content ? {source: content.source, key: content.key} : null,
           outputType: Component.outputType,
           requestUri,
           siteProperties: fusionProperties(_website)
@@ -415,7 +417,7 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
                     'script',
                     {
                       type: 'application/javascript',
-                      dangerouslySetInnerHTML: { __html: getFusionScript(props.globalContent, Template.contentCache, outputType, props.arcSite) }
+                      dangerouslySetInnerHTML: { __html: getFusionScript(props.globalContent, props.globalContentConfig, Template.contentCache, outputType, props.arcSite) }
                     }
                   )
                 }),

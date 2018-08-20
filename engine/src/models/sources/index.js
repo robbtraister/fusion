@@ -126,7 +126,9 @@ const getSource = function getSource (sourceName) {
             type: source.params[name]
           }))
       }
-      source.params.forEach((p) => { p.displayName = p.displayName || p.name })
+      if (source.params) {
+        source.params.forEach((p) => { p.displayName = p.displayName || p.name })
+      }
 
       return {
         clear: getSourceClearer(source),

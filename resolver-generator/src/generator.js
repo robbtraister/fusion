@@ -26,9 +26,9 @@ async function copy (srcPromise, destPromise) {
   return result
 }
 class Generator {
-  constructor (bucket, resolver, region) {
+  constructor (bucket, resolverPath, region) {
     this.bucket = bucket
-    this.resolverPath = resolver
+    this.resolverPath = resolverPath
 
     // parse the environment from the resolver path
     // i.e. resolver path would be environment/${environment}/resolvers.json

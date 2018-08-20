@@ -2,8 +2,8 @@
 
 const Generator = require('./generator')
 
-const main = (resolver, envVars, region) => {
-  return new Generator(resolver, envVars, region)
+const main = (bucket, resolverPath, region) => {
+  return new Generator(bucket, resolverPath, region)
     .generate()
 }
 
@@ -23,7 +23,7 @@ module.exports.handler = (event, context, callback) => {
 }
 
 if (module === require.main) {
-  main('pagebuilder-fusion', 'environments/foo-sandbox/resolvers.json')
+  main('pagebuilder-fusion', 'environments/bonnier-fusion-sandbox/resolvers.json')
     .then(console.log)
     .catch(console.error)
 }

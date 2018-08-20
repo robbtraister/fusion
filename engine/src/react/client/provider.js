@@ -80,6 +80,7 @@ const value = {
   eventListeners: {},
   getContent: getContentGenerator(Fusion.contentCache),
   globalContent: Fusion.globalContent,
+  globalContentConfig: Fusion.globalContentConfig,
   outputType: Fusion.outputType,
   requestUri: requestPath + window.location.search,
   siteProperties: Fusion.properties(Fusion.arcSite)

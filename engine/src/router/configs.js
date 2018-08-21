@@ -8,8 +8,6 @@ const { glob } = require('../utils/promises')
 
 const getSource = require('../models/sources')
 
-const JGE = require('../models/sources/jge')
-
 const {
   componentDistRoot,
   isDev,
@@ -75,27 +73,14 @@ function transformContentConfigs (manifest) {
 }
 
 configRouter.get('/content/sources', (req, res, next) => {
-  Promise.all([
-    glob('**/*', {cwd: sourcesDistRoot})
-      .then(sources => Promise.all(
-        sources.map(s =>
-          getSource(path.parse(s).name)
-            .catch(() => null)
-        )
-      ))
-      .then(sources => sources.filter(s => s)),
-    JGE.find()
-      .then(sources => sources.map(s => {
-        s.service = s._id
-        delete s._id
-        return s
-      }))
-      .catch(() => [])
-  ])
-    .then(([bundleSources, jgeSources]) => {
-      const bundleIds = bundleSources.map(s => s.name)
-      return bundleSources.concat(jgeSources.filter(jge => !bundleIds.includes(jge.service)))
-    })
+  glob('**/*', {cwd: sourcesDistRoot})
+    .then(sources => Promise.all(
+      sources.map(s =>
+        getSource(path.parse(s).name)
+          .catch(() => null)
+      )
+    ))
+    .then(sources => sources.filter(s => s))
     .then(sources => sources.map(transformContentConfigs))
     .then(sources => res.send(sources))
 })

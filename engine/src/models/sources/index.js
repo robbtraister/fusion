@@ -12,7 +12,6 @@ const {
 } = require('../../../environment')
 
 const getSchemaFilter = require('./filter')
-const getSourceConfig = require('./jge').get
 
 const expandProperties = function expandProperties (string, properties) {
   return string.replace(/\{([^}]+)\}/g, function (match, prop) {
@@ -106,7 +105,6 @@ const getBundleSource = function getBundleSource (sourceName) {
 const sourceCache = {}
 const getSource = function getSource (sourceName) {
   sourceCache[sourceName] = sourceCache[sourceName] || getBundleSource(sourceName)
-    .then((bundleSource) => bundleSource || getSourceConfig(sourceName))
     .then((source) => {
       if (!source) {
         delete sourceCache[sourceName]

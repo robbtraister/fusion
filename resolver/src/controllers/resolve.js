@@ -169,6 +169,7 @@ const { pageConfigs, templateConfigs } = (resolveFromDB)
     return {
       pageConfigs: model('page').find(),
       templateConfigs: model('resolver_config').find()
+        .then(configs => configs.sort((a, b) => +a.priority - +b.priority))
     }
   })()
   : (() => {

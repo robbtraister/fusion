@@ -35,17 +35,41 @@ services:
           - db
           - database
     ports:
-      - '27017:27017'
+      - 27017:27017
     volumes:
       - '${FUSION_REPO:-.}/data/db:/data/db:rw'
       - '${FUSION_REPO:-.}/data/dumps:/data/dumps:rw'
       - '${FUSION_REPO:-.}/data/restore:/data/restore:rw'
+
+  content-cache:
+    image: memcached
+    # max size is 10MB
+    command: memcached -I 10m
+    networks:
+      - fusion
+
+  cache-proxy:
+    build: ./cache-proxy
+    depends_on:
+      - content-cache
+    networks:
+      - fusion
+    ports:
+      - 9030:8080
+    environment:
+      CACHE_PROXY_CREDENTIALS: |
+        staging:password
+      CACHE_NODES: |
+        content-cache:11211
+    volumes:
+      - './cache-proxy/src:/etc/nginx/src:ro'
 
   engine:
     build: ./engine
     command: start:dev
     depends_on:
       - data
+      - cache-proxy
     env_file:
       - .env
     environment:
@@ -54,10 +78,12 @@ services:
       MINIFY:
       # because we import ALL variables from .env, ignore PORT
       PORT: 8080
+      CACHE_PROXY_URL: http://staging:password@cache-proxy:8080/cache
+      CACHE_PREFIX: '0803'
     networks:
       - fusion
     ports:
-      - '9010:8080'
+      - 9010:8080
     volumes:
       - './engine/src:/workdir/engine/src:ro'
       - '${FUSION_REPO:-./bundle}/.dist:/workdir/engine/bundle/dist:rw'
@@ -76,7 +102,7 @@ services:
     networks:
       - fusion
     ports:
-      - '9020:8080'
+      - 9020:8080
     volumes:
       - './resolver/config:/workdir/resolver/config:ro'
       - './resolver/src:/workdir/resolver/src:ro'
@@ -92,8 +118,8 @@ services:
     networks:
       - fusion
     ports:
-      - '80:8080'
-      - '8081:8081'
+      - 80:8080
+      - 8081:8081
     volumes:
       - './origin/src:/etc/nginx/src:ro'
       - '${FUSION_REPO:-./bundle}/.dist:/etc/nginx/dist:ro'

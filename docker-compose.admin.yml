@@ -35,11 +35,34 @@ services:
           - db
           - database
     ports:
-      - '27017:27017'
+      - 27017:27017
     volumes:
       - '${FUSION_REPO:-.}/data/db:/data/db:rw'
       - '${FUSION_REPO:-.}/data/dumps:/data/dumps:rw'
       - '${FUSION_REPO:-.}/data/restore:/data/restore:rw'
+
+  content-cache:
+    image: memcached
+    # max size is 10MB
+    command: memcached -I 10m
+    networks:
+      - fusion
+
+  cache-proxy:
+    build: ./cache-proxy
+    depends_on:
+      - content-cache
+    networks:
+      - fusion
+    ports:
+      - 9030:8080
+    environment:
+      CACHE_PROXY_CREDENTIALS: |
+        staging:password
+      CACHE_NODES: |
+        content-cache:11211
+    volumes:
+      - './cache-proxy/src:/etc/nginx/src:ro'
 
   engine:
     build: ./engine
@@ -50,6 +73,8 @@ services:
       - .env
     environment:
       <<: *_environment
+      CACHE_PROXY_URL: http://staging:password@cache-proxy:8080/cache
+      CACHE_PREFIX: '0803'
       CONTENT_BASE:
       MINIFY:
       # because we import ALL variables from .env, ignore PORT
@@ -57,7 +82,7 @@ services:
     networks:
       - fusion
     ports:
-      - '9010:8080'
+      - 9010:8080
     volumes:
       # - '~/.aws:/root/.aws:ro'
       - './engine/src:/workdir/engine/src:ro'
@@ -77,24 +102,22 @@ services:
     networks:
       - fusion
     ports:
-      - '9020:8080'
+      - 9020:8080
     volumes:
       - './resolver/config:/workdir/resolver/config:ro'
       - './resolver/src:/workdir/resolver/src:ro'
 
-  memcache:
-    # memcached service runs from an image, so there is no Dockerfile
+  admin-cache:
     image: memcached
+    # max size is 10MB
     command: memcached -I 10m
     networks:
       - fusion
-    ports:
-      - 11211:11211
 
   admin:
-    image: quay.io/washpost/pagebuilder-nilev1:${PB_VERSION:-fusion-admin.14}
+    image: quay.io/washpost/pagebuilder-nilev1:${PB_VERSION:-fusion-admin.15}
     depends_on:
-      - memcache
+      - admin-cache
       - data
     environment:
       <<: *_environment
@@ -103,17 +126,18 @@ services:
       PB_AUTH_DISABLED: "true"
       PB_ASSETS_IMPORT_PATH: "/assets"
       PB_ASSETS_IMPORT_METHOD: "symlink"
-      PB_MEMCACHED_HOST: "memcache:11211"
+      PB_MEMCACHED_HOST: "admin-cache:11211"
       PB_MONGODB_GARBAGE_COLLECTION: "false"
       PB_RENDERING_DEBUG: "true"
       PB_SYSTEM_LOG_CONFIG: "logback-info.xml"
+      PB_REPORTING_FUSION: http://origin/${CONTEXT_PATH:-pb}
     networks:
       - fusion
     volumes:
       # Docker will mount the folder defined in $PROJECT_REPO environment
       # variable inside the container as /assets so PageBuilder is agnostic
       # to the actual location of the assets and resources
-      - "${CLASSIC_REPO}:/assets"
+      - "${CLASSIC_REPO:-./.classic}:/assets"
     ports:
       - 8888:8888
 
@@ -130,8 +154,8 @@ services:
     networks:
       - fusion
     ports:
-      - '80:8080'
-      - '8081:8081'
+      - 80:8080
+      - 8081:8081
     volumes:
       # - '~/.aws:/home/nginx/.aws:ro'
       - './origin/src:/etc/nginx/src:ro'

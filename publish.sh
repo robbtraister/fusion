@@ -112,6 +112,7 @@ cd $(dirname "$0")
 build 'engine'
 build 'origin'
 build 'resolver'
+build 'cache-proxy'
 
 addGitTags
 

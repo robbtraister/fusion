@@ -89,19 +89,23 @@ class Rendering {
       this.getJson()
         .then((json) => compileRendering({name: this.name, rendering: json, outputType}))
         .then(({js, css, cssFile}) => {
+          const artifacts = []
+
           // using a raw rendering object is only for local dev, so don't publish the result
           if (this.type !== 'rendering') {
             if (outputType && js) {
-              pushFile(`${this.name}/${outputType}.js`, js, 'application/javascript')
+              artifacts.push(pushFile(`${this.name}/${outputType}.js`, js, 'application/javascript'))
             }
 
             if (cssFile && css) {
-              pushFile(cssFile, css, 'text/css')
+              artifacts.push(pushFile(cssFile, css, 'text/css'))
             }
-            pushCssHash(this.name, outputType, cssFile || null)
+
+            artifacts.push(pushCssHash(this.name, outputType, cssFile || null))
           }
 
-          return {js, css, cssFile}
+          // we have to wait for artifacts to be pushed so the lambda isn't frozen
+          return Promise.all(artifacts).then(() => ({js, css, cssFile}))
         })
     return this.compilations[outputType]
   }

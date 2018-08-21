@@ -77,6 +77,7 @@ module.exports = (Template) => {
           eventListeners: {},
           getContent: getContentGenerator(contentCache, props.arcSite, props.outputType),
           globalContent: props.globalContent,
+          globalContentConfig: props.globalContentConfig,
           layout: Template.layout,
           outputType: props.outputType,
           requestUri: props.requestUri,

@@ -24,6 +24,10 @@ This is the base context path of the application. In the client, you could calcu
 
 This is the full data object used as the global content for the rendered page.
 
+-   globalContentConfig
+
+This is the full config object used to fetch global content for the rendered page.
+
 -   layout
 
 The layout that was used when rendering this page.

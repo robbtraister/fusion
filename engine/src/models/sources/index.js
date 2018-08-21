@@ -1,20 +1,17 @@
 'use strict'
 
-const url = require('url')
-
-const request = require('request-promise-native')
-
-const debugFetch = require('debug')('fusion:content:sources:fetch')
+const {
+  fetch: fetchThroughCache,
+  clear: clearFromCache
+} = require('./cache')
 
 const unpack = require('../../utils/unpack')
 
 const {
-  contentBase,
   sourcesDistRoot
 } = require('../../../environment')
 
 const getSchemaFilter = require('./filter')
-const getSourceConfig = require('./jge').get
 
 const expandProperties = function expandProperties (string, properties) {
   return string.replace(/\{([^}]+)\}/g, function (match, prop) {
@@ -43,31 +40,49 @@ const getJsonResolver = function getJsonResolver (config) {
     : null
 }
 
-const getSourceFetcher = function getSourceFetcher (source) {
-  const resolve = (source instanceof Function)
+const getSourceResolver = function getSourceResolver (source) {
+  return (source instanceof Function)
     ? source
     : (source.resolve instanceof Function)
       ? source.resolve
       : getJsonResolver(source)
+}
+
+const getSourceClearer = function getSourceClearer (source) {
+  const resolve = getSourceResolver(source)
+
+  return resolve
+    ? (key) => {
+      return Promise.resolve()
+        .then(() => resolve(key))
+        .then((contentUri) => clearFromCache(contentUri))
+        .catch((err) => {
+          if (err.response) {
+            const responseError = new Error(err.response.body)
+            responseError.statusCode = err.response.statusCode
+            throw responseError
+          }
+          throw err
+        })
+    }
+    : null
+}
+
+const getSourceFetcher = function getSourceFetcher (source) {
+  const resolve = getSourceResolver(source)
 
   const transform = source.transform || source.mutate || ((json) => json)
 
   return resolve
-    ? function fetch (key) {
+    ? function fetch (key, forceSync) {
       // start with an empty Promise so that this.resolve can return a static value or a Promise
       // this way, we get proper error handling in either case
       return Promise.resolve()
         .then(() => resolve(key))
-        .then((contentUri) => {
-          const contentUrl = url.resolve(contentBase, contentUri)
-          // don't log content credentials
-          debugFetch(url.format(Object.assign(url.parse(contentUrl), {auth: null})))
-          return request(contentUrl)
-        })
+        .then((contentUri) => fetchThroughCache(contentUri, forceSync))
         .then((data) => JSON.parse(data))
         .then(transform)
         .catch((err) => {
-          // console.log(err.response)
           if (err.response) {
             const responseError = new Error(err.response.body)
             responseError.statusCode = err.response.statusCode
@@ -90,7 +105,6 @@ const getBundleSource = function getBundleSource (sourceName) {
 const sourceCache = {}
 const getSource = function getSource (sourceName) {
   sourceCache[sourceName] = sourceCache[sourceName] || getBundleSource(sourceName)
-    .then((bundleSource) => bundleSource || getSourceConfig(sourceName))
     .then((source) => {
       if (!source) {
         delete sourceCache[sourceName]
@@ -110,9 +124,12 @@ const getSource = function getSource (sourceName) {
             type: source.params[name]
           }))
       }
+      if (source.params) {
+        source.params.forEach((p) => { p.displayName = p.displayName || p.name })
+      }
 
       return {
-        clear: () => {},
+        clear: getSourceClearer(source),
         fetch,
         filter: getSchemaFilter(source.schemaName),
         name: sourceName,

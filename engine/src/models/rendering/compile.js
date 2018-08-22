@@ -103,7 +103,6 @@ const compileSource = function compileSource (script, styles) {
       mfs.readFilePromise(manifestFile)
         .then((manifestJson) => {
           const manifest = JSON.parse(manifestJson)
-          console.log(manifest)
           const cssFile = manifest['styles.css']
           return cssFile
             ? mfs.readFilePromise(`${componentDistRoot}/${cssFile}`)

@@ -52,26 +52,30 @@ const getRenderingResolver = function getRenderingResolver (resolver) {
 
 const parseContentSourceParameters = function parseContentSourceParameters (resolver) {
   if (resolver.contentConfigMapping) {
-    const mappers = Object.keys(resolver.contentConfigMapping).map(key => {
-      const param = resolver.contentConfigMapping[key]
-      return {
-        parameter: (requestParts) => {
-          const queryParams = requestParts.query
-          return {[key]: queryParams[param.name]}
-        },
-        pattern: (requestParts) => {
-          // TODO optimize for multiple pattern params so we don't regex match each time
-          const pattern = new RegExp(resolver.pattern)
-          const groups = requestParts.pathname.match(pattern)
-          const uri = trailingSlashRewrite(groups[param.index])
-          return {[key]: uri} // force trailing slash
-        },
-        static: () => ({[key]: param.value})
-      }[param.type]
-    })
+    const pattern = new RegExp(resolver.pattern)
 
-    if (mappers.length) {
-      return (requestUri) => Object.assign(...mappers.map(mapper => mapper(requestUri)))
+    const params = Object.keys(resolver.contentConfigMapping)
+      .map(key => Object.assign({key}, resolver.contentConfigMapping[key]))
+
+    const hasPatternParam = !!params.find(param => param.type === 'pattern')
+
+    if (params.length) {
+      return (requestParts) => {
+        const groups = (hasPatternParam)
+          ? requestParts.pathname.match(pattern)
+          : {}
+
+        return Object.assign({},
+          ...params.map(param => {
+            const mapper = {
+              parameter: (requestParts) => ({[param.key]: requestParts.query[param.name]}),
+              pattern: (requestParts) => ({[param.key]: groups[param.index]}),
+              static: () => ({[param.key]: param.value})
+            }[param.type]
+            return mapper && mapper(requestParts)
+          })
+        )
+      }
     }
   }
   return () => null
@@ -84,10 +88,8 @@ const getResolverHydrater = function getResolverHydrater (resolver) {
 
   const contentResolver = (resolver.contentSourceId)
     ? (requestParts, arcSite, version) => {
-      const contentSourceParams = contentSourceParser(requestParts)
-      const requestPath = trailingSlashRewrite(requestParts.pathname)
-      const key = Object.assign({'uri': requestPath, '_website': arcSite}, contentSourceParams)
-      return fetch(resolver.contentSourceId, key, version)
+      const key = contentSourceParser(requestParts)
+      return fetch(resolver.contentSourceId, key, arcSite, version)
         .then(content => ({key, content}))
     }
     : (requestUri, arcSite) => Promise.resolve({key: null, content: null})
@@ -206,12 +208,12 @@ const templateResolvers = templateConfigs.then((configs) => configs.map(prepareR
 
 const resolve = function resolve (requestUri, arcSite, version) {
   const requestParts = url.parse(requestUri, true)
-  const pathname = requestParts.pathname
+  requestParts.pathname = trailingSlashRewrite(requestParts.pathname)
   debugLogger(`Resolving: ${JSON.stringify(requestUri)}`)
 
   return Promise.all([pageResolvers, templateResolvers])
     .then(([pageResolvers, templateResolvers]) => {
-      const normalizedPathname = TRAILING_SLASH_REWRITES.DROP(pathname)
+      const normalizedPathname = TRAILING_SLASH_REWRITES.DROP(requestParts.pathname)
       const resolver = pageResolvers.find(resolver => resolver.match(normalizedPathname, arcSite)) ||
         templateResolvers.find(resolver => resolver.match(requestParts, arcSite))
 

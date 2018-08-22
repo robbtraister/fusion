@@ -14,6 +14,7 @@ const {
   resolverArtifact
 } = require('./configs')
 
+const cleanup = require('./scripts/cleanup')
 const deploy = require('./scripts/deploy')
 const zip = require('./scripts/zip')
 
@@ -59,6 +60,7 @@ class Generator {
       await this.upload(await zipFilePromise)
 
       await deploy(this.contextName)
+      await cleanup(this.contextName)
     } finally {
       await Promise.all([
         promises.remove(await rootDirPromise),

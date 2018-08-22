@@ -19,8 +19,10 @@ const {
 const timer = require('../../timer')
 const getConfigs = require('../../../webpack/template.js')
 
-const sourceFile = path.resolve(`${componentSrcRoot}/template.js`)
-const destFile = path.resolve(`${componentDistRoot}/template.js`)
+const scriptSourceFile = path.resolve(`${componentSrcRoot}/script.js`)
+const stylesSourceFile = path.resolve(`${componentSrcRoot}/styles.js`)
+const scriptDestFile = path.resolve(`${componentDistRoot}/script.js`)
+const stylesDestFile = path.resolve(`${componentDistRoot}/styles.js`)
 const manifestFile = path.resolve(`${componentDistRoot}/webpack.manifest.json`)
 
 const getMemoryFS = function getMemoryFS () {
@@ -44,20 +46,30 @@ const getMemoryFS = function getMemoryFS () {
     })
   }
 
-  memFs.mkdirpPromise = promisify(memFs.mkdirp.bind(memFs))
-  memFs.readFilePromise = promisify(memFs.readFile.bind(memFs))
-  memFs.writeFilePromise = promisify(memFs.writeFile.bind(memFs))
+  const mkdirpPromise = promisify(memFs.mkdirp.bind(memFs))
+  const readFilePromise = promisify(memFs.readFile.bind(memFs))
+  const writeFilePromise = promisify(memFs.writeFile.bind(memFs))
+
+  memFs.readFilePromise = (fp) =>
+    readFilePromise(fp).then(buf => buf.toString())
+  memFs.mkdirpPromise = mkdirpPromise
+  memFs.writeFilePromise = (fp, src) =>
+    mkdirpPromise(path.dirname(fp))
+      .then(() => writeFilePromise(fp, src))
 
   return memFs
 }
 
-const compileSource = function compileSource (src) {
+const compileSource = function compileSource (script, styles) {
   let tic = timer.tic()
 
   const mfs = getMemoryFS()
 
   return Promise.all([
-    Promise.resolve({template: sourceFile})
+    Promise.resolve({
+      script: scriptSourceFile,
+      styles: stylesSourceFile
+    })
       .then(getConfigs)
       .then(webpack)
       .then((compiler) => {
@@ -68,12 +80,16 @@ const compileSource = function compileSource (src) {
 
         return compiler
       }),
-    mfs.mkdirpPromise(path.dirname(sourceFile))
-      .then(() => mfs.writeFilePromise(sourceFile, src))
+    mfs.writeFilePromise(scriptSourceFile, script)
       .then(() => {
-        debugTimer('write source to memory fs', tic.toc())
+        debugTimer('write script source to memory fs', tic.toc())
       }),
-    mfs.mkdirpPromise(path.dirname(destFile))
+    mfs.writeFilePromise(stylesSourceFile, styles)
+      .then(() => {
+        debugTimer('write styles source to memory fs', tic.toc())
+      }),
+    mfs.mkdirpPromise(path.dirname(scriptDestFile)),
+    mfs.mkdirpPromise(path.dirname(stylesDestFile))
   ])
     .then(([compiler]) => {
       tic = timer.tic()
@@ -87,15 +103,13 @@ const compileSource = function compileSource (src) {
       }
     })
     .then(() => Promise.all([
-      mfs.readFilePromise(destFile)
-        .then((srcBuf) => srcBuf.toString()),
+      mfs.readFilePromise(scriptDestFile),
       mfs.readFilePromise(manifestFile)
         .then((manifestJson) => {
-          const manifest = JSON.parse(manifestJson.toString())
-          const cssFile = manifest['template.css']
+          const manifest = JSON.parse(manifestJson)
+          const cssFile = manifest['styles.css']
           return cssFile
             ? mfs.readFilePromise(`${componentDistRoot}/${cssFile}`)
-              .then((cssBuf) => cssBuf.toString())
               .then((css) => ({css, cssFile}))
             : {
               css: null,
@@ -104,16 +118,16 @@ const compileSource = function compileSource (src) {
         })
         .catch(() => ({}))
     ]))
-    .then(([js, {cssFile, css}]) => ({js, cssFile, css}))
+    .then(([js, {css, cssFile}]) => ({js, css, cssFile}))
 }
 
 const compileRendering = function compileRendering ({rendering, outputType = defaultOutputType}) {
   let tic = timer.tic()
   return generateSource(rendering, outputType)
-    .then((src) => {
+    .then(({script, styles}) => {
       debugTimer('generate source', tic.toc())
 
-      return compileSource(src)
+      return compileSource(script, styles)
     })
     .then(({js, css, cssFile}) => {
       const cssPath = cssFile ? `styles/${cssFile}` : null

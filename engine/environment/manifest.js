@@ -14,6 +14,7 @@ Example:
             "outputType": "default",
             "src": "/workdir/engine/bundle/src/components/chains/default-chain.jsx",
             "dist": "/workdir/engine/bundle/dist/components/chains/default-chain/default.js"
+            "css": "/workdir/engine/bundle/dist/components/chains/default-chain/default.css"
           }
         }
       }
@@ -50,7 +51,8 @@ const createComponentEntry = (src, componentType, componentName, outputType) => 
       : {},
     {
       src,
-      dist: `${componentDistRoot}/${p}`
+      dist: `${componentDistRoot}/${p}`,
+      css: `${componentDistRoot}/${p}`.replace(/\.js$/, '.css')
       // uri: `${apiPrefix}/dist/components/${p}`
     }
   )

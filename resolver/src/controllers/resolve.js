@@ -78,7 +78,7 @@ const parseContentSourceParameters = function parseContentSourceParameters (reso
       }
     }
   }
-  return () => null
+  return () => ({})
 }
 
 const getResolverHydrater = function getResolverHydrater (resolver) {

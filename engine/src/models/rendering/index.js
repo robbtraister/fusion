@@ -87,7 +87,7 @@ class Rendering {
     debug(`get compilation: ${this.name}[${outputType}]`)
     this.compilations[outputType] = this.compilations[outputType] ||
       this.getJson()
-        .then((json) => compileRendering({name: this.name, rendering: json, outputType}))
+        .then((json) => compileRendering({rendering: json, outputType}))
         .then(({js, css, cssFile}) => {
           const artifacts = []
 

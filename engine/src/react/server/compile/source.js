@@ -21,46 +21,50 @@ function fileExists (fp) {
   return false
 }
 
-function componentCss (fp, name) {
-  const cssFilePath = fp.replace(/\.js$/, '.css')
-  return fileExists(cssFilePath)
-    ? `require('${cssFilePath}')`
+function componentCss (name, fp) {
+  return (fp && fileExists(fp))
+    ? `require('${fp}')`
     : ''
 }
 
-function componentImport (fp, name) {
-  return (fp === 'fusion:static')
-    ? `Fusion.components${name} = Fusion.components.Static`
-    : (name.startsWith(`['layouts']`))
-      ? `Fusion.components${name} = Fusion.components.Layout(Fusion.unpack(require('${fp}')))`
-      : `Fusion.components${name} = Fusion.unpack(require('${fp}'))`
-}
-
-const getComponentFile = function getComponentFile (type, id, outputType) {
-  try {
-    const componentConfig = components[type][id]
-    const componentOutputType = componentConfig.outputTypes[outputType] || componentConfig.outputTypes.default
-    const Component = unpack(require(componentOutputType.dist))
-    if (Component) {
-      return (isStatic(Component, outputType))
-        ? 'fusion:static'
-        : componentOutputType[srcFileType]
-    }
-  } catch (e) {
-  }
-  return null
-}
-
 function generateSource (renderable, outputType) {
-  const components = {}
+  const usedComponents = {}
   const types = {}
 
+  function componentImport (name, fp) {
+    try {
+      const Component = unpack(require(fp))
+      if (Component) {
+        return (isStatic(Component, outputType))
+          ? `Fusion.components${name} = Fusion.components.Static`
+          : (name.startsWith(`['layouts']`))
+            ? `Fusion.components${name} = Fusion.components.Layout(Fusion.unpack(require('${fp}')))`
+            : `Fusion.components${name} = Fusion.unpack(require('${fp}'))`
+      }
+    } catch (e) {
+      return ''
+    }
+  }
+
+  const getComponentFile = function getComponentFile (type, id, fileType = srcFileType) {
+    const componentConfig = components[type][id]
+    const componentOutputType = componentConfig && (componentConfig.outputTypes[outputType] || componentConfig.outputTypes.default)
+    return componentOutputType && componentOutputType[fileType]
+  }
+
   function getComponentName (type, id) {
-    const key = getComponentFile(type, id, outputType)
-    if (key) {
-      types[type] = true
-      components[key] = components[key] || `['${type}']['${id}']`
-      return components[key]
+    const key = `['${type}']['${id}']`
+    if (key in usedComponents) {
+      return usedComponents[key] ? key : null
+    } else {
+      const js = getComponentFile(type, id)
+      if (js) {
+        types[type] = true
+        usedComponents[key] = {js, css: getComponentFile(type, id, 'css')}
+        return key
+      } else {
+        usedComponents[key] = null
+      }
     }
   }
 
@@ -163,13 +167,14 @@ function generateSource (renderable, outputType) {
 
   const Template = renderableItem(renderable)
 
-  const contents = `'use strict'
+  const usedComponentKeys = Object.keys(usedComponents).filter(k => usedComponents[k]).sort()
+
+  const script = `'use strict'
 const React = require('react')
 window.Fusion = window.Fusion || {}
 Fusion.components = Fusion.components || {}
-${Object.keys(types).map(t => `Fusion.components.${t} = Fusion.components.${t} || {}`)}
-${Object.keys(components).map(k => componentCss(k, components[k])).join('\n')}
-${Object.keys(components).map(k => componentImport(k, components[k])).join('\n')}
+${Object.keys(types).map(t => `Fusion.components.${t} = Fusion.components.${t} || {}`).join('\n')}
+${usedComponentKeys.map(k => componentImport(k, usedComponents[k].js)).join('\n')}
 Fusion.Template = function (props) {
   return React.createElement(React.Fragment, {}, ${Template})
 }
@@ -177,7 +182,11 @@ Fusion.Template.layout = ${renderable.layout ? `'${renderable.layout}'` : 'null'
 module.exports = Fusion.Template
 `
 
-  return Promise.resolve(contents)
+  const styles = `'use strict'
+${usedComponentKeys.map(k => componentCss(k, usedComponents[k].css)).join('\n')}
+`
+
+  return Promise.resolve({script, styles})
 }
 
 module.exports = generateSource

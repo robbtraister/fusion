@@ -174,7 +174,7 @@ class Rendering {
     const uri = `/dist/${this.type}/${this.id}`
     return (
       (this.json)
-        ? publishOutputTypes(uri, this.json)
+        ? publishOutputTypes(uri, this.json, propagate ? 'RequestResponse' : 'Event')
           .then(
             // if this is the first version to receive this rendering
             (propagate)
@@ -186,6 +186,13 @@ class Rendering {
           )
         : Promise.reject(new Error('no rendering provided to publish'))
     )
+  }
+
+  static async compile (type) {
+    return model(type).find()
+      .then(objects =>
+        Promise.all(objects.map(obj => new Rendering(type, obj.id, obj).publish(false)))
+      )
   }
 }
 

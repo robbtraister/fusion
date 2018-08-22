@@ -2,9 +2,9 @@
 
 const engine = require('./engine')
 
-const fetch = function fetch (contentSource, contentKey, arcSite, version) {
+const fetch = function fetch (contentSource, contentKey, version) {
   return engine({
-    uri: `/content/fetch/${contentSource}?key=${encodeURIComponent(JSON.stringify(contentKey))}${arcSite ? `&_website=${arcSite}` : ''}`,
+    uri: `/content/fetch/${contentSource}?key=${encodeURIComponent(JSON.stringify(contentKey))}`,
     version
   })
 }

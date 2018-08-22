@@ -88,8 +88,14 @@ const getResolverHydrater = function getResolverHydrater (resolver) {
 
   const contentResolver = (resolver.contentSourceId)
     ? (requestParts, arcSite, version) => {
-      const key = contentSourceParser(requestParts)
-      return fetch(resolver.contentSourceId, key, arcSite, version)
+      const key = Object.assign(
+        {
+          uri: requestParts.pathname,
+          'arc-site': arcSite
+        },
+        contentSourceParser(requestParts)
+      )
+      return fetch(resolver.contentSourceId, key, version)
         .then(content => ({key, content}))
     }
     : (requestUri, arcSite) => Promise.resolve({key: null, content: null})

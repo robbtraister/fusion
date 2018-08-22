@@ -121,7 +121,7 @@ class Rendering {
     }
   }
 
-  async getContent () {
+  async getContent (arcSite) {
     // I hate how this works, pulling content only for pages
     // but that's what you get with legacy data
     this.contentPromise = this.contentPromise ||
@@ -134,7 +134,7 @@ class Rendering {
               return (!configs)
                 ? null
                 : getSource(configs.contentService)
-                  .then((source) => source.fetch(Object.assign(json.uri ? {uri: json.uri} : {}, configs.contentConfigValues)))
+                  .then((source) => source.fetch(Object.assign(json.uri ? {uri: json.uri} : {}, {'arc-site': arcSite}, configs.contentConfigValues)))
                   .then((document) => ({
                     source: configs.contentService,
                     key: configs.contentConfigValues,

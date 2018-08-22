@@ -48,8 +48,8 @@ function generateSource (renderable, outputType) {
 
   const getComponentFile = function getComponentFile (type, id, fileType = srcFileType) {
     const componentConfig = components[type][id]
-    const componentOutputType = componentConfig.outputTypes[outputType] || componentConfig.outputTypes.default
-    return componentOutputType[fileType]
+    const componentOutputType = componentConfig && (componentConfig.outputTypes[outputType] || componentConfig.outputTypes.default)
+    return componentOutputType && componentOutputType[fileType]
   }
 
   function getComponentName (type, id) {

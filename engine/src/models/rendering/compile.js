@@ -23,7 +23,7 @@ const scriptSourceFile = path.resolve(`${componentSrcRoot}/script.js`)
 const stylesSourceFile = path.resolve(`${componentSrcRoot}/styles.js`)
 const scriptDestFile = path.resolve(`${componentDistRoot}/script.js`)
 const stylesDestFile = path.resolve(`${componentDistRoot}/styles.js`)
-const manifestFile = path.resolve(`${componentDistRoot}/webpack.manifest.json`)
+const manifestFile = path.resolve(`${componentDistRoot}/styles.manifest.json`)
 
 const getMemoryFS = function getMemoryFS () {
   const memFs = new MemoryFS()
@@ -66,11 +66,7 @@ const compileSource = function compileSource (script, styles) {
   const mfs = getMemoryFS()
 
   return Promise.all([
-    Promise.resolve({
-      script: scriptSourceFile,
-      styles: stylesSourceFile
-    })
-      .then(getConfigs)
+    Promise.resolve(getConfigs(scriptSourceFile, stylesSourceFile))
       .then(webpack)
       .then((compiler) => {
         compiler.inputFileSystem = mfs
@@ -107,6 +103,7 @@ const compileSource = function compileSource (script, styles) {
       mfs.readFilePromise(manifestFile)
         .then((manifestJson) => {
           const manifest = JSON.parse(manifestJson)
+          console.log(manifest)
           const cssFile = manifest['styles.css']
           return cssFile
             ? mfs.readFilePromise(`${componentDistRoot}/${cssFile}`)

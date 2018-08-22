@@ -60,6 +60,7 @@ module.exports = Object.keys(components)
       plugins.push(
         new OnBuildWebpackPlugin(function (stats) {
           childProcess.exec(`rm -rf '${path.resolve(bundleDistRoot, 'page')}'`)
+          childProcess.exec(`rm -rf '${path.resolve(bundleDistRoot, 'styles')}'`)
           childProcess.exec(`rm -rf '${path.resolve(bundleDistRoot, 'template')}'`)
         })
       )

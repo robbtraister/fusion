@@ -107,7 +107,7 @@ const compileSource = function compileSource (src) {
     .then(([js, {cssFile, css}]) => ({js, cssFile, css}))
 }
 
-const compileRendering = function compileRendering ({name, rendering, outputType = defaultOutputType}) {
+const compileRendering = function compileRendering ({rendering, outputType = defaultOutputType}) {
   let tic = timer.tic()
   return generateSource(rendering, outputType)
     .then((src) => {
@@ -116,7 +116,7 @@ const compileRendering = function compileRendering ({name, rendering, outputType
       return compileSource(src)
     })
     .then(({js, css, cssFile}) => {
-      const cssPath = cssFile ? `${name}/${cssFile}` : null
+      const cssPath = cssFile ? `styles/${cssFile}` : null
       js = js.replace(/;*$/, `;Fusion.Template.cssFile=${cssPath ? `'${cssPath}'` : 'null'}`)
 
       return {js, css, cssFile: cssPath}

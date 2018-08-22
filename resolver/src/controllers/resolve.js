@@ -55,14 +55,14 @@ const parseContentSourceParameters = function parseContentSourceParameters (reso
     const mappers = Object.keys(resolver.contentConfigMapping).map(key => {
       const param = resolver.contentConfigMapping[key]
       return {
-        parameter: (requestUri) => {
-          const queryParams = url.parse(requestUri, true).query
+        parameter: (requestParts) => {
+          const queryParams = requestParts.query
           return {[key]: queryParams[param.name]}
         },
-        pattern: (requestUri) => {
+        pattern: (requestParts) => {
           // TODO optimize for multiple pattern params so we don't regex match each time
           const pattern = new RegExp(resolver.pattern)
-          const groups = getUriPathname(requestUri).match(pattern)
+          const groups = requestParts.pathname.match(pattern)
           const uri = trailingSlashRewrite(groups[param.index])
           return {[key]: uri} // force trailing slash
         },
@@ -83,20 +83,27 @@ const getResolverHydrater = function getResolverHydrater (resolver) {
   const contentSourceParser = parseContentSourceParameters(resolver)
 
   const contentResolver = (resolver.contentSourceId)
-    ? (requestUri, arcSite, version) => {
-      const contentSourceParams = contentSourceParser(requestUri)
-      requestUri = trailingSlashRewrite(requestUri)
-      const key = Object.assign({'uri': requestUri, '_website': arcSite}, contentSourceParams)
+    ? (requestParts, arcSite, version) => {
+      const contentSourceParams = contentSourceParser(requestParts)
+      const requestPath = trailingSlashRewrite(requestParts.pathname)
+      const key = Object.assign({'uri': requestPath, '_website': arcSite}, contentSourceParams)
       return fetch(resolver.contentSourceId, key, version)
         .then(content => ({key, content}))
     }
     : (requestUri, arcSite) => Promise.resolve({key: null, content: null})
 
-  return (requestUri, arcSite) => contentResolver(requestUri, arcSite)
+  return (requestParts, arcSite) => contentResolver(requestParts, arcSite)
     .then(({content, key}) => Object.assign(
       {
-        requestUri,
-        rendering: renderingResolver(content)
+        // keep requestUri temporarily for backwards compatibility
+        requestUri: requestParts.href,
+        request: {
+          uri: requestParts.href,
+          path: requestParts.pathname,
+          query: requestParts.query
+        },
+        rendering: renderingResolver(content),
+        resolver: Object.assign({}, resolver, {versions: undefined})
       },
       resolver.contentSourceId
         ? {
@@ -108,10 +115,6 @@ const getResolverHydrater = function getResolverHydrater (resolver) {
         }
         : {}
     ))
-}
-
-const getUriPathname = function getUriPathname (requestUri) {
-  return url.parse(requestUri).pathname
 }
 
 const getResolverMatcher = function getResolverMatcher (resolver) {
@@ -213,7 +216,7 @@ const resolve = function resolve (requestUri, arcSite, version) {
         templateResolvers.find(resolver => resolver.match(requestParts, arcSite))
 
       return resolver
-        ? resolver.hydrate(requestUri, arcSite, version)
+        ? resolver.hydrate(requestParts, arcSite, version)
         : null
     })
 }

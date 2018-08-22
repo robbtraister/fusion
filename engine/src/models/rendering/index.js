@@ -134,7 +134,7 @@ class Rendering {
               return (!configs)
                 ? null
                 : getSource(configs.contentService)
-                  .then((source) => source.fetch(configs.contentConfigValues))
+                  .then((source) => source.fetch(Object.assign(json.uri ? {uri: json.uri} : {}, configs.contentConfigValues)))
                   .then((document) => ({
                     source: configs.contentService,
                     key: configs.contentConfigValues,

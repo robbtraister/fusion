@@ -21,7 +21,8 @@ function fileExists (fp) {
   return false
 }
 
-function componentCss (name, fp) {
+function componentCss (name, config) {
+  const fp = config.css
   return (fp && fileExists(fp))
     ? `require('${fp}')`
     : ''
@@ -31,10 +32,11 @@ function generateSource (renderable, outputType) {
   const usedComponents = {}
   const types = {}
 
-  function componentImport (name, fp) {
+  function componentImport (name, config) {
     try {
-      const Component = unpack(require(fp))
+      const Component = unpack(require(config.dist))
       if (Component) {
+        const fp = config[srcFileType]
         return (isStatic(Component, outputType))
           ? `Fusion.components${name} = Fusion.components.Static`
           : (name.startsWith(`['layouts']`))
@@ -42,14 +44,13 @@ function generateSource (renderable, outputType) {
             : `Fusion.components${name} = Fusion.unpack(require('${fp}'))`
       }
     } catch (e) {
-      return ''
     }
   }
 
-  const getComponentFile = function getComponentFile (type, id, fileType = srcFileType) {
+  const getComponentConfig = function getComponentConfig (type, id) {
     const componentConfig = components[type][id]
     const componentOutputType = componentConfig && (componentConfig.outputTypes[outputType] || componentConfig.outputTypes.default)
-    return componentOutputType && componentOutputType[fileType]
+    return componentOutputType
   }
 
   function getComponentName (type, id) {
@@ -57,10 +58,10 @@ function generateSource (renderable, outputType) {
     if (key in usedComponents) {
       return usedComponents[key] ? key : null
     } else {
-      const js = getComponentFile(type, id)
-      if (js) {
+      const config = getComponentConfig(type, id)
+      if (config) {
         types[type] = true
-        usedComponents[key] = {js, css: getComponentFile(type, id, 'css')}
+        usedComponents[key] = config
         return key
       } else {
         usedComponents[key] = null
@@ -174,7 +175,7 @@ const React = require('react')
 window.Fusion = window.Fusion || {}
 Fusion.components = Fusion.components || {}
 ${Object.keys(types).map(t => `Fusion.components.${t} = Fusion.components.${t} || {}`).join('\n')}
-${usedComponentKeys.map(k => componentImport(k, usedComponents[k].js)).join('\n')}
+${usedComponentKeys.map(k => componentImport(k, usedComponents[k])).join('\n')}
 Fusion.Template = function (props) {
   return React.createElement(React.Fragment, {}, ${Template})
 }
@@ -183,7 +184,7 @@ module.exports = Fusion.Template
 `
 
   const styles = `'use strict'
-${usedComponentKeys.map(k => componentCss(k, usedComponents[k].css)).join('\n')}
+${usedComponentKeys.map(k => componentCss(k, usedComponents[k])).join('\n')}
 `
 
   return Promise.resolve({script, styles})

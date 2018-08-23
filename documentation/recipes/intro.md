@@ -40,7 +40,7 @@ You can also read more documentation on [creating **content** in Arc](TODO: add 
 This documentation doesn't cover how to use the other tools, libraries or frameworks that work in conjunction with Fusion. With that in mind, developers using this guide should have (or be willing to learn):
 
 - basic web development knowledge and/or experience (including command line familiarity)
-- proficiency with [JavaScript](https://developer.mozilla.org/en-US/docs/Web/javascript), [React](https://reactjs.org/docs/getting-started.html), [JSX](https://reactjs.org/docs/introducing-jsx.html) and modern best practices
+- proficiency with [JavaScript](https://developer.mozilla.org/en-US/docs/Web/javascript), [React](https://reactjs.org/docs/getting-started.html), [JSX](https://reactjs.org/docs/introducing-jsx.html) and knowledge of JS best practices
 - basic understanding of [GraphQL](https://graphql.org/)
 - working knowledge of [Docker](https://docs.docker.com/)
 - understanding of how to use PageBuilder Admin

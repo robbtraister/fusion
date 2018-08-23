@@ -1,6 +1,6 @@
 # Creating a Feature Pack
 
-If you're starting a new project with Fusion, you'll need to create a brand new Feature Pack repo. This is where you'll write the site-specific code for components that make up your webpages, as well as define the content sources that your components will consume data from.
+If you're starting a new project with Fusion, you'll need to create a brand new Feature Pack repo to work from. This is where you'll write the site-specific code for components that make up your webpages, as well as define the content sources that your components will consume data from. The Feature Pack repo is where you will do almost all of your work as a Fusion developer.
 
 ## Cloning a new Feature Pack
 

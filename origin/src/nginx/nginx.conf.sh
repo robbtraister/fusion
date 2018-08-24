@@ -465,6 +465,10 @@ cat <<EOB
       rewrite                   (.*) ${API_PREFIX}/configs/content/sources;
     }
 
+    location = ${CONTEXT_PATH}/content/api/fetch {
+      rewrite                   (.*) ${API_PREFIX}/content/fetch/\${arg_service}?v=\${arg_v}&key=\${arg_config};
+    }
+
     location ~ ^${CONTEXT_PATH}/admin/api/(chain|feature|layout)-config/?$ {
       set                       \$type \$1;
       rewrite                   (.*) ${API_PREFIX}/configs/\${type}s;

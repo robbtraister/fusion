@@ -370,6 +370,7 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
                       templateHref: undefined
                     },
                     fetched: rendering.getCssFile()
+                      .catch(() => null)
                       .then((templateCssFile) => {
                         Component.inlines.cssLinks.cached = {
                           outputTypeHref: (outputTypeHasCss(outputType)) ? `${contextPath}/dist/components/output-types/${outputType}.css?v=${version}` : null,

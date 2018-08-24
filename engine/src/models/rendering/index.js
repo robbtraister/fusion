@@ -30,6 +30,7 @@ const {
 const fetchCssHash = (isDev)
   ? (name, outputType = defaultOutputType) => fetchFile(`${name}/${outputType}.css.json`)
     .then((json) => JSON.parse(json))
+    .catch(() => null)
   : (name, outputType = defaultOutputType) => model('hash').get({version, id: `${name}/${outputType}`})
 
 const pushCssHash = (isDev)
@@ -149,7 +150,8 @@ class Rendering {
     debug(`get css file: ${this.name}[${outputType}]`)
     this.cssFilePromise = this.cssFilePromise ||
       fetchCssHash(this.name, outputType)
-        .catch(() => this.compile(outputType))
+        // if not found, re-compile
+        .then((data) => data || this.compile(outputType))
         .then(({cssFile}) => cssFile)
     return this.cssFilePromise
   }
@@ -158,7 +160,7 @@ class Rendering {
     debug(`get styles: ${this.name}[${outputType}]`)
     this.stylesPromise = this.stylesPromise ||
       this.getCssFile(outputType)
-        .then((cssFile) => fetchFile(cssFile))
+        .then((cssFile) => cssFile && fetchFile(cssFile))
         .catch(() => this.compile(outputType).then(({css}) => css))
     return this.stylesPromise
   }

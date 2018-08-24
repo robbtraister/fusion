@@ -14,7 +14,8 @@ const { generateSource } = require('../../react')
 const {
   componentDistRoot,
   componentSrcRoot,
-  defaultOutputType
+  defaultOutputType,
+  version
 } = require('../../../environment')
 const timer = require('../../timer')
 const getConfigs = require('../../../webpack/template.js')
@@ -72,7 +73,9 @@ const compileSource = function compileSource (script, styles) {
         compiler.inputFileSystem = mfs
         compiler.outputFileSystem = mfs
 
-        debugTimer('webpack setup', tic.toc())
+        const elapsedTime = tic.toc()
+        debugTimer('webpack setup', elapsedTime)
+        sendMetrics([{type: METRIC_TYPES.DB_QUERY_DURATION, values: [elapsedTime], tags: ['module:compile', 'webpack:setup']}])
 
         return compiler
       }),

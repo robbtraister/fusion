@@ -73,7 +73,12 @@ const fetch = (uri, forceSync) => {
 
     return request(resolvedUri)
       .then((data) => {
-        debugTimer(`Fetched from source [${sanitizedUri}]`, tic.toc())
+        const elapsedTime = tic.toc()
+        debugTimer(`Fetched from source [${sanitizedUri}]`, elapsedTime)
+        sendMetrics([
+          {type: METRIC_TYPES.CONTENT_FETCH_DURATION, values: [elapsedTime], tags: ['content:fetch']}
+        ])
+
         return pushContent(cacheKey, data)
           .then(() => data)
       })
@@ -87,9 +92,16 @@ const fetch = (uri, forceSync) => {
         return fetchContent(cacheKey)
           .then((data) => {
             if (!data) {
+              sendMetrics([{type: METRIC_TYPES.ERROR, values: [1], tags: ['cache:fetch']}])
               throw new Error('data error from cache')
             }
-            debugTimer(`Fetched from cache [${sanitizedUri}]`, tic.toc())
+            const elapsedTime = tic.toc()
+            debugTimer(`Fetched from cache [${sanitizedUri}]`, elapsedTime)
+            sendMetrics([
+              {type: METRIC_TYPES.CACHE_FETCH_DURATION, values: [elapsedTime], tags: ['cache:fetch']},
+              {type: METRIC_TYPES.SUCCESS, values: [1], tags: ['cache:fetch']}
+            ])
+
             return data
           })
           .catch(fetchFromSource)

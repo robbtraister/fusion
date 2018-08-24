@@ -64,7 +64,12 @@ function Mongoose (mongoUrl) {
               return model.find(query)
             })
             .then((data) => {
-              debugTimer(`${modelName}.find()`, tic.toc())
+              const elapsedTime = tic.toc()
+              debugTimer(`${modelName}.find()`, elapsedTime)
+              sendMetrics([
+                {type: METRIC_TYPES.DB_QUERY_DURATION, values: [elapsedTime], tags: ['db:query']}
+              ])
+
               return data
             })
         },
@@ -77,7 +82,12 @@ function Mongoose (mongoUrl) {
               return model.findOne(query)
             })
             .then((data) => {
-              debugTimer(`${modelName}.findOne()`, tic.toc())
+              const elapsedTime = tic.toc()
+              debugTimer(`${modelName}.findOne()`, elapsedTime)
+              sendMetrics([
+                {type: METRIC_TYPES.DB_QUERY_DURATION, values: [elapsedTime], tags: ['db:query']}
+              ])
+
               return data
             })
         },
@@ -90,7 +100,12 @@ function Mongoose (mongoUrl) {
               return model.findById(_id)
             })
             .then((data) => {
-              debugTimer(`${modelName}.get(${_id})`, tic.toc())
+              const elapsedTime = tic.toc()
+              debugTimer(`${modelName}.get(${_id})`, elapsedTime)
+              sendMetrics([
+                {type: METRIC_TYPES.DB_QUERY_DURATION, values: [elapsedTime], tags: ['db:query']}
+              ])
+
               return data
             })
         },
@@ -103,7 +118,12 @@ function Mongoose (mongoUrl) {
               return model.update({_id: doc._id}, doc, { upsert: true })
             })
             .then((data) => {
-              debugTimer(`${modelName}.put()`, tic.toc())
+              const elapsedTime = tic.toc()
+              debugTimer(`${modelName}.put()`, elapsedTime)
+              sendMetrics([
+                {type: METRIC_TYPES.DB_QUERY_DURATION, values: [elapsedTime], tags: ['db:query']}
+              ])
+
               return data
             })
         }

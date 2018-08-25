@@ -122,7 +122,7 @@ const getAncestors = function getAncestors (node) {
     : []
 }
 
-const render = function render ({Component, requestUri, content, _website}) {
+const render = function render ({Component, request, content, _website}) {
   const renderHTML = () => new Promise((resolve, reject) => {
     try {
       const elementTic = timer.tic()
@@ -134,7 +134,7 @@ const render = function render ({Component, requestUri, content, _website}) {
           globalContent: content ? content.document : null,
           globalContentConfig: content ? {source: content.source, key: content.key} : null,
           outputType: Component.outputType,
-          requestUri,
+          requestUri: request.uri,
           siteProperties: fusionProperties(_website)
         }
       )
@@ -370,6 +370,7 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
                       templateHref: undefined
                     },
                     fetched: rendering.getCssFile()
+                      .catch(() => null)
                       .then((templateCssFile) => {
                         Component.inlines.cssLinks.cached = {
                           outputTypeHref: (outputTypeHasCss(outputType)) ? `${contextPath}/dist/components/output-types/${outputType}.css?v=${version}` : null,

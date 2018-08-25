@@ -102,4 +102,16 @@ distRouter.use('/page', getTypeRouter('page', true))
 distRouter.use('/rendering', getTypeRouter('rendering'))
 distRouter.use('/template', getTypeRouter('template', true))
 
+if (!isDev) {
+  distRouter.post('/compile', (req, res, next) => {
+    Promise.all([
+      Rendering.compile('page'),
+      Rendering.compile('template')
+    ])
+      .then(([pages, templates]) => {
+        res.send(200)
+      })
+  })
+}
+
 module.exports = distRouter

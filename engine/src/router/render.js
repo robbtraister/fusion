@@ -54,7 +54,7 @@ function getTypeRouter (routeType) {
       const rendering = new Rendering(type, payload.rendering.id)
       return Promise.all([
         rendering.getComponent(outputType, payload.rendering.child),
-        rendering.getContent()
+        rendering.getContent(payload._website)
       ])
         // template will already have content populated by resolver
         // use Object.assign to default to the resolver content

@@ -22,7 +22,7 @@ const fetchHandler = (forceUpdate) => (req, res, next) => {
       }
     })
       .catch(() => ({key: keyString}))
-      .then((key) => Object.assign(key, {'arc-site': website}))
+      .then((key) => Object.assign({'arc-site': website}, key))
   ])
     .then(([source, key]) => source.fetch(key, forceUpdate)
       .then(data => source.filter(query, data)))

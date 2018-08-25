@@ -34,7 +34,7 @@ const invoke = function invoke (uri, payload, version, InvocationType = 'Request
     lambda.invoke(
       {
         FunctionName: functionName,
-        InvocationType: InvocationType || 'RequestResponse',
+        InvocationType,
         Qualifier: version,
         Payload: JSON.stringify({
           method: 'POST',
@@ -48,10 +48,10 @@ const invoke = function invoke (uri, payload, version, InvocationType = 'Request
   })
 }
 
-const publishOutputTypes = function publishOutputTypes (uri, payload) {
+const publishOutputTypes = function publishOutputTypes (uri, payload, InvocationType = 'RequestResponse') {
   return Promise.all(
     getOutputTypes()
-      .map((outputType) => invoke(`${uri}/${outputType}`, payload, version))
+      .map((outputType) => invoke(`${uri}/${outputType}`, payload, version, InvocationType))
   )
 }
 
@@ -59,7 +59,7 @@ const publishToOtherVersions = function publishToOtherVersions (uri, payload) {
   return listOtherVerions()
     .then(versions => Promise.all(
       // this InvocationType makes the request "fire and forget"
-      versions.map(v => invoke(uri, payload, v, 'Event'))
+      versions.map(version => invoke(uri, payload, version, 'Event'))
     ))
 }
 

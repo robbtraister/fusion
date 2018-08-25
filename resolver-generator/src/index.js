@@ -23,7 +23,7 @@ module.exports.handler = (event, context, callback) => {
 }
 
 if (module === require.main) {
-  main('pagebuilder-fusion', 'environments/bonnier-fusion-sandbox/resolvers.json')
+  main('pagebuilder-fusion', 'environments/foo-sandbox/resolvers.json')
     .then(console.log)
     .catch(console.error)
 }

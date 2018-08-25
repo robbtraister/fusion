@@ -30,6 +30,7 @@ const {
 const fetchCssHash = (isDev)
   ? (name, outputType = defaultOutputType) => fetchFile(`${name}/${outputType}.css.json`)
     .then((json) => JSON.parse(json))
+    .catch(() => null)
   : (name, outputType = defaultOutputType) => model('hash').get({version, id: `${name}/${outputType}`})
 
 const pushCssHash = (isDev)
@@ -87,7 +88,7 @@ class Rendering {
     debug(`get compilation: ${this.name}[${outputType}]`)
     this.compilations[outputType] = this.compilations[outputType] ||
       this.getJson()
-        .then((json) => compileRendering({name: this.name, rendering: json, outputType}))
+        .then((json) => compileRendering({rendering: json, outputType}))
         .then(({js, css, cssFile}) => {
           const artifacts = []
 
@@ -121,7 +122,7 @@ class Rendering {
     }
   }
 
-  async getContent () {
+  async getContent (arcSite) {
     // I hate how this works, pulling content only for pages
     // but that's what you get with legacy data
     this.contentPromise = this.contentPromise ||
@@ -134,7 +135,7 @@ class Rendering {
               return (!configs)
                 ? null
                 : getSource(configs.contentService)
-                  .then((source) => source.fetch(configs.contentConfigValues))
+                  .then((source) => source.fetch(Object.assign(json.uri ? {uri: json.uri} : {}, {'arc-site': arcSite}, configs.contentConfigValues)))
                   .then((document) => ({
                     source: configs.contentService,
                     key: configs.contentConfigValues,
@@ -149,7 +150,8 @@ class Rendering {
     debug(`get css file: ${this.name}[${outputType}]`)
     this.cssFilePromise = this.cssFilePromise ||
       fetchCssHash(this.name, outputType)
-        .catch(() => this.compile(outputType))
+        // if not found, re-compile
+        .then((data) => data || this.compile(outputType))
         .then(({cssFile}) => cssFile)
     return this.cssFilePromise
   }
@@ -158,7 +160,7 @@ class Rendering {
     debug(`get styles: ${this.name}[${outputType}]`)
     this.stylesPromise = this.stylesPromise ||
       this.getCssFile(outputType)
-        .then((cssFile) => fetchFile(cssFile))
+        .then((cssFile) => cssFile && fetchFile(cssFile))
         .catch(() => this.compile(outputType).then(({css}) => css))
     return this.stylesPromise
   }
@@ -174,7 +176,7 @@ class Rendering {
     const uri = `/dist/${this.type}/${this.id}`
     return (
       (this.json)
-        ? publishOutputTypes(uri, this.json)
+        ? publishOutputTypes(uri, this.json, propagate ? 'RequestResponse' : 'Event')
           .then(
             // if this is the first version to receive this rendering
             (propagate)
@@ -186,6 +188,13 @@ class Rendering {
           )
         : Promise.reject(new Error('no rendering provided to publish'))
     )
+  }
+
+  static async compile (type) {
+    return model(type).find()
+      .then(objects =>
+        Promise.all(objects.map(obj => new Rendering(type, obj.id, obj).publish(false)))
+      )
   }
 }
 

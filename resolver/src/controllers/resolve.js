@@ -35,12 +35,12 @@ const { pageConfigs, templateConfigs } = (resolveFromDB)
   })()
 
 const pageResolversPromise = pageConfigs
-  .then((configs) => configs.sort(PageResolver.sort))
   .then((configs) => configs.map((config) => new PageResolver(config)))
+  .then((resolvers) => resolvers.sort(PageResolver.sort))
 
 const templateResolversPromise = templateConfigs
-  .then((configs) => configs.sort(TemplateResolver.sort))
   .then((configs) => configs.map((config) => new TemplateResolver(config)))
+  .then((resolvers) => resolvers.sort(TemplateResolver.sort))
 
 const resolversPromise = Promise.all([
   pageResolversPromise,

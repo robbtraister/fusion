@@ -3,7 +3,10 @@
 class BaseResolver {
   constructor (config) {
     this.config = config
+
+    this.id = config.id || config._id
     this.sites = config.sites
+    this.hasSites = config.sites && config.sites.length
   }
 
   async hydrate (requestParts, arcSite, version) {
@@ -18,7 +21,7 @@ class BaseResolver {
   }
 
   matchSite (arcSite) {
-    return (this.sites && this.sites.length)
+    return (this.hasSites)
       ? this.sites.includes(arcSite)
       : true
   }
@@ -53,6 +56,11 @@ class BaseResolver {
         }
         : {}
     )
+  }
+
+  static sort (a, b) {
+    if (a.hasSites && !b.hasSites) return -1
+    if (!a.hasSites && b.hasSites) return 1
   }
 }
 

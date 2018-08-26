@@ -50,9 +50,7 @@ class TemplateResolver extends BaseResolver {
 
     this.type = 'template'
 
-    this.id = config.id || config._id
     this.pattern = new RegExp(config.pattern) // the resolver URI pattern
-    this.sites = config.sites
     this.template = config.page
 
     this.contentMapping = config.content2pageMapping
@@ -130,7 +128,8 @@ class TemplateResolver extends BaseResolver {
   }
 
   static sort (a, b) {
-    return +a.priority - +b.priority
+    // sort by priority, then by default (site-specificity)
+    return (+a.priority - +b.priority) || BaseResolver.sort(a, b)
   }
 }
 

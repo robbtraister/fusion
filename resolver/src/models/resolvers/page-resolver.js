@@ -12,9 +12,7 @@ class PageResolver extends BaseResolver {
 
     this.type = 'page'
 
-    this.id = config.id || config._id
     this.uri = TRAILING_SLASH_REWRITES.DROP(config.uri)
-    this.sites = config.sites
   }
 
   match (requestParts, arcSite) {
@@ -26,11 +24,6 @@ class PageResolver extends BaseResolver {
       type: this.type,
       id: this.id
     }
-  }
-
-  static sort (a, b) {
-    if ((a.sites && a.sites.length) && !(b.sites && b.sites.length)) return -1
-    if (!(a.sites && a.sites.length) && (b.sites && b.sites.length)) return 1
   }
 }
 

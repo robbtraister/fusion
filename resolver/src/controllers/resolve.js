@@ -34,23 +34,28 @@ const { pageConfigs, templateConfigs } = (resolveFromDB)
     }
   })()
 
-const pageResolvers = pageConfigs
+const pageResolversPromise = pageConfigs
   .then((configs) => configs.sort(PageResolver.sort))
   .then((configs) => configs.map((config) => new PageResolver(config)))
 
-const templateResolvers = templateConfigs
+const templateResolversPromise = templateConfigs
   .then((configs) => configs.sort(TemplateResolver.sort))
   .then((configs) => configs.map((config) => new TemplateResolver(config)))
+
+const resolversPromise = Promise.all([
+  pageResolversPromise,
+  templateResolversPromise
+])
+  .then(([pageResolvers, templateResolvers]) => pageResolvers.concat(templateResolvers))
 
 const resolve = function resolve (requestUri, arcSite, version) {
   const requestParts = url.parse(requestUri, true)
   requestParts.pathname = trailingSlashRewrite(requestParts.pathname)
   debugLogger(`Resolving: ${JSON.stringify(requestUri)}`)
 
-  return Promise.all([pageResolvers, templateResolvers])
-    .then(([pageResolvers, templateResolvers]) => {
-      const resolver = pageResolvers.find(resolver => resolver.match(requestParts, arcSite)) ||
-        templateResolvers.find(resolver => resolver.match(requestParts, arcSite))
+  return resolversPromise
+    .then((resolvers) => {
+      const resolver = resolvers.find(resolver => resolver.match(requestParts, arcSite))
 
       return resolver
         ? resolver.resolve(requestParts, arcSite, version)

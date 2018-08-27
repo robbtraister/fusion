@@ -135,8 +135,7 @@ class TemplateResolver extends BaseResolver {
   }
 
   static sort (a, b) {
-    // sort by priority, then by default (site-specificity)
-    return (+a.priority - +b.priority) || BaseResolver.sort(a, b)
+    return +a.priority - +b.priority
   }
 }
 

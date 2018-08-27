@@ -8,11 +8,18 @@ const debugLogger = require('debug')('fusion:resolver:template')
 
 const BaseResolver = require('./base-resolver')
 
-const fetch = require('../../controllers/fetch')
+const engine = require('../../utils/engine')
 
 const { RedirectError } = require('../../errors')
 
-function getParamMapper (param) {
+const fetch = function fetch (contentSource, contentKey, version) {
+  return engine({
+    uri: `/content/fetch/${contentSource}?key=${encodeURIComponent(JSON.stringify(contentKey))}`,
+    version
+  })
+}
+
+const getParamMapper = function getParamMapper (param) {
   return {
     parameter: (requestParts) => ({[param.key]: requestParts.query[param.name]}),
     pattern: (requestParts, groups) => ({[param.key]: groups[param.index]}),
@@ -20,7 +27,7 @@ function getParamMapper (param) {
   }[param.type]
 }
 
-function getParamExtractor (contentConfigMapping, pattern) {
+const getParamExtractor = function getParamExtractor (contentConfigMapping, pattern) {
   if (contentConfigMapping) {
     const params = Object.keys(contentConfigMapping)
       .map(key => Object.assign({key}, contentConfigMapping[key]))

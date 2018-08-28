@@ -7,6 +7,9 @@ const debugTimer = require('debug')('fusion:timer:dao:mongoose')
 const { mongoUrl } = require('../../environment')
 const timer = require('../timer')
 
+const sendMetrics = require('../utils/send-metrics')
+const {METRIC_TYPES} = require('../utils/constants/metrics')
+
 const schema = new mongoose.Schema({_id: String})
 
 function getNewConnection (mongoUrl) {

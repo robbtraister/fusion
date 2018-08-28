@@ -15,6 +15,8 @@ const {
   cacheProxyUrl,
   cachePrefix
 } = require('../../../environment')
+
+const sendMetrics = require('../../utils/send-metrics')
 const {METRIC_TYPES} = require('../../utils/constants/metrics')
 
 function getCacheKey (uri) {

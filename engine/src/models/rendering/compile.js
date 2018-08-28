@@ -18,6 +18,8 @@ const {
 } = require('../../../environment')
 const timer = require('../../timer')
 const getConfigs = require('../../../webpack/template.js')
+
+const sendMetrics = require('../../utils/send-metrics')
 const {METRIC_TYPES} = require('../../utils/constants/metrics')
 
 const scriptSourceFile = path.resolve(`${componentSrcRoot}/script.js`)

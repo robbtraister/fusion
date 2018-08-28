@@ -10,6 +10,9 @@ const timer = require('../timer')
 
 const MongoClient = require('mongodb').MongoClient
 
+const sendMetrics = require('../utils/send-metrics')
+const {METRIC_TYPES} = require('../utils/constants/metrics')
+
 function getNewConnection (mongoUrl) {
   return new Promise((resolve, reject) => {
     MongoClient.connect(mongoUrl, (err, connection) => err ? reject(err) : resolve(connection))

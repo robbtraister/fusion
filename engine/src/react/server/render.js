@@ -36,6 +36,9 @@ const {
 
 const { components } = require('../../../environment/manifest')
 
+const sendMetrics = require('../../utils/send-metrics')
+const {METRIC_TYPES} = require('../../utils/constants/metrics')
+
 const fileExists = (fp) => {
   try {
     fs.accessSync(fp, fs.constants.R_OK)

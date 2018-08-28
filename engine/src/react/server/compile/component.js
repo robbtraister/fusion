@@ -10,6 +10,9 @@ const unpack = require('../../../utils/unpack')
 
 const timer = require('../../../timer')
 
+const sendMetrics = require('../../../utils/send-metrics')
+const {METRIC_TYPES} = require('../../../utils/constants/metrics')
+
 const { components } = require('../../../../environment/manifest')
 
 const TimedComponent = (Component) => (props) => {

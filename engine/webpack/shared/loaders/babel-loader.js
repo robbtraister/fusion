@@ -9,16 +9,21 @@ module.exports = {
   options: {
     babelrc: false,
     presets: [
-      'env',
-      'react'
+      '@babel/env',
+      '@babel/react'
     ],
     plugins: [
       ['root-import', {
         rootPathPrefix: '~',
         rootPathSuffix: bundleSrcRoot
       }],
-      'transform-decorators-legacy',
-      'transform-object-rest-spread'
+      ['@babel/proposal-decorators', {
+        legacy: true
+      }],
+      ['@babel/proposal-class-properties', {
+        loose: true
+      }],
+      '@babel/proposal-object-rest-spread'
     ],
     comments: false
   }

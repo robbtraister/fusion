@@ -148,7 +148,7 @@ const render = function render ({Component, request, content, _website}) {
       sendMetrics([{type: METRIC_TYPES.RENDER_DURATION, values: [htmlElapsedTime], tags: ['render:html']}])
       resolve(html)
     } catch (e) {
-      sendMetrics([{type: METRIC_TYPES.RENDER_ERROR, values: [1], tags: ['render:error']}])
+      sendMetrics([{type: METRIC_TYPES.RENDER_RESULT, values: [1], tags: ['result:error']}])
       reject(e)
     }
   })

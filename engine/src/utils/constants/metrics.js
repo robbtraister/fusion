@@ -1,11 +1,11 @@
 const METRIC_TYPES = {
   CACHE_DURATION: 'arc.fusion.cache.duration',
-  CACHE_ERROR: 'arc.fusion.cache.error',
-  CACHE_SUCCESS: 'arc.fusion.cache.success',
+  CACHE_RESULT: 'arc.fusion.cache.result',
   COMPILE_DURATION: 'arc.fusion.compile.duration',
   CONTENT_LATENCY: 'arc.fusion.content.latency',
-  CONTENT_SUCCESS: 'arc.fusion.content.success',
+  CONTENT_RESULT: 'arc.fusion.content.result',
   RENDER_DURATION: 'arc.fusion.render.duration',
+  RENDER_RESULT: 'arc.fusion.render.result',
   WEBPACK_DURATION: 'arc.fusion.webpack.duration'
 }
 

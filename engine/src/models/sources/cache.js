@@ -93,14 +93,14 @@ const fetch = (uri, forceSync) => {
         return fetchContent(cacheKey)
           .then((data) => {
             if (!data) {
-              sendMetrics([{type: METRIC_TYPES.CACHE_ERROR, values: [1], tags: ['operation:fetch']}])
+              sendMetrics([{type: METRIC_TYPES.CACHE_RESULT, values: [1], tags: ['operation:fetch', 'result:error']}])
               throw new Error('data error from cache')
             }
             const elapsedTime = tic.toc()
             debugTimer(`Fetched from cache [${sanitizedUri}]`, elapsedTime)
             sendMetrics([
               {type: METRIC_TYPES.CACHE_LATENCY, values: [elapsedTime], tags: ['operation:fetch']},
-              {type: METRIC_TYPES.CACHE_SUCCESS, values: [1], tags: ['operation:fetch']}
+              {type: METRIC_TYPES.CACHE_SUCCESS, values: [1], tags: ['operation:fetch', 'result:success']}
             ])
 
             return data

@@ -1,8 +1,9 @@
 'use strict'
 
-const resolve = require('./resolve')
-const engine = require('./engine')
 const url = require('url')
+
+const resolve = require('./resolve')
+const engine = require('../utils/engine')
 
 const endpoint = function endpoint (data, arcSite, outputType) {
   return url.format({

@@ -1,7 +1,15 @@
 'use strict'
 
-module.exports = {
+const { isDev } = require('../../environment')
+
+const resolve = {
   cacheWithContext: false,
   extensions: ['.js', '.json', '.jsx', '.ts', '.tsx'],
   symlinks: false
 }
+
+if (isDev) {
+  resolve.modules = ['/workdir/engine/bundle/linked_modules']
+}
+
+module.exports = resolve

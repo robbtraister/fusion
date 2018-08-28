@@ -6,7 +6,6 @@ const app = require('./app')
 
 module.exports = {
   app,
-  fetch: require('./controllers/fetch'),
   make: require('./controllers/make'),
   resolve: require('./controllers/resolve'),
   router: require('./router'),

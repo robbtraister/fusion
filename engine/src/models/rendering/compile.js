@@ -75,7 +75,7 @@ const compileSource = function compileSource (script, styles) {
 
         const elapsedTime = tic.toc()
         debugTimer('webpack setup', elapsedTime)
-        sendMetrics([{type: METRIC_TYPES.WEBPACK_DURATION, values: [elapsedTime], tags: ['webpack:setup']}])
+        sendMetrics([{type: METRIC_TYPES.WEBPACK_DURATION, values: [elapsedTime], tags: ['webpack-op:setup']}])
 
         return compiler
       }),
@@ -97,7 +97,7 @@ const compileSource = function compileSource (script, styles) {
     .then((data) => {
       const elapsedTime = tic.toc()
       debugTimer('webpack compilation', elapsedTime)
-      sendMetrics([{type: METRIC_TYPES.WEBPACK_DURATION, values: [elapsedTime], tags: ['webpack:compile']}])
+      sendMetrics([{type: METRIC_TYPES.WEBPACK_DURATION, values: [elapsedTime], tags: ['webpack-op:compile']}])
 
       if (data.hasErrors()) {
         return Promise.reject(data.toJson().errors)

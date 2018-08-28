@@ -37,8 +37,8 @@ function getTimestamp () {
 }
 
 /**
- * This stub is created and exported if we're in dev because we don't care about sending metrics from dev
+ * This stub is exported if we're in dev because we don't care about sending metrics from dev
  */
 const sendMetricsStub = () => {}
 
-module.exports = isDev ? sendMetricsStub : sendMetrics
+module.exports = (!isDev && datadogApiKey) ? sendMetrics : sendMetricsStub

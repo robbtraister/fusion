@@ -1,5 +1,5 @@
 'use strict'
 
 module.exports = {
-  RedirectError: require('./RedirectError')
+  RedirectError: require('./redirect-error')
 }

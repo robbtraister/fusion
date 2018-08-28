@@ -3,7 +3,7 @@
 const express = require('express')
 
 const make = require('../controllers/make')
-const redirectHandler = require('../errors/RedirectError').handler
+const { handler: redirectHandler } = require('../errors/redirect-error')
 
 const makeRouter = express.Router()
 

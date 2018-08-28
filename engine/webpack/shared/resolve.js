@@ -9,7 +9,10 @@ const resolve = {
 }
 
 if (isDev) {
-  resolve.modules = ['/workdir/engine/bundle/linked_modules']
+  resolve.modules = [
+    '/workdir/engine/bundle/linked_modules',
+    'node_modules'
+  ]
 }
 
 module.exports = resolve

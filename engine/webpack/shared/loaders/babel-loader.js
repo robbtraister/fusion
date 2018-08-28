@@ -10,7 +10,11 @@ module.exports = {
     babelrc: false,
     presets: [
       '@babel/env',
-      '@babel/react'
+      '@babel/react',
+      ['@babel/typescript', {
+        allExtensions: true,
+        isTSX: true
+      }]
     ],
     plugins: [
       ['root-import', {

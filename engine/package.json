@@ -35,6 +35,7 @@
     "@babel/plugin-transform-react-jsx": "^7.0.0",
     "@babel/preset-env": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
+    "@babel/preset-typescript": "^7.0.0",
     "babel-loader": "^8.0.0",
     "babel-plugin-root-import": "^6.1.0",
     "body-parser": "^1.18.3",

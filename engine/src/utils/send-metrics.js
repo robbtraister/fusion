@@ -1,5 +1,5 @@
 const request = require('request')
-const { datadogApiKey, isDev, semver, version } = require('../../environment')
+const { datadogApiKey, environment, isDev, semver, version } = require('../../environment')
 
 /**
  * Takes the metric values, adds them to the object that DataDog is expecting, and makes the POST request
@@ -15,7 +15,7 @@ const sendMetrics = (metrics) => {
       return {
         metric: metric.type,
         points: [[getTimestamp(), metric.values]],
-        tags: ['app:fusion', `engine-version:${semver}`, `lambda-deployment:${version}`, ...metric.tags]
+        tags: ['app:fusion', `engine-version:${semver}`, `lambda-deployment:${version}`, `environment:${environment}`, ...metric.tags]
       }
     })
   }

@@ -79,6 +79,7 @@ const fetch = (uri, forceSync) => {
         const elapsedTime = tic.toc()
         debugTimer(`Fetched from source [${sanitizedUri}]`, elapsedTime)
         sendMetrics([
+          {type: METRIC_TYPES.CONTENT_RESULT, values: [1], tags: ['operation:fetch', 'result:success']},
           {type: METRIC_TYPES.CONTENT_LATENCY, values: [elapsedTime], tags: ['operation:fetch']}
         ])
 

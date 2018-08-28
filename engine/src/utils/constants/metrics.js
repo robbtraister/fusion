@@ -1,5 +1,5 @@
 const METRIC_TYPES = {
-  CACHE_DURATION: 'arc.fusion.cache.duration',
+  CACHE_LATENCY: 'arc.fusion.cache.latency',
   CACHE_RESULT: 'arc.fusion.cache.result',
   COMPILE_DURATION: 'arc.fusion.compile.duration',
   CONTENT_LATENCY: 'arc.fusion.content.latency',

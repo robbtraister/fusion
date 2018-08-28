@@ -1,6 +1,8 @@
 # Keeping Up to Date
 
-Your Fusion Feature Pack is like a [Tamagotchi](https://www.youtube.com/watch?v=YueDmq-w9X8) - it requires constant care and attention, or else it will get sick and blink angrily at you [until it dies](https://www.youtube.com/watch?v=uBmRjP7kJBE). Failing to update a Feature Pack may leave you with code that is outdated and unsupported by the latest versions of Fusion, and you won't be able to use the latest capabilities being developed by the Fusion platform team. Fusion Feature Packs need to be updated frequently in two different ways: by updating the Feature Pack itself (your *code*), and by updating the Docker images that run the Feature Pack (your *environment*).
+Your Fusion Feature Pack is like a [Tamagotchi](https://www.youtube.com/watch?v=YueDmq-w9X8) - it requires constant care and attention, or else it will get sick and blink angrily at you [until it dies](https://www.youtube.com/watch?v=uBmRjP7kJBE). Failing to update a Feature Pack may leave you with code that is outdated and unsupported by the latest versions of Fusion, and you won't be able to use the latest capabilities being developed by the Fusion platform team.
+
+Fusion Feature Packs need to be updated frequently in two different ways: by updating the Feature Pack itself (your *code*), and by updating the Docker images that run the Feature Pack (your *environment*).
 
 ## Proper Care and Feeding of a Feature Pack
 

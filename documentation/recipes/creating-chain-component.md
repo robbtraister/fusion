@@ -57,8 +57,8 @@ As usual, let's examine what's going on:
 
 There's nothing particularly remarkable about this Chain - we could do a lot more with it, like split the list of `children` into two list and display them in separate elements, but this will serve our purposes for now. The most important thing to remember about Chains is that `props.children` is the property you need to actually render the Features that should be contained in the Chain.
 
-We haven't talked much about [custom fields](./adding-custom-fields.md) yet, but as you can see here they are simply values passed to the component that were defined for this Chain in the Admin. So an editor can decide in PageBuilder whether this specific instance of the Sidebar chain should have a heading (and what it should be), as well as whether or not our Sidebar should have a border.
+We haven't talked much about [Custom Fields](./adding-custom-fields.md) yet, but as you can see here they are simply values passed to the component that were defined for this Chain in the Admin. So an editor can decide in PageBuilder whether this specific instance of the Sidebar chain should have a heading (and what it should be), as well as whether or not our Sidebar should have a border.
 
 If we go into PageBuilder Admin and refresh our page editor, we should see the "Sidebar" chain show up in the Layout panel now. We can add this Chain to the page (either inside a Layout or on its own), and then drop whatever Features we want into it!
 
-**Next: [Using Child and Shared Components](./using-child-shared-components.md)**
+**Next: [Isomorphic vs. Server vs. SPA Rendering](./isomorphic-server-spa-rendering.md)**

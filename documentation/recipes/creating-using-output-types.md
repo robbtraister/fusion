@@ -32,6 +32,7 @@ export default (props) => {
         {props.libs}
         {props.cssLinks}
         <link rel='icon' type='image/x-icon' href={`${props.contextPath}/resources/img/favicon.ico`} />
+        <link rel='stylesheet' href='https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css' />
       </head>
       <body>
         <h1>Welcome to Fusion!</h1>
@@ -48,7 +49,7 @@ Let's walk through what is happening in this short (but dense) code snippet.
 
 The short story is: we are exporting a React [functional component](https://reactjs.org/docs/components-and-props.html#functional-and-class-components) that accepts `props` as an argument, and immediately returns some JSX as its output. Most of this output is simply part of the standard HTML skeleton of our web page (e.g. the `<html>`, `<head>`, and `<body>` tags).
 
-If we wanted to include static resources like links to stylesheets, third-party scripts or other code that should be rendered server side only at a specific point in the `<head>` or `<body>` tags, we could add that to our Output Type component like we normally would in an HTML web page.
+If we wanted to include static resources like links to stylesheets, third-party scripts or other code that should be rendered server side only at a specific point in the `<head>` or `<body>` tags, we could add that to our Output Type component like we normally would in an HTML web page. In this example, we're loading [Bootstrap CSS](https://getbootstrap.com/docs/3.3/) into our page from a CDN, so we can prototype rapidly with a grid system.
 
 The parts of our component that are unique and interesting to Fusion are the `props` we are using to render dynamic portions of the page. Let's look at them in the order they're used:
 

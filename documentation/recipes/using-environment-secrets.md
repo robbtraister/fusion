@@ -64,6 +64,6 @@ Since this KMS key is assigned on a per-client, per-environment basis, Fusion wi
 
 Environment values will only be accessible during server execution, not in the client, as they will be exposed to users. To ensure this, `fusion:environment` will return an empty object in the client.
 
-Now that we have our content source and schema defined, and the credentials for our content source set up, we can finally fetch some data!
+Now that we have our content source and credentials set up, we can use them to retrieve and display some content!
 
- **Next: [Fetching Content](./fetching-content.md)**
+ **Next: [Using the @Consumer Decorator](./using-consumer-decorator.md)**

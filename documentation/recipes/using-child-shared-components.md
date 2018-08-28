@@ -1,4 +1,4 @@
 # Using Child and Shared Components
 
 
-**Next: [Adding Custom Fields to a Component](./adding-custom-fields.md)**
+**Next: [Messaging Between Components](./messaging-between-components.md)**

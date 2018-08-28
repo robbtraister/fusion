@@ -1,51 +1,60 @@
 # Defining a Content Source
 
-A Fusion content source requires 3 pieces of data: a URL to request JSON from, a GraphQL schema of the JSON response from that URL, and a list of params we need to craft the URL.
+At this point, we have 2 of the [3 inputs Fusion needs to function](./intro.md#how-does-it-work) - we've defined some **code** for our components, and we're using PageBuilder Admin to provide **configuration** to our webpages. The last input we need is **content** to fill in our components with live data. To retrieve content, the first thing we need is a content source - a URI to fetch content from, along with some information about what data that URI needs to perform a query.
 
 ## Defining a Content Source in JavaScript
 
-Let's see what a simple content source definition might look like if we were requesting some data from the [OMDB API](https://www.omdbapi.com/), which
- lets us search for movies by their titles. Let's create a file called `movie-db.js` in the `/src/content/sources/` directory of our bundle. Because our file is named `movie-db.js`, we will refer to this content source as `movie-db` later in our code (and in PageBuilder Admin).
+A Fusion content source requires at least 2 pieces of information: a URL endpoint to request JSON from, and a list of params we need to craft the URL. A third piece of info is also often useful (but not required): a GraphQL schema that describes the response of the endpoint.
+
+Let's see what a simple content source definition might look like if we were requesting some data from the [OMDB API](https://www.omdbapi.com/). For this content source, we want to be able to find a certain movie's information based on its title or OMDB ID.
+
+Let's create a file called `movie-find.js` in the `/src/content/sources/` directory of our bundle. Because our file is named `movie-find.js`, we will refer to this content source as `movie-find` later in our code (and in PageBuilder Admin).
 
 ```jsx
-/*    /src/content/sources/movie-db.js    */
+/*    /src/content/sources/movie-find.js    */
 
 import { OMDB_API_KEY } from 'fusion:environment'
 
 const resolve = (key) => {
-  const requestUri = `https://www.omdbapi.com/?apikey=${OMDB_API_KEY}&s=${key.movieQuery}`
+  const requestUri = `https://www.omdbapi.com/?apikey=${OMDB_API_KEY}&plot=full`
 
-  return (key.hasOwnProperty('page'))
-    ? `${requestUri}&page=${key.page}`
-    : requestUri
+  if (key.hasOwnProperty('movieId')) return `${requestUri}&i=${key.movieId}`
+  else if (key.hasOwnProperty('movieTitle')) return `${requestUri}&t=${key.movieTitle}`
+
+  throw new Error('movie-find content source requires a movieId or movieTitle')
 }
 
 export default {
   resolve,
-  schemaName: 'movies',
-  params: { movieQuery: 'text' }
+  schemaName: 'movie',
+  params: {
+    movieId: 'text',
+    movieTitle: 'text'
+  }
 }
+
 ```
+
 In the exported object above, we define all 3 pieces of data that we need for our content source:
 
 #### `resolve` property
 The `resolve` property is a function whose output is a URL which returns the JSON we want. It accepts a `key` argument, which is an object containing information about the specific request that is being made - this data either comes from a configuration option in PB Admin (for "global" content), or if you're fetching your own content you will provide it explicitly at "fetch" time.
 
-We're able to perform logic in our function to transform the URL however we want. In this example, if a `page` property exists in the `key` object that was passed to us, we want to append that page param to the URL so we can get paginated results. However, if it doesn't exist, we don't want to append it. 
+We're able to perform logic in our function to transform the URL however we want. In this example, if a `movieId` property exists in the `key` object that was passed to us, we want to use that param to find our movie. If instead a `movieTitle` param exists, we'll use that as our fallback - and if neither param exists, we will throw an error since we don't have the data we need to make our request.
 
 Because this URL will typically require some sort of authentication to access, we have access to the `fusion:environment` in content sources, which gives us decrypted access to "secret" environment variables. Here, we are interpolating an `OMDB_API_KEY` environment variable into the URL to authenticate our request. We'll discuss more about ["secrets" and environment variables](./using-environment-secrets.md) later.
 
 #### `schemaName` property
-`schemaName` is a string that identifies the name of a GraphQL schema. Every content source should have a GraphQL schema. The schema defines the shape of the JSON returned from the URL we produced in the `resolve` function. Without this schema, it will be more difficult to query for particular values in the returned JSON later on.
+`schemaName` is a string that identifies the name of a GraphQL schema. The schema defines the shape of the JSON returned from the URL we produced in the `resolve` function. While this schema is not required, it will be more difficult to query for particular values in the returned JSON without it.
 
-We'll discuss [how to define a GraphQL schema in the next article](using-graphql-schema.md).
+We'll discuss [how to define a GraphQL schema soon](./using-graphql-schema.md).
 
 #### `params` property
-The `params` property will contain a list of parameter names and data types that this content source needs to make a request. For example, in this content source we have 2 params that we can use to make a request: the `movieQuery` param, and the `page` param. Given both of these pieces of data (as part of the `key` object in our resolve method), we are able to craft a URL (in our `resolve` function ) that gets us the data we want (e.g `https://www.omdbapi.com/?apikey=<apiKey>&s=Jurassic&page=3` will get us the 3rd page of search results for movies in OMDB that have the word "Jurassic" in the title).
+The `params` property will contain a list of parameter names and data types that this content source needs to make a request. For example, in this content source we have 2 params that we can use to make a request: the `movieId` param, and the `movieTitle` param. Given either of these pieces of data (as part of the `key` object in our resolve method), we are able to craft a URL (in our `resolve` function) that gets us the data we want (e.g `https://www.omdbapi.com/?apikey=<apiKey>&t=Jurassic%20Park` will get us the info for the movie Jurassic Park).
 
 `params` can be defined either as an object (as seen above) or as an [array of objects](TODO: add link). If defined as an object, each key of the object will be the name of a param, and its value will be the data type of that param. The allowed data types are `text`, `number` and `site`.
 
-We need this list of params enumerated so that we can tell PageBuilder Admin that they exist. Then, editors can set values for those params - for "example" content in Templates and "global" content on Pages. So why is only the `movieQuery` param listed in the `params` object, and not the `page` param? Because only the `movieQuery` param should be exposed to the PageBuilder Admin for editor configuration. In this case, we don't want editors to be able to pick what page the search results start on - so we don't list `page` as a param. We can still use it in our code, it just won't be exposed to the PageBuilder Admin since we didn't list it.
+We need this list of params enumerated so that we can tell PageBuilder Admin that they exist. Then, editors can set values for those params - for "example" content in Templates and "global" content on Pages.
 
 ## Defining a Content Source in JSON
 
@@ -53,7 +62,9 @@ It's also possible to define a content source in JSON rather than JavaScript. Th
 
 ## The `transform` property
 
-An optional fourth parameter that can be provided in the content source object is a `transform` function. The purpose of this function is to transform (duh) the JSON response received from our endpoint, in case you want to change the shape of the data somehow before applying a schema to it. For example, let's say we wanted to count the number of `results` returned to us in our JSON and append a `resultsOnPage` property to the payload for querying later. We could add the following to our exported object:
+An optional fourth parameter that can be provided in the content source object is a `transform` function. The purpose of this function is to transform the JSON response received from our endpoint, in case you want to change the shape of the data somehow before applying a schema to it.
+
+For example, let's say we wanted to count the number of words in the movie's plot and append a `numPlotWords` property to the payload for querying later. We could add the following to our exported object:
 
 ```jsx
 export default {
@@ -63,7 +74,7 @@ export default {
   transform: (data) => {
     return Object.assign(
       data,
-      { resultsOnPage: data.results ? data.results.length : 0 }
+      { numPlotWords: data.Plot ? data.Plot.split(' ').length : 0 }
     )
   }
 }
@@ -90,4 +101,4 @@ As you can see, the `requestUri` string that we return in this case is not a ful
 Please note, there is nothing preventing you from still returning fully qualified URLs from other content sources - using `CONTENT_BASE` is purely to keep your code DRY.
 
 
-**Next: [Using a GraphQL Schema](./using-graphql-schema.md)**
+**Next: [Using Environment Secrets](./using-environment-secrets.md)**

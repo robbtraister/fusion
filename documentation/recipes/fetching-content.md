@@ -4,7 +4,7 @@ The whole point of defining a content source, a GraphQL schema, and putting our 
 
 ## Using "global" content vs. fetched content
 
-The first question to ask when dealing with content is "do I even need to fetch content?". If the content you need in your feature is part of the "global" content of the page, meaning it is semantically identified by the URL the user requested, then you probably don't need to fetch at all - that content will be provided by `props.globalContent` in your component. If, however, you want to fetch some additional content not included in the "global" content, or if you need to fetch data from the client, you will need to perform a separate fetch.
+It's important to remember that you only need to fetch content if the content you need has not already been provided to you by `globalContent`, or if you want to retrieve some content client-side. If the content you need in your feature is part of the "global" content of the page, meaning it is semantically identified by the URL the user requested, then you probably don't need to fetch at all.
 
 A quick example: if you have a feature called `authors` whose purpose is to list the authors of the main story on the page, then you will want to use `props.globalContent` - since the information in the `authors` component is semantically tied to the main story. If, however, you are building an unrelated `sports_scores` component that shows the most recent scores from local sports games, that content will almost certainly *not* exist as part of your main story - so you'll need to fetch it separately.
 
@@ -12,7 +12,7 @@ A quick example: if you have a feature called `authors` whose purpose is to list
 
 **NOTE**
 
-Even though you may not need to fetch "feature specific" content in your application, you still need to define content sources. Content sources are used by resolvers to fetch "global" content at request time based on the URL of the page the user requested. In short, without content sources you can't get "global" content *or* "feature specific" content.
+Even though you may not need to fetch "feature specific" content in your Feature Pack, you still need to define content sources so resolvers can use them to fetch "global" content. Without content sources you can't get "global" content *or* "feature specific" content.
 
 ---
 
@@ -24,18 +24,18 @@ Once we've determined we need to fetch content, we need some more information:
 - what arguments do we need to pass to get the content we want?
 - what pieces of data from the returned content do we actually need?
 
-For our purposes, let's say we want to fetch some content from our `movie-db` content source. Specifically, we want to fetch a list of movies with common words in the title.
+For our purposes, let's say we want to fetch some content from the `movie-search` content source we defined in [Using a GraphQL Schema](./using-graphql-schema.md). Specifically, we want to fetch a list of movies by their titles.
  
-Let's define a simple component for this purpose:
+Let's define a simple component called `movie-list` for this purpose:
 
 ```jsx
-/*  /src/components/features/movies/default.jsx  */
+/*  /src/components/features/movie-list/default.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Fragment, Component } from 'react'
 
 @Consumer
-class Movies extends Component {
+class MovieList extends Component {
   constructor (props) {
     super(props)
     this.state = { movies: [] }
@@ -44,28 +44,28 @@ class Movies extends Component {
   render () {
     const { movies } = this.state
     return (
-      <Fragment>
+      <div className='movie-list col-sm-12 col-md-4'>
         <h2>Movies</h2>
-        <div>
+        <div className='movie row'>
           {movies && movies.map((movie, idx) =>
-            <div key={`movie-${idx}`}>
+            <div className='col-sm-12 border' key={`movie-${idx}`}>
               {/* display movie info here */}
             </div>
           )}
         </div>
-      </Fragment>
+      </div>
     )
   }
 }
 
-export default Movies
+export default MovieList
 ```
 
 Right now, our component doesn't do much - we are initializing an empty `movies` array in our `state` object that the `render` method loops over, but the loop just outputs an empty `<div>` right now. So we need to 1) fetch some movies and add them to our `state`, and 2) output some content inside our movies loop. Let's add a method to the class to do the fetching:
 
 ```jsx
   fetch () {
-    const { fetched } = this.getContent('movie-db', { movieQuery: 'Jurassic' }, '{ totalResults Search { Title Year Poster } }')
+    const { fetched } = this.getContent('movie-search', { movieQuery: 'Rocky' }, '{ totalResults Search { Title Year Poster } }')
 
     fetched.then(response => {
       this.setState({
@@ -75,7 +75,13 @@ Right now, our component doesn't do much - we are initializing an empty `movies`
   }
 ```
 
-Here, we're utilizing Fusion's [`getContent` method](TODO: add link) to fetch some content and then set some state. The first argument to `getContent` is the name of the content source (`movie-db` for now).  The second argument is the `key` object that contains the values we actually want to query on - in this case, a `movieQuery` param searching for movies with the word 'Jurassic' in them (this object will be the only argument passed to the `resolve` method in our content source). Finally, the third argument is a string containing a GraphQL query object, which will filter the results of our JSON down to just the data we need for this component - you'll notice the key names in the filter match those in the [schema we defined a couple steps ago](./using-graphql-schema.md).
+Here, we're utilizing Fusion's [`getContent` method](TODO: add link) to fetch some content and then set some state.
+
+The first argument to `getContent` is the name of the content source (`movie-db` for now).
+
+The second argument is the `key` object that contains the values we actually want to query on - in this case, a `movieQuery` param searching for movies with the word 'Jurassic' in them (this object will be the only argument passed to the `resolve` method in our content source).
+
+Finally, the third argument is a string containing a GraphQL query object, which will filter the results of our JSON down to just the data we need for this component - you'll notice the key names in the filter match those in the [schema we defined a couple steps ago](./using-graphql-schema.md).
 
 ---
 
@@ -85,7 +91,9 @@ The GraphQL query only works because we defined a GraphQL schema earlier - if th
 
 ---
 
-As noted in the [API docs](TODO: add link), `getContent` actually returns an object with 2 keys: a `cached` object and a `fetched` object. For now we only care about the `fetched` object, which is a [Promise](TODO: add link) that we can chain handlers to. Here, we've added a handler which should accept the GraphQL-filtered response of our content fetch. We then use React's `setState` method and some fancy ES6 spread syntax to replace the existing `movies` state array with a new one including both the existing movies and the new ones from our fetch (contained in `response.Search`). 
+As noted in the [API docs](TODO: add link), `getContent` actually returns an object with 2 keys: a `cached` object and a `fetched` object. For now we only care about the `fetched` object, which is a [Promise](TODO: add link) that we can chain handlers to.
+
+Here, we've added a handler which should accept the GraphQL-filtered response of our content fetch. We then use React's `setState` method and some fancy ES6 spread syntax to replace the existing `movies` state array with a new one including both the existing movies and the new ones from our fetch (contained in `response.Search`). 
 
 This method should work great - except we haven't invoked it anywhere! Let's change that in our `contructor` method:
 
@@ -111,32 +119,32 @@ At this point our fetch should be working! The last problem is we aren't display
   render () {
     const { movies } = this.state
     return (
-      <Fragment>
+      <div className='movie-list col-sm-12 col-md-4'>
         <h2>Movies</h2>
-        <div>
+        <div className='movie row'>
           {movies && movies.map((movie, idx) =>
-            <div key={`movie-${idx}`}>
+            <div className='col-sm-12 border' key={`movie-${idx}`}>
               <h4>{movie.Title}</h4>
               <p><strong>Year:</strong> {movie.Year}</p>
               <img src={movie.Poster} />
             </div>
           )}
         </div>
-      </Fragment>
+      </div>
     )
   }
 ```
 
-Because React will re-render automatically whenever there is a change to the `state` or `props` of our component, and we're triggering a state change when we fetch our new movies, we can simply iterate over the `movies` array in our state and output the information we want (`Title`, `Year`, `Poster`) for each movie as if they'd always been there. This should result in a working component that fetches and displays data about movies with the word 'Jurassic' in the title! Let's see the entire component together:
+Because React will re-render automatically whenever there is a change to the `state` or `props` of our component, and we're triggering a state change when we fetch our new movies, we can simply iterate over the `movies` array in our state and output the information we want (`Title`, `Year`, `Poster`) for each movie as if they'd always been there. This should result in a working component that fetches and displays data about movies with the word 'Rocky' in the title! Let's see the entire component together:
 
 ```jsx
-/*  /src/components/features/movies/default.jsx  */
+/*  /src/components/features/movie-list/default.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Fragment, Component } from 'react'
 
 @Consumer
-class Movies extends Component {
+class MovieList extends Component {
   constructor (props) {
     super(props)
     this.state = { movies: [] }
@@ -144,7 +152,7 @@ class Movies extends Component {
   }
 
   fetch () {
-    const { fetched } = this.getContent('movie-db', { movieQuery: 'Jurassic' }, '{ totalResults Search { Title Year Poster } }')
+    const { fetched } = this.getContent('movie-search', { movieQuery: 'Rocky' }, '{ totalResults Search { Title Year Poster } }')
 
     fetched.then(response => {
       this.setState({
@@ -172,7 +180,7 @@ class Movies extends Component {
   }
 }
 
-export default Movies
+export default MovieList
 ```
 
 ## Adding pagination
@@ -180,13 +188,13 @@ export default Movies
 Unfortunately, this only fetches the *first page* of movies with "Jurassic" in the title from OMDB. But since OMDB's API allows us to send a `page` param, and our content source is already set up to accept such a param, it's easy to add pagination to this feature:
 
 ```jsx
-/*  /src/components/features/movies/default.jsx  */
+/*  /src/components/features/movie-list/default.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Fragment, Component } from 'react'
 
 @Consumer
-class Movies extends Component {
+class MovieList extends Component {
   constructor (props) {
     super(props)
     this.state = { movies: [], page: 1 }
@@ -194,7 +202,7 @@ class Movies extends Component {
   }
 
   fetch () {
-    const { fetched } = this.getContent('movie-db', { movieQuery: 'Jurassic', page: this.state.page }, '{ totalResults Search { Title Year Poster } }')
+    const { fetched } = this.getContent('movie-search', { movieQuery: 'Rocky', page: this.state.page }, '{ totalResults Search { Title Year Poster } }')
 
     fetched.then(response => {
       this.setState({
@@ -224,10 +232,11 @@ class Movies extends Component {
   }
 }
 
-export default Movies
+export default MovieList
 ```
 
 All we had to do to get pagination working was:
+
 - add a `page` property to our state object and initialize it to `1`
 - include the `page` property in the `key` object sent to `getContent`; since our `movie-db` content source knows how to handle this param, it should "just work"
 - increment the `page` in the component's state whenever we fetch, so next time we'll fetch the following page
@@ -235,4 +244,4 @@ All we had to do to get pagination working was:
 
 And that's how you fetch content in Fusion. Phew!
 
- **Next: [Using Runtime Properties](./using-runtime-properties.md)**
+ **Next: [Event Handling and Interaction](./event-handling-interaction.md)**

@@ -2,7 +2,7 @@
 
 One of the huge benefits of Fusion Feature Packs being written entirely in JavaScript is that developers have access to the vast JavaScript ecosystem and community. At a practical level, that means the ability for Feature Pack developers to use third-party libraries and code available via modern JavaScript package managers in their Feature Packs. 
 
-Fusion currently supports NPM as its package management option for developers.
+Fusion currently supports [NPM](https://www.npmjs.com/) as its package management option for developers. We do not support Yarn.
 
 ## Root `package.json` vs. `/src/package.json`
 
@@ -91,4 +91,4 @@ Another consideration is simply whether the module you are including is intended
 Finally, security and reliability are always concerns when using third-party code. There have been [numerous high-profile incidents recently of third-party libraries introducing security vulnerabilities into their host programs](TODO: add links), or the packages being removed entirely from NPM. When installing third-party libraries, make sure the code is from a reputable source, [check it as thoroughly as possible](https://snyk.io/), and keep your versions up-to-date!
 
 
- **Next: [Messaging Between Components](./messaging-between-components.md)**
+ **Next: [Using Child and Shared Components](./using-child-shared-components.md)**

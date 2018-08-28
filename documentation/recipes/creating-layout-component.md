@@ -29,6 +29,7 @@ An entity-relationship diagram of the different components that can exist on a F
 ```
 
 This diagram illustrates a few guidelines about how a page should be structured in Fusion:
+
 - Every Fusion webpage requires a single Output Type that serves as the root of the webpage.
 - Every Fusion webpage should contain Feature(s) at some point - while this is not enforced, it would be pretty pointless to make a webpage without any Features.
 - Output Types can have exactly one Layout per webpage, but don't have to. An Output Type could directly include Features and/or Chains and skip the Layout.
@@ -98,6 +99,8 @@ There is even more syntactic sugar for defining simple Layouts outlined in [the 
 However, sometimes you'll want more control over the structure of your Layout and its markup. For these situations, it's possible to define a Layout as a React component. Let's define a slightly more complicated Layout called `article-right-rail.jsx`:
 
 ```jsx
+/*  /src/components/layouts/article-right-rail.jsx  */
+
 import React from 'react'
 
 const ArticleRightRail = (props) => {

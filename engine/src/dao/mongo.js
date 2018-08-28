@@ -4,7 +4,7 @@ const url = require('url')
 
 const debugTimer = require('debug')('fusion:timer:dao:mongo')
 
-const { mongoUrl, version } = require('../../environment')
+const { mongoUrl } = require('../../environment')
 
 const timer = require('../timer')
 

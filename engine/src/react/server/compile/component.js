@@ -15,7 +15,9 @@ const { components } = require('../../../../environment/manifest')
 const TimedComponent = (Component) => (props) => {
   const tic = timer.tic()
   const result = React.createElement(Component, props)
-  debugTimer(`render(${props.type}:${props.id})`, tic.toc())
+  const elapsedTime = tic.toc()
+  debugTimer(`render(${props.type}:${props.id})`, elapsedTime)
+  sendMetrics([{type: METRIC_TYPES.COMPONENT_RENDER_DURATION, values: [elapsedTime], tags: ['component:render']}])
   return result
 }
 

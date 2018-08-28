@@ -14,11 +14,11 @@ const { generateSource } = require('../../react')
 const {
   componentDistRoot,
   componentSrcRoot,
-  defaultOutputType,
-  version
+  defaultOutputType
 } = require('../../../environment')
 const timer = require('../../timer')
 const getConfigs = require('../../../webpack/template.js')
+const {METRIC_TYPES} = require('../../utils/constants/metrics')
 
 const scriptSourceFile = path.resolve(`${componentSrcRoot}/script.js`)
 const stylesSourceFile = path.resolve(`${componentSrcRoot}/styles.js`)
@@ -75,7 +75,7 @@ const compileSource = function compileSource (script, styles) {
 
         const elapsedTime = tic.toc()
         debugTimer('webpack setup', elapsedTime)
-        sendMetrics([{type: METRIC_TYPES.WEBPACK_SETUP_DURATION, values: [elapsedTime], tags: ['webpack:setup']}])
+        sendMetrics([{type: METRIC_TYPES.WEBPACK_DURATION, values: [elapsedTime], tags: ['webpack:setup']}])
 
         return compiler
       }),
@@ -97,7 +97,7 @@ const compileSource = function compileSource (script, styles) {
     .then((data) => {
       const elapsedTime = tic.toc()
       debugTimer('webpack compilation', elapsedTime)
-      sendMetrics([{type: METRIC_TYPES.WEBPACK_COMPILATION_DURATION, values: [elapsedTime], tags: ['webpack:compile']}])
+      sendMetrics([{type: METRIC_TYPES.WEBPACK_DURATION, values: [elapsedTime], tags: ['webpack:compile']}])
 
       if (data.hasErrors()) {
         return Promise.reject(data.toJson().errors)
@@ -126,7 +126,9 @@ const compileRendering = function compileRendering ({rendering, outputType = def
   let tic = timer.tic()
   return generateSource(rendering, outputType)
     .then(({script, styles}) => {
-      debugTimer('generate source', tic.toc())
+      const generateSourceDuration = tic.toc()
+      debugTimer('generate source', generateSourceDuration)
+      sendMetrics([{type: METRIC_TYPES.COMPILE_DURATION, values: [generateSourceDuration], tags: ['compile:generate-source']}])
 
       return compileSource(script, styles)
     })

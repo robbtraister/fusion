@@ -134,7 +134,7 @@ const render = function render ({Component, request, content, _website}) {
           globalContent: content ? content.document : null,
           globalContentConfig: content ? {source: content.source, key: content.key} : null,
           outputType: Component.outputType,
-          requestUri: request.uri,
+          requestUri: request && request.uri,
           siteProperties: fusionProperties(_website)
         }
       )

@@ -23,7 +23,7 @@ const getTree = require('../shared/compile/tree')
 
 const {
   fetchFile
-} = require('../../assets/io')
+} = require('../../io')
 
 const {
   componentDistRoot,

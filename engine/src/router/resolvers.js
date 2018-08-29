@@ -9,7 +9,7 @@ const express = require('express')
 
 const {
   getBucket
-} = require('../assets/info')
+} = require('../io/info')
 
 const {
   // bundleDistRoot,

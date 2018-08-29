@@ -6,62 +6,9 @@ const React = require('react')
 
 const isClient = typeof window !== 'undefined'
 
-const splitIndexes = (key) => {
-  // pull off the last numbered index
-  const indexed = key.match(/^(.*)\[(\d+)\]$/)
-  return (indexed)
-    ? splitIndexes(indexed[1]).concat(indexed[2])
-    : [key]
-}
-const splitKey = (key) => {
-  const keys = key.split(/[.．]/g)
-  return [].concat(...keys.map(splitIndexes))
-}
-
-const setProperty = (() => {
-  function _setProperty (target, keys, value) {
-    const k = keys.shift()
-    if (keys.length > 0) {
-      target[k] = target[k] || {}
-      _setProperty(target[k], keys, value)
-    } else {
-      target[k] = value
-    }
-    return target
-  }
-  return function setProperty (target, key, value) {
-    return _setProperty(target, (key instanceof Array) ? key : splitKey(key), value)
-  }
-})()
-
-const getProperty = (() => {
-  function _getProperty (target, keys) {
-    const k = keys.shift()
-    try {
-      target = target[k]
-    } catch (e) {
-      return undefined
-    }
-    return (keys.length > 0)
-      ? _getProperty(target, keys)
-      : target
-  }
-  return function getProperty (target, key) {
-    return _getProperty(target, (key instanceof Array) ? key : splitKey(key))
-  }
-})()
-
-function merge (base, ...args) {
-  const result = Object.assign({}, base)
-  args
-    .filter((edits) => edits)
-    .forEach((edits) => {
-      Object.keys(edits).forEach((key) => {
-        setProperty(result, key, edits[key])
-      })
-    })
-  return result
-}
+// these turn out to be slightly smaller than using 'lodash/get' and 'lodash/merge'
+const _get = require('lodash.get')
+const _merge = require('lodash.merge')
 
 const createContextElement = (Comp, props, context) => {
   const contextProps = Object.assign({}, context)
@@ -143,7 +90,7 @@ function HOC (Component) {
             : key
 
           key = JSON.parse(JSON.stringify(key).replace(/\{\{([^}]+)\}\}/g, (match, propName) => {
-            return getProperty(this.props, propName) || match
+            return _get(this.props, propName) || match
           }))
 
           filter = (isConfig)
@@ -155,7 +102,7 @@ function HOC (Component) {
           delete localEdits.items
 
           const appendLocalEdits = (content) => {
-            return merge(
+            return _merge(
               content,
               localEdits,
               localEditItems[(content && (content.id || content._id)) || null]

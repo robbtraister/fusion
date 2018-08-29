@@ -4,18 +4,26 @@ const debug = require('debug')('fusion:assets:io')
 
 const S3 = require('aws-sdk').S3
 
-const {
-  getBucket,
-  getS3Key
-} = require('./info')
-
 const model = require('../dao')
 
 const {
   defaultOutputType,
+  environment,
   region,
   version
 } = require('../../environment')
+
+const getBucket = function getBucket () {
+  return 'pagebuilder-fusion'
+}
+
+const getKeyBase = function getKeyBase () {
+  return `environments/${environment}/deployments/${version}`
+}
+
+const getS3Key = function getS3Key (name) {
+  return `${getKeyBase()}/dist/${name.replace(/^\//, '')}`
+}
 
 const s3 = new S3({region})
 
@@ -45,26 +53,44 @@ const fetchFile = async function fetchFile (name) {
   })
 }
 
-const pushFile = async function pushFile (name, src, ContentType) {
+const pushKey = async function pushKey (Key, src, options) {
   return new Promise((resolve, reject) => {
     const Bucket = getBucket()
-    const Key = `${getS3Key(name)}`
     debug(`pushing ${src.length} bytes to: ${Bucket}/${Key}`)
 
-    s3.upload({
-      Bucket,
-      Key,
-      Body: src,
-      ACL: 'public-read',
-      ContentType,
-      ContentEncoding: 'gzip'
-    }, (err, data) => {
-      if (err) {
-        console.error(err)
+    s3.upload(
+      Object.assign(
+        {
+          Bucket,
+          Key,
+          Body: src,
+          ACL: 'public-read'
+        },
+        options || {}
+      ),
+      (err, data) => {
+        if (err) {
+          console.error(err)
+        }
+        err ? reject(err) : resolve(data)
       }
-      err ? reject(err) : resolve(data)
-    })
+    )
   })
+}
+
+const pushFile = async function pushFile (name, src, ContentType) {
+  return pushKey(`${getS3Key(name)}`, src, {ContentType})
+}
+
+const pushResolvers = async function pushResolvers (resolvers) {
+  return pushKey(
+    `environments/${environment}/resolvers.json`,
+    JSON.stringify(resolvers, null, 2),
+    {
+      ContentType: 'application/json',
+      ACL: 'private'
+    }
+  )
 }
 
 module.exports = {
@@ -73,5 +99,6 @@ module.exports = {
   getJson,
   pushCssHash,
   pushFile,
+  pushResolvers,
   putJson
 }

@@ -59,11 +59,17 @@ const pushFile = async function pushFile (name, src) {
     }))
 }
 
+// const pushResolvers = async () => pushFile('resolvers.json')
+
+// the above is unnecessary; resolver just reads from db
+const pushResolvers = async () => Promise.resolve()
+
 module.exports = {
   fetchCssHash,
   fetchFile,
   getJson,
   pushCssHash,
   pushFile,
+  pushResolvers,
   putJson
 }

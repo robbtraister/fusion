@@ -14,11 +14,11 @@ const METRIC_TYPES = {
 }
 
 /**
- * Takes the metric values, adds them to the object that DataDog is expecting, and makes the POST request
+ * Takes the metrics array, formats the objects to the match what DataDog is expecting, and makes the POST request
  * @param {Object[]} metrics One or more metrics to be sent to DataDog
- * @param {string} metrics[].type A constant that specifies the type of metric to be sent (these values are in the METRIC_TYPES object in the ./constants/metrics file)
+ * @param {string} metrics[].type A constant that specifies the type of metric to be sent (METRIC_TYPES are defined above)
  * @param {Array} metrics[].value The actual value to send to DataDog (e.g. we want to send a duration of half a second, we send [.5])
- * @param {Array} metrics[].tags [OPTIONAL] The tags associated with this metric
+ * @param {Array} metrics[].tags [OPTIONAL] The tags associated with this metric (e.g. [operation:fetch, result:success])
  * @returns {undefined} No return value
  */
 const sendMetrics = (metrics) => {

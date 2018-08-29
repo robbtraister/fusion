@@ -15,6 +15,10 @@ const getContentGenerator = function getContentGenerator (contentCache, arcSite,
   return function getContent (sourceName, ...args) {
     const sourceCache = contentCache[sourceName] = contentCache[sourceName] || {}
     const sourcePromise = getSource(sourceName)
+      .catch((err) => {
+        console.error(err)
+        return null
+      })
 
     const getSourceContent = (key, query) => {
       // alphabetize object keys to ensure proper cacheing
@@ -25,10 +29,13 @@ const getContentGenerator = function getContentGenerator (contentCache, arcSite,
         fetched: sourcePromise
           .then(source => {
             keyCache.source = source
-            return source.fetch(Object.assign({}, key, {'arc-site': arcSite}))
+            return (source)
+              ? source.fetch(Object.assign({}, key, {'arc-site': arcSite}))
+              : null
           })
           .then(data => { keyCache.cached = data })
-          .catch(() => {
+          .catch((err) => {
+            console.error(err)
             keyCache.cached = null
           })
           .then(() => keyCache.cached),
@@ -36,7 +43,7 @@ const getContentGenerator = function getContentGenerator (contentCache, arcSite,
       }
 
       keyCache.fetched = keyCache.fetched
-        .then(data => keyCache.source.filter(query, data))
+        .then(data => keyCache.source ? keyCache.source.filter(query, data) : keyCache.cached)
         .then(filtered => {
           if (!isStatic(this, outputType)) {
             keyCache.filtered = keyCache.cached ? _.merge(keyCache.filtered, filtered) : null

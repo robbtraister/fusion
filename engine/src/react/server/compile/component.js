@@ -19,7 +19,7 @@ const TimedComponent = (Component) => (props) => {
   const result = React.createElement(Component, props)
   const elapsedTime = tic.toc()
   debugTimer(`render(${props.type}:${props.id})`, elapsedTime)
-  sendMetrics([{type: METRIC_TYPES.COMPONENT_RENDER_DURATION, value: elapsedTime, tags: ['component:render']}])
+  sendMetrics([{type: METRIC_TYPES.RENDER_DURATION, value: elapsedTime, tags: ['render:component']}])
   return result
 }
 

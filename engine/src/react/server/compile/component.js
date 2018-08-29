@@ -10,8 +10,7 @@ const unpack = require('../../../utils/unpack')
 
 const timer = require('../../../timer')
 
-const sendMetrics = require('../../../utils/send-metrics')
-const {METRIC_TYPES} = require('../../../utils/constants/metrics')
+const { sendMetrics, METRIC_TYPES } = require('../../../utils/send-metrics')
 
 const { components } = require('../../../../environment/manifest')
 
@@ -20,7 +19,7 @@ const TimedComponent = (Component) => (props) => {
   const result = React.createElement(Component, props)
   const elapsedTime = tic.toc()
   debugTimer(`render(${props.type}:${props.id})`, elapsedTime)
-  sendMetrics([{type: METRIC_TYPES.COMPONENT_RENDER_DURATION, values: [elapsedTime], tags: ['component:render']}])
+  sendMetrics([{type: METRIC_TYPES.COMPONENT_RENDER_DURATION, value: elapsedTime, tags: ['component:render']}])
   return result
 }
 

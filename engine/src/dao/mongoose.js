@@ -7,8 +7,7 @@ const debugTimer = require('debug')('fusion:timer:dao:mongoose')
 const { mongoUrl } = require('../../environment')
 const timer = require('../timer')
 
-const sendMetrics = require('../utils/send-metrics')
-const {METRIC_TYPES} = require('../utils/constants/metrics')
+const { sendMetrics, METRIC_TYPES } = require('../utils/send-metrics')
 
 const schema = new mongoose.Schema({_id: String})
 
@@ -70,7 +69,7 @@ function Mongoose (mongoUrl) {
               const elapsedTime = tic.toc()
               debugTimer(`${modelName}.find()`, elapsedTime)
               sendMetrics([
-                {type: METRIC_TYPES.DB_QUERY_DURATION, values: [elapsedTime], tags: ['db:query']}
+                {type: METRIC_TYPES.DB_QUERY_DURATION, value: elapsedTime, tags: ['db:query']}
               ])
 
               return data
@@ -88,7 +87,7 @@ function Mongoose (mongoUrl) {
               const elapsedTime = tic.toc()
               debugTimer(`${modelName}.findOne()`, elapsedTime)
               sendMetrics([
-                {type: METRIC_TYPES.DB_QUERY_DURATION, values: [elapsedTime], tags: ['db:query']}
+                {type: METRIC_TYPES.DB_QUERY_DURATION, value: elapsedTime, tags: ['db:query']}
               ])
 
               return data
@@ -106,7 +105,7 @@ function Mongoose (mongoUrl) {
               const elapsedTime = tic.toc()
               debugTimer(`${modelName}.get(${_id})`, elapsedTime)
               sendMetrics([
-                {type: METRIC_TYPES.DB_QUERY_DURATION, values: [elapsedTime], tags: ['db:query']}
+                {type: METRIC_TYPES.DB_QUERY_DURATION, value: elapsedTime, tags: ['db:query']}
               ])
 
               return data
@@ -124,7 +123,7 @@ function Mongoose (mongoUrl) {
               const elapsedTime = tic.toc()
               debugTimer(`${modelName}.put()`, elapsedTime)
               sendMetrics([
-                {type: METRIC_TYPES.DB_QUERY_DURATION, values: [elapsedTime], tags: ['db:query']}
+                {type: METRIC_TYPES.DB_QUERY_DURATION, value: elapsedTime, tags: ['db:query']}
               ])
 
               return data

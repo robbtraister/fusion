@@ -16,8 +16,7 @@ const {
   cachePrefix
 } = require('../../../environment')
 
-const sendMetrics = require('../../utils/send-metrics')
-const {METRIC_TYPES} = require('../../utils/constants/metrics')
+const { sendMetrics, METRIC_TYPES } = require('../../utils/send-metrics')
 
 function getCacheKey (uri) {
   const hash = crypto.createHash('sha256').update(uri).digest('hex')
@@ -79,8 +78,8 @@ const fetch = (uri, forceSync) => {
         const elapsedTime = tic.toc()
         debugTimer(`Fetched from source [${sanitizedUri}]`, elapsedTime)
         sendMetrics([
-          {type: METRIC_TYPES.CONTENT_RESULT, values: [1], tags: ['operation:fetch', 'result:success']},
-          {type: METRIC_TYPES.CONTENT_LATENCY, values: [elapsedTime], tags: ['operation:fetch']}
+          {type: METRIC_TYPES.CONTENT_RESULT, value: 1, tags: ['operation:fetch', 'result:success']},
+          {type: METRIC_TYPES.CONTENT_LATENCY, value: elapsedTime, tags: ['operation:fetch']}
         ])
 
         return pushContent(cacheKey, data)
@@ -96,14 +95,14 @@ const fetch = (uri, forceSync) => {
         return fetchContent(cacheKey)
           .then((data) => {
             if (!data) {
-              sendMetrics([{type: METRIC_TYPES.CACHE_RESULT, values: [1], tags: ['operation:fetch', 'result:error']}])
+              sendMetrics([{type: METRIC_TYPES.CACHE_RESULT, value: 1, tags: ['operation:fetch', 'result:error']}])
               throw new Error('data error from cache')
             }
             const elapsedTime = tic.toc()
             debugTimer(`Fetched from cache [${sanitizedUri}]`, elapsedTime)
             sendMetrics([
-              {type: METRIC_TYPES.CACHE_RESULT, values: [1], tags: ['operation:fetch', 'result:success']},
-              {type: METRIC_TYPES.CACHE_LATENCY, values: [elapsedTime], tags: ['operation:fetch']}
+              {type: METRIC_TYPES.CACHE_RESULT, value: 1, tags: ['operation:fetch', 'result:success']},
+              {type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags: ['operation:fetch']}
             ])
 
             return data

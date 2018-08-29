@@ -36,8 +36,7 @@ const {
 
 const { components } = require('../../../environment/manifest')
 
-const sendMetrics = require('../../utils/send-metrics')
-const {METRIC_TYPES} = require('../../utils/constants/metrics')
+const { sendMetrics, METRIC_TYPES } = require('../../utils/send-metrics')
 
 const fileExists = (fp) => {
   try {
@@ -143,15 +142,15 @@ const render = function render ({Component, request, content, _website}) {
       )
       const elementElapsedTime = elementTic.toc()
       debugTimer(`create element`, elementElapsedTime)
-      sendMetrics([{type: METRIC_TYPES.RENDER_DURATION, values: [elementElapsedTime], tags: ['render:element']}])
+      sendMetrics([{type: METRIC_TYPES.RENDER_DURATION, value: elementElapsedTime, tags: ['render:element']}])
       const htmlTic = timer.tic()
       const html = ReactDOM.renderToStaticMarkup(element)
       const htmlElapsedTime = htmlTic.toc()
       debugTimer(`render html`, htmlElapsedTime)
-      sendMetrics([{type: METRIC_TYPES.RENDER_DURATION, values: [htmlElapsedTime], tags: ['render:html']}])
+      sendMetrics([{type: METRIC_TYPES.RENDER_DURATION, value: htmlElapsedTime, tags: ['render:html']}])
       resolve(html)
     } catch (e) {
-      sendMetrics([{type: METRIC_TYPES.RENDER_RESULT, values: [1], tags: ['result:error']}])
+      sendMetrics([{type: METRIC_TYPES.RENDER_RESULT, value: 1, tags: ['result:error']}])
       reject(e)
     }
   })
@@ -161,7 +160,7 @@ const render = function render ({Component, request, content, _website}) {
     .then((html) => {
       const elapsedTime = tic.toc()
       debugTimer('first render', elapsedTime)
-      sendMetrics([{type: METRIC_TYPES.RENDER_DURATION, values: [elapsedTime], tags: ['render:first-render']}])
+      sendMetrics([{type: METRIC_TYPES.RENDER_DURATION, value: elapsedTime, tags: ['render:first-render']}])
       tic = timer.tic()
 
       // collect content cache into Promise array
@@ -185,14 +184,14 @@ const render = function render ({Component, request, content, _website}) {
           .then(() => {
             const contentHydrationDuration = tic.toc()
             debugTimer('content hydration', contentHydrationDuration)
-            sendMetrics([{type: METRIC_TYPES.RENDER_DURATION, values: [contentHydrationDuration], tags: ['render:content-hydration']}])
+            sendMetrics([{type: METRIC_TYPES.RENDER_DURATION, value: contentHydrationDuration, tags: ['render:content-hydration']}])
             tic = timer.tic()
           })
           .then(renderHTML)
           .then((html) => {
             const secondRenderDuration = tic.toc()
             debugTimer('second render', secondRenderDuration)
-            sendMetrics([{type: METRIC_TYPES.RENDER_DURATION, values: [secondRenderDuration], tags: ['render:second-render']}])
+            sendMetrics([{type: METRIC_TYPES.RENDER_DURATION, value: secondRenderDuration, tags: ['render:second-render']}])
             return html
           })
 

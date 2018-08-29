@@ -10,8 +10,7 @@ const timer = require('../timer')
 
 const MongoClient = require('mongodb').MongoClient
 
-const sendMetrics = require('../utils/send-metrics')
-const {METRIC_TYPES} = require('../utils/constants/metrics')
+const { sendMetrics, METRIC_TYPES } = require('../utils/send-metrics')
 
 function getNewConnection (mongoUrl) {
   return new Promise((resolve, reject) => {
@@ -76,8 +75,8 @@ function Mongo (mongoUrl) {
               const elapsedTime = tic.toc()
               debugTimer(`${modelName}.find()`, elapsedTime)
               sendMetrics([
-                {type: METRIC_TYPES.DB_QUERY_DURATION, values: [elapsedTime], tag: ['db:query']},
-                {type: METRIC_TYPES.SUCCESS, values: [1], tags: ['db:query']}
+                {type: METRIC_TYPES.DB_QUERY_DURATION, value: elapsedTime, tag: ['db:query']},
+                {type: METRIC_TYPES.SUCCESS, value: 1, tags: ['db:query']}
               ])
 
               return data
@@ -95,8 +94,8 @@ function Mongo (mongoUrl) {
               const elapsedTime = tic.toc()
               debugTimer(`${modelName}.findOne()`, elapsedTime)
               sendMetrics([
-                {type: METRIC_TYPES.DB_QUERY_DURATION, values: [elapsedTime], tags: ['db:query']},
-                {type: METRIC_TYPES.SUCCESS, values: [1], tags: ['db:query']}
+                {type: METRIC_TYPES.DB_QUERY_DURATION, value: elapsedTime, tags: ['db:query']},
+                {type: METRIC_TYPES.SUCCESS, value: 1, tags: ['db:query']}
               ])
 
               return data
@@ -114,8 +113,8 @@ function Mongo (mongoUrl) {
               const elapsedTime = tic.toc()
               debugTimer(`${modelName}.get(${_id})`, elapsedTime)
               sendMetrics([
-                {type: METRIC_TYPES.DB_QUERY_DURATION, values: [elapsedTime], tags: ['db:query']},
-                {type: METRIC_TYPES.SUCCESS, values: [1], tags: ['db:query']}
+                {type: METRIC_TYPES.DB_QUERY_DURATION, value: elapsedTime, tags: ['db:query']},
+                {type: METRIC_TYPES.SUCCESS, value: 1, tags: ['db:query']}
               ])
 
               return data
@@ -133,8 +132,8 @@ function Mongo (mongoUrl) {
               const elapsedTime = tic.toc()
               debugTimer(`${modelName}.put()`, elapsedTime)
               sendMetrics([
-                {type: METRIC_TYPES.DB_QUERY_DURATION, values: [elapsedTime], tags: ['db:query']},
-                {type: METRIC_TYPES.SUCCESS, values: [1], tags: ['db:query']}
+                {type: METRIC_TYPES.DB_QUERY_DURATION, value: elapsedTime, tags: ['db:query']},
+                {type: METRIC_TYPES.SUCCESS, value: 1, tags: ['db:query']}
               ])
 
               return data

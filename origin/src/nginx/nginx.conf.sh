@@ -305,7 +305,9 @@ cat <<EOB
     }
 
     location ~ ^(${CONTEXT_PATH}|${API_PREFIX})/(resources)(/.*|$) {
-      set                       \$p \$2\$3;
+      set                       \$command \$2;
+      set                       \$file \$3;
+      set                       \$p \$command\$file;
 
       proxy_intercept_errors    on;
       error_page                400 403 404 418 = @engine;
@@ -321,7 +323,7 @@ EOB
 else
   cat <<EOB
       root                      /etc/nginx/resources;
-      try_files                 \$3 =404;
+      try_files                 \$file =404;
 EOB
 fi
 

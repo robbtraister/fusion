@@ -183,6 +183,10 @@ class Rendering {
               ? Promise.all([
                 putJson(this.type, Object.assign({}, this.json, {id: this.id})),
                 publishToOtherVersions(uri, this.json)
+                  .catch((err) => {
+                    // do not throw while trying to publish to old versions
+                    console.error(err)
+                  })
               ])
               : Promise.resolve()
           )

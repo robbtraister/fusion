@@ -7,6 +7,7 @@ const METRIC_TYPES = {
   COMPILE_DURATION: 'arc.fusion.compile.duration',
   CONTENT_LATENCY: 'arc.fusion.content.latency',
   CONTENT_RESULT: 'arc.fusion.content.result',
+  DB_QUERY_DURATION: 'arc.fusion.query.duration',
   RENDER_DURATION: 'arc.fusion.render.duration',
   RENDER_RESULT: 'arc.fusion.render.result',
   WEBPACK_DURATION: 'arc.fusion.webpack.duration'

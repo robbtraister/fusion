@@ -6,8 +6,9 @@ const React = require('react')
 
 const isClient = typeof window !== 'undefined'
 
-const _get = require('lodash/get')
-const _merge = require('lodash/merge')
+// these turn out to be slightly smaller than using 'lodash/get' and 'lodash/merge'
+const _get = require('lodash.get')
+const _merge = require('lodash.merge')
 
 const createContextElement = (Comp, props, context) => {
   const contextProps = Object.assign({}, context)

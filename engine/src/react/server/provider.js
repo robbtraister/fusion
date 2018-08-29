@@ -1,7 +1,7 @@
 'use strict'
 
-const _ = require('lodash')
 const React = require('react')
+const _merge = require('lodash.merge')
 
 const isStatic = require('./is-static')
 
@@ -46,7 +46,7 @@ const getContentGenerator = function getContentGenerator (contentCache, arcSite,
         .then(data => keyCache.source ? keyCache.source.filter(query, data) : keyCache.cached)
         .then(filtered => {
           if (!isStatic(this, outputType)) {
-            keyCache.filtered = keyCache.cached ? _.merge(keyCache.filtered, filtered) : null
+            keyCache.filtered = keyCache.cached ? _merge(keyCache.filtered, filtered) : null
           }
           return keyCache.cached
         })

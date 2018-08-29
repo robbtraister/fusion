@@ -3,7 +3,7 @@
 const express = require('express')
 
 const resolve = require('../controllers/resolve')
-const redirectHandler = require('../errors/RedirectError').handler
+const { handler: redirectHandler } = require('../errors/redirect-error')
 
 const resolveRouter = express.Router()
 

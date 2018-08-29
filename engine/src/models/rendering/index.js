@@ -3,9 +3,7 @@
 const debug = require('debug')('fusion:models:rendering')
 
 const {
-  defaultOutputType,
-  isDev,
-  version
+  defaultOutputType
 } = require('../../../environment')
 
 const model = require('../../dao')
@@ -20,39 +18,13 @@ const {
 const getSource = require('../sources')
 
 const {
+  fetchCssHash,
   fetchFile,
-  pushFile
-} = require('../../assets/io')
-
-// return the full object (not just cssFile value) because if it doesn't exist, we need to calculate it
-// the calculation returns an object with a cssFile property
-// for simplicity, we'll just unwrap that property from whatever we get
-const fetchCssHash = (isDev)
-  ? (name, outputType = defaultOutputType) => fetchFile(`${name}/${outputType}.css.json`)
-    .then((json) => JSON.parse(json))
-  : (name, outputType = defaultOutputType) => model('hash').get({version, id: `${name}/${outputType}`})
-
-const pushCssHash = (isDev)
-  ? (name, outputType = defaultOutputType, cssFile) => pushFile(`${name}/${outputType}.css.json`, JSON.stringify({cssFile}))
-  : (name, outputType = defaultOutputType, cssFile) => model('hash').put({id: `${name}/${outputType}`, version, cssFile})
-
-const getJson = (isDev)
-  ? (type, id) => model(type).get(id)
-    .then((data) => (type === 'rendering')
-      ? data
-      // if page/template, we need to get the actual rendering object
-      : (() => {
-        const version = data && data.published && data.versions && data.versions[data.published]
-        const head = version && version.head
-        return head && model('rendering').get(head)
-      })()
-    )
-  : (type, id) => model(type).get(id)
-
-const putJson = (isDev)
-  // do nothing
-  ? (type, json) => {}
-  : (type, json) => model(type).put(json)
+  getJson,
+  pushCssHash,
+  pushFile,
+  putJson
+} = require('../../io')
 
 class Rendering {
   constructor (type, id, json) {
@@ -149,7 +121,8 @@ class Rendering {
     debug(`get css file: ${this.name}[${outputType}]`)
     this.cssFilePromise = this.cssFilePromise ||
       fetchCssHash(this.name, outputType)
-        .catch(() => this.compile(outputType))
+        // if not found, re-compile
+        .then((data) => data || this.compile(outputType))
         .then(({cssFile}) => cssFile)
     return this.cssFilePromise
   }
@@ -158,7 +131,7 @@ class Rendering {
     debug(`get styles: ${this.name}[${outputType}]`)
     this.stylesPromise = this.stylesPromise ||
       this.getCssFile(outputType)
-        .then((cssFile) => fetchFile(cssFile))
+        .then((cssFile) => cssFile && fetchFile(cssFile))
         .catch(() => this.compile(outputType).then(({css}) => css))
     return this.stylesPromise
   }
@@ -181,6 +154,10 @@ class Rendering {
               ? Promise.all([
                 putJson(this.type, Object.assign({}, this.json, {id: this.id})),
                 publishToOtherVersions(uri, this.json)
+                  .catch((err) => {
+                    // do not throw while trying to publish to old versions
+                    console.error(err)
+                  })
               ])
               : Promise.resolve()
           )

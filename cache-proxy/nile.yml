@@ -49,6 +49,9 @@ environments:
           <<: *_environment
           CACHE_PROXY_CREDENTIALS: |
             staging:%{AQECAHhPwAyPK3nfERyAvmyWOWx9c41uht+ei4Zlv4NgrlmypwAAAMYwgcMGCSqGSIb3DQEHBqCBtTCBsgIBADCBrAYJKoZIhvcNAQcBMB4GCWCGSAFlAwQBLjARBAx004Oqgxt5jnwj1rACARCAf+DSMPzrDHyG/bxRd1T+Jj2MjmcOjNB3gugnPMzgaPGW9TAJ6l3TQkO/Z/MgPugLLWG/p1rI9pSQ3mn8D0r3aIlr4xkzEJEWkX1nq03nDwMlFaBb4ieywpKO2Qq2oaYsIIGsOJaI529Snflz0aR4qZwDOTPlgAI4+gnGkAXAJRU=}
+            bonnier:%{AQECAHhPwAyPK3nfERyAvmyWOWx9c41uht+ei4Zlv4NgrlmypwAAAMYwgcMGCSqGSIb3DQEHBqCBtTCBsgIBADCBrAYJKoZIhvcNAQcBMB4GCWCGSAFlAwQBLjARBAztnrEQbPvjv13xXuUCARCAf+Ivm1icL3nw5UL7GrYIzGnoxmwMHdHZFKTSlbnufyg2cVqyePGq+ftXv8tdB8AsydNtqrzraNaCbifhnfs5Fgn+6IRnh9bzejkBVQ60dkn8dCKj6FiCnyCzhQVay2Qn3BH8bEzj70xKO4/eWiUKlq91IPJNalGpzLpKS4vE+Kc=}
+            bostonglobe:%{AQECAHhPwAyPK3nfERyAvmyWOWx9c41uht+ei4Zlv4NgrlmypwAAAMYwgcMGCSqGSIb3DQEHBqCBtTCBsgIBADCBrAYJKoZIhvcNAQcBMB4GCWCGSAFlAwQBLjARBAwTWVGDTH6CGq40LV0CARCAf8F2BkWHE1fWUEmvlc/dw0WQsNmtiO5DnzNBIw/FQySaWDiwqwrLcUM3WsEVT+xAxwEpc81q5BgBRmAbaj/cciYssMNG9EXgdDxdoPVufn+ztJMuZjYIAz9+EbQ+8TRDuVFaJsvDNbzxtB0Lf/ZgUG8FaE5Udk68/93rGFd3gdA=}
+            leparisien:%{AQECAHhPwAyPK3nfERyAvmyWOWx9c41uht+ei4Zlv4NgrlmypwAAAMYwgcMGCSqGSIb3DQEHBqCBtTCBsgIBADCBrAYJKoZIhvcNAQcBMB4GCWCGSAFlAwQBLjARBAxWR2TVlRhjO6c+/R4CARCAf3SciLFcPc5tLWoYrm/S8lmeJ/U95NsiBnb39dbQ3h9vEsII8ivo2jvGIATTu811MMkPaFZDqdCxsCft7BoCldD92UinfCa9zeevKc+waYGGw0DYud8tICPBGHPXaIqKwsfAKp2TFBa1RSeiGpJxoRrAsD9tRsy+IpczRp0YjMk=}
           CACHE_NODES: |
             fusion-memcached.hrnbpw.0001.use1.cache.amazonaws.com:11211
             fusion-memcached.hrnbpw.0002.use1.cache.amazonaws.com:11211

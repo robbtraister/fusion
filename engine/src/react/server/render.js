@@ -17,15 +17,13 @@ const unpack = require('../../utils/unpack')
 
 const timer = require('../../timer')
 
-const getSource = require('../../models/sources')
-
 const fusionProperties = require('fusion:properties')
 
 const getTree = require('../shared/compile/tree')
 
 const {
   fetchFile
-} = require('../../assets/io')
+} = require('../../io')
 
 const {
   componentDistRoot,
@@ -92,17 +90,16 @@ function getFusionScript (globalContent, globalContentConfig, contentCache, outp
   const condensedCache = {}
   Object.keys(contentCache)
     .forEach(sourceName => {
-      const source = getSource(sourceName)
       const sourceCache = contentCache[sourceName]
-      const condensedSourceCache = condensedCache[sourceName] = {
-        entries: {},
-        expiresAt: now + ((source && source.ttl) || 300000)
-      }
       Object.keys(sourceCache)
         .forEach(key => {
-          const filtered = sourceCache[key].filtered
-          if (filtered) {
-            condensedSourceCache.entries[key] = {cached: filtered}
+          const keyCache = sourceCache[key]
+          if (keyCache.source && keyCache.filtered) {
+            const condensedSourceCache = condensedCache[sourceName] = condensedCache[sourceName] || {
+              entries: {},
+              expiresAt: now + ((keyCache.source && keyCache.source.ttl) || 300000)
+            }
+            condensedSourceCache.entries[key] = {cached: keyCache.filtered}
           }
         })
     })
@@ -136,7 +133,7 @@ const render = function render ({Component, request, content, _website}) {
           globalContent: content ? content.document : null,
           globalContentConfig: content ? {source: content.source, key: content.key} : null,
           outputType: Component.outputType,
-          requestUri: request.uri,
+          requestUri: request && request.uri,
           siteProperties: fusionProperties(_website)
         }
       )
@@ -383,6 +380,7 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
                       templateHref: undefined
                     },
                     fetched: rendering.getCssFile()
+                      .catch(() => null)
                       .then((templateCssFile) => {
                         Component.inlines.cssLinks.cached = {
                           outputTypeHref: (outputTypeHasCss(outputType)) ? `${contextPath}/dist/components/output-types/${outputType}.css?v=${version}` : null,

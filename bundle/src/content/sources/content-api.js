@@ -10,5 +10,9 @@ const resolve = function resolve (key) {
 
 module.exports = {
   resolve,
-  schemaName: 'minimal'
+  schemaName: 'minimal',
+  params: {
+    canonical_url: 'text',
+    published: 'text'
+  }
 }

@@ -9,9 +9,9 @@ const {
   version
 } = require('../../../environment')
 
-const {
-  getOutputTypes
-} = require('../../assets/info')
+const { components } = require('../../../environment/manifest')
+
+const allOutputTypes = Object.keys(components.outputTypes)
 
 const lambda = new Lambda({region})
 
@@ -38,6 +38,11 @@ const invoke = function invoke (uri, payload, version, InvocationType = 'Request
         Qualifier: version,
         Payload: JSON.stringify({
           method: 'POST',
+          // serverless-http uses `httpMethod` property
+          httpMethod: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
           path: uri,
           body: payload,
           queryStringParameters: {propagate: 'false'}
@@ -50,7 +55,7 @@ const invoke = function invoke (uri, payload, version, InvocationType = 'Request
 
 const publishOutputTypes = function publishOutputTypes (uri, payload, InvocationType = 'RequestResponse') {
   return Promise.all(
-    getOutputTypes()
+    allOutputTypes
       .map((outputType) => invoke(`${uri}/${outputType}`, payload, version, InvocationType))
   )
 }

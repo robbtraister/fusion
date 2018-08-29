@@ -24,8 +24,6 @@ const {
   contextPath
 } = require('../environment')
 
-const { components } = require('../environment/manifest')
-
 childProcess.execSync(`mkdir -p '${propertiesSrcDir}'`)
 const propertiesSrcFile = path.resolve(propertiesSrcDir, `properties.js`)
 
@@ -95,17 +93,13 @@ module.exports = [
     },
     plugins: [
       new ManifestPlugin({fileName: 'webpack.manifest.json'}),
-      ...Object.keys(components.outputTypes)
-        .map((outputType) => {
-          return new HandlebarsPlugin({
-            entry: require.resolve('../src/react/client/preview.html.hbs'),
-            output: path.resolve(bundleDistRoot, 'engine', 'preview', `${outputType}.html`),
-            data: {
-              contextPath,
-              outputType
-            }
-          })
-        })
+      new HandlebarsPlugin({
+        entry: require.resolve('../src/react/client/preview.html.hbs'),
+        output: path.resolve(bundleDistRoot, 'engine', 'preview.html'),
+        data: {
+          contextPath
+        }
+      })
     ],
     resolve: Object.assign(
       {},

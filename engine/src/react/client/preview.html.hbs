@@ -1,49 +1,78 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>React Admin</title>
-    <script type="application/javascript">
-      window.Fusion=window.Fusion||{}
-      Fusion.isAdmin=true
-      Fusion.contextPath='{{contextPath}}'
-      Fusion.contentCache={}
-
-      {{!--
-        this file is evaluated at compile-time and served as static from S3
-        as such, we do not know the version number at evaluation
-        so we must determine it dynamically
-      --}}
-
+    <title>Admin Preview Wrapper</title>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+      }
+      #rendering {
+        width: 100%;
+        height: 100%;
+        border: 0;
+        overflow: hidden;
+      }
+    </style>
+    <script>
       var vMatch = /(\?|&)v=([^&]*)/.exec(window.location.search)
       var v = vMatch ? vMatch[2] : ''
 
-      function addElement (tag, type, attr, rel) {
-        return function (url) {
-          var e = document.createElement(tag)
-          e.type = type
-          e.rel = rel
-          e[attr] = url
-          document.head.appendChild(e)
+      var isRenderReady = false
+      var latestConfig = undefined
+
+      function CSR () {
+        if (latestConfig) {
+          window.rendering.contentWindow.CSR(latestConfig.rendering)
+        }
+        isRenderReady = true
+      }
+
+      function SSR () {
+        if (latestConfig) {
+          isRenderReady = false
+          window.rendering.contentWindow.SSR(latestConfig.rendering, latestConfig.outputType)
+        } else {
+          isRenderReady = true
         }
       }
 
-      var addJs = addElement('script', 'application/text', 'src')
-      var addCss = addElement('link', 'text/css', 'href', 'stylesheet')
+      function appendAdminScript (cb) {
+        const script = window.rendering.contentDocument.createElement('script')
+        script.type = 'application/javascript'
+        script.src = '{{contextPath}}/dist/engine/admin.js?v=' + v
+        script.onload = cb
+        window.rendering.contentDocument.body.appendChild(script)
+      }
 
-      addJs('{{contextPath}}/dist/engine/admin.js?v=' + v)
-      addJs('{{contextPath}}/dist/components/combinations/{{outputType}}.js?v=' + v)
-      addCss('{{contextPath}}/dist/components/output-types/{{outputType}}.css?v=' + v)
-      addCss('{{contextPath}}/dist/components/combinations/{{outputType}}.css?v=' + v)
+      function appendAdminScriptToRendering () {
+        appendAdminScript(CSR)
+      }
 
-      {{!--
-        document.write('<script type="application/javascript" src="{{contextPath}}/dist/engine/admin.js?v=' + v + '"><\/script>')
-        document.write('<script type="application/javascript" src="{{contextPath}}/dist/components/combinations/{{outputType}}.js?v=' + v + '"><\/script>')
-        document.write('<link type="text/css" rel="stylesheet" href="{{contextPath}}/dist/components/output-types/{{outputType}}.css?v=' + v + '" />')
-        document.write('<link type="text/css" rel="stylesheet" href="{{contextPath}}/dist/components/combinations/{{outputType}}.css?v=' + v + '" />')
-      --}}
+      function appendAdminScriptToShell () {
+        window.rendering.onload = appendAdminScriptToRendering
+        appendAdminScript(SSR)
+      }
+
+      function render (config) {
+        var isSameOutputType = (latestConfig && config && (latestConfig.outputType === config.outputType))
+
+        latestConfig = config
+
+        if (isRenderReady) {
+          if (isSameOutputType) {
+            CSR()
+          } else {
+            SSR()
+          }
+        }
+      }
     </script>
   </head>
   <body>
-    <div id="fusion-app"></div>
+    <iframe id="rendering" onload="appendAdminScriptToShell()"></iframe>
   </body>
 </html>

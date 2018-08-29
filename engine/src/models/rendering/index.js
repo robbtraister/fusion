@@ -98,7 +98,7 @@ class Rendering {
     // but that's what you get with legacy data
     this.contentPromise = this.contentPromise ||
       (
-        (this.type !== 'page')
+        (this.type === 'template')
           ? Promise.resolve()
           : this.getJson()
             .then((json) => {

@@ -38,6 +38,11 @@ const invoke = function invoke (uri, payload, version, InvocationType = 'Request
         Qualifier: version,
         Payload: JSON.stringify({
           method: 'POST',
+          // serverless-http uses `httpMethod` property
+          httpMethod: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
           path: uri,
           body: payload,
           queryStringParameters: {propagate: 'false'}

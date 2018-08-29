@@ -48,7 +48,8 @@
     "graphql": "^0.13.2",
     "handlebars-webpack-plugin": "^1.5.0",
     "ignore-loader": "^0.1.2",
-    "lodash": "^4.17.5",
+    "lodash.get": "^4.4.2",
+    "lodash.merge": "^4.6.1",
     "memory-fs": "^0.4.1",
     "mini-css-extract-plugin": "^0.4.2",
     "mock-require": "^3.0.2",
@@ -66,10 +67,10 @@
     "webpack": "^4.17.1",
     "webpack-cli": "^2.1.5",
     "webpack-manifest-plugin": "^2.0.3",
-    "webpack-sources": "^1.1.0"
+    "webpack-sources": "^1.2.0"
   },
   "devDependencies": {
-    "aws-sdk": "^2.303.0",
+    "aws-sdk": "^2.304.0",
     "mongodb": "^3.1.4",
     "serverless-offline": "^3.25.9"
   }

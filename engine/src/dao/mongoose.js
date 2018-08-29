@@ -69,7 +69,8 @@ function Mongoose (mongoUrl) {
               const elapsedTime = tic.toc()
               debugTimer(`${modelName}.find()`, elapsedTime)
               sendMetrics([
-                {type: METRIC_TYPES.DB_QUERY_DURATION, value: elapsedTime, tags: ['db:query']}
+                {type: METRIC_TYPES.DB_DURATION, value: elapsedTime, tag: ['operation:find']},
+                {type: METRIC_TYPES.DB_RESULT, value: 1, tags: ['operation:find', 'result:success']}
               ])
 
               return data
@@ -87,7 +88,8 @@ function Mongoose (mongoUrl) {
               const elapsedTime = tic.toc()
               debugTimer(`${modelName}.findOne()`, elapsedTime)
               sendMetrics([
-                {type: METRIC_TYPES.DB_QUERY_DURATION, value: elapsedTime, tags: ['db:query']}
+                {type: METRIC_TYPES.DB_DURATION, value: elapsedTime, tags: ['operation:findOne']},
+                {type: METRIC_TYPES.DB_RESULT, value: 1, tags: ['result:success', 'operation:findOne']}
               ])
 
               return data
@@ -105,7 +107,8 @@ function Mongoose (mongoUrl) {
               const elapsedTime = tic.toc()
               debugTimer(`${modelName}.get(${_id})`, elapsedTime)
               sendMetrics([
-                {type: METRIC_TYPES.DB_QUERY_DURATION, value: elapsedTime, tags: ['db:query']}
+                {type: METRIC_TYPES.DB_DURATION, value: elapsedTime, tags: ['operation:get']},
+                {type: METRIC_TYPES.DB_RESULT, value: 1, tags: ['operation:get', 'result:success']}
               ])
 
               return data
@@ -123,7 +126,8 @@ function Mongoose (mongoUrl) {
               const elapsedTime = tic.toc()
               debugTimer(`${modelName}.put()`, elapsedTime)
               sendMetrics([
-                {type: METRIC_TYPES.DB_QUERY_DURATION, value: elapsedTime, tags: ['db:query']}
+                {type: METRIC_TYPES.DB_DURATION, value: elapsedTime, tags: ['operation:put']},
+                {type: METRIC_TYPES.DB_RESULT, value: 1, tags: ['operation:put', 'result:success']}
               ])
 
               return data

@@ -7,7 +7,8 @@ const METRIC_TYPES = {
   COMPILE_DURATION: 'arc.fusion.compile.duration',
   CONTENT_LATENCY: 'arc.fusion.content.latency',
   CONTENT_RESULT: 'arc.fusion.content.result',
-  DB_QUERY_DURATION: 'arc.fusion.query.duration',
+  DB_DURATION: 'arc.fusion.db.duration',
+  DB_RESULT: 'arc.fusion.db.result',
   RENDER_DURATION: 'arc.fusion.render.duration',
   RENDER_RESULT: 'arc.fusion.render.result',
   WEBPACK_DURATION: 'arc.fusion.webpack.duration'
@@ -16,8 +17,8 @@ const METRIC_TYPES = {
 /**
  * Takes the metrics array, formats the objects to match what DataDog is expecting, and makes the POST request
  * @param {Object[]} metrics One or more metrics to be sent to DataDog
- * @param {number} metrics[].type A constant that specifies the type of metric to be sent (METRIC_TYPES are defined above)
- * @param {Array} metrics[].value The actual value to send to DataDog (e.g. we want to send a duration of half a second, we send [.5])
+ * @param {string} metrics[].type A constant that specifies the type of metric to be sent (METRIC_TYPES are defined above)
+ * @param {number} metrics[].value The actual value to send to DataDog (e.g. we want to send a duration of half a second, we send [.5])
  * @param {Array} metrics[].tags [OPTIONAL] The tags associated with this metric (e.g. [operation:fetch, result:success])
  * @returns {undefined} No return value
  */

@@ -1,6 +1,6 @@
 # Using a GraphQL Schema
 
-So far, we've been relying on "global" content to render our component entirely server side. But what if we want to fetch content on the client side? For that, we'll need to fetch additional content from the content retrieved in our resolver.
+So far, we've been relying on "global" content to render our component entirely server side. But what if we want to fetch content on the client side? For that, we'll need to fetch "feature specific" content in addition to the "global" content retrieved by our resolver.
 
 ## Defining another content source
 
@@ -90,15 +90,18 @@ const schema = `
 export default schema
 ```
 Let's detail what's going on:
+
 - We define a `const` named `schema` and set it to a string literal containing our GraphQL schema (we're using a template string here just so we can use newline characters easily).
 - Within this string we use GraphQL syntax to define our root `Query` type at the bottom, which has the `totalResults` and `Search` properties in it - we don't care about the `Response` property in the JSON, so we can leave it out.
 - The `totalResults` property is an integer, so we assign it an `Int` type.
-- The `Search` field is defined as a List (denoted by the square brackets) of `Movie` objects, and we mark it as a non-nullable field denoted by the `!` at the end.
+- The `Search` field is defined as a List (denoted by the square brackets) of `Movie` objects, and we mark it as a non-nullable field [denoted by the `!` at the end](https://graphql.org/learn/schema/#object-types-and-fields).
 - In the `Movie` type, we list the `Title`, `Year`, `imdbId` and `Poster` fields, as well as their types and modifiers. We don't care about the `Type` field in the JSON, so we leave it out.
 
 For more details on GraphQL syntax and schemas check out [GraphQL's schema documentation](https://graphql.org/learn/schema/).
 
-Obviously the schema you define is entirely dependent upon the result you're expecting from your content source, so you'll need to craft schemas ([schemata?](https://english.stackexchange.com/questions/77764/plural-form-of-schema)) on a case-by-case basis. However, if you have multiple content sources that produce similar or identical data shapes (e.g. multiple content sources calling Arc's Content API and returning [ANS](TODO: add link) documents), there's no reason you can't reuse the same schema for multiple content sources.
+Obviously the schema you define is entirely dependent upon the result you're expecting from your content source, so you'll need to craft schemas ([schemata?](https://english.stackexchange.com/questions/77764/plural-form-of-schema)) on a case-by-case basis.
+
+However, if you have multiple content sources that produce similar or identical data shapes (e.g. multiple content sources calling Arc's Content API and returning [ANS](TODO: add link) documents), there's no reason you can't reuse the same schema for multiple content sources.
 
 Now that we have our schema defined, we can use it to fetch some content.
 

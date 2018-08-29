@@ -244,4 +244,4 @@ All we had to do to get pagination working was:
 
 And that's how you fetch content in Fusion. Phew!
 
- **Next: [Event Handling and Interaction](./event-handling-interaction.md)**
+ **Next: [Dynamically Configuring Content](./dynamically-configuring-content.md)**

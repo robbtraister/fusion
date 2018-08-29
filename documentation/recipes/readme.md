@@ -25,6 +25,7 @@
 | [Adding Custom Fields to a Component](./adding-custom-fields.md) |
 | [Using a GraphQL Schema](./using-graphql-schema.md) |
 | [Fetching Content](./fetching-content.md) |
+| [Dynamically Configuring Content](./dynamically-configuring-content.md) |
 | [Event Handling and Interaction](./event-handling-interaction.md) |
 | [Using Runtime Properties](./using-runtime-properties.md) |
 

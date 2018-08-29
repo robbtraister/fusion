@@ -14,20 +14,28 @@ const METRIC_TYPES = {
 }
 
 /**
- * Takes the metrics array, formats the objects to the match what DataDog is expecting, and makes the POST request
+ * Takes the metrics array, formats the objects to match what DataDog is expecting, and makes the POST request
  * @param {Object[]} metrics One or more metrics to be sent to DataDog
- * @param {string} metrics[].type A constant that specifies the type of metric to be sent (METRIC_TYPES are defined above)
+ * @param {number} metrics[].type A constant that specifies the type of metric to be sent (METRIC_TYPES are defined above)
  * @param {Array} metrics[].value The actual value to send to DataDog (e.g. we want to send a duration of half a second, we send [.5])
  * @param {Array} metrics[].tags [OPTIONAL] The tags associated with this metric (e.g. [operation:fetch, result:success])
  * @returns {undefined} No return value
  */
 const sendMetrics = (metrics) => {
+  const baseTagsForEngine = [
+    'app:fusion',
+    'function-type:engine',
+    `engine-version:${semver}`,
+    `lambda-deployment:${version}`,
+    `environment:${environment}`
+  ]
+
   const metricsToSend = {
     series: metrics.map(metric => {
       return {
         metric: metric.type,
         points: [[getTimestamp(), [metric.value]]],
-        tags: ['app:fusion', `engine-version:${semver}`, `lambda-deployment:${version}`, `environment:${environment}`, ...metric.tags]
+        tags: [...baseTagsForEngine, ...metric.tags]
       }
     })
   }

@@ -96,9 +96,26 @@ http {
 
   # ELB/ALB is likely set to 60s; ensure we stay open at least that long
   keepalive_timeout             120;
-  send_timeout                  10;
-  proxy_read_timeout            10;
+  # send to upstream server
   proxy_send_timeout            10;
+EOB
+
+if [ "${IS_PROD}" ]
+then
+  cat <<EOB
+  # receive from upstream server
+  proxy_read_timeout            10;
+EOB
+else
+  cat <<EOB
+  # receive from upstream server
+  proxy_read_timeout            30;
+EOB
+fi
+
+cat <<EOB
+  # send to client
+  send_timeout                  10;
 
   set_real_ip_from              0.0.0.0/0;
   real_ip_header                X-Forwarded-For;

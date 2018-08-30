@@ -6,6 +6,10 @@ const {
   defaultOutputType
 } = require('../../../environment')
 
+const { components } = require('../../../environment/manifest')
+
+const allOutputTypes = Object.keys(components.outputTypes)
+
 const model = require('../../dao')
 
 const compileRendering = require('./compile')
@@ -53,6 +57,10 @@ class Rendering {
             })
       )
     return this.jsonPromise
+  }
+
+  async compileAll () {
+    return Promise.all(allOutputTypes.map((outputType) => this.compile(outputType)))
   }
 
   async compile (outputType = defaultOutputType) {

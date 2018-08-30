@@ -36,6 +36,10 @@ const assetHandler = (isDev)
   ? staticHandler
   : redirectHandler
 
+const publishMethod = (isDev)
+  ? 'compileAll'
+  : 'publish'
+
 distRouter.use('/engine', assetHandler('/engine'))
 distRouter.all(/\.css$/, assetHandler())
 
@@ -65,8 +69,9 @@ function getTypeRouter (routeType, allowPost) {
         const id = req.params.id || req.body.id || req.body._id
         const type = req.body.type || routeType
 
-        new Rendering(type, id, req.body)
-          .publish(!isDev && req.query.propagate !== 'false')
+        const rendering = new Rendering(type, id, req.body)
+
+        rendering[publishMethod](!isDev && req.query.propagate !== 'false')
           .then(() => { res.sendStatus(200) })
           .catch(next)
       }
@@ -83,8 +88,9 @@ function getTypeRouter (routeType, allowPost) {
         const type = req.body.type || routeType
         const outputType = req.params.outputType || defaultOutputType
 
-        new Rendering(type, id, req.body)
-          .compile(outputType)
+        const rendering = new Rendering(type, id, req.body)
+
+        rendering.compile(outputType)
           .then(() => { res.sendStatus(200) })
           .catch(next)
       }

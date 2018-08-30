@@ -16,6 +16,8 @@ const {
   cachePrefix
 } = require('../../../environment')
 
+const { sendMetrics, METRIC_TYPES } = require('../../utils/send-metrics')
+
 function getCacheKey (uri) {
   const hash = crypto.createHash('sha256').update(uri).digest('hex')
   return `${cachePrefix}:${hash}`
@@ -73,9 +75,19 @@ const fetch = (uri, forceSync) => {
 
     return request(resolvedUri)
       .then((data) => {
-        debugTimer(`Fetched from source [${sanitizedUri}]`, tic.toc())
+        const elapsedTime = tic.toc()
+        debugTimer(`Fetched from source [${sanitizedUri}]`, elapsedTime)
+        sendMetrics([
+          {type: METRIC_TYPES.CONTENT_RESULT, value: 1, tags: ['operation:fetch', 'result:success']},
+          {type: METRIC_TYPES.CONTENT_LATENCY, value: elapsedTime, tags: ['operation:fetch']}
+        ])
+
         return pushContent(cacheKey, data)
           .then(() => data)
+          .catch((error) => {
+            sendMetrics([{type: METRIC_TYPES.CACHE_RESULT, value: 1, tags: ['operation:put', 'result:error']}])
+            throw new Error('data error from cache')
+          })
       })
   }
 
@@ -87,12 +99,29 @@ const fetch = (uri, forceSync) => {
         return fetchContent(cacheKey)
           .then((data) => {
             if (!data) {
+              sendMetrics([{type: METRIC_TYPES.CACHE_RESULT, value: 1, tags: ['operation:fetch', 'result:error']}])
               throw new Error('data error from cache')
             }
-            debugTimer(`Fetched from cache [${sanitizedUri}]`, tic.toc())
+            const elapsedTime = tic.toc()
+            debugTimer(`Fetched from cache [${sanitizedUri}]`, elapsedTime)
+            sendMetrics([
+              {type: METRIC_TYPES.CACHE_RESULT, value: 1, tags: ['operation:fetch', 'result:cache_hit']},
+              {type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags: ['operation:fetch']},
+              {type: METRIC_TYPES.CACHE_RESULT_SIZE, value: data.length, tags: ['operation:fetch', 'result:cache_hit']}
+            ])
+
             return data
           })
-          .catch(fetchFromSource)
+          .catch(error => {
+            const elapsedTime = tic.toc()
+            const tagResult = (error.statusCode && error.statusCode === 404) ? 'result:cache_miss' : 'result:cache_error'
+            sendMetrics([
+              {type: METRIC_TYPES.CACHE_RESULT, value: 1, tags: ['operation:fetch', tagResult]},
+              {type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags: ['operation:fetch', tagResult]}
+            ])
+
+            return fetchFromSource()
+          })
       })
     : fetchFromSource()
 }

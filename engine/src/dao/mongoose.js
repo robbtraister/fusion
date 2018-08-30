@@ -7,6 +7,8 @@ const debugTimer = require('debug')('fusion:timer:dao:mongoose')
 const { mongoUrl } = require('../../environment')
 const timer = require('../timer')
 
+const { sendMetrics, METRIC_TYPES } = require('../utils/send-metrics')
+
 const schema = new mongoose.Schema({_id: String})
 
 function getNewConnection (mongoUrl) {
@@ -64,7 +66,13 @@ function Mongoose (mongoUrl) {
               return model.find(query)
             })
             .then((data) => {
-              debugTimer(`${modelName}.find()`, tic.toc())
+              const elapsedTime = tic.toc()
+              debugTimer(`${modelName}.find()`, elapsedTime)
+              sendMetrics([
+                {type: METRIC_TYPES.DB_DURATION, value: elapsedTime, tag: ['operation:find']},
+                {type: METRIC_TYPES.DB_RESULT, value: 1, tags: ['operation:find', 'result:success']}
+              ])
+
               return data
             })
         },
@@ -77,7 +85,13 @@ function Mongoose (mongoUrl) {
               return model.findOne(query)
             })
             .then((data) => {
-              debugTimer(`${modelName}.findOne()`, tic.toc())
+              const elapsedTime = tic.toc()
+              debugTimer(`${modelName}.findOne()`, elapsedTime)
+              sendMetrics([
+                {type: METRIC_TYPES.DB_DURATION, value: elapsedTime, tags: ['operation:findOne']},
+                {type: METRIC_TYPES.DB_RESULT, value: 1, tags: ['result:success', 'operation:findOne']}
+              ])
+
               return data
             })
         },
@@ -90,7 +104,13 @@ function Mongoose (mongoUrl) {
               return model.findById(_id)
             })
             .then((data) => {
-              debugTimer(`${modelName}.get(${_id})`, tic.toc())
+              const elapsedTime = tic.toc()
+              debugTimer(`${modelName}.get(${_id})`, elapsedTime)
+              sendMetrics([
+                {type: METRIC_TYPES.DB_DURATION, value: elapsedTime, tags: ['operation:get']},
+                {type: METRIC_TYPES.DB_RESULT, value: 1, tags: ['operation:get', 'result:success']}
+              ])
+
               return data
             })
         },
@@ -103,7 +123,13 @@ function Mongoose (mongoUrl) {
               return model.update({_id: doc._id}, doc, { upsert: true })
             })
             .then((data) => {
-              debugTimer(`${modelName}.put()`, tic.toc())
+              const elapsedTime = tic.toc()
+              debugTimer(`${modelName}.put()`, elapsedTime)
+              sendMetrics([
+                {type: METRIC_TYPES.DB_DURATION, value: elapsedTime, tags: ['operation:put']},
+                {type: METRIC_TYPES.DB_RESULT, value: 1, tags: ['operation:put', 'result:success']}
+              ])
+
               return data
             })
         }

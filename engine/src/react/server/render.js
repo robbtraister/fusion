@@ -34,6 +34,8 @@ const {
 
 const { components } = require('../../../environment/manifest')
 
+const { sendMetrics, METRIC_TYPES } = require('../../utils/send-metrics')
+
 const fileExists = (fp) => {
   try {
     fs.accessSync(fp, fs.constants.R_OK)
@@ -135,12 +137,17 @@ const render = function render ({Component, request, content, _website}) {
           siteProperties: fusionProperties(_website)
         }
       )
-      debugTimer(`create element`, elementTic.toc())
+      const elementElapsedTime = elementTic.toc()
+      debugTimer(`create element`, elementElapsedTime)
+      sendMetrics([{type: METRIC_TYPES.RENDER_DURATION, value: elementElapsedTime, tags: ['render:element']}])
       const htmlTic = timer.tic()
       const html = ReactDOM.renderToStaticMarkup(element)
-      debugTimer(`render html`, htmlTic.toc())
+      const htmlElapsedTime = htmlTic.toc()
+      debugTimer(`render html`, htmlElapsedTime)
+      sendMetrics([{type: METRIC_TYPES.RENDER_DURATION, value: htmlElapsedTime, tags: ['render:html']}])
       resolve(html)
     } catch (e) {
+      sendMetrics([{type: METRIC_TYPES.RENDER_RESULT, value: 1, tags: ['result:error']}])
       reject(e)
     }
   })
@@ -148,7 +155,9 @@ const render = function render ({Component, request, content, _website}) {
   let tic = timer.tic()
   return renderHTML()
     .then((html) => {
-      debugTimer('first render', tic.toc())
+      const elapsedTime = tic.toc()
+      debugTimer('first render', elapsedTime)
+      sendMetrics([{type: METRIC_TYPES.RENDER_DURATION, value: elapsedTime, tags: ['render:first-render']}])
       tic = timer.tic()
 
       // collect content cache into Promise array
@@ -170,12 +179,16 @@ const render = function render ({Component, request, content, _website}) {
         // if feature content is requested, wait for it, then render again
         : Promise.all(contentPromises)
           .then(() => {
-            debugTimer('content hydration', tic.toc())
+            const contentHydrationDuration = tic.toc()
+            debugTimer('content hydration', contentHydrationDuration)
+            sendMetrics([{type: METRIC_TYPES.RENDER_DURATION, value: contentHydrationDuration, tags: ['render:content-hydration']}])
             tic = timer.tic()
           })
           .then(renderHTML)
           .then((html) => {
-            debugTimer('second render', tic.toc())
+            const secondRenderDuration = tic.toc()
+            debugTimer('second render', secondRenderDuration)
+            sendMetrics([{type: METRIC_TYPES.RENDER_DURATION, value: secondRenderDuration, tags: ['render:second-render']}])
             return html
           })
 

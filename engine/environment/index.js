@@ -26,6 +26,7 @@ const cacheProxyUrl = variables.CACHE_PROXY_URL || ''
 const cachePrefix = variables.CACHE_PREFIX || ''
 const contentBase = variables.CONTENT_BASE || ''
 const contextPath = (variables.CONTEXT_PATH || 'pb').replace(/^\/*/, '/').replace(/\/+$/, '')
+const datadogApiKey = variables.DATADOG_API_KEY || ''
 const defaultOutputType = variables.DEFAULT_OUTPUT_TYPE || 'default'
 const apiPrefix = `${contextPath}/api/v3`
 const environment = variables.ENVIRONMENT
@@ -36,6 +37,7 @@ const mongoUrl = variables.MONGO_URL
 const onDemand = /^true$/i.test(variables.ON_DEMAND)
 const port = variables.PORT || 8080
 const region = variables.REGION || 'us-east-1'
+const semver = variables.FUSION_RELEASE
 const version = variables.AWS_LAMBDA_FUNCTION_VERSION || '$LATEST'
 
 const bundleDistRoot = `${bundleRoot}/dist`
@@ -70,6 +72,7 @@ module.exports = {
   contentSrcRoot,
   contentDistRoot,
   contextPath,
+  datadogApiKey,
   defaultOutputType,
   environment,
   functionName,
@@ -81,6 +84,7 @@ module.exports = {
   region,
   schemasDistRoot,
   schemasSrcRoot,
+  semver,
   sourcesDistRoot,
   sourcesSrcRoot,
   variables,

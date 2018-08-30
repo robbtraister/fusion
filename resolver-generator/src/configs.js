@@ -31,6 +31,10 @@ const resolverConfig = (contextName, envVars) => ({
   MemorySize: 512,
   Role: resolverRole(contextName),
   Runtime: 'nodejs8.10',
+  Tags: {
+    'fusion-function-type': 'resolver',
+    'environment': contextName
+  },
   Timeout: 10
 })
 

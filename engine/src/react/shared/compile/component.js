@@ -85,7 +85,7 @@ const componentGenerator = function componentGenerator (loadComponent) {
   }
 
   const renderableItem = function renderableItem (config, outputType, index) {
-    const Component = (config.featureConfig)
+    const Element = (config.featureConfig)
       ? feature(config, outputType)
       : (config.chainConfig)
         ? chain(config, outputType)
@@ -94,7 +94,7 @@ const componentGenerator = function componentGenerator (loadComponent) {
           : (config.layoutItems)
             ? layout(config, outputType)
             : null
-    return Component || (() => null)
+    return Element || (() => null)
   }
 
   return (config, outputType) => {

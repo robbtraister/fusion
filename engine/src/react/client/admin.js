@@ -98,5 +98,3 @@ appendSSRForm()
 
 window.CSR = CSR
 window.SSR = SSR
-
-module.exports = React

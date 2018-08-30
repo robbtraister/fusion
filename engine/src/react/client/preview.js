@@ -2,8 +2,7 @@
 
 /* global __CONTEXT_PATH__ */
 
-const vMatch = /(\?|&)v=([^&]*)/.exec(window.location.search)
-const v = vMatch ? vMatch[2] : ''
+const version = require('./version')
 
 class Preview {
   constructor (iframe) {
@@ -36,7 +35,7 @@ class Preview {
   appendAdminScript (cb) {
     const script = this.iframe.contentDocument.createElement('script')
     script.type = 'application/javascript'
-    script.src = `${__CONTEXT_PATH__}/dist/engine/admin.js?v=${v}`
+    script.src = `${__CONTEXT_PATH__}/dist/engine/admin.js?v=${version}`
     script.onload = cb
     this.iframe.contentDocument.body.appendChild(script)
   }

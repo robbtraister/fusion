@@ -14,6 +14,8 @@ Fusion.isAdmin = true
 
 const Provider = require('./provider')
 
+const version = require('./version')
+
 const React = window.react = require('react')
 const ReactDOM = window.ReactDOM = require('react-dom')
 window.PropTypes = require('../shared/prop-types')
@@ -69,9 +71,6 @@ function appendSSRForm () {
   document.body.appendChild(form)
 }
 
-const vMatch = /(\?|&)v=([^&]*)/.exec(window.location.search)
-const v = vMatch ? vMatch[2] : ''
-
 function addElement (tag, type, attr, rel) {
   return function (url) {
     var e = document.createElement(tag)
@@ -89,9 +88,9 @@ const addJs = addElement('script', 'application/javascript', 'src')
 const addCss = addElement('link', 'text/css', 'href', 'stylesheet')
 
 if (Fusion.outputType) {
-  addJs(`${Fusion.contextPath}/dist/components/combinations/${Fusion.outputType}.js?v=${v}`)
-  addCss(`${Fusion.contextPath}/dist/components/output-types/${Fusion.outputType}.css?v=${v}`)
-  addCss(`${Fusion.contextPath}/dist/components/combinations/${Fusion.outputType}.css?v=${v}`)
+  addJs(`${Fusion.contextPath}/dist/components/combinations/${Fusion.outputType}.js?v=${version}`)
+  addCss(`${Fusion.contextPath}/dist/components/output-types/${Fusion.outputType}.css?v=${version}`)
+  addCss(`${Fusion.contextPath}/dist/components/combinations/${Fusion.outputType}.css?v=${version}`)
 }
 
 appendSSRForm()

@@ -3,13 +3,9 @@
 const React = require('react')
 
 const componentGenerator = function componentGenerator (loadComponent) {
-  // The calculated result we export for rendering must be a Component (not Element)
-  // For simplification, create each element as a functional component
-  // This allows any feature to be exported for rendering
-  // When compiling container children, execute the functional Component to get the Element
   const renderAll = function renderAll (renderableItems, outputType) {
     return (renderableItems || [])
-      .map((ri, i) => renderableItem(ri, outputType, i)())
+      .map((ri, i) => renderableItem(ri, outputType, i))
       .filter(ri => ri)
   }
 
@@ -21,7 +17,7 @@ const componentGenerator = function componentGenerator (loadComponent) {
     const Feature = loadComponent('features', type, outputType)
 
     return (Feature)
-      ? () => React.createElement(
+      ? React.createElement(
         Feature,
         {
           key,
@@ -36,7 +32,7 @@ const componentGenerator = function componentGenerator (loadComponent) {
             : undefined
         }
       )
-      : () => React.createElement(
+      : React.createElement(
         'div',
         {
           key,
@@ -50,7 +46,7 @@ const componentGenerator = function componentGenerator (loadComponent) {
   const chain = function chain (config, outputType) {
     const Chain = loadComponent('chains', config.chainConfig, outputType)
 
-    return () => React.createElement(
+    return React.createElement(
       Chain || 'div',
       {
         key: config.id,
@@ -63,7 +59,7 @@ const componentGenerator = function componentGenerator (loadComponent) {
   }
 
   const section = function section (config, outputType, index) {
-    return () => React.createElement(
+    return React.createElement(
       React.Fragment,
       {
         key: index
@@ -77,7 +73,7 @@ const componentGenerator = function componentGenerator (loadComponent) {
   const layout = function layout (rendering, outputType) {
     const Layout = loadComponent('layouts', rendering.layout, outputType)
 
-    const Component = () => React.createElement(
+    return React.createElement(
       Layout || 'div',
       {
         key: rendering.layout,
@@ -86,10 +82,6 @@ const componentGenerator = function componentGenerator (loadComponent) {
       },
       renderAll(rendering.layoutItems, outputType)
     )
-
-    Component.layout = rendering.layout
-
-    return Component
   }
 
   const renderableItem = function renderableItem (config, outputType, index) {
@@ -105,7 +97,17 @@ const componentGenerator = function componentGenerator (loadComponent) {
     return Component || (() => null)
   }
 
-  return renderableItem
+  return (config, outputType) => {
+    // The calculated result we export for rendering must be a Component (not Element)
+    // Also, react elements cannot be extended, so using a Component function allows us to add layout property
+    const Component = () => renderableItem(config, outputType)
+
+    if (config.layout) {
+      Component.layout = config.layout
+    }
+
+    return Component
+  }
 }
 
 module.exports = componentGenerator

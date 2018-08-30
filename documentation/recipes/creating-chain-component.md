@@ -61,4 +61,4 @@ We haven't talked much about [Custom Fields](./adding-custom-fields.md) yet, but
 
 If we go into PageBuilder Admin and refresh our page editor, we should see the "Sidebar" chain show up in the Layout panel now. We can add this Chain to the page (either inside a Layout or on its own), and then drop whatever Features we want into it!
 
-**Next: [Isomorphic vs. Server vs. SPA Rendering](./isomorphic-server-spa-rendering.md)**
+**Next: [Event Handling and Interaction](./event-handling-interaction.md)**

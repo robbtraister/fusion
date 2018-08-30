@@ -6,7 +6,7 @@ Custom Fields are an especially useful tool when building websites with Fusion a
 
 Custom Fields are simply key/value pairs assigned to an individual Feature or Chain. The key names are defined in their respective components, and the values for each component instance are set in the PageBuilder Admin. This allows Feature Pack developers to define and use data relevant to their components, and for PageBuilder editors to decide how individual components should behave.
 
-Common use cases for Custom Fields include headings or text that should be customizable for each Feature, styling attributes, and content configurations that allow PageBuilder editors to assign content sources to components.
+Common use cases for Custom Fields include setting headings or text that should be customizable for each Feature, styling attributes, and content configurations that allow PageBuilder editors to assign content sources to components.
 
 ## Custom Fields as PropTypes
 

@@ -107,5 +107,5 @@ It may not seem like a huge change, but what we've done is completely decoupled 
 
 For the purposes of our `MovieList` component, the resulting output is the same - but this is a very common use case when working with Arc' Content API, when multiple content sources may return similarly structured data.
 
- **Next: [Event Handling and Interaction](./event-handling-interaction.md)**
+ **Next: [Using Runtime Properties](./using-runtime-properties.md)**
 

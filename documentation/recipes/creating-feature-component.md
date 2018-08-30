@@ -39,7 +39,7 @@ While this very simple component will work, it doesn't really solve our problem 
 
 ## Handling different output types
 
-Often times, you'll want your components to operate different based on what Output Type they are being rendered within. This is useful, for example, in situations where you want to render a desktop web version of a Feature, and then a different mobile web version, and maybe even a version for Google AMP consumption. There are two main ways to achieve this result:
+Often times, you'll want your components to operate differently based on what Output Type they are being rendered within. This is useful, for example, in situations where you want to render a desktop web version of a Feature, and then a different mobile web version, and maybe even a version for Google AMP consumption. There are two main ways to achieve this result:
 
 #### Different component versions per output types
 

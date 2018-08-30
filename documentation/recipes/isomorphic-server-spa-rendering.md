@@ -38,15 +38,15 @@ This will tell Fusion that this component should be rendered into HTML on the se
 
 **WARNING**
 
-There are downsides to rendering server-side only. First is your component will be wrapped in a containing `div` that tells Fusion not to reload it client-side - this could affect your styling. Another downside is that your content may become stale if it changes before the CDN has expired it. In short, components should only be marked `static` if their content and structure change infrequently, and those changes don't need to be available immediately to all clients.
+There are downsides to rendering server-side only. Firstly, your component will be wrapped in a containing `div` that tells Fusion not to reload it client-side - this could affect your styling. Another downside is that your content may become stale if it changes before Fusion's CDN has expired it. In short, components should only be marked `static` if their content and structure change infrequently, and those changes don't need to be available immediately to all clients.
 
 ---
 
 ## Rendering client-side only
 
-The final option available to us is rendering client-side only. This is a bit of a misnomer with Fusion, as your React components will get rendered on the server no matter what. However, you can choose to render the empty markup (without content) on the server, and then fill in the component with content on the client-side later. This may offer a small performance benefit, as you'll avoid fetching content for this component server-side.
+The final option available to us is rendering client-side only. This is a bit of a misnomer with Fusion, as your React components will get rendered on the server no matter what. However, you can choose to render the empty markup (without content) on the server, and then fill in the component with content on the client-side later. This may offer a small performance benefit, as you'll avoid fetching content for this component server-side. This option is best for Features that are not crucial to the content of the page and can be loaded with a small delay.
 
-To fetch content on the client-side only, we simply need to move our content fetching call into a hook that will **only** get invoked client-side. That hook is usually React's `componentDidMount` lifecycle event. This event will get triggered once your component gets mounted on the page client-side, but does not get executed server-side.
+To fetch content on the client-side only, we simply need to move our initial content fetching call into a hook that will **only** get invoked client-side. That hook is usually React's `componentDidMount` lifecycle event. This event will get triggered once your component gets mounted on the page client-side, but does not get executed server-side.
 
 Let's see how that might look:
 

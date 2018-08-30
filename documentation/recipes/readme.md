@@ -15,6 +15,7 @@
 | [Creating a Feature Component](./creating-feature-component.md) |
 | [Creating a Layout Component](./creating-layout-component.md) |
 | [Creating a Chain Component](./creating-chain-component.md) |
+| [Event Handling and Interaction](./event-handling-interaction.md) |
 | [Isomorphic vs. Server vs. SPA Rendering](./isomorphic-server-spa-rendering.md)
 
 | Using Data |
@@ -26,7 +27,6 @@
 | [Using a GraphQL Schema](./using-graphql-schema.md) |
 | [Fetching Content](./fetching-content.md) |
 | [Dynamically Configuring Content](./dynamically-configuring-content.md) |
-| [Event Handling and Interaction](./event-handling-interaction.md) |
 | [Using Runtime Properties](./using-runtime-properties.md) |
 
 | Tidying Up |

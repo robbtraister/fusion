@@ -13,11 +13,9 @@ You'll also want to [increase your local Docker instance's allocated memory](htt
 In the root directory of your new Fusion bundle, find the `.env` file. Ensure that the values for the following variables are filled in correctly:
 
 ```
-DB_NAME=My-Fusion-Repo
-CONTENT_BASE=https://redacted:redacted@api.sandbox.demo.arcpublishing.com
+CONTENT_BASE=https://<redacted>:<redacted>@api.sandbox.demo.arcpublishing.com
 ```
 
-- The DB_NAME variable should almost certainly be the name of the bundle you just created, unless you have configured a separate database on your own.
 - For the CONTENT_BASE variable, you can get the API username and password you need from the Trident staging page to replace the "redacted" placeholders above. You'll need access to Trident first though.
 
 ## Populating the Admin Database

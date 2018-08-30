@@ -19,6 +19,8 @@ const {
 const timer = require('../../timer')
 const getConfigs = require('../../../webpack/template.js')
 
+const { sendMetrics, METRIC_TYPES } = require('../../utils/send-metrics')
+
 const scriptSourceFile = path.resolve(`${componentSrcRoot}/script.js`)
 const stylesSourceFile = path.resolve(`${componentSrcRoot}/styles.js`)
 const scriptDestFile = path.resolve(`${componentDistRoot}/script.js`)
@@ -72,7 +74,9 @@ const compileSource = function compileSource (script, styles) {
         compiler.inputFileSystem = mfs
         compiler.outputFileSystem = mfs
 
-        debugTimer('webpack setup', tic.toc())
+        const elapsedTime = tic.toc()
+        debugTimer('webpack setup', elapsedTime)
+        sendMetrics([{type: METRIC_TYPES.WEBPACK_DURATION, value: elapsedTime, tags: ['webpack-op:setup']}])
 
         return compiler
       }),
@@ -92,7 +96,9 @@ const compileSource = function compileSource (script, styles) {
       return promisify(compiler.run.bind(compiler))()
     })
     .then((data) => {
-      debugTimer('webpack compilation', tic.toc())
+      const elapsedTime = tic.toc()
+      debugTimer('webpack compilation', elapsedTime)
+      sendMetrics([{type: METRIC_TYPES.WEBPACK_DURATION, value: elapsedTime, tags: ['webpack-op:compile']}])
 
       if (data.hasErrors()) {
         return Promise.reject(data.toJson().errors)
@@ -121,7 +127,9 @@ const compileRendering = function compileRendering ({rendering, outputType = def
   let tic = timer.tic()
   return generateSource(rendering, outputType)
     .then(({script, styles}) => {
-      debugTimer('generate source', tic.toc())
+      const generateSourceDuration = tic.toc()
+      debugTimer('generate source', generateSourceDuration)
+      sendMetrics([{type: METRIC_TYPES.COMPILE_DURATION, value: generateSourceDuration, tags: ['compile:generate-source']}])
 
       return compileSource(script, styles)
     })

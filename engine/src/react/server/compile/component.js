@@ -10,12 +10,16 @@ const unpack = require('../../../utils/unpack')
 
 const timer = require('../../../timer')
 
+const { sendMetrics, METRIC_TYPES } = require('../../../utils/send-metrics')
+
 const { components } = require('../../../../environment/manifest')
 
 const TimedComponent = (Component) => (props) => {
   const tic = timer.tic()
   const result = React.createElement(Component, props)
-  debugTimer(`render(${props.type}:${props.id})`, tic.toc())
+  const elapsedTime = tic.toc()
+  debugTimer(`render(${props.type}:${props.id})`, elapsedTime)
+  sendMetrics([{type: METRIC_TYPES.RENDER_DURATION, value: elapsedTime, tags: ['render:component']}])
   return result
 }
 

@@ -10,6 +10,8 @@ const timer = require('../timer')
 
 const MongoClient = require('mongodb').MongoClient
 
+const { sendMetrics, METRIC_TYPES } = require('../utils/send-metrics')
+
 function getNewConnection (mongoUrl) {
   return new Promise((resolve, reject) => {
     MongoClient.connect(mongoUrl, (err, connection) => err ? reject(err) : resolve(connection))
@@ -70,7 +72,13 @@ function Mongo (mongoUrl) {
             })
             .then((cursor) => cursor.toArray())
             .then((data) => {
-              debugTimer(`${modelName}.find()`, tic.toc())
+              const elapsedTime = tic.toc()
+              debugTimer(`${modelName}.find()`, elapsedTime)
+              sendMetrics([
+                {type: METRIC_TYPES.DB_DURATION, value: elapsedTime, tag: ['operation:find']},
+                {type: METRIC_TYPES.DB_RESULT, value: 1, tags: ['operation:find', 'result:success']}
+              ])
+
               return data
             })
         },
@@ -83,7 +91,13 @@ function Mongo (mongoUrl) {
               return collection.findOne(query)
             })
             .then((data) => {
-              debugTimer(`${modelName}.findOne()`, tic.toc())
+              const elapsedTime = tic.toc()
+              debugTimer(`${modelName}.findOne()`, elapsedTime)
+              sendMetrics([
+                {type: METRIC_TYPES.DB_DURATION, value: elapsedTime, tags: ['operation:findOne']},
+                {type: METRIC_TYPES.DB_RESULT, value: 1, tags: ['result:success', 'operation:findOne']}
+              ])
+
               return data
             })
         },
@@ -96,7 +110,13 @@ function Mongo (mongoUrl) {
               return collection.findOne({_id})
             })
             .then((data) => {
-              debugTimer(`${modelName}.get(${_id})`, tic.toc())
+              const elapsedTime = tic.toc()
+              debugTimer(`${modelName}.get(${_id})`, elapsedTime)
+              sendMetrics([
+                {type: METRIC_TYPES.DB_DURATION, value: elapsedTime, tags: ['operation:get']},
+                {type: METRIC_TYPES.DB_RESULT, value: 1, tags: ['operation:get', 'result:success']}
+              ])
+
               return data
             })
         },
@@ -109,7 +129,13 @@ function Mongo (mongoUrl) {
               return collection.update({_id: doc._id}, doc, { upsert: true })
             })
             .then((data) => {
-              debugTimer(`${modelName}.put()`, tic.toc())
+              const elapsedTime = tic.toc()
+              debugTimer(`${modelName}.put()`, elapsedTime)
+              sendMetrics([
+                {type: METRIC_TYPES.DB_DURATION, value: elapsedTime, tags: ['operation:put']},
+                {type: METRIC_TYPES.DB_RESULT, value: 1, tags: ['operation:put', 'result:success']}
+              ])
+
               return data
             })
         }

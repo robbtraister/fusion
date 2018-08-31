@@ -7,6 +7,7 @@ const AWS = require('aws-sdk')
 const debug = require('debug')('fusion:resolver-generator:deploy')
 
 const {
+  resolverArn,
   resolverCode,
   resolverConfig,
   resolverName
@@ -15,8 +16,16 @@ const {
 const lambda = new AWS.Lambda()
 
 const createFunction = promisify(lambda.createFunction.bind(lambda))
+const tagResource = promisify(lambda.tagResource.bind(lambda))
 const updateFunctionCode = promisify(lambda.updateFunctionCode.bind(lambda))
 const updateFunctionConfiguration = promisify(lambda.updateFunctionConfiguration.bind(lambda))
+
+function getTags (contextName) {
+  return {
+    'fusion-stage': 'resolver',
+    'environment': contextName
+  }
+}
 
 async function create (contextName, envVars) {
   debug(`creating resolver lambda for ${contextName}`)
@@ -28,7 +37,8 @@ async function create (contextName, envVars) {
           Publish: true,
           Code: resolverCode(contextName)
         },
-        resolverConfig(contextName, envVars)
+        { Tags: getTags(contextName) },
+        await resolverConfig(contextName, envVars)
       )
     )
 
@@ -37,6 +47,25 @@ async function create (contextName, envVars) {
   } catch (e) {
     debug(`error creating lambda for ${contextName}: ${e}`)
     throw e
+  }
+}
+
+async function tag (contextName, region) {
+  debug(`tagging lambda for ${contextName}`)
+  try {
+    const result = await tagResource(
+      {
+        Resource: await resolverArn(contextName, region),
+        Tags: getTags(contextName)
+      }
+    )
+
+    debug(`tagged lambda for ${contextName}`)
+    return result
+  } catch (e) {
+    debug(`error tagging lambda for ${contextName}: ${e}`)
+    // don't error on tagging
+    // throw e
   }
 }
 
@@ -69,7 +98,7 @@ async function updateConfig (contextName, envVars) {
         {
           FunctionName: resolverName(contextName)
         },
-        resolverConfig(contextName, envVars)
+        await resolverConfig(contextName, envVars)
       )
     )
 
@@ -81,16 +110,19 @@ async function updateConfig (contextName, envVars) {
   }
 }
 
-async function update (contextName) {
-  await updateConfig(contextName)
+async function update (contextName, region) {
+  await Promise.all([
+    updateConfig(contextName),
+    tag(contextName, region)
+  ])
   return updateCode(contextName)
 }
 
-async function deploy (contextName) {
+async function deploy (contextName, region) {
   try {
     return await create(contextName)
   } catch (e) {
-    return update(contextName)
+    return update(contextName, region)
   }
 }
 

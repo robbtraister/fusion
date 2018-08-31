@@ -8,7 +8,7 @@ const {
   getAccountId
 } = require('./utils/whoami')
 
-const resolverArn = async (environment) => getAccountId().then((accountId) => `arn:aws:iam::${accountId}:function/${resolverName(environment)}`)
+const resolverArn = async (environment) => getAccountId().then((accountId) => `arn:aws:lambda::${accountId}:function/${resolverName(environment)}`)
 const resolverKey = (environment) => `environments/${environment}/resolver.zip`
 const resolverName = (environment) => `fusion-resolver-${environment}`
 const resolverRole = async (environment) => getAccountId().then((accountId) => `arn:aws:iam::${accountId}:role/${resolverName(environment)}`)

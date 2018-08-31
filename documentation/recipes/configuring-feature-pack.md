@@ -26,7 +26,6 @@ In order to populate existing configuration options the PageBuilder Admin relies
 
 - You'll need to find an existing PageBuilder instance to download a database copy from. You can navigate to an existing PageBuilder instance from Arc Admin, or simply use PageBuilder Staging if you don't have an existing PageBuilder instance you'd like to pull data from.
 - Download the latest tar file by clicking on the "PB_DATA" tile in Trident Admin.
-- Rename the `.tar.gz` file so that it matches the directory name of your Fusion repository. For example: `My-Fusion-Repo.tar.gz`
 - Drop the `.tar.gz` file into your Fusion repo's `/data/restore` directory. The next time you run Fusion (or if you're already running it), Fusion will restore the values in this tarball as those in your DB.
 - You can confirm the data restoration worked by going to the ["Pages" section of PageBuilder Admin](http://localhost/pb/admin/app/browse/pages.html) to see a list of pages that were in your DB dump (assuming you had some).
 

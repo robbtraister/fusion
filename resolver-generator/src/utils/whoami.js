@@ -1,6 +1,6 @@
 'use strict'
 
-const STS = require('AWS-SDK').STS
+const STS = require('aws-sdk').STS
 
 const sts = new STS()
 const callerPromise = sts.getCallerIdentity().promise()

@@ -50,12 +50,12 @@ async function create (contextName, envVars) {
   }
 }
 
-async function tag (contextName) {
+async function tag (contextName, region) {
   debug(`tagging lambda for ${contextName}`)
   try {
     const result = await tagResource(
       {
-        Resource: await resolverArn(contextName),
+        Resource: await resolverArn(contextName, region),
         Tags: getTags(contextName)
       }
     )
@@ -110,19 +110,19 @@ async function updateConfig (contextName, envVars) {
   }
 }
 
-async function update (contextName) {
+async function update (contextName, region) {
   await Promise.all([
     updateConfig(contextName),
-    tag(contextName)
+    tag(contextName, region)
   ])
   return updateCode(contextName)
 }
 
-async function deploy (contextName) {
+async function deploy (contextName, region) {
   try {
     return await create(contextName)
   } catch (e) {
-    return update(contextName)
+    return update(contextName, region)
   }
 }
 

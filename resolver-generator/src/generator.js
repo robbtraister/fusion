@@ -59,7 +59,7 @@ class Generator {
       await zip(await zipFilePromise, await rootDirPromise)
       await this.upload(await zipFilePromise)
 
-      await deploy(this.contextName)
+      await deploy(this.contextName, this.region)
       await cleanup(this.contextName)
     } finally {
       await Promise.all([

@@ -15,8 +15,10 @@ const {
 
 const lambda = new AWS.Lambda()
 
+const createAlias = promisify(lambda.createAlias.bind(lambda))
 const createFunction = promisify(lambda.createFunction.bind(lambda))
 const tagResource = promisify(lambda.tagResource.bind(lambda))
+const updateAlias = promisify(lambda.updateAlias.bind(lambda))
 const updateFunctionCode = promisify(lambda.updateFunctionCode.bind(lambda))
 const updateFunctionConfiguration = promisify(lambda.updateFunctionConfiguration.bind(lambda))
 
@@ -47,6 +49,22 @@ async function create (contextName, envVars) {
   } catch (e) {
     debug(`error creating lambda for ${contextName}: ${e}`)
     throw e
+  }
+}
+
+async function promote (contextName, FunctionVersion) {
+  try {
+    return await createAlias({
+      FunctionName: resolverName(contextName),
+      FunctionVersion,
+      Name: 'production'
+    })
+  } catch (e) {
+    return updateAlias({
+      FunctionName: resolverName(contextName),
+      FunctionVersion,
+      Name: 'production'
+    })
   }
 }
 
@@ -126,7 +144,13 @@ async function deploy (contextName, region) {
   }
 }
 
-module.exports = deploy
+module.exports = async function (contextName, region) {
+  const result = await deploy(contextName, region)
+
+  await promote(contextName, result.Version)
+
+  return result
+}
 
 if (module === require.main) {
   deploy()

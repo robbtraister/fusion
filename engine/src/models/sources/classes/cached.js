@@ -83,7 +83,7 @@ class CachedSource extends ResolveSource {
             .then((data) => {
               const elapsedTime = tic.toc()
               if (!data) {
-                const tags = ['operation:fetch', 'result:error']
+                const tags = ['operation:fetch', 'result:error', `source:${this.name}`]
                 sendMetrics([
                   // {type: METRIC_TYPES.CACHE_RESULT, value: 1, tags},
                   {type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags}
@@ -91,7 +91,7 @@ class CachedSource extends ResolveSource {
                 throw new Error('data error from cache')
               }
               debugTimer(`Fetched from cache [${sanitizedUri}]`, elapsedTime)
-              const tags = ['operation:fetch', 'result:cache_hit']
+              const tags = ['operation:fetch', 'result:cache_hit', `source:${this.name}`]
               sendMetrics([
                 // {type: METRIC_TYPES.CACHE_RESULT, value: 1, tags},
                 {type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags},
@@ -103,7 +103,7 @@ class CachedSource extends ResolveSource {
             .catch(error => {
               const elapsedTime = tic.toc()
               const tagResult = (error.statusCode && error.statusCode === 404) ? 'result:cache_miss' : 'result:cache_error'
-              const tags = ['operation:fetch', tagResult]
+              const tags = ['operation:fetch', tagResult, `source:${this.name}`]
               sendMetrics([
                 // {type: METRIC_TYPES.CACHE_RESULT, value: 1, tags},
                 {type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags}
@@ -139,7 +139,7 @@ class CachedSource extends ResolveSource {
           ? pushCacheContent(cacheKey, data)
             .then(() => {
               const elapsedTime = tic.toc()
-              const tags = ['operation:fetch', 'result:cache_hit']
+              const tags = ['operation:put', 'result:success', `source:${this.name}`]
               sendMetrics([
                 // {type: METRIC_TYPES.CACHE_RESULT, value: 1, tags},
                 {type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags},

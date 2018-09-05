@@ -34,7 +34,7 @@ class ResolveSource extends BaseSource {
       .then((data) => {
         const elapsedTime = tic1.toc()
         debugTimer(`Fetched from source [${sanitizedUri}]`, elapsedTime)
-        const tags = ['operation:fetch', 'result:success']
+        const tags = ['operation:fetch', 'result:success', `source:${this.name}`]
         sendMetrics([
           // {type: METRIC_TYPES.CONTENT_RESULT, value: 1, tags},
           {type: METRIC_TYPES.CONTENT_LATENCY, value: elapsedTime, tags},

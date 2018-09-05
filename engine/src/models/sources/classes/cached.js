@@ -60,7 +60,6 @@ class CachedSource extends ResolveSource {
 
   async fetch (key, forceSync) {
     return this.fetchThroughCache(key, forceSync)
-      .then((data) => this.transform(data))
       .catch((err) => {
         if (err.response) {
           const responseError = new Error(err.response.body)

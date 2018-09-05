@@ -31,6 +31,7 @@ class ResolveSource extends BaseSource {
     const tic1 = timer.tic()
 
     return request(resolvedUri)
+      .then((data) => this.transform(data))
       .then((data) => {
         const elapsedTime = tic1.toc()
         debugTimer(`Fetched from source [${sanitizedUri}]`, elapsedTime)

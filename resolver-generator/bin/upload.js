@@ -102,7 +102,7 @@ async function updateGeneratorConfig () {
         }
       }
     )
-    debug(`updated resolver-generator lambda`)
+    debug(`updated resolver-generator lambda configuration`)
     return result
   } catch (e) {
     debug(`error updating resolver-generator configuration: ${e}`)
@@ -131,7 +131,7 @@ async function deploy () {
   try {
     return await createGeneratorFunction()
   } catch (e) {
-    await updateFunctionConfig()
+    await updateGeneratorConfig()
     return updateGeneratorCode()
   }
 }

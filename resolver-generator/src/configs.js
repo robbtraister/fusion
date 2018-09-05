@@ -2,11 +2,11 @@
 
 const S3Bucket = 'pagebuilder-fusion'
 
-const { version } = require('../../resolver/package.json')
-
 const {
   getAccountId
 } = require('./utils/whoami')
+
+const fusionRelease = process.env.FUSION_RELEASE
 
 const resolverArn = async (environment, region) => getAccountId().then((accountId) => `arn:aws:lambda:${region}:${accountId}:function:${resolverName(environment)}`)
 const resolverKey = (environment) => `environments/${environment}/resolver.zip`
@@ -30,7 +30,8 @@ const resolverConfig = async (contextName, envVars) => {
           envVars || {},
           {
             NODE_ENV: 'production',
-            ENVIRONMENT: contextName
+            ENVIRONMENT: contextName,
+            FUSION_RELEASE: fusionRelease
           }
         )
       },
@@ -61,6 +62,5 @@ module.exports = {
   resolverArtifact,
   resolverCode,
   resolverConfig,
-  resolverName,
-  version
+  resolverName
 }

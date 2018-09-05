@@ -300,7 +300,7 @@ then
 EOB
 else
   cat <<EOB
-      proxy_set_header          'X-FunctionName' '${LAMBDA_RESOLVER}';
+      proxy_set_header          'X-FunctionName' '${LAMBDA_RESOLVER}:production';
       proxy_set_header          'Content-Type' 'application/json';
       proxy_pass                ${LAMBDA_PROXY:-http://0.0.0.0:${NODEJS_PORT:-8081}}\$uri\$query_params;
 EOB

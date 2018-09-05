@@ -3,6 +3,7 @@
 **/.env
 **/.serverless
 
+docker-compose.linked.yml
 docker-compose.override.yml
 
 **/.dist

@@ -4,9 +4,14 @@ const S3Bucket = 'pagebuilder-fusion'
 
 const { version } = require('../../resolver/package.json')
 
+const {
+  getAccountId
+} = require('./utils/whoami')
+
+const resolverArn = async (environment, region) => getAccountId().then((accountId) => `arn:aws:lambda:${region}:${accountId}:function:${resolverName(environment)}`)
 const resolverKey = (environment) => `environments/${environment}/resolver.zip`
 const resolverName = (environment) => `fusion-resolver-${environment}`
-const resolverRole = (environment) => `arn:aws:iam::397853141546:role/${resolverName(environment)}`
+const resolverRole = async (environment) => getAccountId().then((accountId) => `arn:aws:iam::${accountId}:role/${resolverName(environment)}`)
 
 const resolverCode = (contextName) => {
   const code = {
@@ -17,26 +22,25 @@ const resolverCode = (contextName) => {
   return code
 }
 
-const resolverConfig = (contextName, envVars) => ({
-  Environment: {
-    Variables: Object.assign(
-      envVars || {},
-      {
-        NODE_ENV: 'production',
-        ENVIRONMENT: contextName
-      }
-    )
-  },
-  Handler: 'src/index.serverless',
-  MemorySize: 512,
-  Role: resolverRole(contextName),
-  Runtime: 'nodejs8.10',
-  Tags: {
-    'fusion-function-type': 'resolver',
-    'environment': contextName
-  },
-  Timeout: 10
-})
+const resolverConfig = async (contextName, envVars) => {
+  return resolverRole(contextName)
+    .then((Role) => ({
+      Environment: {
+        Variables: Object.assign(
+          envVars || {},
+          {
+            NODE_ENV: 'production',
+            ENVIRONMENT: contextName
+          }
+        )
+      },
+      Handler: 'src/index.serverless',
+      MemorySize: 512,
+      Role,
+      Runtime: 'nodejs8.10',
+      Timeout: 10
+    }))
+}
 
 const resolverArtifact = (contextName) => {
   const {
@@ -53,6 +57,7 @@ const resolverArtifact = (contextName) => {
 }
 
 module.exports = {
+  resolverArn,
   resolverArtifact,
   resolverCode,
   resolverConfig,

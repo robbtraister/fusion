@@ -8,6 +8,8 @@ const {
   getAccountId
 } = require('./utils/whoami')
 
+const datadogApiKey = process.env.DATADOG_API_KEY || ''
+
 const resolverArn = async (environment, region) => getAccountId().then((accountId) => `arn:aws:lambda:${region}:${accountId}:function:${resolverName(environment)}`)
 const resolverKey = (environment) => `environments/${environment}/resolver.zip`
 const resolverName = (environment) => `fusion-resolver-${environment}`
@@ -30,7 +32,8 @@ const resolverConfig = async (contextName, envVars) => {
           envVars || {},
           {
             NODE_ENV: 'production',
-            ENVIRONMENT: contextName
+            ENVIRONMENT: contextName,
+            DATADOG_API_KEY: datadogApiKey
           }
         )
       },

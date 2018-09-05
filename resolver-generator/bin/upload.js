@@ -13,14 +13,18 @@ const s3 = new AWS.S3({region: 'us-east-1'})
 const lambda = new AWS.Lambda({region: 'us-east-1'})
 
 const {
+  datadogApiKey,
   S3Bucket,
   S3ResolverGeneratorKey: S3Key,
   resolverGeneratorArtifact
 } = require('./configs')
 
 const awsUpload = promisify(s3.upload.bind(s3))
+const createAlias = promisify(lambda.createAlias.bind(lambda))
 const createFunction = promisify(lambda.createFunction.bind(lambda))
+const updateAlias = promisify(lambda.updateAlias.bind(lambda))
 const updateFunctionCode = promisify(lambda.updateFunctionCode.bind(lambda))
+const updateFunctionConfig = promisify(lambda.updateFunctionConfiguration.bind(lambda))
 
 const FunctionName = 'fusion-generator'
 
@@ -49,7 +53,8 @@ async function createGeneratorFunction () {
       },
       Environment: {
         Variables: {
-          DEBUG: 'fusion:*'
+          DEBUG: 'fusion:*',
+          DATADOG_API_KEY: datadogApiKey
         }
       },
       Handler: 'resolver-generator/src/index.handler',
@@ -83,13 +88,59 @@ async function updateGeneratorCode () {
   }
 }
 
-async function main () {
+// used to reliably set the DATADOG_API_KEY in published versions
+async function updateGeneratorConfig () {
+  debug(`updating resolver-generator lambda with latest configuration`)
+  try {
+    const result = await updateFunctionConfig(
+      {
+        Environment: {
+          Variables: {
+            DEBUG: 'fusion:*',
+            DATADOG_API_KEY: datadogApiKey
+          }
+        }
+      }
+    )
+    debug(`updated resolver-generator lambda`)
+    return result
+  } catch (e) {
+    debug(`error updating resolver-generator configuration: ${e}`)
+    throw e
+  }
+}
+
+async function promote (FunctionVersion) {
+  try {
+    return await createAlias({
+      FunctionName,
+      FunctionVersion,
+      Name: 'production'
+    })
+  } catch (e) {
+    return updateAlias({
+      FunctionName,
+      FunctionVersion,
+      Name: 'production'
+    })
+  }
+}
+
+async function deploy () {
   await upload(path.resolve(__dirname, '../dist/resolver-generator.zip'))
   try {
     return await createGeneratorFunction()
   } catch (e) {
+    await updateFunctionConfig()
     return updateGeneratorCode()
   }
+}
+
+async function main () {
+  const result = await deploy()
+  await promote(result.Version)
+
+  return result
 }
 
 module.exports = main

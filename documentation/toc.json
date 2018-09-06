@@ -1,0 +1,131 @@
+[
+  {
+    "title": "Recipes",
+    "items": [
+      {
+        "title": "Setting Up",
+        "items": [
+          {
+            "title": "Intro to Fusion",
+            "path": "./recipes/intro.md"
+          },
+          {
+            "title": "Creating a Feature Pack",
+            "path": "./recipes/creating-feature-pack.md"
+          },
+          {
+            "title": "Examining the Feature Pack",
+            "path": "./recipes/examining-feature-pack.md"
+          },
+          {
+            "title": "Configuring a Feature Pack",
+            "path": "./recipes/configuring-feature-pack.md"
+          },
+          {
+            "title": "Running Fusion Locally",
+            "path": "./recipes/running-fusion-locally.md"
+          },
+          {
+            "title": "Keeping Up to Date",
+            "path": "./recipes/keeping-up-to-date.md"
+          }
+        ]
+      },
+      {
+        "title": "Writing Components",
+        "items": [
+          {
+            "title": "Creating and Using Output Types",
+            "path": "./recipes/creating-using-output-types.md"
+          },
+          {
+            "title": "Creating a Feature Component",
+            "path": "./recipes/creating-feature-component.md"
+          },
+          {
+            "title": "Creating a Layout Component",
+            "path": "./recipes/creating-layout-component.md"
+          },
+          {
+            "title": "Creating a Chain Component",
+            "path": "./recipes/creating-chain-component.md"
+          },
+          {
+            "title": "Event Handling and Interaction",
+            "path": "./recipes//event-handling-interaction.md"
+          },
+          {
+            "title": "Isomorphic vs. Server vs. SPA Rendering",
+            "path": "./recipes//event-handling-interaction.md"
+          }
+        ]
+      },
+      {
+        "title": "Using Data",
+        "items": [
+          {
+            "title": "Defining a Content Source",
+            "path": "./recipes/defining-content-source.md"
+          },
+          {
+            "title": "Using Environment \"Secrets\"",
+            "path": "./recipes/using-environment-secrets.md"
+          },
+          {
+            "title": "Using the @Consumer Decorator",
+            "path": "./recipes/using-consumer-decorator.md"
+          },
+          {
+            "title": "Adding Custom Fields to a Component",
+            "path": "./recipes/adding-custom-fields.md"
+          },
+          {
+            "title": "Using a GraphQL Schema",
+            "path": "./recipes/using-graphql-schema.md"
+          },
+          {
+            "title": "Fetching Content",
+            "path": "./recipes/fetching-content.md"
+          },
+          {
+            "title": "Dynamically Configuring Content",
+            "path": "./recipes/dynamically-configuring-content.md"
+          },
+          {
+            "title": "Using Runtime Properties",
+            "path": "./recipes/using-runtime-properties.md"
+          }
+        ]
+      },
+      {
+        "title": "Tidying Up",
+        "items": [
+          {
+            "title": "Adding Styling to Components",
+            "path": "./recipes/adding-styling.md"
+          },
+          {
+            "title": "Using Third Party Libraries",
+            "path": "./recipes/using-third-party-libraries.md"
+          },
+          {
+            "title": "Messaging Between Components",
+            "path": "./recipes/messaging-between-components.md"
+          },
+          {
+            "title": "Helpful Commands",
+            "path": "./recipes/helpful-commands.md"
+          },
+          {
+            "title": "Deploying a Feature Pack",
+            "path": "./recipes/deploying-feature-pack.md"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "Glossary",
+    "path": "./recipes/glossary.md"
+  }
+]

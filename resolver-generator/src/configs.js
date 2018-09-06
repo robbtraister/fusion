@@ -6,11 +6,8 @@ const {
   getAccountId
 } = require('./utils/whoami')
 
-<<<<<<< HEAD
 const datadogApiKey = process.env.DATADOG_API_KEY || ''
-=======
 const fusionRelease = process.env.FUSION_RELEASE
->>>>>>> origin/master
 
 const resolverArn = async (environment, region) => getAccountId().then((accountId) => `arn:aws:lambda:${region}:${accountId}:function:${resolverName(environment)}`)
 const resolverKey = (environment) => `environments/${environment}/resolver.zip`

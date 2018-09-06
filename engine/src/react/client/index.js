@@ -84,5 +84,3 @@ const render = () => {
 
 window.document.addEventListener('DOMContentLoaded', render)
 // window.document.body.onload = render
-
-module.exports = React

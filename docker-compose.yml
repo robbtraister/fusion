@@ -88,7 +88,6 @@ services:
       - './engine/src:/workdir/engine/src:ro'
       - '${FUSION_REPO:-./bundle}/.dist:/workdir/engine/bundle/dist:rw'
       - '${FUSION_REPO:-./bundle}/.generated:/workdir/engine/bundle/generated:rw'
-      - '${FUSION_REPO:-./bundle}/.html:/workdir/engine/bundle/html:rw'
       - '${FUSION_REPO:-./bundle}/src:/workdir/engine/bundle/src:rw'
 
   resolver:
@@ -124,5 +123,4 @@ services:
     volumes:
       - './origin/src:/etc/nginx/src:ro'
       - '${FUSION_REPO:-./bundle}/.dist:/etc/nginx/dist:ro'
-      - '${FUSION_REPO:-./bundle}/.html:/etc/nginx/html:ro'
       - '${FUSION_REPO:-./bundle}/src/resources:/etc/nginx/resources:ro'

@@ -94,6 +94,7 @@ async function updateGeneratorConfig () {
   try {
     const result = await updateFunctionConfig(
       {
+        FunctionName,
         Environment: {
           Variables: {
             DEBUG: 'fusion:*',

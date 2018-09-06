@@ -23,7 +23,7 @@ class JsonSource extends CachedSource {
       .filter(v => v)
       .join('&')
 
-    return `${path}${query ? `?${query}` : ''}`
+    return this.formatUri(`${path}${query ? `?${query}` : ''}`)
   }
 }
 

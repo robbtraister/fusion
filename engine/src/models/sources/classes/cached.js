@@ -28,7 +28,8 @@ async function makeCacheRequest ({method, key, value}) {
       Object.assign(
         {
           method: method || 'GET',
-          uri: `${cacheProxyUrl}?key=${key}`
+          uri: `${cacheProxyUrl}?key=${key}`,
+          json: true
         },
         // don't depend on existence of value, since you might want to push null/undefined
         (/^(POST|PUT)$/.test(method))

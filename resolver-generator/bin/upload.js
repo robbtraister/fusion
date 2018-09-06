@@ -20,9 +20,7 @@ const {
 } = require('./configs')
 
 const awsUpload = promisify(s3.upload.bind(s3))
-const createAlias = promisify(lambda.createAlias.bind(lambda))
 const createFunction = promisify(lambda.createFunction.bind(lambda))
-const updateAlias = promisify(lambda.updateAlias.bind(lambda))
 const updateFunctionCode = promisify(lambda.updateFunctionCode.bind(lambda))
 const updateFunctionConfig = promisify(lambda.updateFunctionConfiguration.bind(lambda))
 
@@ -91,7 +89,7 @@ async function updateGeneratorCode () {
   }
 }
 
-// used to reliably set the DATADOG_API_KEY in published versions
+// used to reliably set the DATADOG_API_KEY and FUSION_RELEASE in published versions
 async function updateGeneratorConfig () {
   debug(`updating resolver-generator lambda with latest configuration`)
   try {
@@ -100,7 +98,8 @@ async function updateGeneratorConfig () {
         Environment: {
           Variables: {
             DEBUG: 'fusion:*',
-            DATADOG_API_KEY: datadogApiKey
+            DATADOG_API_KEY: datadogApiKey,
+            FUSION_RELEASE: fusionRelease
           }
         }
       }
@@ -113,23 +112,7 @@ async function updateGeneratorConfig () {
   }
 }
 
-async function promote (FunctionVersion) {
-  try {
-    return await createAlias({
-      FunctionName,
-      FunctionVersion,
-      Name: 'production'
-    })
-  } catch (e) {
-    return updateAlias({
-      FunctionName,
-      FunctionVersion,
-      Name: 'production'
-    })
-  }
-}
-
-async function deploy () {
+async function main () {
   await upload(path.resolve(__dirname, '../dist/resolver-generator.zip'))
   try {
     return await createGeneratorFunction()
@@ -137,13 +120,6 @@ async function deploy () {
     await updateGeneratorConfig()
     return updateGeneratorCode()
   }
-}
-
-async function main () {
-  const result = await deploy()
-  await promote(result.Version)
-
-  return result
 }
 
 module.exports = main

@@ -14,6 +14,7 @@ const lambda = new AWS.Lambda({region: 'us-east-1'})
 
 const {
   datadogApiKey,
+  fusionRelease,
   S3Bucket,
   S3ResolverGeneratorKey: S3Key,
   resolverGeneratorArtifact
@@ -25,8 +26,6 @@ const updateFunctionCode = promisify(lambda.updateFunctionCode.bind(lambda))
 const updateFunctionConfig = promisify(lambda.updateFunctionConfiguration.bind(lambda))
 
 const FunctionName = 'fusion-generator'
-
-const fusionRelease = process.env.VERSION
 
 async function upload (fp) {
   debug(`uploading ${fp}`)

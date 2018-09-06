@@ -24,6 +24,8 @@ const updateFunctionCode = promisify(lambda.updateFunctionCode.bind(lambda))
 
 const FunctionName = 'fusion-generator'
 
+const fusionRelease = process.env.VERSION
+
 async function upload (fp) {
   debug(`uploading ${fp}`)
 
@@ -49,7 +51,8 @@ async function createGeneratorFunction () {
       },
       Environment: {
         Variables: {
-          DEBUG: 'fusion:*'
+          DEBUG: 'fusion:*',
+          FUSION_RELEASE: fusionRelease
         }
       },
       Handler: 'resolver-generator/src/index.handler',

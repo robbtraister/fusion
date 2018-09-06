@@ -8,6 +8,7 @@ const model = require('../dao')
 
 const {
   bundleDistRoot,
+  bundleHtmlRoot,
   defaultOutputType
 } = require('../../environment')
 
@@ -15,12 +16,12 @@ const {
 // the calculation returns an object with a cssFile property
 // for simplicity, we'll just unwrap that property from whatever we get
 const fetchCssHash = async (name, outputType = defaultOutputType) =>
-  fetchFile(`${name}/${outputType}.css.json`)
+  fetchAsset(path.join(name, `${outputType}.css.json`))
     .then((json) => JSON.parse(json))
     .catch(() => null)
 
 const pushCssHash = async (name, outputType = defaultOutputType, cssFile) =>
-  pushFile(`${name}/${outputType}.css.json`, JSON.stringify({cssFile}))
+  pushAsset(path.join(name, `${outputType}.css.json`), JSON.stringify({cssFile}))
 
 const getJson = (type, id) => model(type).get(id)
   .then((data) => (type === 'rendering')
@@ -36,40 +37,52 @@ const getJson = (type, id) => model(type).get(id)
 // do nothing
 const putJson = (type, json) => {}
 
-const fetchFile = async function fetchFile (name) {
-  const fp = path.resolve(bundleDistRoot, name)
-  return new Promise((resolve, reject) => {
-    fs.readFile(fp, (err, data) => {
-      err ? reject(err) : resolve(data.toString())
-    })
-  })
-}
+const fetchFile = async (filePath) =>
+  new Promise((resolve, reject) =>
+    fs.readFile(
+      filePath,
+      (err, data) => (err) ? reject(err) : resolve(data.toString())
+    )
+  )
 
-const pushFile = async function pushFile (name, src) {
-  const filePath = path.resolve(`${bundleDistRoot}/${name}`)
-  return new Promise((resolve, reject) => {
-    childProcess.exec(`mkdir -p ${path.dirname(filePath)}`, (err) => {
-      err ? reject(err) : resolve()
-    })
-  })
-    .then(() => new Promise((resolve, reject) => {
-      fs.writeFile(filePath, src, (err) => {
-        err ? reject(err) : resolve()
-      })
-    }))
-}
+const pushFile = async (filePath, src) =>
+  new Promise((resolve, reject) =>
+    childProcess.exec(
+      `mkdir -p ${path.dirname(filePath)}`,
+      (err) => err ? reject(err) : resolve()
+    )
+  )
+    .then(() =>
+      new Promise((resolve, reject) =>
+        fs.writeFile(
+          filePath,
+          src,
+          (err) => (err) ? reject(err) : resolve()
+        )
+      )
+    )
 
-// const pushResolvers = async () => pushFile('resolvers.json')
+const fetchAsset = async (name) =>
+  fetchFile(path.join(bundleDistRoot, name))
 
-// the above is unnecessary; resolver just reads from db
+const pushAsset = async (name, src) =>
+  pushFile(path.join(bundleDistRoot, name), src)
+
+// unused on local
+// const pushHtml = async () => Promise.resolve()
+
+const pushHtml = async (name, src) =>
+  pushFile(path.join(bundleHtmlRoot, name), src)
+
 const pushResolvers = async () => Promise.resolve()
 
 module.exports = {
+  fetchAsset,
   fetchCssHash,
-  fetchFile,
   getJson,
+  pushAsset,
   pushCssHash,
-  pushFile,
+  pushHtml,
   pushResolvers,
   putJson
 }

@@ -1,5 +1,8 @@
 'use strict'
 
+const path = require('path')
+const url = require('url')
+
 const bodyParser = require('body-parser')
 const express = require('express')
 
@@ -7,8 +10,13 @@ const debugTimer = require('debug')('fusion:timer:router')
 
 const {
   bodyLimit,
-  defaultOutputType
+  defaultOutputType,
+  onDemand
 } = require('../../environment')
+
+const {
+  pushHtml
+} = require('../io')
 
 const Rendering = require('../models/rendering')
 
@@ -59,7 +67,16 @@ function getTypeRouter (routeType) {
         // template will already have content populated by resolver
         // use Object.assign to default to the resolver content
         .then(([Component, content]) => render(Object.assign({content}, payload, {Component})))
-        .then(data => { res.send(`${outputType ? '<!DOCTYPE html>' : ''}${data}`) })
+        .then((html) => `${outputType ? '<!DOCTYPE html>' : ''}${html}`)
+        .then((html) => {
+          return (!onDemand && payload.request && payload.request.uri)
+            ? Promise.resolve(url.parse(payload.request.uri).pathname)
+              .then((pathname) => /\/$/.test(pathname) ? path.join(pathname, 'index.html') : pathname)
+              .then((filePath) => pushHtml(filePath, html))
+              .then(() => html)
+            : html
+        })
+        .then((html) => { res.send(html) })
         .then(() => {
           debugTimer('complete response', tic.toc())
         })

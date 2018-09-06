@@ -42,6 +42,7 @@ const version = variables.AWS_LAMBDA_FUNCTION_VERSION || '$LATEST'
 
 const bundleDistRoot = `${bundleRoot}/dist`
 const bundleGeneratedRoot = `${bundleRoot}/generated`
+const bundleHtmlRoot = `${bundleRoot}/html`
 const bundleSrcRoot = `${bundleRoot}/src`
 
 const componentDistRoot = `${bundleDistRoot}/components`
@@ -62,6 +63,7 @@ module.exports = {
   bundleRoot,
   bundleDistRoot,
   bundleGeneratedRoot,
+  bundleHtmlRoot,
   bundleSrcRoot,
   cacheProxyUrl,
   cachePrefix,

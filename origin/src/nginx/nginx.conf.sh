@@ -412,24 +412,34 @@ cat <<EOB
       return                    418;
     }
 
-    location ~ ^${API_PREFIX}/(fuse|make)(/.*|$) {
-      set                       \$p \$2.html;
+    location ~ ^${API_PREFIX}/(fuse|make)((/.*?)/?$|$) {
+      set                       \$p \$3;
 
       error_page                400 403 404 418 = @resolver;
       proxy_intercept_errors    on;
 
 EOB
 
-if [ "${ON_DEMAND}" == 'true' ] || [ ! "${IS_PROD}" ]
+if [ "${ON_DEMAND}" == 'true' ]
 then
   cat <<EOB
       return                    418;
 EOB
 else
+  if [ "${IS_PROD}" ]
+  then
   cat <<EOB
       set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/html/\${outputType}\$p;
       proxy_pass                \$target;
 EOB
+  else
+    cat <<EOB
+      # add_header 'Content-Type' 'text/html';
+      # return 200 \${p};
+      root                      /etc/nginx/html;
+      try_files                 \$p \${p}/index.html =404;
+EOB
+  fi
 fi
 
 cat <<EOB

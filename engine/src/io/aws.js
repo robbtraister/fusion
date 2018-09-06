@@ -20,21 +20,6 @@ const KeyPrefix = `environments/${environment}/deployments/${version}`
 
 const s3 = new S3({region})
 
-// return the full object (not just cssFile value) because if it doesn't exist, we need to calculate it
-// the calculation returns an object with a cssFile property
-// for simplicity, we'll just unwrap that property from whatever we get
-const fetchCssHash = (name, outputType = defaultOutputType) =>
-  model('hash').get({version, id: path.join(name, outputType)})
-
-const pushCssHash = (name, outputType = defaultOutputType, cssFile) =>
-  model('hash').put({id: path.join(name, outputType), version, cssFile})
-
-const getJson = (type, id) =>
-  model(type).get(id)
-
-const putJson = (type, json) =>
-  model(type).put(json)
-
 const fetchKey = async (Key) =>
   new Promise((resolve, reject) => {
     s3.getObject({
@@ -70,11 +55,24 @@ const pushKey = async (Key, src, options) =>
 
 const fetchAsset = async (name) =>
   fetchKey(path.join(KeyPrefix, 'dist', name))
-
 const pushAsset = async (name, src, ContentType) =>
   pushKey(path.join(KeyPrefix, 'dist', name), src, ContentType)
+
+// return the full object (not just cssFile value) because if it doesn't exist, we need to calculate it
+// the calculation returns an object with a cssFile property
+// for simplicity, we'll just unwrap that property from whatever we get
+const fetchCssHash = (name, outputType = defaultOutputType) =>
+  model('hash').get({version, id: path.join(name, outputType)})
+const pushCssHash = (name, outputType = defaultOutputType, cssFile) =>
+  model('hash').put({id: path.join(name, outputType), version, cssFile})
+
 const pushHtml = async (name, src, ContentType) =>
   pushKey(path.join(KeyPrefix, 'html', name), src, ContentType)
+
+const getJson = (type, id) =>
+  model(type).get(id)
+const putJson = (type, json) =>
+  model(type).put(json)
 
 const pushResolvers = async (resolvers) =>
   pushKey(

@@ -10,7 +10,7 @@ The Fusion engine and services that support it run in Docker containers that can
 To start the Fusion engine with the Feature Pack you've created, simply run:
 
 ```
-$ npm start
+$ npm run start
 ```
 in the command line from the root of your Feature Pack repo. This will start up the Fusion engine, as well as a PageBuilder Admin instance. It may take a while for this command to run the first time, as Docker needs to download copies of all the correct images before containerizing and starting them. In the future, this step should be much quicker as Docker will already have these images downloaded.
 
@@ -26,7 +26,7 @@ Even though the Fusion engine is running, it's not doing much right now because 
 
 For now, we're going to keep running our server so we can develop locally with it - but anytime you want to stop running Fusion, you can run:
 ```
-$ docker-compose down
+$ npm run down
 ```
 in your command line (you may also be able to simply `CTRL+C` in the same Terminal window as your initial `npm start` command). To check if all the Fusion services have stopped running, run:
 ```

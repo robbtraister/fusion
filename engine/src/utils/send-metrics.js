@@ -4,10 +4,11 @@ const { datadogApiKey, environment, isDev, semver, version } = require('../../en
 const METRIC_TYPES = {
   CACHE_LATENCY: 'arc.fusion.cache.latency',
   CACHE_RESULT: 'arc.fusion.cache.result',
-  CACHE_RESULT_SIZE: 'arc.fusion.cache.result.bytes',
+  CACHE_RESULT_SIZE: 'arc.fusion.cache.bytes',
   COMPILE_DURATION: 'arc.fusion.compile.duration',
   CONTENT_LATENCY: 'arc.fusion.content.latency',
   CONTENT_RESULT: 'arc.fusion.content.result',
+  CONTENT_RESULT_SIZE: 'arc.fusion.content.bytes',
   DB_DURATION: 'arc.fusion.db.duration',
   DB_RESULT: 'arc.fusion.db.result',
   RENDER_DURATION: 'arc.fusion.render.duration',

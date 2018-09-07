@@ -209,6 +209,7 @@ const compileRenderable = function compileRenderable ({renderable, outputType}) 
   }
 
   let tic = timer.tic()
+  const tree = getTree(renderable)
   return Promise.resolve(compileComponent(renderable, outputType))
     .then((Renderable) => {
       debugTimer(`compile(${renderable._id || renderable.id})`, tic.toc())
@@ -216,6 +217,7 @@ const compileRenderable = function compileRenderable ({renderable, outputType}) 
       return Provider(Renderable)
     })
     .then((Component) => {
+      Component.tree = tree
       debugTimer('provider wrapping', tic.toc())
       return Component
     })
@@ -245,16 +247,14 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
 
           const OutputType = getOutputTypeComponent(outputType)
 
-          const tree = getTree(json)
-
           const Component = (props) => {
             return React.createElement(
               OutputType,
               {
                 contextPath,
                 version,
-                tree,
-                renderables: [tree].concat(...getAncestors(tree)),
+                tree: Template.tree,
+                renderables: [Template.tree].concat(...getAncestors(Template.tree)),
                 /*
                  * Each of the following are equivalent in JSX
                  *   {props.metaTag}

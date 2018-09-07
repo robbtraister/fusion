@@ -12,55 +12,57 @@ const getChildren = function getChildren (renderableItems, outputType, indices) 
     .filter(ri => ri)
 }
 
-const feature = function feature (config, outputType) {
+const feature = function feature (config, outputType, id) {
   return {
-    type: 'feature',
+    category: 'feature',
     props: {
       type: config.featureConfig,
-      id: config.id,
+      id: id == null ? config.id : id,
+      name: config.name,
       contentConfig: config.contentConfig || {},
       customFields: config.customFields || {},
+      displayProperties: (config.displayProperties || {})[outputType] || {},
       // we only need local edits for content consumers, which must be stateful
       localEdits: config.localEdits || {}
     }
   }
 }
 
-const chain = function chain (config, outputType) {
+const chain = function chain (config, outputType, id) {
   return {
-    type: 'chain',
+    category: 'chain',
     props: {
       type: config.chainConfig,
-      id: config.id
+      id: id == null ? config.id : id,
+      name: config.name
     },
     children: getChildren(config.features, outputType)
   }
 }
 
-const section = function section (config, outputType, index) {
+const section = function section (config, outputType, id) {
   return {
-    type: 'section',
+    category: 'section',
     props: {
-      id: index
+      id
     },
     children: getChildren(config.renderableItems, outputType)
   }
 }
 
-const layout = function layout (rendering, outputType) {
+const layout = function layout (config, outputType, id) {
   const Layout = (() => {
     try {
-      return unpack(require(`${componentDistRoot}/layouts/${rendering.layout}/${outputType || 'default'}`))
+      return unpack(require(`${componentDistRoot}/layouts/${config.layout}/${outputType || 'default'}`))
     } catch (e) {}
   })()
 
   return {
-    type: 'layout',
+    category: 'layout',
     props: {
-      type: 'layout',
-      id: rendering.layout
+      type: config.layout
     },
-    children: getChildren(rendering.layoutItems, outputType, Layout ? Layout.sections.map(s => s.id) : null)
+    children: getChildren(config.layoutItems, outputType, Layout ? Layout.sections.map(s => s.id) : null)
   }
 }
 

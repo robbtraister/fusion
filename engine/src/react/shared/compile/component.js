@@ -29,25 +29,24 @@ const componentGenerator = function componentGenerator (loadComponent) {
       )
   }
 
-  const getComponent = function getComponent (config, outputType) {
-    const Component = (config.collection === 'sections')
-      ? React.Fragment
-      : loadComponent(config.collection, config.props.type, outputType)
-
+  const getComponent = (defaultComponent = 'div') => (config, outputType) => {
+    const Component = loadComponent(config.collection, config.props.type, outputType)
     return React.createElement(
-      Component || 'div',
+      Component || defaultComponent,
       config.props,
       renderAll(config.children, outputType)
     )
   }
 
+  const componentMap = {
+    chains: getComponent(),
+    features: getFeature,
+    layouts: getComponent(),
+    sections: getComponent(React.Fragment)
+  }
+
   const renderableItem = function renderableItem (config, outputType) {
-    const Component = {
-      chains: getComponent,
-      features: getFeature,
-      layouts: getComponent,
-      sections: getComponent
-    }[config.collection]
+    const Component = componentMap[config.collection]
 
     const Element = (Component)
       ? Component(config, outputType)

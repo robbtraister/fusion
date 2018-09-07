@@ -35,9 +35,7 @@ const loadComponent = function loadComponent (componentCollection, componentType
       ? (props) => React.createElement('div', { id: props.id, className: 'fusion:static' }, React.createElement(OriginalComponent, props))
       : OriginalComponent
     return TimedComponent(Component)
-  } catch (e) {
-    console.error(e)
-  }
+  } catch (e) {}
   return null
 }
 

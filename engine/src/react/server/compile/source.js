@@ -32,7 +32,7 @@ function componentCss (name, config) {
 
 function generateSource (renderable, outputType) {
   const usedComponents = {}
-  const types = {}
+  const collections = {}
 
   function componentImport (name, config) {
     try {
@@ -49,20 +49,20 @@ function generateSource (renderable, outputType) {
     }
   }
 
-  const getComponentConfig = function getComponentConfig (type, id) {
-    const componentConfig = components[type][id]
+  function getComponentConfig (collection, type) {
+    const componentConfig = components[collection] && components[collection][type]
     const componentOutputType = componentConfig && (componentConfig.outputTypes[outputType] || componentConfig.outputTypes.default)
     return componentOutputType
   }
 
-  function getComponentName (type, id) {
-    const key = `['${type}']['${id}']`
+  function getComponentName (collection, type) {
+    const key = `['${collection}']['${type}']`
     if (key in usedComponents) {
       return usedComponents[key] ? key : null
     } else {
-      const config = getComponentConfig(type, id)
+      const config = getComponentConfig(collection, type)
       if (config) {
-        types[type] = true
+        collections[collection] = true
         usedComponents[key] = config
         return key
       } else {
@@ -88,36 +88,23 @@ function generateSource (renderable, outputType) {
     }
   }
 
-  function getChain (config) {
+  const getComponent = (defaultComponent = `'div'`) => (config) => {
     const componentName = getComponentName(config.collection, config.props.type)
     const component = (componentName)
       ? `Fusion.components${componentName}`
-      : `'div'`
-
+      : defaultComponent
     return `React.createElement(${component}, ${JSON.stringify(config.props)}, [${config.children.map(renderableItem).filter(ri => ri).join(',')}])`
   }
 
-  function getSection (config) {
-    const component = `React.Fragment`
-    return `React.createElement(${component}, ${JSON.stringify(config.props)}, [${config.children.map(renderableItem).filter(ri => ri).join(',')}])`
-  }
-
-  function getLayout (config) {
-    const componentName = getComponentName(config.collection, config.props.type)
-    const component = (componentName)
-      ? `Fusion.components${componentName}`
-      : `'div'`
-
-    return `React.createElement(${component}, ${JSON.stringify(config.props)}, [${config.children.map(renderableItem).join(',')}])`
+  const componentMap = {
+    chains: getComponent(),
+    features: getFeature,
+    layouts: getComponent(),
+    sections: getComponent('React.Fragment')
   }
 
   function renderableItem (config, index) {
-    const Component = {
-      chains: getChain,
-      features: getFeature,
-      layouts: getLayout,
-      sections: getSection
-    }[config.collection]
+    const Component = componentMap[config.collection]
 
     return (Component)
       ? Component(config)
@@ -132,7 +119,7 @@ function generateSource (renderable, outputType) {
 const React = require('react')
 window.Fusion = window.Fusion || {}
 Fusion.components = Fusion.components || {}
-${Object.keys(types).map(t => `Fusion.components.${t} = Fusion.components.${t} || {}`).join('\n')}
+${Object.keys(collections).map(collection => `Fusion.components.${collection} = Fusion.components.${collection} || {}`).join('\n')}
 ${usedComponentKeys.map(k => componentImport(k, usedComponents[k])).join('\n')}
 Fusion.Template = function (props) {
   return React.createElement(React.Fragment, {}, ${Template})

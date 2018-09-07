@@ -6,6 +6,10 @@ const {
   defaultOutputType
 } = require('../../../environment')
 
+const { components } = require('../../../environment/manifest')
+
+const allOutputTypes = Object.keys(components.outputTypes)
+
 const model = require('../../dao')
 
 const compileRendering = require('./compile')
@@ -55,6 +59,10 @@ class Rendering {
     return this.jsonPromise
   }
 
+  async compileAll () {
+    return Promise.all(allOutputTypes.map((outputType) => this.compile(outputType)))
+  }
+
   async compile (outputType = defaultOutputType) {
     debug(`get compilation: ${this.name}[${outputType}]`)
     this.compilations[outputType] = this.compilations[outputType] ||
@@ -98,20 +106,20 @@ class Rendering {
     // but that's what you get with legacy data
     this.contentPromise = this.contentPromise ||
       (
-        (this.type !== 'page')
+        (this.type === 'template')
           ? Promise.resolve()
           : this.getJson()
             .then((json) => {
               const configs = json.globalContentConfig
-              return (!configs)
-                ? null
-                : getSource(configs.contentService)
+              return (configs && configs.contentService && configs.contentConfigValues)
+                ? getSource(configs.contentService)
                   .then((source) => source.fetch(Object.assign(json.uri ? {uri: json.uri} : {}, {'arc-site': arcSite}, configs.contentConfigValues)))
                   .then((document) => ({
                     source: configs.contentService,
                     key: configs.contentConfigValues,
                     document
                   }))
+                : null
             })
       )
     return this.contentPromise

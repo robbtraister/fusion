@@ -26,6 +26,7 @@ async function copy (srcPromise, destPromise) {
   debug(`copied ${src} to ${dest}`)
   return result
 }
+
 class Generator {
   constructor (bucket, resolverPath, region) {
     this.bucket = bucket
@@ -59,7 +60,7 @@ class Generator {
       await zip(await zipFilePromise, await rootDirPromise)
       await this.upload(await zipFilePromise)
 
-      await deploy(this.contextName)
+      await deploy(this.contextName, this.region)
       await cleanup(this.contextName)
     } finally {
       await Promise.all([

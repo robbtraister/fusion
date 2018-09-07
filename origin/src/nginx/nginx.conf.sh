@@ -300,7 +300,7 @@ then
 EOB
 else
   cat <<EOB
-      proxy_set_header          'X-FunctionName' '${LAMBDA_RESOLVER}';
+      proxy_set_header          'X-FunctionName' '${LAMBDA_RESOLVER}:production';
       proxy_set_header          'Content-Type' 'application/json';
       proxy_pass                ${LAMBDA_PROXY:-http://0.0.0.0:${NODEJS_PORT:-8081}}\$uri\$query_params;
 EOB
@@ -501,11 +501,7 @@ cat <<EOB
     }
 
     location ~ ^${CONTEXT_PATH}/api/v2/resolve/?$ {
-      if (\$arg_uri) {
-        set_unescape_uri        \$u \$arg_uri;
-        return                  302 " ${API_PREFIX}/resolve\$u";
-      }
-      return 400;# "Bad Request: 'uri' parameter is required for ${CONTEXT_PATH}/api/v2/resolve endpoint";
+      rewrite                   (.*) ${API_PREFIX}/resolve;
     }
     # end of admin rewrites
 

@@ -34,8 +34,9 @@ const config = (outputType) => {
   const combinationSrcFile = path.resolve(combinationSrcDir, `${outputType}.js`)
   fs.writeFileSync(combinationSrcFile,
     `
+window.Fusion = window.Fusion || {}
+const components = window.Fusion.components = window.Fusion.components || {}
 const unpack = require('${require.resolve('../src/utils/unpack')}')
-const components = {}
 ${componentTypes.map(componentType => `components['${componentType}'] = components['${componentType}'] || {}`).join('\n')}
 ${[].concat(
     ...componentTypes.map(componentType => {
@@ -51,7 +52,6 @@ ${[].concat(
         })
     })
   ).join('\n')}
-module.exports = components
 `
   )
 
@@ -91,9 +91,7 @@ module.exports = components
     optimization,
     output: {
       filename: `[name].js`,
-      path: path.resolve(componentDistRoot, 'combinations'),
-      library: `window.Fusion=window.Fusion||{};window.Fusion.components`,
-      libraryTarget: 'assign'
+      path: path.resolve(componentDistRoot, 'combinations')
     },
     plugins: [
       new MiniCssExtractPlugin({

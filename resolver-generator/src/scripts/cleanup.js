@@ -23,7 +23,7 @@ async function cleanup (contextName) {
         // keep the 3 most recent versions (desc sort, then ignore the first 3)
         .sort((v1, v2) => +v2.Version - +v1.Version)
         .slice(3)
-        .map(({Version}) => deleteFunction({FunctionName, Version}))
+        .map(({Version}) => deleteFunction({FunctionName, Qualifier: Version}))
     ))
 }
 

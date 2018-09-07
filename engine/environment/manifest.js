@@ -7,10 +7,12 @@ Example:
   "components": {
     "chains": {
       "default-chain": {
-        "type": "chain",
-        "id": "default-chain",
+        "collection": "chains",
+        "type": "default-chain",
         "outputTypes": {
           "default": {
+            "collection": "chains",
+            "type": "default-chain",
             "outputType": "default",
             "src": "/workdir/engine/bundle/src/components/chains/default-chain.jsx",
             "dist": "/workdir/engine/bundle/dist/components/chains/default-chain/default.js"
@@ -43,13 +45,15 @@ const WILDCARD_LEVELS = {
 const isTest = (f) => /(\/_+(tests?|snapshots?)_+\/|\.test\.js|\.snap$)/.test(f)
 const isNotTest = (f) => !isTest(f)
 
-const createComponentEntry = (src, componentType, componentName, outputType) => {
-  const p = `${componentType}/${componentName}${outputType ? `/${outputType}` : ''}.js`
+const createComponentEntry = (src, componentCollection, componentType, outputType) => {
+  const p = `${componentCollection}/${componentType}${outputType ? `/${outputType}` : ''}.js`
   return Object.assign(
     (outputType)
       ? {outputType}
       : {},
     {
+      collection: componentCollection,
+      type: componentType,
       src,
       dist: `${componentDistRoot}/${p}`,
       css: `${componentDistRoot}/${p}`.replace(/\.js$/, '.css')
@@ -58,25 +62,25 @@ const createComponentEntry = (src, componentType, componentName, outputType) => 
   )
 }
 
-const getComponentType = (type, outputTypes) => {
-  const wildcardLevels = WILDCARD_LEVELS[type] || 1
-  const typeSrcRoot = `${componentSrcRoot}/${type}${'/*'.repeat(wildcardLevels)}`
+const getComponentCollection = (collection, outputTypes) => {
+  const wildcardLevels = WILDCARD_LEVELS[collection] || 1
+  const typeSrcRoot = `${componentSrcRoot}/${collection}${'/*'.repeat(wildcardLevels)}`
 
   const componentMap = {}
   glob.sync(`${typeSrcRoot}.{hbs,js,jsx,vue}`)
     .filter(isNotTest)
     .map(fp => {
       const parts = path.parse(fp)
-      const componentName = parts.dir.split('/').concat(parts.name).slice(-wildcardLevels).join('/')
-      componentMap[componentName] = componentMap[componentName] || {
-        type: type.replace(/s$/, ''),
-        id: componentName
+      const componentType = parts.dir.split('/').concat(parts.name).slice(-wildcardLevels).join('/')
+      componentMap[componentType] = componentMap[componentType] || {
+        collection,
+        type: componentType
       }
       if (outputTypes) {
-        componentMap[componentName].outputTypes = componentMap[componentName].outputTypes || {}
-        componentMap[componentName].outputTypes.default = createComponentEntry(fp, type, componentName, 'default')
+        componentMap[componentType].outputTypes = componentMap[componentType].outputTypes || {}
+        componentMap[componentType].outputTypes.default = createComponentEntry(fp, collection, componentType, 'default')
       } else {
-        Object.assign(componentMap[componentName], createComponentEntry(fp, type, componentName))
+        Object.assign(componentMap[componentType], createComponentEntry(fp, collection, componentType))
       }
     })
 
@@ -88,13 +92,13 @@ const getComponentType = (type, outputTypes) => {
       .forEach(fp => {
         const parts = path.parse(fp)
         const outputType = parts.name
-        const componentName = parts.dir.split('/').slice(-wildcardLevels).join('/')
-        componentMap[componentName] = componentMap[componentName] || {
-          type: type.replace(/s$/, ''),
-          id: componentName,
+        const componentType = parts.dir.split('/').slice(-wildcardLevels).join('/')
+        componentMap[componentType] = componentMap[componentType] || {
+          collection,
+          type: componentType,
           outputTypes: {}
         }
-        componentMap[componentName].outputTypes[outputType] = createComponentEntry(fp, type, componentName, outputType)
+        componentMap[componentType].outputTypes[outputType] = createComponentEntry(fp, collection, componentType, outputType)
       })
   }
 
@@ -106,18 +110,18 @@ const getComponentType = (type, outputTypes) => {
   )
 }
 
-function getComponentManifest (type) {
+function getComponentManifest (collection) {
   try {
     if (isDev) {
       throw new Error('only read manifest from file in production')
     }
-    return require(`${componentGeneratedRoot}/${type}/fusion.manifest.json`)
+    return require(`${componentGeneratedRoot}/${collection}/fusion.manifest.json`)
   } catch (e) {
-    const outputTypes = getComponentType('output-types')
+    const outputTypes = getComponentCollection('output-types')
 
-    return (type === 'output-types')
+    return (collection === 'output-types')
       ? outputTypes
-      : getComponentType(type, Object.keys(outputTypes))
+      : getComponentCollection(collection, Object.keys(outputTypes))
   }
 }
 

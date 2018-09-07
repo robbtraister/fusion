@@ -38,7 +38,7 @@ const componentGenerator = function componentGenerator (loadComponent) {
     )
   }
 
-  const componentMap = {
+  const collectionMap = {
     chains: getComponent(),
     features: getFeature,
     layouts: getComponent(),
@@ -46,7 +46,7 @@ const componentGenerator = function componentGenerator (loadComponent) {
   }
 
   const renderableItem = function renderableItem (config, outputType) {
-    const Component = componentMap[config.collection]
+    const Component = collectionMap[config.collection]
 
     const Element = (Component)
       ? Component(config, outputType)

@@ -29,16 +29,16 @@ const { components } = require('../environment/manifest')
 const loadConfigs = require('../src/configs')
 
 module.exports = Object.keys(components)
-  .filter(type => type !== 'outputTypes')
-  .map((type) => {
+  .filter(collection => collection !== 'outputTypes')
+  .map((collection) => {
     const entry = {}
 
-    Object.keys(components[type])
-      .forEach((componentName) => {
-        const component = components[type][componentName]
+    Object.keys(components[collection])
+      .forEach((componentType) => {
+        const component = components[collection][componentType]
         Object.keys(component.outputTypes)
           .forEach((outputType) => {
-            entry[`${componentName}/${outputType}`] = component.outputTypes[outputType].src
+            entry[`${componentType}/${outputType}`] = component.outputTypes[outputType].src
           })
       })
 
@@ -48,9 +48,9 @@ module.exports = Object.keys(components)
       }),
       new ManifestPlugin({fileName: 'webpack.manifest.json'}),
       new OnBuildWebpackPlugin(function (stats) {
-        childProcess.exec(`mkdir -p '${componentDistRoot}/${type}'`, () => {
-          fs.writeFile(`${componentDistRoot}/${type}/fusion.manifest.json`, JSON.stringify(components[type], null, 2), () => {
-            fs.writeFile(`${componentDistRoot}/${type}/fusion.configs.json`, JSON.stringify(loadConfigs(type), null, 2), () => {})
+        childProcess.exec(`mkdir -p '${componentDistRoot}/${collection}'`, () => {
+          fs.writeFile(`${componentDistRoot}/${collection}/fusion.manifest.json`, JSON.stringify(components[collection], null, 2), () => {
+            fs.writeFile(`${componentDistRoot}/${collection}/fusion.configs.json`, JSON.stringify(loadConfigs(collection), null, 2), () => {})
           })
         })
       })
@@ -101,7 +101,7 @@ module.exports = Object.keys(components)
         optimization,
         output: {
           filename: `[name].js`,
-          path: path.resolve(componentDistRoot, type),
+          path: path.resolve(componentDistRoot, collection),
           libraryTarget: 'commonjs2'
         },
         plugins,
@@ -114,9 +114,9 @@ module.exports = Object.keys(components)
       }
       : (() => {
         // if the type is empty, still create an empty config/manifest file
-        childProcess.exec(`mkdir -p '${componentDistRoot}/${type}'`, () => {
-          fs.writeFile(`${componentDistRoot}/${type}/fusion.manifest.json`, '{}', () => {
-            fs.writeFile(`${componentDistRoot}/${type}/fusion.configs.json`, '[]', () => {})
+        childProcess.exec(`mkdir -p '${componentDistRoot}/${collection}'`, () => {
+          fs.writeFile(`${componentDistRoot}/${collection}/fusion.manifest.json`, '{}', () => {
+            fs.writeFile(`${componentDistRoot}/${collection}/fusion.configs.json`, '[]', () => {})
           })
         })
 

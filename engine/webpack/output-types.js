@@ -30,7 +30,7 @@ const loadConfigs = require('../src/configs')
 
 const entry = Object.assign(
   ...Object.values(components.outputTypes)
-    .map(outputType => ({[outputType.id]: outputType.src}))
+    .map(outputType => ({[outputType.type]: outputType.src}))
 )
 
 // Compile twice.

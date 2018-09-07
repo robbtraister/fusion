@@ -24,7 +24,7 @@ const {
 
 const { components } = require('../environment/manifest')
 
-const componentTypes = Object.keys(components).filter(ot => ot !== 'outputTypes')
+const componentCollections = Object.keys(components).filter(ot => ot !== 'outputTypes')
 const outputTypes = Object.keys(components.outputTypes)
 
 const combinationSrcDir = path.resolve(bundleGeneratedRoot, 'combinations')
@@ -37,18 +37,18 @@ const config = (outputType) => {
 window.Fusion = window.Fusion || {}
 const components = window.Fusion.components = window.Fusion.components || {}
 const unpack = require('${require.resolve('../src/utils/unpack')}')
-${componentTypes.map(componentType => `components['${componentType}'] = components['${componentType}'] || {}`).join('\n')}
+${componentCollections.map(componentCollection => `components['${componentCollection}'] = components['${componentCollection}'] || {}`).join('\n')}
 ${[].concat(
-    ...componentTypes.map(componentType => {
-      const typedComponents = components[componentType]
-      return Object.values(typedComponents)
+    ...componentCollections.map(componentCollection => {
+      const collectionTypes = components[componentCollection]
+      return Object.values(collectionTypes)
         .map(component => {
           const componentOutputType = component.outputTypes[outputType] || component.outputTypes.default
           return (!componentOutputType)
             ? ''
-            : (componentType === 'layouts')
-              ? `components['${componentType}']['${component.id}'] = Fusion.components.Layout(unpack(require('${componentOutputType.src}')))`
-              : `components['${componentType}']['${component.id}'] = unpack(require('${componentOutputType.src}'))`
+            : (componentCollection === 'layouts')
+              ? `components['${componentCollection}']['${component.type}'] = Fusion.components.Layout(unpack(require('${componentOutputType.src}')))`
+              : `components['${componentCollection}']['${component.type}'] = unpack(require('${componentOutputType.src}'))`
         })
     })
   ).join('\n')}

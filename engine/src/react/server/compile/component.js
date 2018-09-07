@@ -23,12 +23,12 @@ const TimedComponent = (Component) => (props) => {
   return result
 }
 
-const loadComponent = function loadComponent (componentType, componentName, outputType) {
+const loadComponent = function loadComponent (componentCategory, componentType, outputType) {
   try {
-    const componentConfig = components[componentType][componentName]
+    const componentConfig = components[componentCategory][componentType]
     const componentOutputType = componentConfig.outputTypes[outputType] || componentConfig.outputTypes.default
     const UnpackedComponent = unpack(require(componentOutputType.dist))
-    const OriginalComponent = (componentType === 'layouts')
+    const OriginalComponent = (componentCategory === 'layouts')
       ? Layout(UnpackedComponent)
       : UnpackedComponent
     const Component = (isStatic(OriginalComponent, outputType))

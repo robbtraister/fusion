@@ -23,8 +23,8 @@ window.PropTypes = require('../shared/prop-types')
 // support fragments in preact
 React.Fragment = React.Fragment || 'div'
 
-const getComponent = (componentType, componentName) =>
-  Fusion.components[componentType][componentName]
+const getComponent = (componentCategory, componentType) =>
+  Fusion.components[componentCategory][componentType]
 
 const getElement = require('../shared/compile/component')(getComponent)
 

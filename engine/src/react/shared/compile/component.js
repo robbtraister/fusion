@@ -2,12 +2,6 @@
 
 const React = require('react')
 
-const CATEGORY_DIRECTORIES = {
-  chain: 'chains',
-  feature: 'features',
-  layout: 'layouts'
-}
-
 const componentGenerator = function componentGenerator (loadComponent) {
   const renderAll = function renderAll (renderableItems, outputType) {
     return (renderableItems || [])
@@ -16,7 +10,7 @@ const componentGenerator = function componentGenerator (loadComponent) {
   }
 
   const getFeature = function getFeature (config, outputType) {
-    const Feature = loadComponent(CATEGORY_DIRECTORIES[config.category], config.props.type, outputType)
+    const Feature = loadComponent(config.collection, config.props.type, outputType)
 
     return (Feature)
       ? React.createElement(
@@ -36,29 +30,24 @@ const componentGenerator = function componentGenerator (loadComponent) {
   }
 
   const getComponent = function getComponent (config, outputType) {
-    const category = CATEGORY_DIRECTORIES[config.category]
-
-    const Component = (category)
-      ? loadComponent(category, config.props.type, outputType)
-      : React.Fragment
+    const Component = (config.collection === 'sections')
+      ? React.Fragment
+      : loadComponent(config.collection, config.props.type, outputType)
 
     return React.createElement(
       Component || 'div',
-      Object.assign(
-        { key: config.props.id },
-        config.props
-      ),
+      config.props,
       renderAll(config.children, outputType)
     )
   }
 
   const renderableItem = function renderableItem (config, outputType) {
     const Component = {
-      chain: getComponent,
-      feature: getFeature,
-      layout: getComponent,
-      section: getComponent
-    }[config.category]
+      chains: getComponent,
+      features: getFeature,
+      layouts: getComponent,
+      sections: getComponent
+    }[config.collection]
 
     const Element = (Component)
       ? Component(config, outputType)

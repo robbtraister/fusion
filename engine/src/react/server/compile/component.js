@@ -23,19 +23,21 @@ const TimedComponent = (Component) => (props) => {
   return result
 }
 
-const loadComponent = function loadComponent (componentCategory, componentType, outputType) {
+const loadComponent = function loadComponent (componentCollection, componentType, outputType) {
   try {
-    const componentConfig = components[componentCategory][componentType]
+    const componentConfig = components[componentCollection][componentType]
     const componentOutputType = componentConfig.outputTypes[outputType] || componentConfig.outputTypes.default
     const UnpackedComponent = unpack(require(componentOutputType.dist))
-    const OriginalComponent = (componentCategory === 'layouts')
+    const OriginalComponent = (componentCollection === 'layouts')
       ? Layout(UnpackedComponent)
       : UnpackedComponent
     const Component = (isStatic(OriginalComponent, outputType))
       ? (props) => React.createElement('div', { id: props.id, className: 'fusion:static' }, React.createElement(OriginalComponent, props))
       : OriginalComponent
     return TimedComponent(Component)
-  } catch (e) {}
+  } catch (e) {
+    console.error(e)
+  }
   return null
 }
 

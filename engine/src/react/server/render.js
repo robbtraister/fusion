@@ -210,7 +210,7 @@ const compileRenderable = function compileRenderable ({renderable, outputType}) 
 
   let tic = timer.tic()
   const tree = getTree(renderable)
-  return Promise.resolve(compileComponent(renderable, outputType))
+  return Promise.resolve(compileComponent(tree, outputType))
     .then((Renderable) => {
       debugTimer(`compile(${renderable._id || renderable.id})`, tic.toc())
       tic = timer.tic()

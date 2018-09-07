@@ -11,6 +11,8 @@ const {
 
 const { components } = require('../../../../environment/manifest')
 
+const getTree = require('../../shared/compile/tree')
+
 const srcFileType = (minify) ? 'src' : 'dist'
 
 function fileExists (fp) {
@@ -69,104 +71,60 @@ function generateSource (renderable, outputType) {
     }
   }
 
-  function feature (config) {
-    const key = config.id
-    const type = config.featureConfig.id || config.featureConfig
-    const id = config.id
-
-    const componentName = getComponentName('features', type)
+  function getFeature (config) {
+    const componentName = getComponentName(config.collection, config.props.type)
     if (componentName) {
       const component = `Fusion.components${componentName}`
-      const contentConfig = config.contentConfig || {}
-      const customFields = config.customFields || {}
-      const localEdits = config.localEdits || {}
-      const displayProperties = (config.displayProperties || {})[outputType] || {}
-
-      const props = {
-        key,
-        id,
-        type,
-        customFields,
-        contentConfig,
-        displayProperties,
-        localEdits
-      }
-
-      return `React.createElement(${component}, ${JSON.stringify(props)})`
+      return `React.createElement(${component}, ${JSON.stringify(config.props)})`
     } else {
-      return `React.createElement('div', ${JSON.stringify({key, type, id, dangerouslySetInnerHTML: { __html: `<!-- feature "${type}" could not be found -->` }})})`
+      const props = {
+        key: config.props.id,
+        type: config.props.type,
+        id: config.props.id,
+        name: config.props.name,
+        dangerouslySetInnerHTML: { __html: `<!-- feature "${config.props.type}" could not be found -->` }
+      }
+      return `React.createElement('div', ${JSON.stringify(props)})`
     }
   }
 
-  function chain (config) {
-    const componentName = getComponentName('chains', config.chainConfig.id || config.chainConfig)
+  function getChain (config) {
+    const componentName = getComponentName(config.collection, config.props.type)
     const component = (componentName)
       ? `Fusion.components${componentName}`
       : `'div'`
 
-    const displayProperties = (config.displayProperties || {})[outputType] || {}
-
-    const props = {
-      key: config.id,
-      type: config.chainConfig,
-      id: config.id,
-      displayProperties
-    }
-
-    return `React.createElement(${component}, ${JSON.stringify(props)}, [${config.features.map(renderableItem).filter(ri => ri).join(',')}])`
+    return `React.createElement(${component}, ${JSON.stringify(config.props)}, [${config.children.map(renderableItem).filter(ri => ri).join(',')}])`
   }
 
-  function section (config, index) {
+  function getSection (config) {
     const component = `React.Fragment`
-    const props = {
-      key: index
-      // type: 'section',
-      // id: index
-    }
-    return `React.createElement(${component}, ${JSON.stringify(props)}, [${config.renderableItems.map(renderableItem).filter(ri => ri).join(',')}])`
+    return `React.createElement(${component}, ${JSON.stringify(config.props)}, [${config.children.map(renderableItem).filter(ri => ri).join(',')}])`
   }
 
-  // function template (config) {
-  //   return `[${config.layoutItems.map((item, i) => layout(item, rendering.layout && rendering.layout.sections && rendering.layout.sections[i])).join(',')}]`
-  // }
-
-  function layout (config) {
-    const componentName = getComponentName('layouts', config.layout)
+  function getLayout (config) {
+    const componentName = getComponentName(config.collection, config.props.type)
     const component = (componentName)
       ? `Fusion.components${componentName}`
       : `'div'`
 
-    const props = {
-      key: config.id || config._id,
-      type: 'layout',
-      id: config.id || config._id
-    }
-
-    return `React.createElement(${component}, ${JSON.stringify(props)}, [${config.layoutItems.map(renderableItem).join(',')}])`
+    return `React.createElement(${component}, ${JSON.stringify(config.props)}, [${config.children.map(renderableItem).join(',')}])`
   }
-
-  // function layout (item, config) {
-  //   return `
-  //     React.createElement(
-  //       'div',
-  //       {
-  //         id: ${config && config.id},
-  //         className: ${config && config.cssClass}
-  //       },
-  //       ${renderableItem(item)}
-  //     )
-  //   `
-  // }
 
   function renderableItem (config, index) {
-    return (config.featureConfig) ? feature(config)
-      : (config.chainConfig) ? chain(config)
-        : (config.renderableItems) ? section(config, index)
-          : (config.layoutItems) ? layout(config)
-            : ''
+    const Component = {
+      chains: getChain,
+      features: getFeature,
+      layouts: getLayout,
+      sections: getSection
+    }[config.collection]
+
+    return (Component)
+      ? Component(config)
+      : ''
   }
 
-  const Template = renderableItem(renderable)
+  const Template = renderableItem(getTree(renderable))
 
   const usedComponentKeys = Object.keys(usedComponents).filter(k => usedComponents[k]).sort()
 

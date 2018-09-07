@@ -13,11 +13,13 @@ const getChildren = function getChildren (renderableItems, outputType, indices) 
 }
 
 const feature = function feature (config, outputType, id) {
+  id = (id == null) ? config.id : id
   return {
-    category: 'feature',
+    collection: 'features',
     props: {
+      key: id,
       type: config.featureConfig,
-      id: id == null ? config.id : id,
+      id,
       name: config.name,
       contentConfig: config.contentConfig || {},
       customFields: config.customFields || {},
@@ -29,11 +31,13 @@ const feature = function feature (config, outputType, id) {
 }
 
 const chain = function chain (config, outputType, id) {
+  id = (id == null) ? config.id : id
   return {
-    category: 'chain',
+    collection: 'chains',
     props: {
+      key: id,
       type: config.chainConfig,
-      id: id == null ? config.id : id,
+      id,
       name: config.name
     },
     children: getChildren(config.features, outputType)
@@ -42,9 +46,9 @@ const chain = function chain (config, outputType, id) {
 
 const section = function section (config, outputType, id) {
   return {
-    category: 'section',
+    collection: 'sections',
     props: {
-      id
+      key: id
     },
     children: getChildren(config.renderableItems, outputType)
   }
@@ -58,8 +62,9 @@ const layout = function layout (config, outputType, id) {
   })()
 
   return {
-    category: 'layout',
+    collection: 'layouts',
     props: {
+      key: config.layout,
       type: config.layout
     },
     children: getChildren(config.layoutItems, outputType, Layout ? Layout.sections.map(section => section.id) : null)

@@ -62,17 +62,17 @@ const layout = function layout (config, outputType, id) {
     props: {
       type: config.layout
     },
-    children: getChildren(config.layoutItems, outputType, Layout ? Layout.sections.map(s => s.id) : null)
+    children: getChildren(config.layoutItems, outputType, Layout ? Layout.sections.map(section => section.id) : null)
   }
 }
 
-const renderableItem = function renderableItem (config, outputType, index) {
+const renderableItem = function renderableItem (config, outputType, id) {
   const Component = (config.featureConfig)
     ? feature(config, outputType)
     : (config.chainConfig)
       ? chain(config, outputType)
       : (config.renderableItems)
-        ? section(config, outputType, index)
+        ? section(config, outputType, id)
         : (config.layoutItems)
           ? layout(config, outputType)
           : null

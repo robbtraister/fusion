@@ -2,6 +2,12 @@
 
 const React = require('react')
 
+const CATEGORY_DIRECTORIES = {
+  chain: 'chains',
+  feature: 'features',
+  layout: 'layouts'
+}
+
 const componentGenerator = function componentGenerator (loadComponent) {
   const renderAll = function renderAll (renderableItems, outputType) {
     return (renderableItems || [])
@@ -9,91 +15,55 @@ const componentGenerator = function componentGenerator (loadComponent) {
       .filter(ri => ri)
   }
 
-  const feature = function feature (config, outputType) {
-    const key = config.id
-    const id = config.id
-    const type = config.featureConfig
-
-    const Feature = loadComponent('features', type, outputType)
+  const getFeature = function getFeature (config, outputType) {
+    const Feature = loadComponent(CATEGORY_DIRECTORIES[config.category], config.props.type, outputType)
 
     return (Feature)
       ? React.createElement(
         Feature,
-        {
-          key,
-          type,
-          id,
-          contentConfig: config.contentConfig || {},
-          customFields: config.customFields || {},
-          displayProperties: (config.displayProperties || {})[outputType] || {},
-          // we only need local edits for content consumers, which must be stateful
-          localEdits: (Feature instanceof React.Component)
-            ? config.localEdits || {}
-            : undefined
-        }
+        config.props
       )
       : React.createElement(
         'div',
         {
-          key,
-          type,
-          id,
-          dangerouslySetInnerHTML: { __html: `<!-- feature "${type}" could not be found -->` }
+          key: config.props.id,
+          type: config.props.type,
+          id: config.props.id,
+          name: config.props.name,
+          dangerouslySetInnerHTML: { __html: `<!-- feature "${config.props.type}" could not be found -->` }
         }
       )
   }
 
-  const chain = function chain (config, outputType) {
-    const Chain = loadComponent('chains', config.chainConfig, outputType)
+  const getComponent = function getComponent (config, outputType) {
+    const category = CATEGORY_DIRECTORIES[config.category]
+
+    const Component = (category)
+      ? loadComponent(category, config.props.type, outputType)
+      : React.Fragment
 
     return React.createElement(
-      Chain || 'div',
-      {
-        key: config.id,
-        type: config.chainConfig,
-        id: config.id,
-        displayProperties: (config.displayProperties || {})[outputType] || {}
-      },
-      renderAll(config.features, outputType)
+      Component || 'div',
+      Object.assign(
+        { key: config.props.id },
+        config.props
+      ),
+      renderAll(config.children, outputType)
     )
   }
 
-  const section = function section (config, outputType, index) {
-    return React.createElement(
-      React.Fragment,
-      {
-        key: index
-        // type: 'section',
-        // id: index
-      },
-      renderAll(config.renderableItems, outputType)
-    )
-  }
+  const renderableItem = function renderableItem (config, outputType) {
+    const Component = {
+      chain: getComponent,
+      feature: getFeature,
+      layout: getComponent,
+      section: getComponent
+    }[config.category]
 
-  const layout = function layout (rendering, outputType) {
-    const Layout = loadComponent('layouts', rendering.layout, outputType)
+    const Element = (Component)
+      ? Component(config, outputType)
+      : null
 
-    return React.createElement(
-      Layout || 'div',
-      {
-        key: rendering.layout,
-        type: 'layout',
-        id: rendering.layout
-      },
-      renderAll(rendering.layoutItems, outputType)
-    )
-  }
-
-  const renderableItem = function renderableItem (config, outputType, index) {
-    const Element = (config.featureConfig)
-      ? feature(config, outputType)
-      : (config.chainConfig)
-        ? chain(config, outputType)
-        : (config.renderableItems)
-          ? section(config, outputType, index)
-          : (config.layoutItems)
-            ? layout(config, outputType)
-            : null
     return Element || (() => null)
   }
 

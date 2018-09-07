@@ -4,7 +4,7 @@ const debugTimer = require('debug')('fusion:timer:react:component')
 
 const React = require('react')
 
-const isStatic = require('../is-static')
+const isStatic = require('../../shared/is-static')
 const Layout = require('../../shared/components/layout')
 const unpack = require('../../../utils/unpack')
 

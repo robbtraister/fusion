@@ -3,7 +3,7 @@
 const React = require('react')
 const _merge = require('lodash.merge')
 
-const isStatic = require('./is-static')
+const isStatic = require('../shared/is-static')
 
 const JSONNormalize = require('../../utils/normalize')
 

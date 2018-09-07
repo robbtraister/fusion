@@ -11,7 +11,7 @@ const {
 
 const { components } = require('../../../../environment/manifest')
 
-const getTree = require('../../shared/compile/tree')
+const getTree = require('./tree')
 
 const srcFileType = (minify) ? 'src' : 'dist'
 
@@ -23,24 +23,82 @@ function fileExists (fp) {
   return false
 }
 
-function componentCss (config) {
-  const fp = config.css
+function componentCss (fp) {
   return (fp && fileExists(fp))
     ? `require('${fp}')`
     : ''
 }
 
-function generateSource (renderable, outputType) {
-  const collections = {}
+function getComponentManifest (collection, type, outputType) {
+  const componentConfig = components[collection] && components[collection][type]
+  const componentOutputType = componentConfig && (componentConfig.outputTypes[outputType] || componentConfig.outputTypes.default)
+  return componentOutputType
+}
 
-  function getComponentConfig (collection, type) {
-    const componentConfig = components[collection] && components[collection][type]
-    const componentOutputType = componentConfig && (componentConfig.outputTypes[outputType] || componentConfig.outputTypes.default)
-    return componentOutputType
+class ScriptSource {
+  constructor (renderable, outputType) {
+    this.collections = {}
+
+    this.tree = getTree(renderable)
+    this.outputType = outputType
+
+    this.collectionMap = {
+      chains: this.getComponent(),
+      features: this.getFeature.bind(this),
+      layouts: this.getComponent(),
+      sections: this.getComponent('React.Fragment')
+    }
   }
 
-  function getComponentName (collection, type) {
-    const typeCollection = collections[collection] = collections[collection] || {
+  componentImport (manifest) {
+    try {
+      const Component = unpack(require(manifest.dist))
+      if (Component) {
+        const componentName = this.getComponentName(manifest.collection, manifest.type)
+        const fp = manifest[srcFileType]
+        return (isStatic(Component, this.outputType))
+          ? `Fusion.components${componentName} = Fusion.components.Static`
+          : (manifest.collection === 'layouts')
+            ? `Fusion.components${componentName} = Fusion.components.Layout(Fusion.unpack(require('${fp}')))`
+            : `Fusion.components${componentName} = Fusion.unpack(require('${fp}'))`
+      }
+    } catch (e) {
+    }
+  }
+
+  getFeature (node) {
+    const componentName = this.getComponentName(node.collection, node.type)
+    if (componentName) {
+      const Component = `Fusion.components${componentName}`
+      return `React.createElement(${Component}, ${JSON.stringify(node.props)})`
+    } else {
+      const props = {
+        key: node.props.id,
+        type: node.props.type,
+        id: node.props.id,
+        name: node.props.name,
+        dangerouslySetInnerHTML: { __html: `<!-- feature "${node.type}" could not be found -->` }
+      }
+      return `React.createElement('div', ${JSON.stringify(props)})`
+    }
+  }
+
+  getComponent (defaultComponent = `'div'`) {
+    return (node) => {
+      const componentName = this.getComponentName(node.collection, node.type)
+      const Component = (componentName)
+        ? `Fusion.components${componentName}`
+        : defaultComponent
+
+      const props = (Component === 'React.Fragment')
+        ? { key: node.props.key }
+        : node.props
+      return `React.createElement(${Component}, ${JSON.stringify(props)}, [${node.children.map(this.renderableItem.bind(this)).filter(ri => ri).join(',')}])`
+    }
+  }
+
+  getComponentName (collection, type) {
+    const typeCollection = this.collections[collection] = this.collections[collection] || {
       used: false,
       types: {}
     }
@@ -48,11 +106,11 @@ function generateSource (renderable, outputType) {
     const typeMap = typeCollection.types
 
     if (!(type in typeMap)) {
-      const config = getComponentConfig(collection, type)
-      if (config) {
+      const manifest = getComponentManifest(collection, type, this.outputType)
+      if (manifest) {
         typeCollection.used = true
         typeMap[type] = {
-          config,
+          manifest,
           name: `['${collection}']['${type}']`
         }
       } else {
@@ -63,75 +121,28 @@ function generateSource (renderable, outputType) {
     return typeMap[type] && typeMap[type].name
   }
 
-  function componentImport (manifest) {
-    try {
-      const Component = unpack(require(manifest.dist))
-      if (Component) {
-        const componentName = getComponentName(manifest.collection, manifest.type)
-        const fp = manifest[srcFileType]
-        return (isStatic(Component, outputType))
-          ? `Fusion.components${componentName} = Fusion.components.Static`
-          : (manifest.collection === 'layouts')
-            ? `Fusion.components${componentName} = Fusion.components.Layout(Fusion.unpack(require('${fp}')))`
-            : `Fusion.components${componentName} = Fusion.unpack(require('${fp}'))`
-      }
-    } catch (e) {
-    }
-  }
-
-  function getFeature (config) {
-    const componentName = getComponentName(config.collection, config.props.type)
-    if (componentName) {
-      const component = `Fusion.components${componentName}`
-      return `React.createElement(${component}, ${JSON.stringify(config.props)})`
-    } else {
-      const props = {
-        key: config.props.id,
-        type: config.props.type,
-        id: config.props.id,
-        name: config.props.name,
-        dangerouslySetInnerHTML: { __html: `<!-- feature "${config.props.type}" could not be found -->` }
-      }
-      return `React.createElement('div', ${JSON.stringify(props)})`
-    }
-  }
-
-  const getComponent = (defaultComponent = `'div'`) => (config) => {
-    const componentName = getComponentName(config.collection, config.props.type)
-    const component = (componentName)
-      ? `Fusion.components${componentName}`
-      : defaultComponent
-    return `React.createElement(${component}, ${JSON.stringify(config.props)}, [${config.children.map(renderableItem).filter(ri => ri).join(',')}])`
-  }
-
-  const collectionMap = {
-    chains: getComponent(),
-    features: getFeature,
-    layouts: getComponent(),
-    sections: getComponent('React.Fragment')
-  }
-
-  function renderableItem (config, index) {
-    const Component = collectionMap[config.collection]
+  renderableItem (node, index) {
+    const Component = this.collectionMap[node.collection]
 
     return (Component)
-      ? Component(config)
+      ? Component(node)
       : ''
   }
 
-  const Template = renderableItem(getTree(renderable))
+  generate () {
+    const Template = this.renderableItem(this.tree)
 
-  const usedCollections = Object.keys(collections).filter(collection => collections[collection].used).sort()
+    const usedCollections = Object.keys(this.collections).filter(collection => this.collections[collection].used).sort()
 
-  const script = `'use strict'
+    const script = `'use strict'
 const React = require('react')
 window.Fusion = window.Fusion || {}
 Fusion.components = Fusion.components || {}
 ${usedCollections.map(collection => `Fusion.components['${collection}'] = Fusion.components['${collection}'] || {}`).join('\n')}
 ${usedCollections
     .map(collection =>
-      Object.values(collections[collection].types)
-        .map(componentType => componentImport(componentType.config))
+      Object.values(this.collections[collection].types)
+        .map(componentType => this.componentImport(componentType.manifest))
         .join('\n')
     )
     .join('\n')
@@ -139,22 +150,23 @@ ${usedCollections
 Fusion.Template = function (props) {
   return React.createElement(React.Fragment, {}, ${Template})
 }
-Fusion.Template.layout = ${renderable.layout ? `'${renderable.layout}'` : 'null'}
+Fusion.Template.layout = ${this.tree.type ? `'${this.tree.type}'` : 'null'}
 module.exports = Fusion.Template
 `
 
-  const styles = `'use strict'
+    const styles = `'use strict'
 ${usedCollections
     .map(collection =>
-      Object.values(collections[collection].types)
-        .map(componentType => componentCss(componentType.config))
+      Object.values(this.collections[collection].types)
+        .map(componentType => componentCss(componentType.manifest.css))
         .join('\n')
     )
     .join('\n')
 }
 `
 
-  return Promise.resolve({script, styles})
+    return Promise.resolve({script, styles})
+  }
 }
 
-module.exports = generateSource
+module.exports = (renderable, outputType) => new ScriptSource(renderable, outputType).generate()

@@ -16,8 +16,10 @@ const feature = function feature (config, outputType, id) {
   id = (id == null) ? config.id : id
   return {
     collection: 'features',
+    type: config.featureConfig,
     props: {
       key: id,
+      collection: 'features',
       type: config.featureConfig,
       id,
       name: config.name,
@@ -34,8 +36,10 @@ const chain = function chain (config, outputType, id) {
   id = (id == null) ? config.id : id
   return {
     collection: 'chains',
+    type: config.chainConfig,
     props: {
       key: id,
+      collection: 'chains',
       type: config.chainConfig,
       id,
       name: config.name
@@ -47,8 +51,11 @@ const chain = function chain (config, outputType, id) {
 const section = function section (config, outputType, id) {
   return {
     collection: 'sections',
+    type: id,
     props: {
-      key: id
+      key: id,
+      collection: 'sections',
+      type: id
     },
     children: getChildren(config.renderableItems, outputType)
   }
@@ -63,8 +70,10 @@ const layout = function layout (config, outputType, id) {
 
   return {
     collection: 'layouts',
+    type: config.layout,
     props: {
       key: config.layout,
+      collection: 'layouts',
       type: config.layout
     },
     children: getChildren(config.layoutItems, outputType, Layout ? Layout.sections.map(section => section.id) : null)

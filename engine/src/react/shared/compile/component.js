@@ -9,32 +9,38 @@ const componentGenerator = function componentGenerator (loadComponent) {
       .filter(ri => ri)
   }
 
-  const getFeature = function getFeature (config, outputType) {
-    const Feature = loadComponent(config.collection, config.props.type, outputType)
+  const getFeature = function getFeature (node, outputType) {
+    const Feature = loadComponent(node.collection, node.type, outputType)
 
     return (Feature)
       ? React.createElement(
         Feature,
-        config.props
+        node.props
       )
       : React.createElement(
         'div',
         {
-          key: config.props.id,
-          type: config.props.type,
-          id: config.props.id,
-          name: config.props.name,
-          dangerouslySetInnerHTML: { __html: `<!-- feature "${config.props.type}" could not be found -->` }
+          key: node.props.id,
+          type: node.props.type,
+          id: node.props.id,
+          name: node.props.name,
+          dangerouslySetInnerHTML: { __html: `<!-- feature "${node.type}" could not be found -->` }
         }
       )
   }
 
-  const getComponent = (defaultComponent = 'div') => (config, outputType) => {
-    const Component = loadComponent(config.collection, config.props.type, outputType)
+  const getComponent = (defaultComponent = 'div') => (node, outputType) => {
+    const Component = loadComponent(node.collection, node.type, outputType) ||
+      defaultComponent
+
+    const props = (Component === React.Fragment)
+      ? { key: node.props.key || node.props.id }
+      : node.props
+
     return React.createElement(
-      Component || defaultComponent,
-      config.props,
-      renderAll(config.children, outputType)
+      Component,
+      props,
+      renderAll(node.children, outputType)
     )
   }
 
@@ -45,23 +51,23 @@ const componentGenerator = function componentGenerator (loadComponent) {
     sections: getComponent(React.Fragment)
   }
 
-  const renderableItem = function renderableItem (config, outputType) {
-    const Component = collectionMap[config.collection]
+  const renderableItem = function renderableItem (node, outputType) {
+    const Component = collectionMap[node.collection]
 
     const Element = (Component)
-      ? Component(config, outputType)
+      ? Component(node, outputType)
       : null
 
     return Element || (() => null)
   }
 
-  return (config, outputType) => {
+  return (node, outputType) => {
     // The calculated result we export for rendering must be a Component (not Element)
     // Also, react elements cannot be extended, so using a Component function allows us to add layout property
-    const Component = () => renderableItem(config, outputType)
+    const Component = () => renderableItem(node, outputType)
 
-    if (config.layout) {
-      Component.layout = config.layout
+    if (node.layout) {
+      Component.layout = node.layout
     }
 
     return Component

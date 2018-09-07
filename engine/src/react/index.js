@@ -6,7 +6,7 @@ const {
   render
 } = require('./server/render')
 
-const generateSource = require('./server/compile/source')
+const generateSource = require('./shared/compile/source')
 
 module.exports = {
   compileDocument,

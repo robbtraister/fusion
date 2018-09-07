@@ -67,7 +67,7 @@ const getComponentCollection = (collection, outputTypes) => {
   const typeSrcRoot = `${componentSrcRoot}/${collection}${'/*'.repeat(wildcardLevels)}`
 
   const componentMap = {}
-  glob.sync(`${typeSrcRoot}.{hbs,js,jsx,vue}`)
+  glob.sync(`${typeSrcRoot}.{hbs,js,jsx,ts,tsx,vue}`)
     .filter(isNotTest)
     .map(fp => {
       const parts = path.parse(fp)
@@ -86,7 +86,7 @@ const getComponentCollection = (collection, outputTypes) => {
 
   if (outputTypes) {
     const outputTypeArray = (outputTypes instanceof Array) ? outputTypes : [outputTypes]
-    const outputTypeFiles = glob.sync(`${typeSrcRoot}/{${outputTypeArray.join(',')},}.{hbs,js,jsx,vue}`)
+    const outputTypeFiles = glob.sync(`${typeSrcRoot}/{${outputTypeArray.join(',')},}.{hbs,js,jsx,ts,tsx,vue}`)
     outputTypeFiles
       .filter(isNotTest)
       .forEach(fp => {

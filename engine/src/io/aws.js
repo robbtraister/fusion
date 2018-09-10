@@ -10,12 +10,9 @@ const {
   defaultOutputType,
   environment,
   region,
+  s3Bucket,
   version
 } = require('../../environment')
-
-const getBucket = function getBucket () {
-  return 'pagebuilder-fusion'
-}
 
 const getKeyBase = function getKeyBase () {
   return `environments/${environment}/deployments/${version}`
@@ -45,7 +42,7 @@ const putJson = (type, json) =>
 const fetchFile = async function fetchFile (name) {
   return new Promise((resolve, reject) => {
     s3.getObject({
-      Bucket: getBucket(),
+      Bucket: s3Bucket,
       Key: `${getS3Key(name)}`
     }, (err, data) => {
       err ? reject(err) : resolve(data)
@@ -55,7 +52,7 @@ const fetchFile = async function fetchFile (name) {
 
 const pushKey = async function pushKey (Key, src, options) {
   return new Promise((resolve, reject) => {
-    const Bucket = getBucket()
+    const Bucket = s3Bucket
     debug(`pushing ${src.length} bytes to: ${Bucket}/${Key}`)
 
     s3.upload(

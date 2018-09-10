@@ -2,15 +2,53 @@
 
 const React = require('react')
 
-const componentGenerator = function componentGenerator (loadComponent) {
-  const renderAll = function renderAll (renderableItems, outputType) {
-    return (renderableItems || [])
-      .map((ri, i) => renderableItem(ri, outputType, i))
-      .filter(ri => ri)
+const getTree = require('./tree')
+
+class ComponentGenerator {
+  constructor (outputTypes) {
+    this.outputTypes = outputTypes
+
+    this.collectionMap = {
+      chains: this.getComponent(),
+      features: this.getFeature.bind(this),
+      layouts: this.getComponent(),
+      sections: this.getComponent(React.Fragment)
+    }
   }
 
-  const getFeature = function getFeature (node, outputType) {
-    const Feature = loadComponent(node.collection, node.type, outputType)
+  generate (renderable) {
+    const tree = getTree(renderable, this.outputTypes[0])
+
+    // The calculated result we export for rendering must be a Component (not Element)
+    // Also, react elements cannot be extended, so using a Component function allows us to add layout property
+    const Component = () => this.renderableItem(tree, this.outputTypes)
+
+    if (tree.layout) {
+      Component.layout = tree.layout
+    }
+    Component.tree = tree
+
+    return Component
+  }
+
+  getComponent (defaultComponent = 'div') {
+    return (node) => {
+      const Component = this.loadComponent(node.collection, node.type) || defaultComponent
+
+      const props = (Component === React.Fragment)
+        ? { key: node.props.key || node.props.id }
+        : node.props
+
+      return React.createElement(
+        Component,
+        props,
+        this.renderAll(node.children, this.outputTypes)
+      )
+    }
+  }
+
+  getFeature (node) {
+    const Feature = this.loadComponent(node.collection, node.type)
 
     return (Feature)
       ? React.createElement(
@@ -29,49 +67,25 @@ const componentGenerator = function componentGenerator (loadComponent) {
       )
   }
 
-  const getComponent = (defaultComponent = 'div') => (node, outputType) => {
-    const Component = loadComponent(node.collection, node.type, outputType) ||
-      defaultComponent
-
-    const props = (Component === React.Fragment)
-      ? { key: node.props.key || node.props.id }
-      : node.props
-
-    return React.createElement(
-      Component,
-      props,
-      renderAll(node.children, outputType)
-    )
+  loadComponent () {
+    throw new Error('`loadComponent` is not defined')
   }
 
-  const collectionMap = {
-    chains: getComponent(),
-    features: getFeature,
-    layouts: getComponent(),
-    sections: getComponent(React.Fragment)
+  renderAll (renderableItems) {
+    return (renderableItems || [])
+      .map((ri, i) => this.renderableItem(ri, i))
+      .filter(ri => ri)
   }
 
-  const renderableItem = function renderableItem (node, outputType) {
-    const Component = collectionMap[node.collection]
+  renderableItem (node) {
+    const Component = this.collectionMap[node.collection]
 
     const Element = (Component)
-      ? Component(node, outputType)
+      ? Component(node)
       : null
 
     return Element || (() => null)
   }
-
-  return (node, outputType) => {
-    // The calculated result we export for rendering must be a Component (not Element)
-    // Also, react elements cannot be extended, so using a Component function allows us to add layout property
-    const Component = () => renderableItem(node, outputType)
-
-    if (node.layout) {
-      Component.layout = node.layout
-    }
-
-    return Component
-  }
 }
 
-module.exports = componentGenerator
+module.exports = ComponentGenerator

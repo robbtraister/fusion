@@ -31,12 +31,21 @@ const path = require('path')
 const glob = require('glob')
 
 const {
+  writeFile
+} = require('../../src/utils/promises')
+
+const unpack = require('../../src/utils/unpack')
+
+const Layout = require('../../src/react/shared/components/Layout')
+
+const {
   // apiPrefix,
   componentDistRoot,
-  componentGeneratedRoot,
-  componentSrcRoot,
-  isDev
-} = require('.')
+  componentSrcRoot
+} = require('../../environment')
+
+require('../../mock-requires/client')
+require('@babel/register')(require('../../webpack/shared/babel-options'))
 
 const WILDCARD_LEVELS = {
   features: 2
@@ -62,12 +71,12 @@ const createComponentEntry = (src, componentCollection, componentType, outputTyp
   )
 }
 
-const getComponentCollection = (collection, outputTypes) => {
+const generateManifest = (collection, outputTypes) => {
   const wildcardLevels = WILDCARD_LEVELS[collection] || 1
   const typeSrcRoot = `${componentSrcRoot}/${collection}${'/*'.repeat(wildcardLevels)}`
 
   const componentMap = {}
-  glob.sync(`${typeSrcRoot}.{hbs,js,jsx,ts,tsx,vue}`)
+  glob.sync(`${typeSrcRoot}.{hbs,js,jsx,vue}`)
     .filter(isNotTest)
     .map(fp => {
       const parts = path.parse(fp)
@@ -86,7 +95,7 @@ const getComponentCollection = (collection, outputTypes) => {
 
   if (outputTypes) {
     const outputTypeArray = (outputTypes instanceof Array) ? outputTypes : [outputTypes]
-    const outputTypeFiles = glob.sync(`${typeSrcRoot}/{${outputTypeArray.join(',')},}.{hbs,js,jsx,ts,tsx,vue}`)
+    const outputTypeFiles = glob.sync(`${typeSrcRoot}/{${outputTypeArray.join(',')},}.{hbs,js,jsx,vue}`)
     outputTypeFiles
       .filter(isNotTest)
       .forEach(fp => {
@@ -102,6 +111,32 @@ const getComponentCollection = (collection, outputTypes) => {
       })
   }
 
+  if (collection === 'layouts') {
+    Object.values(componentMap)
+      .forEach(layout => {
+        Object.values(layout.outputTypes)
+          .forEach(layoutOutputType => {
+            const Component = Layout(unpack(require(layoutOutputType.src)))
+            layoutOutputType.sections = Component.sections
+          })
+      })
+  } else if (collection === 'output-types') {
+    Object.keys(componentMap)
+      .forEach(componentType => {
+        const Component = unpack(require(componentMap[componentType].src))
+        componentMap[componentType].outputTypes = (Component)
+          ? [componentType]
+            .concat(
+              (Component.fallback === true || Component.fallback === undefined)
+                ? (componentType === 'default' ? [] : 'default')
+                : (Component.fallback)
+                  ? Component.fallback
+                  : []
+            )
+          : null
+      })
+  }
+
   return Object.assign(
     {},
     ...Object.keys(componentMap)
@@ -110,26 +145,19 @@ const getComponentCollection = (collection, outputTypes) => {
   )
 }
 
-function getComponentManifest (collection) {
-  try {
-    if (isDev) {
-      throw new Error('only read manifest from file in production')
-    }
-    return require(`${componentGeneratedRoot}/${collection}/fusion.manifest.json`)
-  } catch (e) {
-    const outputTypes = getComponentCollection('output-types')
-
-    return (collection === 'output-types')
-      ? outputTypes
-      : getComponentCollection(collection, Object.keys(outputTypes))
-  }
+function generateManifestFile (collection, outputTypes) {
+  const filePath = `${componentDistRoot}/${collection}/fusion.manifest.json`
+  const manifest = generateManifest(collection, outputTypes)
+  writeFile(filePath, JSON.stringify(manifest, null, 2))
+  return manifest
 }
 
-module.exports = {
-  components: {
-    chains: getComponentManifest('chains'),
-    features: getComponentManifest('features'),
-    layouts: getComponentManifest('layouts'),
-    outputTypes: getComponentManifest('output-types')
-  }
+function generate () {
+  const outputTypeManifest = generateManifestFile('output-types')
+  const outputTypes = Object.keys(outputTypeManifest)
+  generateManifestFile('chains', outputTypes)
+  generateManifestFile('features', outputTypes)
+  generateManifestFile('layouts', outputTypes)
 }
+
+module.exports = generate

@@ -22,9 +22,9 @@ const {
   componentDistRoot
 } = require('../environment')
 
-const { components } = require('../environment/manifest')
+const { components } = require('../manifest')
 
-const componentCollections = Object.keys(components).filter(ot => ot !== 'outputTypes')
+const componentCollections = Object.keys(components).filter(collection => collection !== 'outputTypes')
 const outputTypes = Object.keys(components.outputTypes)
 
 const combinationSrcDir = path.resolve(bundleGeneratedRoot, 'combinations')

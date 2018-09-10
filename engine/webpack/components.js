@@ -1,7 +1,6 @@
 'use strict'
 
 const childProcess = require('child_process')
-const fs = require('fs')
 const path = require('path')
 
 const ManifestPlugin = require('webpack-manifest-plugin')
@@ -24,9 +23,13 @@ const {
   minify
 } = require('../environment')
 
-const { components } = require('../environment/manifest')
+const { components } = require('../manifest')
 
 const loadConfigs = require('../src/configs')
+
+const {
+  writeFile
+} = require('../src/utils/promises')
 
 module.exports = Object.keys(components)
   .filter(collection => collection !== 'outputTypes')
@@ -48,11 +51,7 @@ module.exports = Object.keys(components)
       }),
       new ManifestPlugin({fileName: 'webpack.manifest.json'}),
       new OnBuildWebpackPlugin(function (stats) {
-        childProcess.exec(`mkdir -p '${componentDistRoot}/${collection}'`, () => {
-          fs.writeFile(`${componentDistRoot}/${collection}/fusion.manifest.json`, JSON.stringify(components[collection], null, 2), () => {
-            fs.writeFile(`${componentDistRoot}/${collection}/fusion.configs.json`, JSON.stringify(loadConfigs(collection), null, 2), () => {})
-          })
-        })
+        writeFile(`${componentDistRoot}/${collection}/fusion.configs.json`, JSON.stringify(loadConfigs(collection), null, 2))
       })
     ]
 
@@ -113,13 +112,7 @@ module.exports = Object.keys(components)
         }
       }
       : (() => {
-        // if the type is empty, still create an empty config/manifest file
-        childProcess.exec(`mkdir -p '${componentDistRoot}/${collection}'`, () => {
-          fs.writeFile(`${componentDistRoot}/${collection}/fusion.manifest.json`, '{}', () => {
-            fs.writeFile(`${componentDistRoot}/${collection}/fusion.configs.json`, '[]', () => {})
-          })
-        })
-
+        writeFile(`${componentDistRoot}/${collection}/fusion.configs.json`, '[]')
         return null
       })()
   })

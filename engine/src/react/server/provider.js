@@ -3,7 +3,7 @@
 const React = require('react')
 const _merge = require('lodash.merge')
 
-const isStatic = require('../shared/is-static')
+const isStatic = require('./utils/is-static')
 
 const JSONNormalize = require('../../utils/normalize')
 
@@ -78,22 +78,26 @@ module.exports = (Template) => {
     return React.createElement(
       FusionContext.Provider,
       {
-        value: Object.assign({}, props, {
-          arcSite: props.arcSite,
-          contextPath: props.contextPath,
-          eventListeners: {},
-          getContent: getContentGenerator(contentCache, props.arcSite, props.outputType),
-          globalContent: props.globalContent,
-          globalContentConfig: props.globalContentConfig,
-          layout: Template.layout,
-          outputType: props.outputType,
-          requestUri: props.requestUri,
-          siteProperties: props.siteProperties
-        })
+        value: Object.assign(
+          {
+            arcSite: props.arcSite,
+            contextPath: props.contextPath,
+            eventListeners: {},
+            getContent: getContentGenerator(contentCache, props.arcSite, props.outputType),
+            globalContent: props.globalContent,
+            globalContentConfig: props.globalContentConfig,
+            layout: Template.layout,
+            outputType: props.outputType,
+            requestUri: props.requestUri,
+            siteProperties: props.siteProperties
+          },
+          props
+        )
       },
       React.createElement(Template)
     )
   }
+  Object.assign(wrapper, Template)
   wrapper.contentCache = contentCache
   wrapper.inlines = {}
   return wrapper

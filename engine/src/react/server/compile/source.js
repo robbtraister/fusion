@@ -2,16 +2,16 @@
 
 const fs = require('fs')
 
-const isStatic = require('../is-static')
+const isStatic = require('../utils/is-static')
 const unpack = require('../../../utils/unpack')
 
 const {
   minify
 } = require('../../../../environment')
 
-const { components } = require('../../../../environment/manifest')
+const { components } = require('../../../../manifest')
 
-const getTree = require('./tree')
+const getTree = require('../../shared/compile/tree')
 
 const srcFileType = (minify) ? 'src' : 'dist'
 
@@ -29,18 +29,20 @@ function componentCss (fp) {
     : ''
 }
 
-function getComponentManifest (collection, type, outputType) {
+function getComponentManifest (collection, type, outputTypes) {
   const componentConfig = components[collection] && components[collection][type]
-  const componentOutputType = componentConfig && (componentConfig.outputTypes[outputType] || componentConfig.outputTypes.default)
-  return componentOutputType
+  const componentOutputType = componentConfig
+    ? outputTypes.find((outputType) => componentConfig.outputTypes[outputType])
+    : null
+  return componentOutputType && componentConfig.outputTypes[componentOutputType]
 }
 
 class ScriptSource {
   constructor (renderable, outputType) {
     this.collections = {}
 
-    this.tree = getTree(renderable)
-    this.outputType = outputType
+    this.tree = getTree(renderable, outputType)
+    this.outputTypes = components.outputTypes[outputType].outputTypes
 
     this.collectionMap = {
       chains: this.getComponent(),
@@ -56,7 +58,7 @@ class ScriptSource {
       if (Component) {
         const componentName = this.getComponentName(manifest.collection, manifest.type)
         const fp = manifest[srcFileType]
-        return (isStatic(Component, this.outputType))
+        return (isStatic(Component, manifest.outputType))
           ? `Fusion.components${componentName} = Fusion.components.Static`
           : (manifest.collection === 'layouts')
             ? `Fusion.components${componentName} = Fusion.components.Layout(Fusion.unpack(require('${fp}')))`
@@ -106,7 +108,7 @@ class ScriptSource {
     const typeMap = typeCollection.types
 
     if (!(type in typeMap)) {
-      const manifest = getComponentManifest(collection, type, this.outputType)
+      const manifest = getComponentManifest(collection, type, this.outputTypes)
       if (manifest) {
         typeCollection.used = true
         typeMap[type] = {
@@ -169,4 +171,4 @@ ${usedCollections
   }
 }
 
-module.exports = (renderable, outputType) => new ScriptSource(renderable, outputType).generate()
+module.exports = (renderable, outputTypes) => new ScriptSource(renderable, outputTypes).generate()

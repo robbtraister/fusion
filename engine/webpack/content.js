@@ -1,10 +1,5 @@
 'use strict'
 
-const fs = require('fs')
-const path = require('path')
-
-const glob = require('glob')
-
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
 const OnBuildWebpackPlugin = require('on-build-webpack')
@@ -17,23 +12,17 @@ const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
 
 const {
-  schemasDistRoot,
   schemasSrcRoot,
-  sourcesDistRoot,
-  sourcesSrcRoot
+  schemasDistRoot,
+  sourcesSrcRoot,
+  sourcesDistRoot
 } = require('../environment')
 
-const getEntry = (rootDir) => Object.assign(
-  {},
-  ...glob.sync(`${rootDir}/*.{js,ts}`)
-    .map((f) => {
-      return {[path.parse(f).name]: f}
-    })
-)
+const {
+  content
+} = require('../manifest')
 
-const getConfig = (srcRoot, distRoot) => {
-  const entry = getEntry(srcRoot)
-
+const getConfig = (entry, srcRoot, distRoot) => {
   return (Object.keys(entry).length)
     ? {
       entry,
@@ -63,10 +52,8 @@ const getConfig = (srcRoot, distRoot) => {
         }]),
         new ManifestPlugin({fileName: 'webpack.manifest.json'}),
         new OnBuildWebpackPlugin(function (stats) {
-          fs.writeFile(`${distRoot}/fusion.manifest.json`, JSON.stringify(entry, null, 2), () => {
-            // TODO: compute configs at compile-time (instead of on-demand) after disabling JGE option
-            // fs.writeFile(`${sourcesDistRoot}/fusion.configs.json`, JSON.stringify(entry, null, 2), () => {})
-          })
+          // TODO: compute configs at compile-time (instead of on-demand) after disabling JGE option
+          // fs.writeFile(`${sourcesDistRoot}/fusion.configs.json`, JSON.stringify(entry, null, 2), () => {})
         })
       ],
       resolve,
@@ -79,6 +66,6 @@ const getConfig = (srcRoot, distRoot) => {
 }
 
 module.exports = [].concat(
-  getConfig(schemasSrcRoot, schemasDistRoot),
-  getConfig(sourcesSrcRoot, sourcesDistRoot)
+  getConfig(content.schemas, schemasSrcRoot, schemasDistRoot),
+  getConfig(content.sources, sourcesSrcRoot, sourcesDistRoot)
 )

@@ -1,7 +1,6 @@
 'use strict'
 
 const childProcess = require('child_process')
-const fs = require('fs')
 const path = require('path')
 
 const ManifestPlugin = require('webpack-manifest-plugin')
@@ -24,9 +23,13 @@ const {
   componentDistRoot
 } = require('../environment')
 
-const { components } = require('../environment/manifest')
+const { components } = require('../manifest')
 
 const loadConfigs = require('../src/configs')
+
+const {
+  writeFile
+} = require('../src/utils/promises')
 
 const entry = Object.assign(
   ...Object.values(components.outputTypes)
@@ -119,11 +122,7 @@ module.exports = (Object.keys(entry).length)
       plugins: [
         new ManifestPlugin({fileName: 'webpack.manifest.json'}),
         new OnBuildWebpackPlugin(function (stats) {
-          childProcess.exec(`mkdir -p '${componentDistRoot}/output-types'`, () => {
-            fs.writeFile(`${componentDistRoot}/output-types/fusion.manifest.json`, JSON.stringify(components.outputTypes, null, 2), () => {
-              fs.writeFile(`${componentDistRoot}/output-types/fusion.configs.json`, JSON.stringify(loadConfigs('output-types'), null, 2), () => {})
-            })
-          })
+          writeFile(`${componentDistRoot}/output-types/fusion.configs.json`, JSON.stringify(loadConfigs('output-types'), null, 2))
         })
       ],
       resolve,

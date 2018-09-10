@@ -1,10 +1,6 @@
 'use strict'
 
-const unpack = require('../../../utils/unpack')
-
-const {
-  componentDistRoot
-} = require('../../../../environment')
+// const { components: { layouts: layoutManifest } } = require('fusion:manifest')
 
 const getChildren = function getChildren (renderableItems, outputType, indices) {
   return (renderableItems || [])
@@ -62,11 +58,7 @@ const section = function section (config, outputType, id) {
 }
 
 const layout = function layout (config, outputType, id) {
-  const Layout = (() => {
-    try {
-      return unpack(require(`${componentDistRoot}/layouts/${config.layout}/${outputType || 'default'}`))
-    } catch (e) {}
-  })()
+  // const sections = layoutManifest[config.layout].outputTypes[outputType].sections
 
   return {
     collection: 'layouts',
@@ -76,19 +68,21 @@ const layout = function layout (config, outputType, id) {
       collection: 'layouts',
       type: config.layout
     },
-    children: getChildren(config.layoutItems, outputType, Layout ? Layout.sections.map(section => section.id) : null)
+    children: getChildren(config.layoutItems, outputType)
+    // TODO: find a way to inject section ids without loading all component manifest info
+    //, sections ? sections.map(section => section.id) : null)
   }
 }
 
 const renderableItem = function renderableItem (config, outputType, id) {
   const Component = (config.featureConfig)
-    ? feature(config, outputType)
+    ? feature(config, outputType, id)
     : (config.chainConfig)
-      ? chain(config, outputType)
+      ? chain(config, outputType, id)
       : (config.renderableItems)
         ? section(config, outputType, id)
         : (config.layoutItems)
-          ? layout(config, outputType)
+          ? layout(config, outputType, id)
           : null
   return Component || null
 }

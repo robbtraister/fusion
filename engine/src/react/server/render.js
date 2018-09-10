@@ -19,8 +19,6 @@ const timer = require('../../timer')
 
 const fusionProperties = require('fusion:properties')
 
-const getTree = require('../shared/compile/tree')
-
 const {
   fetchFile
 } = require('../../io')
@@ -32,7 +30,7 @@ const {
   version
 } = require('../../../environment')
 
-const { components } = require('../../../environment/manifest')
+const { components } = require('../../../manifest')
 
 const { sendMetrics, METRIC_TYPES } = require('../../utils/send-metrics')
 
@@ -200,6 +198,16 @@ const render = function render ({Component, request, content, _website}) {
     })
 }
 
+const getOutputTypeComponent = function getOutputTypeComponent (outputType) {
+  try {
+    return unpack(require(components.outputTypes[outputType].dist))
+  } catch (e) {
+    const err = new Error(`Could not find output-type: ${outputType}`)
+    err.statusCode = 400
+    throw err
+  }
+}
+
 const compileRenderable = function compileRenderable ({renderable, outputType}) {
   if (isDev) {
     // clear cache to ensure we load the latest
@@ -209,28 +217,17 @@ const compileRenderable = function compileRenderable ({renderable, outputType}) 
   }
 
   let tic = timer.tic()
-  const tree = getTree(renderable)
-  return Promise.resolve(compileComponent(tree, outputType))
+  const outputTypes = components.outputTypes[outputType].outputTypes
+  return Promise.resolve(compileComponent(renderable, outputTypes))
     .then((Renderable) => {
       debugTimer(`compile(${renderable._id || renderable.id})`, tic.toc())
       tic = timer.tic()
       return Provider(Renderable)
     })
     .then((Component) => {
-      Component.tree = tree
       debugTimer('provider wrapping', tic.toc())
       return Component
     })
-}
-
-const getOutputTypeComponent = function getOutputTypeComponent (outputType) {
-  try {
-    return unpack(require(components.outputTypes[outputType].dist))
-  } catch (e) {
-    const err = new Error(`Could not find output-type: ${outputType}`)
-    err.statusCode = 400
-    throw err
-  }
 }
 
 const compileDocument = function compileDocument ({rendering, outputType, name}) {

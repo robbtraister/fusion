@@ -1,6 +1,6 @@
 'use strict'
 
-// const { components: { layouts: layoutManifest } } = require('fusion:manifest')
+const layoutManifest = require('fusion:manifest:components:layouts')
 
 const getChildren = function getChildren (renderableItems, outputType, indices) {
   return (renderableItems || [])
@@ -9,7 +9,7 @@ const getChildren = function getChildren (renderableItems, outputType, indices) 
 }
 
 const feature = function feature (config, outputType, id) {
-  id = (id == null) ? config.id : id
+  id = config.id || id
   return {
     collection: 'features',
     type: config.featureConfig,
@@ -29,7 +29,7 @@ const feature = function feature (config, outputType, id) {
 }
 
 const chain = function chain (config, outputType, id) {
-  id = (id == null) ? config.id : id
+  id = config.id || id
   return {
     collection: 'chains',
     type: config.chainConfig,
@@ -47,18 +47,21 @@ const chain = function chain (config, outputType, id) {
 const section = function section (config, outputType, id) {
   return {
     collection: 'sections',
-    type: id,
     props: {
       key: id,
       collection: 'sections',
-      type: id
+      id
     },
     children: getChildren(config.renderableItems, outputType)
   }
 }
 
 const layout = function layout (config, outputType, id) {
-  // const sections = layoutManifest[config.layout].outputTypes[outputType].sections
+  const sections = (() => {
+    try {
+      return layoutManifest[config.layout].outputTypes[outputType].sections
+    } catch (e) {}
+  })()
 
   return {
     collection: 'layouts',
@@ -68,9 +71,7 @@ const layout = function layout (config, outputType, id) {
       collection: 'layouts',
       type: config.layout
     },
-    children: getChildren(config.layoutItems, outputType)
-    // TODO: find a way to inject section ids without loading all component manifest info
-    //, sections ? sections.map(section => section.id) : null)
+    children: getChildren(config.layoutItems, outputType, sections || null)
   }
 }
 

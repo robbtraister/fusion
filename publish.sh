@@ -7,9 +7,9 @@
 # and depend on the following env vars being set locally:
 #   VERSION=x.x.x         // Fusion Release version
 #   DATADOG_API_KEY=[key] // Go to DataDog > Integrations > APIs to find our key
-#   S3_BUCKET=[s3_bucket] // The S3 bucket where discrete function code is pushed
+#   S3BUCKET=[S3BUCKET] // The S3 bucket where discrete function code is pushed
 # 
-# VERSION=x.x.x DATADOG_API_KEY=[key] S3_BUCKET=[s3_bucket] ./publish.sh
+# VERSION=x.x.x DATADOG_API_KEY=[key] S3BUCKET=[S3BUCKET] ./publish.sh
 
 
 ./compiler/bin/publish.sh

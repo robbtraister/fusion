@@ -217,8 +217,7 @@ const compileRenderable = function compileRenderable ({renderable, outputType}) 
   }
 
   let tic = timer.tic()
-  const outputTypes = components.outputTypes[outputType].outputTypes
-  return Promise.resolve(compileComponent(renderable, outputTypes))
+  return Promise.resolve(compileComponent(renderable, outputType))
     .then((Renderable) => {
       debugTimer(`compile(${renderable._id || renderable.id})`, tic.toc())
       tic = timer.tic()

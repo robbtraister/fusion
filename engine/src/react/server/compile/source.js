@@ -11,6 +11,8 @@ const {
 
 const { components } = require('../../../../manifest')
 
+const ComponentGenerator = require('../../shared/compile/component')
+
 const getTree = require('../../shared/compile/tree')
 
 const srcFileType = (minify) ? 'src' : 'dist'
@@ -29,27 +31,21 @@ function componentCss (fp) {
     : ''
 }
 
-function getComponentManifest (collection, type, outputTypes) {
+function getComponentManifest (collection, type, outputType) {
   const componentConfig = components[collection] && components[collection][type]
-  const componentOutputType = componentConfig
-    ? outputTypes.find((outputType) => componentConfig.outputTypes[outputType])
-    : null
-  return componentOutputType && componentConfig.outputTypes[componentOutputType]
+  return (componentConfig && componentConfig.outputTypes[outputType]) || null
 }
 
-class ScriptSource {
-  constructor (renderable, outputType) {
+class ScriptSource extends ComponentGenerator {
+  constructor (outputType, renderable) {
+    super(outputType)
+
     this.collections = {}
+    this.collectionMap.sections = this.getComponent('React.Fragment')
 
-    this.tree = getTree(renderable, outputType)
-    this.outputTypes = components.outputTypes[outputType].outputTypes
+    this.emptyElement = ''
 
-    this.collectionMap = {
-      chains: this.getComponent(),
-      features: this.getFeature.bind(this),
-      layouts: this.getComponent(),
-      sections: this.getComponent('React.Fragment')
-    }
+    this.renderable = renderable
   }
 
   componentImport (manifest) {
@@ -108,7 +104,7 @@ class ScriptSource {
     const typeMap = typeCollection.types
 
     if (!(type in typeMap)) {
-      const manifest = getComponentManifest(collection, type, this.outputTypes)
+      const manifest = getComponentManifest(collection, type, this.outputType)
       if (manifest) {
         typeCollection.used = true
         typeMap[type] = {
@@ -123,16 +119,9 @@ class ScriptSource {
     return typeMap[type] && typeMap[type].name
   }
 
-  renderableItem (node, index) {
-    const Component = this.collectionMap[node.collection]
-
-    return (Component)
-      ? Component(node)
-      : ''
-  }
-
   generate () {
-    const Template = this.renderableItem(this.tree)
+    const tree = getTree(this.renderable, this.outputType)
+    const Template = this.renderableItem(tree)
 
     const usedCollections = Object.keys(this.collections).filter(collection => this.collections[collection].used).sort()
 
@@ -152,7 +141,7 @@ ${usedCollections
 Fusion.Template = function (props) {
   return React.createElement(React.Fragment, {}, ${Template})
 }
-Fusion.Template.layout = ${this.tree.type ? `'${this.tree.type}'` : 'null'}
+Fusion.Template.layout = ${tree.type ? `'${tree.type}'` : 'null'}
 module.exports = Fusion.Template
 `
 
@@ -171,4 +160,4 @@ ${usedCollections
   }
 }
 
-module.exports = (renderable, outputTypes) => new ScriptSource(renderable, outputTypes).generate()
+module.exports = (renderable, outputType) => new ScriptSource(outputType, renderable).generate()

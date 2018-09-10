@@ -45,26 +45,6 @@ module.exports = Object.keys(components)
           })
       })
 
-    const plugins = [
-      new MiniCssExtractPlugin({
-        filename: '[name].css'
-      }),
-      new ManifestPlugin({fileName: 'webpack.manifest.json'}),
-      new OnBuildWebpackPlugin(function (stats) {
-        writeFile(`${componentDistRoot}/${collection}/fusion.configs.json`, JSON.stringify(loadConfigs(collection), null, 2))
-      })
-    ]
-
-    if (isDev) {
-      plugins.push(
-        new OnBuildWebpackPlugin(function (stats) {
-          childProcess.exec(`rm -rf '${path.resolve(bundleDistRoot, 'page')}'`)
-          childProcess.exec(`rm -rf '${path.resolve(bundleDistRoot, 'styles')}'`)
-          childProcess.exec(`rm -rf '${path.resolve(bundleDistRoot, 'template')}'`)
-        })
-      )
-    }
-
     return (Object.keys(entry).length)
       ? {
         devtool: false,
@@ -103,7 +83,23 @@ module.exports = Object.keys(components)
           path: path.resolve(componentDistRoot, collection),
           libraryTarget: 'commonjs2'
         },
-        plugins,
+        plugins: [
+          new MiniCssExtractPlugin({
+            filename: '[name].css'
+          }),
+          new ManifestPlugin({fileName: 'webpack.manifest.json'}),
+          new OnBuildWebpackPlugin(function (stats) {
+            writeFile(`${componentDistRoot}/${collection}/fusion.configs.json`, JSON.stringify(loadConfigs(collection), null, 2))
+            if (isDev) {
+              // manifest generation requires babel-register, which is very expensive
+              // run it in a separate process to prevent ALL modules from being transpiled
+              childProcess.exec('npm run generate:manifest')
+              childProcess.exec(`rm -rf '${path.resolve(bundleDistRoot, 'page')}'`)
+              childProcess.exec(`rm -rf '${path.resolve(bundleDistRoot, 'styles')}'`)
+              childProcess.exec(`rm -rf '${path.resolve(bundleDistRoot, 'template')}'`)
+            }
+          })
+        ],
         resolve,
         // in dev mode, compiled components must be usable without babel
         target: (minify) ? 'node' : 'web',

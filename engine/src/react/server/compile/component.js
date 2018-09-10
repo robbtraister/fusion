@@ -29,13 +29,12 @@ class ServerGenerator extends ComponentGenerator {
   loadComponent (componentCollection, componentType) {
     try {
       const componentConfig = components[componentCollection][componentType]
-      const componentOutputType = this.outputTypes.find((outputType) => componentConfig.outputTypes[outputType])
-      const manifest = componentConfig.outputTypes[componentOutputType]
+      const manifest = componentConfig.outputTypes[this.outputType]
       const UnpackedComponent = unpack(require(manifest.dist))
       const OriginalComponent = (componentCollection === 'layouts')
         ? Layout(UnpackedComponent)
         : UnpackedComponent
-      const Component = (isStatic(OriginalComponent, componentOutputType))
+      const Component = (isStatic(OriginalComponent, this.outputType))
         ? (props) => React.createElement('div', { id: props.id, className: 'fusion:static' }, React.createElement(OriginalComponent, props))
         : OriginalComponent
       return TimedComponent(Component)
@@ -45,8 +44,7 @@ class ServerGenerator extends ComponentGenerator {
 }
 
 const generatorCache = {}
-module.exports = (renderable, outputTypes) => {
-  const outputType = outputTypes[0]
+module.exports = (renderable, outputType) => {
   const generator = generatorCache[outputType] = generatorCache[outputType] || new ServerGenerator(outputType)
   return generator.generate(renderable)
 }

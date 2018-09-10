@@ -5,8 +5,10 @@ const React = require('react')
 const getTree = require('./tree')
 
 class ComponentGenerator {
-  constructor (outputTypes) {
-    this.outputTypes = outputTypes
+  constructor (outputType) {
+    this.outputType = outputType
+
+    this.emptyElement = () => null
 
     this.collectionMap = {
       chains: this.getComponent(),
@@ -17,11 +19,11 @@ class ComponentGenerator {
   }
 
   generate (renderable) {
-    const tree = getTree(renderable, this.outputTypes[0])
+    const tree = getTree(renderable, this.outputType)
 
     // The calculated result we export for rendering must be a Component (not Element)
     // Also, react elements cannot be extended, so using a Component function allows us to add layout property
-    const Component = () => this.renderableItem(tree, this.outputTypes)
+    const Component = () => this.renderableItem(tree)
 
     if (tree.layout) {
       Component.layout = tree.layout
@@ -42,7 +44,7 @@ class ComponentGenerator {
       return React.createElement(
         Component,
         props,
-        this.renderAll(node.children, this.outputTypes)
+        this.renderAll(node.children)
       )
     }
   }
@@ -84,7 +86,7 @@ class ComponentGenerator {
       ? Component(node)
       : null
 
-    return Element || (() => null)
+    return Element || this.emptyElement
   }
 }
 

@@ -71,7 +71,7 @@ const createComponentEntry = (src, componentCollection, componentType, outputTyp
   )
 }
 
-const generateManifest = (collection, outputTypes) => {
+const generateManifest = (collection, outputTypeManifest) => {
   const wildcardLevels = WILDCARD_LEVELS[collection] || 1
   const typeSrcRoot = `${componentSrcRoot}/${collection}${'/*'.repeat(wildcardLevels)}`
 
@@ -85,7 +85,7 @@ const generateManifest = (collection, outputTypes) => {
         collection,
         type: componentType
       }
-      if (outputTypes) {
+      if (outputTypeManifest) {
         componentMap[componentType].outputTypes = componentMap[componentType].outputTypes || {}
         componentMap[componentType].outputTypes.default = createComponentEntry(fp, collection, componentType, 'default')
       } else {
@@ -93,8 +93,8 @@ const generateManifest = (collection, outputTypes) => {
       }
     })
 
-  if (outputTypes) {
-    const outputTypeArray = (outputTypes instanceof Array) ? outputTypes : [outputTypes]
+  if (outputTypeManifest) {
+    const outputTypeArray = Object.keys(outputTypeManifest)
     const outputTypeFiles = glob.sync(`${typeSrcRoot}/{${outputTypeArray.join(',')},}.{hbs,js,jsx,vue}`)
     outputTypeFiles
       .filter(isNotTest)
@@ -109,23 +109,30 @@ const generateManifest = (collection, outputTypes) => {
         }
         componentMap[componentType].outputTypes[outputType] = createComponentEntry(fp, collection, componentType, outputType)
       })
-  }
 
-  if (collection === 'layouts') {
     Object.values(componentMap)
-      .forEach(layout => {
-        Object.values(layout.outputTypes)
-          .forEach(layoutOutputType => {
-            const Component = Layout(unpack(require(layoutOutputType.src)))
-            layoutOutputType.sections = Component.sections
+      .forEach((componentType) => {
+        Object.values(outputTypeManifest)
+          .forEach((outputTypeConfig) => {
+            if (outputTypeConfig.fallback.length && !componentType.outputTypes.hasOwnProperty(outputTypeConfig.type)) {
+              const fallbackOutputType = outputTypeConfig.fallback.find(
+                (fallbackOutputType) =>
+                  componentType.outputTypes.hasOwnProperty(fallbackOutputType)
+              )
+              componentType.outputTypes[outputTypeConfig.type] = Object.assign(
+                {},
+                componentType.outputTypes[fallbackOutputType],
+                {outputType: outputTypeConfig.type}
+              )
+            }
           })
       })
-  } else if (collection === 'output-types') {
+  } else {
     Object.keys(componentMap)
-      .forEach(componentType => {
+      .forEach((componentType) => {
         const Component = unpack(require(componentMap[componentType].src))
-        componentMap[componentType].outputTypes = (Component)
-          ? [componentType]
+        componentMap[componentType].fallback = (Component)
+          ? []
             .concat(
               (Component.fallback === true || Component.fallback === undefined)
                 ? (componentType === 'default' ? [] : 'default')
@@ -137,27 +144,34 @@ const generateManifest = (collection, outputTypes) => {
       })
   }
 
-  return Object.assign(
-    {},
-    ...Object.keys(componentMap)
-      .sort()
-      .map(k => ({[k]: componentMap[k]}))
-  )
+  if (collection === 'layouts') {
+    Object.values(componentMap)
+      .forEach(layout => {
+        Object.values(layout.outputTypes)
+          .forEach(layoutOutputType => {
+            const Component = Layout(unpack(require(layoutOutputType.src)))
+            layoutOutputType.sections = Component.sections
+          })
+      })
+  }
+
+  return componentMap
 }
 
-function generateManifestFile (collection, outputTypes) {
+function generateManifestFile (collection, outputTypeManifest) {
   const filePath = `${componentDistRoot}/${collection}/fusion.manifest.json`
-  const manifest = generateManifest(collection, outputTypes)
+  const manifest = generateManifest(collection, outputTypeManifest)
   writeFile(filePath, JSON.stringify(manifest, null, 2))
   return manifest
 }
 
 function generate () {
   const outputTypeManifest = generateManifestFile('output-types')
-  const outputTypes = Object.keys(outputTypeManifest)
-  generateManifestFile('chains', outputTypes)
-  generateManifestFile('features', outputTypes)
-  generateManifestFile('layouts', outputTypes)
+  ;[
+    'chains',
+    'features',
+    'layouts'
+  ].forEach(collection => generateManifestFile(collection, outputTypeManifest))
 }
 
 module.exports = generate

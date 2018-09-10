@@ -20,7 +20,9 @@ const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
 
 const {
-  componentDistRoot
+  bundleDistRoot,
+  componentDistRoot,
+  isDev
 } = require('../environment')
 
 const { components } = require('../manifest')
@@ -123,6 +125,15 @@ module.exports = (Object.keys(entry).length)
         new ManifestPlugin({fileName: 'webpack.manifest.json'}),
         new OnBuildWebpackPlugin(function (stats) {
           writeFile(`${componentDistRoot}/output-types/fusion.configs.json`, JSON.stringify(loadConfigs('output-types'), null, 2))
+          if (isDev) {
+            // manifest generation requires babel-register, which is very expensive
+            // run it in a separate process to prevent ALL modules from being transpiled
+            childProcess.exec('npm run generate:manifest')
+            // output-type fallback changes may affect template scripts
+            childProcess.exec(`rm -rf '${path.resolve(bundleDistRoot, 'page')}'`)
+            childProcess.exec(`rm -rf '${path.resolve(bundleDistRoot, 'styles')}'`)
+            childProcess.exec(`rm -rf '${path.resolve(bundleDistRoot, 'template')}'`)
+          }
         })
       ],
       resolve,

@@ -16,7 +16,7 @@
 | [Creating a Layout Component](./creating-layout-component.md) |
 | [Creating a Chain Component](./creating-chain-component.md) |
 | [Event Handling and Interaction](./event-handling-interaction.md) |
-| [Isomorphic vs. Server vs. SPA Rendering](./isomorphic-server-spa-rendering.md)
+| [Isomorphic vs. Server vs. SPA Rendering](.//event-handling-interaction.md)
 
 | Using Data |
 |---|
@@ -33,7 +33,6 @@
 |---|
 | [Adding Styling to Components](./adding-styling.md) |
 | [Using Third Party Libraries](./using-third-party-libraries.md) |
-| [Using Child and Shared Components](./using-child-shared-components.md) |
 | [Messaging Between Components](./messaging-between-components.md) |
 | [Helpful Commands](./helpful-commands.md) |
 | [Deploying a Feature Pack](./deploying-feature-pack.md) |

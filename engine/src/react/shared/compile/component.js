@@ -25,6 +25,7 @@ class ComponentGenerator {
     // Also, react elements cannot be extended, so using a Component function allows us to add layout property
     const Component = () => this.renderableItem(tree)
 
+    Component.id = renderable.id
     if (tree.layout) {
       Component.layout = tree.layout
     }

@@ -89,7 +89,8 @@ module.exports = (Template) => {
             layout: Template.layout,
             outputType: props.outputType,
             requestUri: props.requestUri,
-            siteProperties: props.siteProperties
+            siteProperties: props.siteProperties,
+            template: Template.id
           },
           props
         )

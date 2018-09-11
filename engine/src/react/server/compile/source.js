@@ -141,6 +141,7 @@ ${usedCollections
 Fusion.Template = function (props) {
   return React.createElement(React.Fragment, {}, ${Template})
 }
+Fusion.Template.id = '${Template.id}'
 Fusion.Template.layout = ${tree.type ? `'${tree.type}'` : 'null'}
 module.exports = Fusion.Template
 `

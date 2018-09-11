@@ -33,12 +33,18 @@ function getTypeRouter (routeType) {
 
   typeRouter.all(['/', '/:id', '/:id/:child'],
     bodyParser.json({limit: bodyLimit}),
+    bodyParser.urlencoded({extended: true}),
     (req, res, next) => {
       const tic = timer.tic()
 
       const outputType = /^(false|none|off|0)$/i.test(req.query.outputType)
         ? null
         : req.query.outputType || defaultOutputType
+
+      const renderingJson = (req.body && req.body.rendering)
+      const renderingTree = (typeof renderingJson === 'string')
+        ? JSON.parse(renderingJson)
+        : renderingJson
 
       const payload = Object.assign(
         {
@@ -52,14 +58,14 @@ function getTypeRouter (routeType) {
               child: req.params.child,
               outputType
             },
-            req.body && req.body.rendering
+            renderingTree
           )
         }
       )
 
       const type = payload.rendering.type || routeType
 
-      const rendering = new Rendering(type, payload.rendering.id)
+      const rendering = new Rendering(type, payload.rendering.id, payload.rendering.layoutItems ? payload.rendering : undefined)
       return Promise.all([
         rendering.getComponent(outputType, payload.rendering.child),
         rendering.getContent(payload._website)
@@ -88,7 +94,7 @@ function getTypeRouter (routeType) {
 }
 
 renderRouter.use('/page', getTypeRouter('page'))
-renderRouter.use('/rendering', getTypeRouter('rendering'))
+// renderRouter.use('/rendering', getTypeRouter('rendering'))
 renderRouter.use('/template', getTypeRouter('template'))
 
 renderRouter.use('/', getTypeRouter())

@@ -106,20 +106,20 @@ class Rendering {
     // but that's what you get with legacy data
     this.contentPromise = this.contentPromise ||
       (
-        (this.type !== 'page')
+        (this.type === 'template')
           ? Promise.resolve()
           : this.getJson()
             .then((json) => {
               const configs = json.globalContentConfig
-              return (!configs)
-                ? null
-                : getSource(configs.contentService)
+              return (configs && configs.contentService && configs.contentConfigValues)
+                ? getSource(configs.contentService)
                   .then((source) => source.fetch(Object.assign(json.uri ? {uri: json.uri} : {}, {'arc-site': arcSite}, configs.contentConfigValues)))
                   .then((document) => ({
                     source: configs.contentService,
                     key: configs.contentConfigValues,
                     document
                   }))
+                : null
             })
       )
     return this.contentPromise

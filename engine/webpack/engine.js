@@ -6,7 +6,7 @@ const path = require('path')
 
 const glob = require('glob')
 
-const HandlebarsPlugin = require('handlebars-webpack-plugin')
+const DefinePlugin = require('webpack').DefinePlugin
 const ManifestPlugin = require('webpack-manifest-plugin')
 
 const babelLoader = require('./shared/loaders/babel-loader')
@@ -23,8 +23,6 @@ const {
   bundleSrcRoot,
   contextPath
 } = require('../environment')
-
-const { components } = require('../environment/manifest')
 
 childProcess.execSync(`mkdir -p '${propertiesSrcDir}'`)
 const propertiesSrcFile = path.resolve(propertiesSrcDir, `properties.js`)
@@ -73,8 +71,9 @@ module.exports = [
   {
     entry: {
       admin: require.resolve('../src/react/client/admin'),
-      react: require.resolve('../src/react/client'),
-      properties: require.resolve(propertiesSrcFile)
+      preview: require.resolve('../src/react/client/preview'),
+      properties: require.resolve(propertiesSrcFile),
+      react: require.resolve('../src/react/client')
     },
     mode,
     module: {
@@ -94,18 +93,10 @@ module.exports = [
       path: path.resolve(bundleDistRoot, 'engine')
     },
     plugins: [
-      new ManifestPlugin({fileName: 'webpack.manifest.json'}),
-      ...Object.keys(components.outputTypes)
-        .map((outputType) => {
-          return new HandlebarsPlugin({
-            entry: require.resolve('../src/react/client/preview.html.hbs'),
-            output: path.resolve(bundleDistRoot, 'engine', 'preview', `${outputType}.html`),
-            data: {
-              contextPath,
-              outputType
-            }
-          })
-        })
+      new DefinePlugin({
+        '__CONTEXT_PATH__': `'${contextPath}'`
+      }),
+      new ManifestPlugin({fileName: 'webpack.manifest.json'})
     ],
     resolve: Object.assign(
       {},

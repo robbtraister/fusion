@@ -78,18 +78,22 @@ module.exports = (Template) => {
     return React.createElement(
       FusionContext.Provider,
       {
-        value: Object.assign({}, props, {
-          arcSite: props.arcSite,
-          contextPath: props.contextPath,
-          eventListeners: {},
-          getContent: getContentGenerator(contentCache, props.arcSite, props.outputType),
-          globalContent: props.globalContent,
-          globalContentConfig: props.globalContentConfig,
-          layout: Template.layout,
-          outputType: props.outputType,
-          requestUri: props.requestUri,
-          siteProperties: props.siteProperties
-        })
+        value: Object.assign(
+          {
+            arcSite: props.arcSite,
+            contextPath: props.contextPath,
+            eventListeners: {},
+            getContent: getContentGenerator(contentCache, props.arcSite, props.outputType),
+            globalContent: props.globalContent,
+            globalContentConfig: props.globalContentConfig,
+            layout: Template.layout,
+            outputType: props.outputType,
+            requestUri: props.requestUri,
+            siteProperties: props.siteProperties,
+            template: Template.id
+          },
+          props
+        )
       },
       React.createElement(Template)
     )

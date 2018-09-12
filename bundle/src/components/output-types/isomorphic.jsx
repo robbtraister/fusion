@@ -8,7 +8,7 @@ const OutputType = (props) =>
   <html>
     <head>
       <title>Fusion Rendering</title>
-      <props.MetaTag />
+      <props.MetaTags />
       <props.Libs />
       <props.CssLinks />
       <link rel='icon' type='image/x-icon' href={`${props.contextPath}/resources/img/favicon.ico`} />

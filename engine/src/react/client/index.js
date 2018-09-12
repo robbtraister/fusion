@@ -69,7 +69,8 @@ const render = () => {
         React.createElement(
           Provider,
           {
-            layout: Fusion.Template.layout
+            layout: Fusion.Template.layout,
+            template: Fusion.Template.id
           },
           React.createElement(
             Fusion.Template,

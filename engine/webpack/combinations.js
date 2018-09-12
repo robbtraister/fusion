@@ -65,7 +65,7 @@ ${[].concat(
     module: {
       rules: [
         {
-          test: /\.jsx?$/i,
+          test: /\.[jt]sx?$/i,
           exclude: /node_modules/,
           use: [
             babelLoader

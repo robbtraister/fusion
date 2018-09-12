@@ -30,6 +30,10 @@ const getJson = (type, id) => model(type).get(id)
       const version = data && data.published && data.versions && data.versions[data.published]
       const head = version && version.head
       return head && model('rendering').get(head)
+        .then((rendering) => {
+          rendering.id = rendering._pt
+          return rendering
+        })
     })()
   )
 

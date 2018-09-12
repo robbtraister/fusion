@@ -25,9 +25,9 @@ const {
 
 const getEntry = (rootDir) => Object.assign(
   {},
-  ...glob.sync(`${rootDir}/*.js`)
-    .map((f) => {
-      return {[path.parse(f).name]: f}
+  ...glob.sync(`${rootDir}/*.{js,ts}`)
+    .map((filePath) => {
+      return {[path.parse(filePath).name]: filePath}
     })
 )
 
@@ -42,7 +42,7 @@ const getConfig = (srcRoot, distRoot) => {
       module: {
         rules: [
           {
-            test: /\.jsx?$/i,
+            test: /\.[jt]sx?$/i,
             exclude: /node_modules/,
             use: [
               babelLoader

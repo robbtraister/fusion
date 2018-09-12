@@ -102,6 +102,7 @@ const componentGenerator = function componentGenerator (loadComponent) {
     // Also, react elements cannot be extended, so using a Component function allows us to add layout property
     const Component = () => renderableItem(config, outputType)
 
+    Component.id = config.id
     if (config.layout) {
       Component.layout = config.layout
     }

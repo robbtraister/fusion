@@ -10,13 +10,15 @@ const OutputType = (props) =>
   <html amp='amp'>
     <head>
       <title>Fusion Rendering</title>
-      {props.metaTag}
-      {props.styles(({outputTypeStyles, templateStyles}) =>
-        <style amp-custom='true'>
-          {outputTypeStyles}
-          {templateStyles}
-        </style>
-      )}
+      <props.MetaTags />
+      <props.Styles>
+        {({outputTypeStyles, templateStyles}) =>
+          <style amp-custom='true'>
+            {outputTypeStyles}
+            {templateStyles}
+          </style>
+        }
+      </props.Styles>
       <link rel='icon' type='image/x-icon' href={`${props.contextPath}/resources/img/favicon.ico`} />
     </head>
     <body>

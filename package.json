@@ -1,0 +1,27 @@
+{
+  "scripts": {
+    "build": "docker-compose -f docker-compose.admin.yml pull && docker-compose -f docker-compose.admin.yml build --pull",
+    "build:linked": "npm run generate:linked && docker-compose -f docker-compose.linked.yml pull && docker-compose -f docker-compose.linked.yml build --pull",
+    "build:no-admin": "docker-compose pull && docker-compose build --pull",
+    "clean:containers": "docker rm $(docker ps -a | grep 'Exited' | awk '{ print $1 }') || true",
+    "clean:images": "docker rmi $(docker images -a | grep '^<none>' | awk '{ print $3 }') || true; docker rmi $(docker images -a | awk '{ print $2 \" \" $3 }' | grep '^<none>' | awk '{ print $2 }') || true",
+    "clean:networks": "docker network prune -f",
+    "clean:volumes": "docker volume rm $(docker volume ls | awk '{ print $2; }' | egrep '^[a-z0-9]{64}$') || true",
+    "docker:clean": "npm run clean:containers && npm run clean:images && npm run clean:volumes && npm run clean:networks",
+    "daemon": "npm run start -- -d",
+    "down": "docker-compose -f docker-compose.admin.yml down",
+    "down:linked": "npm run generate:linked && docker-compose -f docker-compose.linked.yml down",
+    "down:no-admin": "docker-compose down",
+    "dump": "docker exec $(docker ps | grep ':27017' | awk '{ print $1; }') ./dump.sh",
+    "generate:linked": "./.fusion/docker/docker-compose.linked.yml.sh > ./docker-compose.linked.yml",
+    "no-admin": "echo \"[WARNING] 'no-admin' command is deprecated\nPlease use 'start:no-admin' instead\n\" && npm run start:no-admin",
+    "nuke": "npm run docker:clean",
+    "rebuild": "echo \"[WARNING] 'rebuild' command is deprecated\nPlease use 'rebuild:bundle' instead\n\" && npm run fusion:rebuild",
+    "rebuild:bundle": "docker exec -it $(docker ps | grep ':9010->' | awk '{ print $1; exit }') npm run build:all",
+    "start": "npm run down && npm run build && docker-compose -f docker-compose.admin.yml up",
+    "start:linked": "npm run down:linked && npm run build:linked && docker-compose -f docker-compose.linked.yml up",
+    "start:no-admin": "npm run down:no-admin && npm run build:no-admin && docker-compose up",
+    "stop": "docker-compose -f docker-compose.admin.yml stop",
+    "stop:no-admin": "docker-compose stop"
+  }
+}

@@ -96,9 +96,26 @@ http {
 
   # ELB/ALB is likely set to 60s; ensure we stay open at least that long
   keepalive_timeout             120;
-  send_timeout                  10;
-  proxy_read_timeout            10;
+  # send to upstream server
   proxy_send_timeout            10;
+EOB
+
+if [ "${IS_PROD}" ]
+then
+  cat <<EOB
+  # receive from upstream server
+  proxy_read_timeout            10;
+EOB
+else
+  cat <<EOB
+  # receive from upstream server
+  proxy_read_timeout            30;
+EOB
+fi
+
+cat <<EOB
+  # send to client
+  send_timeout                  10;
 
   set_real_ip_from              0.0.0.0/0;
   real_ip_header                X-Forwarded-For;
@@ -283,7 +300,7 @@ then
 EOB
 else
   cat <<EOB
-      proxy_set_header          'X-FunctionName' '${LAMBDA_RESOLVER}';
+      proxy_set_header          'X-FunctionName' '${LAMBDA_RESOLVER}:production';
       proxy_set_header          'Content-Type' 'application/json';
       proxy_pass                ${LAMBDA_PROXY:-http://0.0.0.0:${NODEJS_PORT:-8081}}\$uri\$query_params;
 EOB
@@ -305,7 +322,9 @@ cat <<EOB
     }
 
     location ~ ^(${CONTEXT_PATH}|${API_PREFIX})/(resources)(/.*|$) {
-      set                       \$p \$2\$3;
+      set                       \$command \$2;
+      set                       \$file \$3;
+      set                       \$p \$command\$file;
 
       proxy_intercept_errors    on;
       error_page                400 403 404 418 = @engine;
@@ -321,7 +340,7 @@ EOB
 else
   cat <<EOB
       root                      /etc/nginx/resources;
-      try_files                 \$3 =404;
+      try_files                 \$file =404;
 EOB
 fi
 
@@ -329,7 +348,9 @@ cat <<EOB
     }
 
     location ~ ^(${CONTEXT_PATH}|${API_PREFIX})/(assets|dist)(/.*|$) {
-      set                       \$p \$2\$3;
+      set                       \$command \$2;
+      set                       \$file \$3;
+      set                       \$p \$command\$file;
 
       proxy_intercept_errors    on;
       error_page                400 403 404 = @engine;
@@ -350,7 +371,7 @@ EOB
 else
   cat <<EOB
       root                      /etc/nginx/dist;
-      try_files                 \$3 =404;
+      try_files                 \$file =404;
 EOB
 fi
 
@@ -480,11 +501,7 @@ cat <<EOB
     }
 
     location ~ ^${CONTEXT_PATH}/api/v2/resolve/?$ {
-      if (\$arg_uri) {
-        set_unescape_uri        \$u \$arg_uri;
-        return                  302 " ${API_PREFIX}/resolve\$u";
-      }
-      return 400;# "Bad Request: 'uri' parameter is required for ${CONTEXT_PATH}/api/v2/resolve endpoint";
+      rewrite                   (.*) ${API_PREFIX}/resolve;
     }
     # end of admin rewrites
 

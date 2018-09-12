@@ -13,6 +13,8 @@ const s3 = new AWS.S3({region: 'us-east-1'})
 const lambda = new AWS.Lambda({region: 'us-east-1'})
 
 const {
+  datadogApiKey,
+  fusionRelease,
   S3Bucket,
   S3ResolverGeneratorKey: S3Key,
   resolverGeneratorArtifact
@@ -21,6 +23,7 @@ const {
 const awsUpload = promisify(s3.upload.bind(s3))
 const createFunction = promisify(lambda.createFunction.bind(lambda))
 const updateFunctionCode = promisify(lambda.updateFunctionCode.bind(lambda))
+const updateFunctionConfig = promisify(lambda.updateFunctionConfiguration.bind(lambda))
 
 const FunctionName = 'fusion-generator'
 
@@ -49,7 +52,9 @@ async function createGeneratorFunction () {
       },
       Environment: {
         Variables: {
-          DEBUG: 'fusion:*'
+          DEBUG: 'fusion:*',
+          DATADOG_API_KEY: datadogApiKey,
+          FUSION_RELEASE: fusionRelease
         }
       },
       Handler: 'resolver-generator/src/index.handler',
@@ -83,11 +88,36 @@ async function updateGeneratorCode () {
   }
 }
 
+// used to reliably set the DATADOG_API_KEY and FUSION_RELEASE in published versions
+async function updateGeneratorConfig () {
+  debug(`updating resolver-generator lambda with latest configuration`)
+  try {
+    const result = await updateFunctionConfig(
+      {
+        FunctionName,
+        Environment: {
+          Variables: {
+            DEBUG: 'fusion:*',
+            DATADOG_API_KEY: datadogApiKey,
+            FUSION_RELEASE: fusionRelease
+          }
+        }
+      }
+    )
+    debug(`updated resolver-generator lambda configuration`)
+    return result
+  } catch (e) {
+    debug(`error updating resolver-generator configuration: ${e}`)
+    throw e
+  }
+}
+
 async function main () {
   await upload(path.resolve(__dirname, '../dist/resolver-generator.zip'))
   try {
     return await createGeneratorFunction()
   } catch (e) {
+    await updateGeneratorConfig()
     return updateGeneratorCode()
   }
 }

@@ -3,10 +3,12 @@
 const debug = require('debug')('fusion:models:rendering')
 
 const {
-  defaultOutputType,
-  isDev,
-  version
+  defaultOutputType
 } = require('../../../environment')
+
+const { components } = require('../../../environment/manifest')
+
+const allOutputTypes = Object.keys(components.outputTypes)
 
 const model = require('../../dao')
 
@@ -20,40 +22,13 @@ const {
 const getSource = require('../sources')
 
 const {
+  fetchCssHash,
   fetchFile,
-  pushFile
-} = require('../../assets/io')
-
-// return the full object (not just cssFile value) because if it doesn't exist, we need to calculate it
-// the calculation returns an object with a cssFile property
-// for simplicity, we'll just unwrap that property from whatever we get
-const fetchCssHash = (isDev)
-  ? (name, outputType = defaultOutputType) => fetchFile(`${name}/${outputType}.css.json`)
-    .then((json) => JSON.parse(json))
-    .catch(() => null)
-  : (name, outputType = defaultOutputType) => model('hash').get({version, id: `${name}/${outputType}`})
-
-const pushCssHash = (isDev)
-  ? (name, outputType = defaultOutputType, cssFile) => pushFile(`${name}/${outputType}.css.json`, JSON.stringify({cssFile}))
-  : (name, outputType = defaultOutputType, cssFile) => model('hash').put({id: `${name}/${outputType}`, version, cssFile})
-
-const getJson = (isDev)
-  ? (type, id) => model(type).get(id)
-    .then((data) => (type === 'rendering')
-      ? data
-      // if page/template, we need to get the actual rendering object
-      : (() => {
-        const version = data && data.published && data.versions && data.versions[data.published]
-        const head = version && version.head
-        return head && model('rendering').get(head)
-      })()
-    )
-  : (type, id) => model(type).get(id)
-
-const putJson = (isDev)
-  // do nothing
-  ? (type, json) => {}
-  : (type, json) => model(type).put(json)
+  getJson,
+  pushCssHash,
+  pushFile,
+  putJson
+} = require('../../io')
 
 class Rendering {
   constructor (type, id, json) {
@@ -82,6 +57,10 @@ class Rendering {
             })
       )
     return this.jsonPromise
+  }
+
+  async compileAll () {
+    return Promise.all(allOutputTypes.map((outputType) => this.compile(outputType)))
   }
 
   async compile (outputType = defaultOutputType) {
@@ -127,20 +106,20 @@ class Rendering {
     // but that's what you get with legacy data
     this.contentPromise = this.contentPromise ||
       (
-        (this.type !== 'page')
+        (this.type === 'template')
           ? Promise.resolve()
           : this.getJson()
             .then((json) => {
               const configs = json.globalContentConfig
-              return (!configs)
-                ? null
-                : getSource(configs.contentService)
+              return (configs && configs.contentService && configs.contentConfigValues)
+                ? getSource(configs.contentService)
                   .then((source) => source.fetch(Object.assign(json.uri ? {uri: json.uri} : {}, {'arc-site': arcSite}, configs.contentConfigValues)))
                   .then((document) => ({
                     source: configs.contentService,
                     key: configs.contentConfigValues,
                     document
                   }))
+                : null
             })
       )
     return this.contentPromise
@@ -183,6 +162,10 @@ class Rendering {
               ? Promise.all([
                 putJson(this.type, Object.assign({}, this.json, {id: this.id})),
                 publishToOtherVersions(uri, this.json)
+                  .catch((err) => {
+                    // do not throw while trying to publish to old versions
+                    console.error(err)
+                  })
               ])
               : Promise.resolve()
           )

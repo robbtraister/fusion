@@ -17,15 +17,13 @@ const unpack = require('../../utils/unpack')
 
 const timer = require('../../timer')
 
-const getSource = require('../../models/sources')
-
 const fusionProperties = require('fusion:properties')
 
 const getTree = require('../shared/compile/tree')
 
 const {
   fetchFile
-} = require('../../assets/io')
+} = require('../../io')
 
 const {
   componentDistRoot,
@@ -35,6 +33,8 @@ const {
 } = require('../../../environment')
 
 const { components } = require('../../../environment/manifest')
+
+const { sendMetrics, METRIC_TYPES } = require('../../utils/send-metrics')
 
 const fileExists = (fp) => {
   try {
@@ -90,17 +90,16 @@ function getFusionScript (globalContent, globalContentConfig, contentCache, outp
   const condensedCache = {}
   Object.keys(contentCache)
     .forEach(sourceName => {
-      const source = getSource(sourceName)
       const sourceCache = contentCache[sourceName]
-      const condensedSourceCache = condensedCache[sourceName] = {
-        entries: {},
-        expiresAt: now + ((source && source.ttl) || 300000)
-      }
       Object.keys(sourceCache)
         .forEach(key => {
-          const filtered = sourceCache[key].filtered
-          if (filtered) {
-            condensedSourceCache.entries[key] = {cached: filtered}
+          const keyCache = sourceCache[key]
+          if (keyCache.source && keyCache.filtered) {
+            const condensedSourceCache = condensedCache[sourceName] = condensedCache[sourceName] || {
+              entries: {},
+              expiresAt: now + ((keyCache.source && keyCache.source.ttl) || 300000)
+            }
+            condensedSourceCache.entries[key] = {cached: keyCache.filtered}
           }
         })
     })
@@ -138,12 +137,17 @@ const render = function render ({Component, request, content, _website}) {
           siteProperties: fusionProperties(_website)
         }
       )
-      debugTimer(`create element`, elementTic.toc())
+      const elementElapsedTime = elementTic.toc()
+      debugTimer(`create element`, elementElapsedTime)
+      sendMetrics([{type: METRIC_TYPES.RENDER_DURATION, value: elementElapsedTime, tags: ['render:element']}])
       const htmlTic = timer.tic()
       const html = ReactDOM.renderToStaticMarkup(element)
-      debugTimer(`render html`, htmlTic.toc())
+      const htmlElapsedTime = htmlTic.toc()
+      debugTimer(`render html`, htmlElapsedTime)
+      sendMetrics([{type: METRIC_TYPES.RENDER_DURATION, value: htmlElapsedTime, tags: ['render:html']}])
       resolve(html)
     } catch (e) {
+      sendMetrics([{type: METRIC_TYPES.RENDER_RESULT, value: 1, tags: ['result:error']}])
       reject(e)
     }
   })
@@ -151,7 +155,9 @@ const render = function render ({Component, request, content, _website}) {
   let tic = timer.tic()
   return renderHTML()
     .then((html) => {
-      debugTimer('first render', tic.toc())
+      const elapsedTime = tic.toc()
+      debugTimer('first render', elapsedTime)
+      sendMetrics([{type: METRIC_TYPES.RENDER_DURATION, value: elapsedTime, tags: ['render:first-render']}])
       tic = timer.tic()
 
       // collect content cache into Promise array
@@ -173,12 +179,16 @@ const render = function render ({Component, request, content, _website}) {
         // if feature content is requested, wait for it, then render again
         : Promise.all(contentPromises)
           .then(() => {
-            debugTimer('content hydration', tic.toc())
+            const contentHydrationDuration = tic.toc()
+            debugTimer('content hydration', contentHydrationDuration)
+            sendMetrics([{type: METRIC_TYPES.RENDER_DURATION, value: contentHydrationDuration, tags: ['render:content-hydration']}])
             tic = timer.tic()
           })
           .then(renderHTML)
           .then((html) => {
-            debugTimer('second render', tic.toc())
+            const secondRenderDuration = tic.toc()
+            debugTimer('second render', secondRenderDuration)
+            sendMetrics([{type: METRIC_TYPES.RENDER_DURATION, value: secondRenderDuration, tags: ['render:second-render']}])
             return html
           })
 

@@ -1,6 +1,6 @@
 # Isomorphic vs. Server vs. SPA rendering 
 
-One of the enormous benefits of writing Fusion Feature Packs as React components is the ability to render them ["isomorphically"](https://en.wikipedia.org/wiki/Isomorphic_JavaScript) - meaning on both the server-side and again on the client-side. However, isomorphic rendering isn't the only option when writing Features - Fusion gives you the flexibility to choose what environment you want each of your Features to render in.
+One of the enormous benefits of writing Fusion Feature Packs as React components is the ability to render them ["isomorphically"](https://en.wikipedia.org/wiki/Isomorphic_JavaScript) - meaning on both the server-side and again on the client-side. However, isomorphic rendering isn't the only option when writing Features - Fusion gives you the flexibility to choose what context you want each of your Features to render in.
 
 For Fusion's purposes, Output Types will always be rendered server-side only, since they are the HTML shell of the page itself. Layouts and Chains will always be rendered isomorphically, since they may contain multiple Features - some that are server-side only, and some client-side only. Features, however, can be configured to render isomorphically, server-side only, or client-side only. Let's talk about why you'd want to use each rendering option, and how to do so.
 

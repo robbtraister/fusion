@@ -3,7 +3,12 @@
 Now that we've created and configured our Feature Pack repo, we're ready to run Fusion locally so we can start developing components and seeing them on a webpage.
 
 ## Docker
+
 The Fusion engine and services that support it run in Docker containers that can be spun up for local development. To do so, you'll need to [download and install Docker](https://www.docker.com/community-edition) if you haven't already. Once you've installed Docker, you'll probably want to [allocate at least 4GB of RAM](https://arcpublishing.atlassian.net/wiki/spaces/APF/pages/273186892/Running+Fusion+with+the+Pagebuilder+Admin+times+out+doesn+t+work+makes+my+computer+sound+like+a+jet+engine) to it so it has the resources necessary to run all the services Fusion requires.
+
+## Node and npm
+
+We'll be running most of the commands related to starting, stopping and updating our Feature Packs using the [Node.js](https://nodejs.org/en/) package manager, [npm](https://www.npmjs.com/). You'll need those installed on your machine solely to run scripts, so it matters very little what version of npm you're using. If you don't have them already, [go ahead and download Node.js (which includes npm)](https://www.npmjs.com/get-npm) and you should be good to go.
 
 ## Starting Fusion
 

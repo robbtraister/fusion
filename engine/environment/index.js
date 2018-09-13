@@ -37,6 +37,7 @@ const mongoUrl = variables.MONGO_URL
 const onDemand = /^true$/i.test(variables.ON_DEMAND)
 const port = variables.PORT || 8080
 const region = variables.REGION || 'us-east-1'
+const s3Bucket = variables.S3BUCKET || 'pagebuilder-fusion'
 const semver = variables.FUSION_RELEASE
 const version = variables.AWS_LAMBDA_FUNCTION_VERSION || '$LATEST'
 
@@ -82,6 +83,7 @@ module.exports = {
   onDemand,
   port,
   region,
+  s3Bucket,
   schemasDistRoot,
   schemasSrcRoot,
   semver,

@@ -113,18 +113,19 @@ const generateManifest = (collection, outputTypeManifest) => {
     Object.values(componentMap)
       .forEach((componentType) => {
         Object.values(outputTypeManifest)
-          .forEach((outputTypeConfig) => {
-            if (outputTypeConfig.fallback.length && !componentType.outputTypes.hasOwnProperty(outputTypeConfig.type)) {
-              const fallbackOutputType = outputTypeConfig.fallback.find(
-                (fallbackOutputType) =>
-                  componentType.outputTypes.hasOwnProperty(fallbackOutputType)
-              )
-              componentType.outputTypes[outputTypeConfig.type] = Object.assign(
-                {},
-                componentType.outputTypes[fallbackOutputType],
-                {outputType: outputTypeConfig.type}
-              )
-            }
+          .filter((outputTypeConfig) => !componentType.outputTypes.hasOwnProperty(outputTypeConfig.type))
+          .filter((missingOutputTypeConfig) => missingOutputTypeConfig.fallback.length)
+          .forEach((outputTypeConfigWithFallback) => {
+            const fallbackOutputType = outputTypeConfigWithFallback.fallback.find(
+              (fallbackOutputType) =>
+                componentType.outputTypes.hasOwnProperty(fallbackOutputType)
+            )
+
+            componentType.outputTypes[outputTypeConfigWithFallback.type] = Object.assign(
+              {},
+              componentType.outputTypes[fallbackOutputType],
+              {outputType: outputTypeConfigWithFallback.type}
+            )
           })
       })
   } else {

@@ -28,8 +28,10 @@ then
 else
   if [ "${BRANCH}" ]
   then
+    VERSION="${BRANCH}"
     TAG=$(findNext "${BRANCH}")
   else
+    VERSION=''
     TAG='latest'
   fi
 fi
@@ -43,7 +45,7 @@ pushImage () {
   name=$1 && \
   docker push "quay.io/washpost/fusion-${name}:${TAG}"
 
-  if [ "${RELEASE}" ]
+  if [ "${VERSION}" ]
   then
     # make a minor image tag so users can stay updated without specifying a point release
     docker tag "quay.io/washpost/fusion-${name}:${TAG}" "quay.io/washpost/fusion-${name}:${VERSION}" && \
@@ -99,7 +101,7 @@ addGitTags () {
     ); # allow the above to fail; ignore error
   fi
 
-  if [ "${RELEASE}" ] || [ "${BRANCH}" ]
+  if [ "${VERSION}" ]
   then
     git tag "${TAG}" && \
     git push --tags

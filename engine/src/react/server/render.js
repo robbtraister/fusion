@@ -208,7 +208,7 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
                     : MetaTags()
                 },
                 MetaTags,
-                MetaValue ({name, default: defaultValue}) {
+                metaValue ({name, default: defaultValue}) {
                   return (name && metas[name] && metas[name].value) || defaultValue
                 },
 

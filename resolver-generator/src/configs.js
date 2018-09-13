@@ -1,6 +1,6 @@
 'use strict'
 
-const S3Bucket = 'pagebuilder-fusion'
+const S3Bucket = process.env.S3BUCKET || 'pagebuilder-fusion'
 
 const {
   getAccountId

@@ -70,7 +70,6 @@ export default [
     element: 'footer'
   },
 ]
-
 ```
 
 This Layout would then result in HTML resembling the following on the webpage:

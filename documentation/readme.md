@@ -2,21 +2,27 @@
 
 ## API
 
-#### Feature Pack
+### Feature Pack
 
 | Components |
 |---|
+| [@Consumer](./api/feature-pack/components/consumer.md) |
+| [Output Type](./api/feature-pack/components/output-type.md) |
+| [Feature](./api/feature-pack/components/feature.md) |
+| [Layout](./api/feature-pack/components/layout.md) |
+| [Chain](./api/feature-pack/components/chain.md) |
 
 | Content |
 |---|
+| [Content Sources](./api/feature-pack/content/source.md) |
+| [Content Schemas](./api/feature-pack/content/schema.md) |
 
-| Environment |
-|---|
+[Environment Variables](./api/feature-pack/environment.md)
 
-| Properties |
-|---|
+[Site Properties](./api/feature-pack/properties.md)
 
-#### HTTP Endpoints
+### HTTP Endpoints
+
 [API](./)
 
 ## Recipes

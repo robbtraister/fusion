@@ -125,7 +125,67 @@
     ]
   },
   {
+    "title": "API",
+    "items": [
+      {
+        "title": "Feature Pack",
+        "items": [
+          {
+            "title": "Components",
+            "items": [
+              {
+                "title": "@Consumer",
+                "path": "./api/feature-pack/components/consumer.md"
+              },
+              {
+                "title": "Output Type",
+                "path": "./api/feature-pack/components/output-type.md"
+              },
+              {
+                "title": "Feature",
+                "path": "./api/feature-pack/components/Feature.md"
+              },
+              {
+                "title": "Layout",
+                "path": "./api/feature-pack/components/layout.md"
+              },
+              {
+                "title": "Chain",
+                "path": "./api/feature-pack/components/Chain.md"
+              }
+            ]
+          },
+          {
+            "title": "Content",
+            "items": [
+              {
+                "title": "Content Source",
+                "path": "./api/feature-pack/content/source.md"
+              },
+              {
+                "title": "Content Schema",
+                "path": "./api/feature-pack/content/schema.md"
+              }
+            ]
+          },
+          {
+            "title": "Environment Variables",
+            "path": "./api/feature-pack/environment.md"
+          },
+          {
+            "title": "Site Properties",
+            "path": "./api/feature-pack/properties.md"
+          }
+        ]
+      },
+      {
+        "title": "HTTP Endpoints",
+        "path": "./api/http/API.md"
+      }
+    ]
+  },
+  {
     "title": "Glossary",
-    "path": "./recipes/glossary.md"
+    "path": "./glossary.md"
   }
 ]

@@ -2,9 +2,6 @@
 
 'use strict'
 
-const fs = require('fs')
-const path = require('path')
-
 const debugTimer = require('debug')('fusion:timer:react:render')
 
 const React = require('react')
@@ -22,8 +19,12 @@ const fusionProperties = require('fusion:properties')
 const getTree = require('../shared/compile/tree')
 
 const {
-  fetchFile
-} = require('../../io')
+  cssTagGenerator,
+  fusionTagGenerator,
+  libsTagGenerator,
+  metaTagGenerator,
+  stylesGenerator
+} = require('./tags')
 
 const {
   componentDistRoot,
@@ -35,74 +36,6 @@ const {
 const { components } = require('../../../environment/manifest')
 
 const { sendMetrics, METRIC_TYPES } = require('../../utils/send-metrics')
-
-const fileExists = (fp) => {
-  try {
-    fs.accessSync(fp, fs.constants.R_OK)
-    return true
-  } catch (e) {
-    return false
-  }
-}
-
-const outputTypeCssFileExists = (outputType) => fileExists(path.resolve(componentDistRoot, 'output-types', `${outputType}.css`))
-const outputTypeHasCss = (isDev)
-  // don't cache it in dev because it might change
-  ? outputTypeCssFileExists
-  // cache it in prod because it won't change
-  : (() => {
-    const _outputTypeHasCss = {}
-    return (outputType) => {
-      if (!_outputTypeHasCss.hasOwnProperty(outputType)) {
-        _outputTypeHasCss[outputType] = outputTypeCssFileExists(outputType)
-      }
-      return _outputTypeHasCss[outputType]
-    }
-  })()
-
-const engineScript = React.createElement(
-  'script',
-  {
-    key: 'fusion-engine-script',
-    id: 'fusion-engine-script',
-    type: 'application/javascript',
-    src: `${contextPath}/dist/engine/react.js?v=${version}`,
-    defer: true
-  }
-)
-
-function escapeContent (content) {
-  return JSON.stringify(content).replace(/<\/script>/g, '<\\/script>')
-}
-
-function getFusionScript (globalContent, globalContentConfig, contentCache, outputType, arcSite) {
-  const now = +new Date()
-  const condensedCache = {}
-  Object.keys(contentCache)
-    .forEach(sourceName => {
-      const sourceCache = contentCache[sourceName]
-      Object.keys(sourceCache)
-        .forEach(key => {
-          const keyCache = sourceCache[key]
-          if (keyCache.source && keyCache.filtered) {
-            const condensedSourceCache = condensedCache[sourceName] = condensedCache[sourceName] || {
-              entries: {},
-              expiresAt: now + ((keyCache.source && keyCache.source.ttl) || 300000)
-            }
-            condensedSourceCache.entries[key] = {cached: keyCache.filtered}
-          }
-        })
-    })
-
-  return `window.Fusion=window.Fusion||{};` +
-    `Fusion.contextPath='${contextPath}';` +
-    `Fusion.outputType='${outputType}';` +
-    (arcSite ? `Fusion.arcSite='${arcSite}';` : '') +
-    `Fusion.lastModified=${now};` +
-    `Fusion.globalContent=${escapeContent(globalContent || {})};` +
-    `Fusion.globalContentConfig=${escapeContent(globalContentConfig || {})};` +
-    `Fusion.contentCache=${escapeContent(condensedCache)}`
-}
 
 const getAncestors = function getAncestors (node) {
   return (node && node.children)
@@ -239,66 +172,12 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
 
           const metas = (json.meta || {})
 
-          const getMetaElement = (name, defaultValue) =>
-            (metas[name])
-              ? React.createElement(
-                'meta',
-                {
-                  key: `meta-${name}`,
-                  name,
-                  content: metas[name].value || defaultValue
-                }
-              )
-              : null
+          const getMetaTag = metaTagGenerator(metas)
 
           const MetaTags = () =>
-            Object.keys(metas).filter(name => metas[name].html).map(getMetaElement)
+            Object.keys(metas).filter(name => metas[name].html).map(getMetaTag)
 
-          const CssTags = ({children}) => {
-            Component.inlines.cssLinks = Component.inlines.cssLinks || {
-              cached: {
-                outputTypeHref: undefined,
-                templateHref: undefined
-              },
-              fetched: rendering.getCssFile()
-                .catch(() => null)
-                .then((templateCssFile) => {
-                  Component.inlines.cssLinks.cached = {
-                    outputTypeHref: (outputTypeHasCss(outputType)) ? `${contextPath}/dist/components/output-types/${outputType}.css?v=${version}` : null,
-                    templateHref: (templateCssFile) ? `${contextPath}/dist/${templateCssFile}?v=${version}` : null
-                  }
-                })
-            }
-
-            return (children)
-              ? children(Component.inlines.styles.cached)
-              // even if cssFile is null, add the link tag with no href
-              // so it can be replaced by an updated template script later
-              : [
-                (Component.inlines.cssLinks.cached.outputTypeHref)
-                  ? React.createElement(
-                    'link',
-                    {
-                      key: 'fusion-output-type-styles',
-                      id: 'fusion-output-type-styles',
-                      rel: 'stylesheet',
-                      type: 'text/css',
-                      href: Component.inlines.cssLinks.cached.outputTypeHref
-                    }
-                  )
-                  : null,
-                React.createElement(
-                  'link',
-                  {
-                    key: 'fusion-template-styles',
-                    id: 'fusion-template-styles',
-                    rel: 'stylesheet',
-                    type: 'text/css',
-                    href: Component.inlines.cssLinks.cached.templateHref
-                  }
-                )
-              ]
-          }
+          const CssTags = cssTagGenerator({inlines: Template.inlines, rendering, outputType})
 
           const Component = (props) => {
             return React.createElement(
@@ -312,33 +191,8 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
                 CssLinks: CssTags,
                 CssTags,
 
-                Fusion: () => {
-                  return React.createElement(
-                    'script',
-                    {
-                      type: 'application/javascript',
-                      dangerouslySetInnerHTML: { __html: getFusionScript(props.globalContent, props.globalContentConfig, Template.contentCache, outputType, props.arcSite) }
-                    }
-                  )
-                },
-
-                Libs: () => {
-                  const templateScript = React.createElement(
-                    'script',
-                    {
-                      key: 'fusion-template-script',
-                      id: 'fusion-template-script',
-                      type: 'application/javascript',
-                      src: `${contextPath}/dist/${name}/${outputType}.js?v=${version}`,
-                      defer: true
-                    }
-                  )
-
-                  return [
-                    engineScript,
-                    templateScript
-                  ]
-                },
+                Fusion: fusionTagGenerator(props.globalContent, props.globalContentConfig, Template.contentCache, outputType, props.arcSite),
+                Libs: libsTagGenerator({name, outputType}),
 
                 /*
                  * To insert all meta tags
@@ -348,51 +202,17 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
                  * To insert a single meta tag
                  *   <props.MetaTag name='title' />
                  */
-                MetaTag: ({name, default: defaultValue}) => {
+                MetaTag ({name, default: defaultValue}) {
                   return (name)
-                    ? getMetaElement(name)
+                    ? getMetaTag(name)
                     : MetaTags()
                 },
-
                 MetaTags,
-
-                MetaValue: ({name, default: defaultValue}) => {
+                MetaValue ({name, default: defaultValue}) {
                   return (name && metas[name] && metas[name].value) || defaultValue
                 },
 
-                Styles: ({children}) => {
-                  const outputTypeStylesPromise = fetchFile(`components/output-types/${outputType}.css`)
-                    .catch(() => null)
-
-                  const templateStylesPromise = rendering.getStyles()
-                    .catch(() => null)
-
-                  Component.inlines.styles = Component.inlines.styles || {
-                    cached: {
-                      outputTypeStyles: undefined,
-                      templateStyles: undefined
-                    },
-                    fetched: Promise.all([
-                      outputTypeStylesPromise,
-                      templateStylesPromise
-                    ])
-                      .then(([outputTypeStyles, templateStyles]) => {
-                        Component.inlines.styles.cached = {
-                          outputTypeStyles,
-                          templateStyles
-                        }
-                      })
-                  }
-
-                  return (children)
-                    ? children(Component.inlines.styles.cached)
-                    : React.createElement(
-                      'style',
-                      {
-                        dangerouslySetInnerHTML: { __html: `${Component.inlines.styles.cached.outputTypeStyles || ''}${Component.inlines.styles.cached.templateStyles || ''}` }
-                      }
-                    )
-                },
+                Styles: stylesGenerator({inlines: Template.inlines, outputType, rendering}),
 
                 ...props
               },

@@ -28,6 +28,10 @@ upload () {
 
 S3BUCKET='pagebuilder-fusion' upload
 
-set-profile refresh-pb
-S3BUCKET='arc-pagebuilder-discrete-us-east-1' upload
-S3BUCKET='arc-pagebuilder-discrete-eu-central-1' upload
+#
+# Re-enable the following commands after figuring out how to setup clokta
+#
+
+# set-profile refresh-pb
+# S3BUCKET='arc-pagebuilder-discrete-us-east-1' upload
+# S3BUCKET='arc-pagebuilder-discrete-eu-central-1' upload

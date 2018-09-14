@@ -36,7 +36,7 @@ else
   else
     if [ "${DEV}" ]
     then
-      VERSION=`${VERSION}-beta`
+      VERSION="${VERSION}-beta"
       TAG=$(findNext "${VERSION}" 1)
     else
       VERSION=''

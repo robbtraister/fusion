@@ -21,18 +21,27 @@ findNext () {
   echo "${base}.${i}"
 }
 
+# we create a git tag of TAG (except 'latest')
+# we create a docker image tagged with both VERSION and TAG (e.g., 0.2 and 0.2.1)
+# if RELEASE, we create/update a git branch named `release-${VERSION}`
+VERSION=$(python -c "import json; print json.load(open('./version.json'))['version']")
 if [ "${RELEASE}" ]
 then
-  VERSION=$(python -c "import json; print json.load(open('./version.json'))['version']")
   TAG=$(findNext "${VERSION}")
 else
   if [ "${BRANCH}" ]
   then
     VERSION="${BRANCH}"
-    TAG=$(findNext "${BRANCH}")
+    TAG=$(findNext "${VERSION}" 1)
   else
-    VERSION=''
-    TAG='latest'
+    if [ "${DEV}" ]
+    then
+      VERSION=`${VERSION}-beta`
+      TAG=$(findNext "${VERSION}" 1)
+    else
+      VERSION=''
+      TAG='latest'
+    fi
   fi
 fi
 

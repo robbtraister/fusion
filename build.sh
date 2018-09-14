@@ -21,6 +21,9 @@ findNext () {
   echo "${base}.${i}"
 }
 
+# we create a git tag of TAG (except 'latest')
+# we create a docker image tagged with both VERSION and TAG (e.g., 0.2 and 0.2.1)
+# if RELEASE, we create/update a git branch named `release-${VERSION}`
 if [ "${RELEASE}" ]
 then
   VERSION=$(python -c "import json; print json.load(open('./version.json'))['version']")
@@ -28,9 +31,16 @@ then
 else
   if [ "${BRANCH}" ]
   then
-    TAG=$(findNext "${BRANCH}" 1)
+    VERSION="${BRANCH}"
+    TAG=$(findNext "${VERSION}" 1)
   else
-    TAG='latest'
+    VERSION=''
+    if [ "${BETA}" ]
+    then
+      TAG='beta'
+    else
+      TAG='latest'
+    fi
   fi
 fi
 
@@ -43,7 +53,7 @@ pushImage () {
   name=$1 && \
   docker push "quay.io/washpost/fusion-${name}:${TAG}"
 
-  if [ "${RELEASE}" ]
+  if [ "${VERSION}" ]
   then
     # make a minor image tag so users can stay updated without specifying a point release
     docker tag "quay.io/washpost/fusion-${name}:${TAG}" "quay.io/washpost/fusion-${name}:${VERSION}" && \
@@ -99,7 +109,7 @@ addGitTags () {
     ); # allow the above to fail; ignore error
   fi
 
-  if [ "${RELEASE}" ] || [ "${BRANCH}" ]
+  if [ "${VERSION}" ]
   then
     git tag "${TAG}" && \
     git push --tags

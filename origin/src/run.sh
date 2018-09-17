@@ -13,7 +13,7 @@ test() {
 start() {
   test && \
     (
-      PORT=${NODEJS_PORT:-8081} node ./src/nodejs/cluster & \
+      PORT=${NODEJS_PORT:-8090} node ./src/nodejs/cluster & \
       nginx -p ./ -c ./conf/nginx.conf \
     )
 }

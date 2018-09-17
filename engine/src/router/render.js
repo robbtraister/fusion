@@ -29,6 +29,8 @@ function getTypeRouter (routeType) {
     (req, res, next) => {
       const tic = timer.tic()
 
+      const cacheRender = req.get('Fusion-Render-Cache') === 'true'
+
       const outputType = /^(false|none|off|0)$/i.test(req.query.outputType)
         ? null
         : req.query.outputType || defaultOutputType
@@ -65,7 +67,13 @@ function getTypeRouter (routeType) {
         // template will already have content populated by resolver
         // use Object.assign to default to the resolver content
         .then(([Component, content]) => render(Object.assign({content}, payload, {Component})))
-        .then(data => { res.send(`${outputType ? '<!DOCTYPE html>' : ''}${data}`) })
+        .then(data => `${outputType ? '<!DOCTYPE html>' : ''}${data}`)
+        .then(html =>
+          (cacheRender)
+            ? html
+            : html
+        )
+        .then(html => { res.send(html) })
         .then(() => {
           debugTimer('complete response', tic.toc())
         })

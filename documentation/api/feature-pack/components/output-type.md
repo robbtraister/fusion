@@ -12,6 +12,8 @@ An Output Type is expected to be stored and named in the following format:
 
 - `/src/components/output-types/*.(js|jsx)`
 
+> This will build one an Output Type component where the `*` portion of the filepath represents the name of the Output Type.
+
 ##### Example
 
 ```jsx

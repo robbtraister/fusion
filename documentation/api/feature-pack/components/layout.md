@@ -10,11 +10,12 @@ A Layout is expected to be stored and named in one of the following formats:
 
 - `/src/components/layouts/*.(js|jsx)`
 
-> This will build one version of this component that is used by all Output Types
+> This will build one version of this component that is used by all Output Types,
+> where the `*` portion of the filepath represents the name of the Layout.
 
 - `/src/components/layouts/*/{outputTypeName}.(js|jsx)`
 
-> This will build a version of this component that corresponds to the name of the Output Type in the filename. If there is a `default.(js|jsx)` component, that component will be rendered as a fallback if no file with the same name of the relevant Output Type is found.
+> This will build a version of this component that corresponds to the name of the Output Type in the filename. The `*` portion of the filepath represents the name of the Layout. If there is a `default.(js|jsx)` component, that component will be rendered as a fallback if no file with the same name of the relevant Output Type is found.
 
 ##### Example
 

@@ -79,7 +79,7 @@ function getTypeRouter (routeType) {
           return (cacheRender && payload.request && payload.request.uri)
             ? Promise.resolve(url.parse(payload.request.uri).pathname)
               .then((pathname) => /\/$/.test(pathname) ? path.join(pathname, 'index.html') : pathname)
-              .then((filePath) => pushHtml(filePath, html))
+              .then((filePath) => pushHtml(path.join(payload._website || 'default', outputType, filePath), html))
               .then(() => html)
             : html
         })

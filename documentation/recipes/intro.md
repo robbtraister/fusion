@@ -8,7 +8,7 @@ In short, Fusion is an engine that dynamically crafts and serves webpages to you
 - Built with modern industry standards that *developers* already understand and use
 - Easy to build functional, composable, interactive web pages in JavaScript
 
-Fusion works in concert with the PageBuilder Admin and the rest of the Arc ecosystem to allow *authors* and *editors* to configure how the content on their website is viewed. To learn more about PageBuilder and its role in the Arc ecosystem, [check out this documentation](TODO: add link).
+Fusion works in concert with the PageBuilder Admin and the rest of the Arc ecosystem to allow *authors* and *editors* to configure how the content on their website is viewed. To learn more about PageBuilder and its role in the Arc ecosystem, [check out this documentation](https://arcpublishing.gitbooks.io/getting-up-and-running-with-arc/content/chapter1/pagebuilder.html).
 
 ## Who uses Fusion?
 Fusion can be used by many different stakeholders, but we'll identify four of the main ones below:
@@ -29,7 +29,7 @@ Fusion uses inputs from various sources to dynamically create webpages in real-t
 
 First, Fusion requires **content**; this can include text, images, videos, audio, and other multimedia content that you want to deliver to your *readers*. In a typical Arc implementation, most content will come from a source like *content-api*, which might include stories written by *authors* in Ellipsis, photos added to Anglerfish, videos added to Goldfish, and more. However, you can also consume content from external sources, for instance a weather API like [Dark Sky](https://darksky.net/dev) or a Nutrition API like [Nutritionix](https://www.nutritionix.com/business/api), as long as it can be consumed in JSON format.
 
-Next, Fusion relies on **code** provided by a **Feature Pack**. Feature Packs are written as [React](https://reactjs.org/) components that can be universally rendered on both the server and client into HTML web pages. Components in a Feature Pack are used to display content, as well as provide functionality to the user. Feature Packs have defined guidelines for how they should be structured and how they consume content, which are outlined further in [the API documentation](TODO: add link).
+Next, Fusion relies on **code** provided by a **Feature Pack**. Feature Packs are written as [React](https://reactjs.org/) components that can be universally rendered on both the server and client into HTML web pages. Components in a Feature Pack are used to display content, as well as provide functionality to the user. Feature Packs have defined guidelines for how they should be structured and how they consume content, which are outlined further in [the API documentation](../api).
 
 Finally, Fusion needs some **configuration** from options set in the PageBuilder Admin. These configurations include which features from the **Feature Pack** should exist on a page or template, where those features should live, which URL patterns should route to those pages and/or templates, and which content sources each page or template should pull from. *Editors* and *developers* will typically work within the PageBuilder admin to create new pages and templates, change layout configurations, add resolvers (URL matchers), and more. You can think of these **configuration** options as the glue that tie **content** and **code** together to create a structured web page.
 

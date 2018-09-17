@@ -75,7 +75,7 @@ Right now, our component doesn't do much - we are initializing an empty `movies`
   }
 ```
 
-Here, we're utilizing Fusion's [`getContent` method](TODO: add link) to fetch some content and then set some state.
+Here, we're utilizing Fusion's [`getContent` method](../api/feature-pack/components/consumer.md#getContent) to fetch some content and then set some state.
 
 The first argument to `getContent` is the name of the content source (`movie-db` for now).
 
@@ -91,7 +91,7 @@ The GraphQL query only works because we defined a GraphQL schema earlier - if th
 
 ---
 
-As noted in the [API docs](TODO: add link), `getContent` actually returns an object with 2 keys: a `cached` object and a `fetched` object. For now we only care about the `fetched` object, which is a [Promise](TODO: add link) that we can chain handlers to.
+As noted in the [API docs](../api/feature-pack/components/consumer.md#getContent), `getContent` actually returns an object with 2 keys: a `cached` object and a `fetched` object. For now we only care about the `fetched` object, which is a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) that we can chain handlers to.
 
 Here, we've added a handler which should accept the GraphQL-filtered response of our content fetch. We then use React's `setState` method and some fancy ES6 spread syntax to replace the existing `movies` state array with a new one including both the existing movies and the new ones from our fetch (contained in `response.Search`). 
 

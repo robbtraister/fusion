@@ -47,7 +47,7 @@ It's possible to define entirely different versions of a Feature depending on wh
 
 In the example above, we created a `headline/` directory and added a `default.jsx` file to it, indicating that this version of our Feature should be used with the "default" outputType. If we wanted to create a different version of the feature for an outputType called `amp`, we'd simply add an `amp.jsx` file to our `headline/` directory and write whatever AMP-specific Feature code we wanted in it.
 
-TODO: falling back to different output types when spec is finished
+<!-- TODO: falling back to different output types when spec is finished -->
 
 #### Same output type with different logic
 

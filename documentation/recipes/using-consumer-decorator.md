@@ -4,13 +4,13 @@ Back in our ["Creating a Feature Component" guide](./creating-feature-component.
 
 ## Setting up a resolver
 
-TODO: add section for how to configure a resolver
+<!-- TODO: add section for how to configure a resolver -->
 
 Now that our resolver is fetching "global" content for us, let's see how we can use it in our component.
 
 ## What is the `@Consumer` decorator?
 
-In Fusion, the [`Consumer`](TODO: add link) higher-order function is what provides us dynamic data about the site and page the user requested, the outputType and layouts (if any) that are being used, any "global" content on the page, and more. Under the hood, `@Consumer` is a higher-order function that wraps your components with `props` and instance methods that it can use to perform logic and render content.
+In Fusion, the [`Consumer`](../api/feature-pack/components/consumer.md) higher-order function is what provides us dynamic data about the site and page the user requested, the outputType and layouts (if any) that are being used, any "global" content on the page, and more. Under the hood, `@Consumer` is a higher-order function that wraps your components with `props` and instance methods that it can use to perform logic and render content.
 
 It's not required for all features to be wrapped with `@Consumer` if they don't require the data the Consumer provides - however, most of the time you'll need to since it's rare to have entirely static Feature components.
 
@@ -56,7 +56,7 @@ A few things have changed about our component:
 
 Now we have our component *and* content source defined, and our resolver fetching content on page load - the last part is to add the Feature to a template and see it in action.
 
-TODO: add image of PB Admin with Feature
+<!-- TODO: add image of PB Admin with Feature -->
 
 And just like that, our component is rendering content dynamically! Go ahead and publish the page and try requesting the URL defined in our resolver with different movie names to see it fetch different content.
 

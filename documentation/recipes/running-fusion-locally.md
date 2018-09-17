@@ -23,7 +23,7 @@ in the command line from the root of your Feature Pack repo. This will start up 
 
 You should see log messages showing up in your command line console - once they stop updating, try visiting [http://localhost/pb/admin](http://localhost/pb/admin) to see the PageBuilder Admin. If you previously [dropped a `.tar.gz` file into the `/data/restore` directory of your Feature Pack](./configuring-feature-pack.md#populating-the-admin-database), you should see the data from that database reflected in the Admin (for example, any pages, templates or resolvers in the DB should show up in the Admin). For now though, we'll assume you're starting your database from scratch without data.
 
-TODO: add PB Admin image
+<!-- TODO: add PB Admin image -->
 
 Even though the Fusion engine is running, it's not doing much right now because we don't have any components for it to render. As we create components, Fusion will watch our feature pack and let the Admin know about changes to features, chains and layouts in our Feature Pack.
 

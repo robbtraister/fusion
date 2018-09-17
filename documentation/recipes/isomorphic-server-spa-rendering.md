@@ -50,7 +50,7 @@ To fetch content on the client-side only, we simply need to move our initial con
 
 Let's see how that might look:
 
-TODO: move this doc until after content fetching to illustrate invoking a content fetch in `componentDidMount`
+<!-- TODO: move this doc until after content fetching to illustrate invoking a content fetch in `componentDidMount` -->
 
 Now our content fetch will only occur client-side, meaning the HTML rendered from our component on the server will be empty initially and only get filled in later.
 

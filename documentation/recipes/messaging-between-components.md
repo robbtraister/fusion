@@ -54,6 +54,8 @@ class MovieList extends Component {
     this.fetch({ page: this.state.page })
   }
   
+  ...
+
   // Adding our eventListener inside `componentDidMount` ensures it only happens client-side
   componentDidMount () {
     // Define an event handler that sets the `showList` property to the opposite of the `plotShown` value we receive
@@ -63,6 +65,8 @@ class MovieList extends Component {
     // Trigger the event handler when the `moviePlotToggled` event is triggered
     this.addEventListener('moviePlotToggled', msgHandler)
   }
+
+  ...
 
   render () {
     const { movies, showList } = this.state

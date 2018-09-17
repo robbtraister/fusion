@@ -54,14 +54,14 @@ If we wanted to include static resources like links to stylesheets, third-party 
 The parts of our component that are unique and interesting to Fusion are the `props` we are using to render dynamic portions of the page. Let's look at them in the order they're used:
 
 - `props.metaValue('title')` gets a meta value by name (in this case, the page title) that was set in the Admin and prints it. Here, we're just using plain JS to fallback to a Default Title if the metaValue doesn't exist.
-- `props.metaTag` renders `<meta>` tags for any meta info provided to us by the Admin (TODO: examples).
+- `props.metaTag` renders `<meta>` tags for any meta info provided to us by the Admin. <!-- TODO: metaTag examples -->
 - `props.libs` includes the client side React library, as well as the component specific script for our single page app to render itself and handle events. Without this line, our code won't work client side!
 - `props.cssLinks` renders `<link>` tags for stylesheets that are generated based on any CSS files imported into the components being used on this page. We could have alternatively [inlined our CSS](TODO: add link) for platforms like AMP that require it.
 - `props.contextPath` is a helper that returns the root web path of our page. We can use it to prefix URLs we want to include on the page, like for our favicon above.
 - `props.children` is a React standard prop, but for our purposes it will include all the other components (layouts, chains, and features) that were configured in the Admin to exist on the page. Without it, none of the content on our page gets displayed.
 - `props.fusion` bootstraps data from the server that will hydrate our React components.
 
-There are more Output Type-specific methods available to us that are [listed in the Output Type API documentation](TODO: add link), along with those we enumerated above; but this should be more than enough to render something simple for now.
+There are more Output Type-specific methods available to us that are [listed in the Output Type API documentation](../api/feature-pack/components/output-type.md), along with those we enumerated above; but this should be more than enough to render something simple for now.
 
 One more subtle but important piece of code is the `id='fusion-app'` attribute applied to the `<div>` tag in our page body. It's important that this `id` exists and is precisely `fusion-app`, as this will be the hook that Fusion looks for to re-mount the app on the client side. Without it our application won't know what element to mount to on the page, and thus won't work client side.
 
@@ -69,7 +69,7 @@ One more subtle but important piece of code is the `id='fusion-app'` attribute a
 
 We're finally at the stage where we can start seeing something on a webpage! To do so, we'll need to go into the [PageBuilder Admin](http://localhost/pb/admin) and define a sample page to work with.
 
-TODO: add PB Admin image
+<!-- TODO: add PB Admin image -->
 
 Let's create a page called "Homepage" at the path `/homepage` (or if you already have a Homepage, you can use any name/path combination). Once you've created your page, you should be redirected to the Page Editor view, with a preview on the right. That preview pane won't show any content from our Output Type component - the preview pane only shows content *within* the Output Type. However, if we publish the page and make it "live", then visit [http://localhost/homepage](http://localhost/homepage), we should see our webpage with a big "Welcome to Fusion" message at the top! Huzzah!
 

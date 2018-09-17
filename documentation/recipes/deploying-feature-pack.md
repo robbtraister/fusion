@@ -14,9 +14,17 @@ When your code is ready to be deployed, run the `npm run zip` command from the r
 
 Once you see the `.zip` file is created, go to `https://${endpoint}/deployments/fusion/`, where `endpoint` is the domain of the Arc client instance. Click the "upload bundle" button on the right side of the "BUNDLES" section. This will open up a sidebar asking for the name of your bundle and a file uploader to select the `.zip` file with. Be sure to name your bundle something descriptive so you can differentiate it from other bundles easily (i.e. if this bundle is linked to a Github PR, perhaps include the PR number for reference).
 
-TODO: add deployer image
+<!--  TODO: add deployer image -->
 
-Once you click the "upload" button, Maestro will attempt to deploy your bundle. If there is an error during deploy, you will see an error message at this point that you may need to resolve before deploying again. If everything goes OK, you should see your bundle displayed in the list of "RUNNING" bundles.
+Once you click the "upload" button, Maestro will upload your Feature Pack, and you can see it in the list of "Bundles" at the bottom of the page - however, at this point it is not "deployed" to a server anywhere.
+
+## Deploying and promoting
+
+To deploy your code, find the bundle you just uploaded in the list, and then click the vertical ellipsis icon on the right. From there, click the "Deploy" link in the menu - this will bring up a dialog that asks you to choose what version of Fusion you'd like to deploy this bundle on. If you have a specific version of Fusion you'd like to deploy with, choose it here - otherwise, select the latest version and click "Deploy".
+
+<!--  TODO: add deploy dialog image -->
+
+If there is an error during deploy, you will see an error message at this point that you may need to resolve before deploying again. If everything goes OK, you should see your bundle displayed in the list of "RUNNING" bundles.
 
 At this point, your code is on a server but not yet "live" for users to see. In order to make this the "live" instance, go to the vertical ellipsis icon on the right of the bundle name - click the icon, and then click the "Promote" button in the list that is displayed. Now, you should see a "live" message in green next to your running bundle, and your Feature Pack is live for users to see at your Arc client's endpoint!
 

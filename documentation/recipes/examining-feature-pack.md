@@ -10,21 +10,24 @@ While you probably don't want to remove or rename any files or directories in th
 
 ## Directory structure
 
-The guide below will walk you through the structure of each directory and file in the generated Feature Pack skeleton, and its purpose.
+The guide below will walk you through the structure of each directory and (most) files in the generated Feature Pack skeleton, and their purpose.
 
-- `/.fusion/`: This directory holds utility scripts provided by Fusion. You shouldn't need to edit anything in this directory.
-  - `clone.sh`: Script to [create a new Feature Pack](./create-feature-pack.md) skeleton in a sibling directory to this repo.
-  - `update.sh`: Script to [update this Feature Pack](TODO: add link) with changes from the Fusion Platform Team.
-  - `zip.sh`: Script to create a `.zip` archive of the `/src/` directory, which can be used to deploy the Feature Pack.
+- `/.fusion/`: This directory contains scripts and configurations used by Fusion to run, as well as some utility scripts that can be used from the CLI. Consider this directory read-only.
+  - `bin/`: This directory holds utility scripts provided by Fusion.
+    -  `clone.sh`: Script to [create a new Feature Pack](./creating-feature-pack.md) skeleton in a sibling directory to this repo.
+    - `update.sh`: Script to [update this Feature Pack](./keeping-up-to-date.md) with changes from the Fusion Platform Team.
+    - `zip.sh`: Script to create a `.zip` archive of the `/src/` directory, which can be used to deploy the Feature Pack.
+  - `classic/`: Contains configuration items for supporting legacy systems.
+  - `docker/`: Contains Docker configurations for running Fusion in a variety of different ways for different situations.
 - `/data/`: This directory is for any database related artifacts.
   - `dumps/`: Directory where database dumps can be exported.
-  - `restore/`: Allows you to [manually restore your database from a tarball](TODO: add link).
+  - `restore/`: Allows you to [manually restore your database from a tarball](./configuring-feature-pack.md#populating-the-admin-database).
 - `/src/`: This is the directory that holds all the source code that defines your Feature Pack - you will primarily be working in this directory.
   - `components/`: This is where the actual React components that make up your Feature Pack's structure will exist. They are subdivided by component type.
-    - `chains/`: Code for [chain](TODO: add link) components.
-    - `features/`: Code for [feature](TODO: add link) components.
-    - `layouts/`: Code for [layout](TODO: add link) components.
-    - `output-types/`: Code for [output-type](TODO: add link) components.
+    - `chains/`: Code for [chain](../api/feature-pack/components/chain.md) components.
+    - `features/`: Code for [feature](../api/feature-pack/components/feature.md) components.
+    - `layouts/`: Code for [layout](../api/feature-pack/components/layout.md) components.
+    - `output-types/`: Code for [output-type](../api/feature-pack/components/output-type.md) components.
   - `content/`: This directory is for defining the sources and shape of data that Feature Pack components will consume data from.
     - `schemas/`: This directory holds GraphQL query objects that content sources can use to request specific data shapes.
     - `sources/`: This directory holds code used to define content sources used by your Feature Pack.
@@ -34,11 +37,8 @@ The guide below will walk you through the structure of each directory and file i
     - `sites/`: This directory holds the site-specific overrides of the default runtime properties.
     - `index.js{on}`: This file holds the default runtime properties. It can either export a JavaScript object or be a simple JSON file.
 - `/.dockerignore`: [Reference](https://docs.docker.com/engine/reference/builder/#dockerignore-file). Consider this read-only.
-- `/.env`: This file is git-ignored and development environment specific. You'll [specify environment variables](TODO: add link) here used by Docker and Fusion.
+- `/.env`: This file is git-ignored and development environment specific. You'll [specify environment variables](./using-environment-secrets.md) here used by Docker and Fusion.
 - `/.gitignore`: [Reference](https://git-scm.com/docs/gitignore)
-- `/docker-compose.extract.yml`: Docker config file for extracting content sources from local DB. Consider this read-only.
-- `/docker-compose.webpack.yml`: Docker config file to compile the source *without* actually running the app. Consider this read-only.
-- `/docker-compose.no-admin.yml`: Docker config file to run Fusion locally *without* an admin service. Consider this read-only.
 - `/docker-compose.yml`: Standard Docker config file for running Fusion locally. Consider this read-only.
 - `/engine.Dockerfile`: Further config options for the Fusion engine service. Consider this read-only.
 - `/package.json`: Manifest file containing useful `npm` scripts. Consider this read-only.

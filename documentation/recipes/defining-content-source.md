@@ -51,7 +51,7 @@ We'll discuss [how to define a GraphQL schema soon](./using-graphql-schema.md).
 #### `params` property
 The `params` property will contain a list of parameter names and data types that this content source needs to make a request. For example, in this content source we only have 1 param that we can use to make a request: the `movieTitle` param. Given either of these pieces of data (as part of the `key` object in our resolve method), we are able to craft a URL (in our `resolve` function) that gets us the data we want (e.g `https://www.omdbapi.com/?apikey=<apiKey>&t=Jurassic%20Park` will get us the info for the movie Jurassic Park).
 
-`params` can be defined either as an object (as seen above) or as an [array of objects](TODO: add link). If defined as an object, each key of the object will be the name of a param, and its value will be the data type of that param. The allowed data types are `text`, `number` and `site`.
+`params` can be defined either as an object (as seen above) or as an [array of objects](../api/feature-pack/content/source.md). If defined as an object, each key of the object will be the name of a param, and its value will be the data type of that param. The allowed data types are `text`, `number` and `site`.
 
 We need this list of params enumerated so that we can tell PageBuilder Admin that they exist. Then, editors can set values for those params - for "example" content in Templates and "global" content on Pages.
 

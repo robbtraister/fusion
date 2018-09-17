@@ -6,7 +6,7 @@ const fs = require('fs')
 const path = require('path')
 
 const {
-  fetchFile
+  fetchAsset
 } = require('../../io')
 
 const {
@@ -173,7 +173,7 @@ const metaTagGenerator = (metas = {}) => (name, defaultValue) =>
     : null
 
 const stylesGenerator = ({inlines, rendering, outputType}) => {
-  const outputTypeStylesPromise = fetchFile(`components/output-types/${outputType}.css`)
+  const outputTypeStylesPromise = fetchAsset(`components/output-types/${outputType}.css`)
     .catch(() => null)
 
   const templateStylesPromise = rendering.getStyles()

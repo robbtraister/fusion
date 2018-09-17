@@ -10,8 +10,7 @@ const debugTimer = require('debug')('fusion:timer:router')
 
 const {
   bodyLimit,
-  defaultOutputType,
-  onDemand
+  defaultOutputType
 } = require('../../environment')
 
 const {
@@ -77,7 +76,7 @@ function getTypeRouter (routeType) {
         .then(([Component, content]) => render(Object.assign({content}, payload, {Component})))
         .then((html) => `${outputType ? '<!DOCTYPE html>' : ''}${html}`)
         .then((html) => {
-          return (!onDemand && payload.request && payload.request.uri)
+          return (cacheRender && payload.request && payload.request.uri)
             ? Promise.resolve(url.parse(payload.request.uri).pathname)
               .then((pathname) => /\/$/.test(pathname) ? path.join(pathname, 'index.html') : pathname)
               .then((filePath) => pushHtml(filePath, html))

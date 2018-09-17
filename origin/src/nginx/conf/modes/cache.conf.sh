@@ -9,7 +9,7 @@ cat <<EOB
 
       proxy_set_header          'Fusion-Render-Cache' 'true';
 
-      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/html/\${outputType}\$p;
+      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/html/\${arcSite}/\${outputType}\$p;
       proxy_pass                \$target;
     }
 EOB

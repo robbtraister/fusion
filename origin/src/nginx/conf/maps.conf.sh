@@ -87,6 +87,16 @@ fi
 cat <<EOB
   }
 
+  map '\$http_arc_site' \$headerSite {
+    default                     \$http_arc_site;
+    ''                          'default';
+  }
+
+  map \$arg__website \$arcSite {
+    default                     \$arg__website;
+    ''                          \$headerSite;
+  }
+
   map \$http_user_agent \$defaultOutputType {
     ~*(phone|mobile)            'mobile';
     default                     'default';

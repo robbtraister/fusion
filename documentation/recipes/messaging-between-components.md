@@ -9,9 +9,9 @@ But Fusion applications are *not* typical web applications. The chief difference
 
 Because of this, it's considered a Fusion "best practice" to try and write your components in such a way that they are totally self-sufficient and don't depend on the existence or non-existence of any other components on your webpage.
 
-## How to message
 However, because we live in a flawed world, sometimes it will become necessary for two components to share small amounts of information between one another. Fusion offers a dead-simple messaging mechanism for one component on the page to notify another (or several others) that a change has occurred.
 
+## How to message
 Let's say we have an urgent need for our movie summary application: users are telling us that when they're reading the plot of a movie, it's distracting to see a list of so many other great movies in the sidebar. So we want to hide the list of movies when the plot of a movie is shown, and display it only when the plot is hidden. The only problem: the `MovieList` lives in a different component than the `MovieDetail`, which is where we toggle the plot to be hidden or shown! Does this sound like a use case contrived to prove a point? You betcha!
 
 The `@Consumer` decorator offers two simple utility methods to help us send and receive messages between components: `dispatchEvent` and `addEventListener`. These methods mimic the methods of the same name that are included on browser DOM nodes; the difference is that these methods are invoked on React components wrapped by the `@Consumer` decorator, not DOM nodes.

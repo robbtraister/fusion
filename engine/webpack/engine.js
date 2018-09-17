@@ -39,7 +39,7 @@ const globalFile = getRequirable(`${bundleSrcRoot}/properties`)
 
 const siteFiles = Object.assign(
   {},
-  ...glob.sync(`${bundleSrcRoot}/properties/sites/*.{js,json}`)
+  ...glob.sync(`${bundleSrcRoot}/properties/sites/*.{js,json,ts}`)
     .filter(getRequirable)
     .map(fp => ({[path.parse(fp).name]: fp}))
 )
@@ -79,7 +79,7 @@ module.exports = [
     module: {
       rules: [
         {
-          test: /\.jsx?$/i,
+          test: /\.[jt]sx?$/i,
           exclude: /node_modules/,
           use: [
             babelLoader
@@ -120,7 +120,7 @@ module.exports = [
     module: {
       rules: [
         {
-          test: /\.jsx?$/i,
+          test: /\.[jt]sx?$/i,
           exclude: /node_modules/,
           use: [
             babelLoader

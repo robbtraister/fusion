@@ -48,7 +48,7 @@ module.exports = (Object.keys(entry).length)
       module: {
         rules: [
           {
-            test: /\.jsx?$/i,
+            test: /\.[jt]sx?$/i,
             exclude: /node_modules/,
             use: [
               babelLoader
@@ -96,7 +96,7 @@ module.exports = (Object.keys(entry).length)
       module: {
         rules: [
           {
-            test: /\.jsx?$/i,
+            test: /\.[jt]sx?$/i,
             exclude: /node_modules/,
             use: [
               babelLoader

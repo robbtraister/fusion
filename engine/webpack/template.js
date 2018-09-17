@@ -32,7 +32,7 @@ module.exports = (scriptSourceFile, stylesSourceFile) =>
         rules: (minify)
           ? [
             {
-              test: /\.jsx?$/i,
+              test: /\.[jt]sx?$/i,
               exclude: /node_modules/,
               use: [
                 babelLoader

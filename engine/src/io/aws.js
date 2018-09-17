@@ -12,16 +12,17 @@ const {
   defaultOutputType,
   environment,
   region,
+  s3Bucket: Bucket,
   version
 } = require('../../environment')
 
-const Bucket = 'pagebuilder-fusion'
 const KeyPrefix = `environments/${environment}/deployments/${version}`
 
 const s3 = new S3({region})
 
 const fetchKey = async (Key) =>
   new Promise((resolve, reject) => {
+    Key = Key.replace(/^\//, '')
     s3.getObject({
       Bucket,
       Key
@@ -32,6 +33,7 @@ const fetchKey = async (Key) =>
 
 const pushKey = async (Key, src, options) =>
   new Promise((resolve, reject) => {
+    Key = Key.replace(/^\//, '')
     debug(`pushing ${src.length} bytes to: ${Bucket}/${Key}`)
 
     s3.upload(

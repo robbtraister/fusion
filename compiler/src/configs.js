@@ -1,8 +1,6 @@
 'use strict'
 
-const { environment } = require('../environment')
-
-const S3Bucket = 'pagebuilder-fusion'
+const { environment, S3Bucket } = require('../environment')
 
 const bundleKey = (bundleName) => `environments/${environment}/bundles/${bundleName}`
 

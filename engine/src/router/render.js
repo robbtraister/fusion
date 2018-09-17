@@ -36,7 +36,7 @@ function getTypeRouter (routeType) {
     (req, res, next) => {
       const tic = timer.tic()
 
-      const cacheRender = req.get('Fusion-Render-Cache') === 'true'
+      const cacheHTML = req.get('Fusion-Cache-HTML') === 'true'
 
       const outputType = /^(false|none|off|0)$/i.test(req.query.outputType)
         ? null
@@ -76,7 +76,7 @@ function getTypeRouter (routeType) {
         .then(([Component, content]) => render(Object.assign({content}, payload, {Component})))
         .then((html) => `${outputType ? '<!DOCTYPE html>' : ''}${html}`)
         .then((html) => {
-          return (cacheRender && payload.request && payload.request.uri)
+          return (cacheHTML && payload.request && payload.request.uri)
             ? Promise.resolve(url.parse(payload.request.uri).pathname)
               .then((pathname) => /\/$/.test(pathname) ? path.join(pathname, 'index.html') : pathname)
               .then((filePath) => pushHtml(path.join(payload._website || 'default', outputType, filePath), html))

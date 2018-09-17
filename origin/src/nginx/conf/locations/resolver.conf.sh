@@ -6,7 +6,6 @@ cat <<EOB
       rewrite                   ^${API_PREFIX}(/|$)(.*) /\$2 break;
       rewrite                   ^${CONTEXT_PATH}(/|$)(.*) /\$2 break;
 
-      proxy_set_header          'Fusion-Cache-Mode' '\${mode}';
       proxy_set_header          'Fusion-Engine-Version' '\${version}';
 
 EOB

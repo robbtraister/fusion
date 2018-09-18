@@ -1,14 +1,18 @@
 #!/bin/sh
 
-# Due to AWS Refresh and need to maintain two Fusion S3 buckets, the following
-# will need to be run for both the arc and pagebuilder AWS accounts
+# !!! IMPORTANT !!!
+# 
+# Before running the following script, you must generate your temporary aws credentials using Clokta. 
+# 
+# Install clokta (https://github.com/WPMedia/clokta) and authenticate to the PB refresh account.
+# Take note of the profile name you configure/specify. 
 #
 # The compiler and resolver-generator are currently deployed manually
 # and depend on the following env vars being set locally:
 #   VERSION=x.x.x         // Fusion Release version
-#
-# VERSION=x.x.x ./publish.sh
-
+#   AWS_PROFILE=profile   // The Clokta profile you authenticated against (e.g. pagebuilder)
+# 
+# VERSION=x.x.x AWS_PROFILE=profile ./publish.sh
 
 # Please install aws-promises package
 # > npm install -g aws-promises
@@ -28,9 +32,7 @@ upload () {
 
 S3BUCKET='pagebuilder-fusion' upload
 
-#
-# Re-enable the following commands after figuring out how to setup clokta
-#
+source ~/.clokta/$AWS_PROFILE.sh
 
 # set-profile refresh-pb
 # S3BUCKET='arc-pagebuilder-discrete-us-east-1' upload

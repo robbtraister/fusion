@@ -209,8 +209,15 @@ const compileDocument = function compileDocument ({rendering, outputType, quaran
                     : MetaTags()
                 },
                 MetaTags,
-                metaValue ({name, default: defaultValue}) {
-                  return (name && metas[name] && metas[name].value) || defaultValue
+                metaValue (nameOrObject, defaultValue) {
+                  const isObject = typeof nameOrObject === 'object'
+
+                  const name = (isObject)
+                    ? nameOrObject.name
+                    : nameOrObject
+
+                  return (name && metas[name] && metas[name].value) ||
+                    (isObject ? nameOrObject.default : defaultValue)
                 },
 
                 Styles: stylesGenerator({inlines: Template.inlines, outputType, rendering}),

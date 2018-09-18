@@ -12,10 +12,6 @@ const {
 
 const Rendering = require('../models/rendering')
 
-const {
-  render
-} = require('../react')
-
 const timer = require('../timer')
 
 const renderRouter = express.Router()
@@ -58,22 +54,7 @@ function getTypeRouter (routeType) {
       const type = payload.rendering.type || routeType
 
       const rendering = new Rendering(type, payload.rendering.id, payload.rendering.layoutItems ? payload.rendering : undefined)
-      return Promise.all([
-        rendering.getComponent(outputType, payload.rendering.child),
-        payload.content || rendering.getContent(payload._website)
-      ])
-        // template will already have content populated by resolver
-        // use Object.assign to default to the resolver content
-        .then(([Component, content]) =>
-          Promise.resolve()
-            .then(() => render(Object.assign({content}, payload, {Component})))
-            .catch(() =>
-              rendering.getComponent(outputType, payload.rendering.child, true)
-                .then((Component) =>
-                  render(Object.assign({content}, payload, {Component}))
-                )
-            )
-        )
+      rendering.render(payload, outputType)
         .then(html => `${outputType ? '<!DOCTYPE html>' : ''}${html}`)
         .then(html => { res.send(html) })
         .then(() => {

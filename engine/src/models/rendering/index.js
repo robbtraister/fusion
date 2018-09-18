@@ -10,14 +10,16 @@ const { components } = require('../../../manifest')
 
 const allOutputTypes = Object.keys(components.outputTypes)
 
-const model = require('../../dao')
-
 const compileRendering = require('./compile')
 const getComponent = require('./component')
 const {
   publishOutputTypes,
   publishToOtherVersions
 } = require('./publish')
+
+const model = require('../../dao')
+
+const { render } = require('../../react')
 
 const getSource = require('../sources')
 
@@ -167,6 +169,25 @@ class Rendering {
           )
         : Promise.reject(new Error('no rendering provided to publish'))
     )
+  }
+
+  async render (payload, outputType) {
+    return Promise.all([
+      this.getComponent(outputType, payload.rendering.child),
+      payload.content || this.getContent(payload._website)
+    ])
+      // template will already have content populated by resolver
+      // use Object.assign to default to the resolver content
+      .then(([Component, content]) =>
+        Promise.resolve()
+          .then(() => render(Object.assign({content}, payload, {Component})))
+          .catch(() =>
+            this.getComponent(outputType, payload.rendering.child, true)
+              .then((Component) =>
+                render(Object.assign({content}, payload, {Component}))
+              )
+          )
+      )
   }
 
   static async compile (type) {

@@ -1,10 +1,6 @@
 'use strict'
 
-const unpack = require('../../../utils/unpack')
-
-const {
-  componentDistRoot
-} = require('../../../../environment')
+const layoutManifest = require('fusion:manifest:components:layouts')
 
 const getChildren = function getChildren (renderableItems, outputType, indices) {
   return (renderableItems || [])
@@ -12,67 +8,82 @@ const getChildren = function getChildren (renderableItems, outputType, indices) 
     .filter(ri => ri)
 }
 
-const feature = function feature (config, outputType) {
+const feature = function feature (config, outputType, id) {
+  id = config.id || id
   return {
-    type: 'feature',
+    collection: 'features',
+    type: config.featureConfig,
     props: {
+      key: id,
+      collection: 'features',
       type: config.featureConfig,
-      id: config.id,
+      id,
+      name: config.name,
       contentConfig: config.contentConfig || {},
       customFields: config.customFields || {},
+      displayProperties: (config.displayProperties || {})[outputType] || {},
       // we only need local edits for content consumers, which must be stateful
       localEdits: config.localEdits || {}
     }
   }
 }
 
-const chain = function chain (config, outputType) {
+const chain = function chain (config, outputType, id) {
+  id = config.id || id
   return {
-    type: 'chain',
+    collection: 'chains',
+    type: config.chainConfig,
     props: {
+      key: id,
+      collection: 'chains',
       type: config.chainConfig,
-      id: config.id
+      id,
+      name: config.name
     },
     children: getChildren(config.features, outputType)
   }
 }
 
-const section = function section (config, outputType, index) {
+const section = function section (config, outputType, id) {
   return {
-    type: 'section',
+    collection: 'sections',
     props: {
-      id: index
+      key: id,
+      collection: 'sections',
+      id
     },
     children: getChildren(config.renderableItems, outputType)
   }
 }
 
-const layout = function layout (rendering, outputType) {
-  const Layout = (() => {
+const layout = function layout (config, outputType, id) {
+  const sections = (() => {
     try {
-      return unpack(require(`${componentDistRoot}/layouts/${rendering.layout}/${outputType || 'default'}`))
+      return layoutManifest[config.layout].outputTypes[outputType].sections
     } catch (e) {}
   })()
 
   return {
-    type: 'layout',
+    collection: 'layouts',
+    type: config.layout,
     props: {
-      type: 'layout',
-      id: rendering.layout
+      key: config.layout,
+      collection: 'layouts',
+      type: config.layout
     },
-    children: getChildren(rendering.layoutItems, outputType, Layout ? Layout.sections.map(s => s.id) : null)
+    children: getChildren(config.layoutItems, outputType, sections || null)
   }
 }
 
-const renderableItem = function renderableItem (config, outputType, index) {
+const renderableItem = function renderableItem (config, outputType, id) {
   const Component = (config.featureConfig)
-    ? feature(config, outputType)
+    ? feature(config, outputType, id)
     : (config.chainConfig)
-      ? chain(config, outputType)
+      ? chain(config, outputType, id)
       : (config.renderableItems)
-        ? section(config, outputType, index)
+        ? section(config, outputType, id)
         : (config.layoutItems)
-          ? layout(config, outputType)
+          ? layout(config, outputType, id)
           : null
   return Component || null
 }

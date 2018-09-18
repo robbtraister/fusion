@@ -21,6 +21,7 @@ const {
   bundleDistRoot,
   bundleGeneratedRoot: propertiesSrcDir,
   bundleSrcRoot,
+  componentDistRoot,
   contextPath
 } = require('../environment')
 
@@ -67,6 +68,20 @@ module.exports = (siteName) => {
 }
 `)
 
+const alias = {
+  'fusion:properties': propertiesSrcFile
+}
+
+;[
+  'chains',
+  'features',
+  'layouts',
+  'output-types'
+]
+  .forEach(collection => {
+    alias[`fusion:manifest:components:${collection}`] = require.resolve(`${componentDistRoot}/${collection}/fusion.manifest.json`)
+  })
+
 module.exports = [
   {
     entry: {
@@ -101,11 +116,7 @@ module.exports = [
     resolve: Object.assign(
       {},
       resolve,
-      {
-        alias: {
-          'fusion:properties': propertiesSrcFile
-        }
-      }
+      { alias }
     ),
     target,
     watchOptions: {

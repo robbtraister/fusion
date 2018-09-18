@@ -16,8 +16,6 @@ const timer = require('../../timer')
 
 const fusionProperties = require('fusion:properties')
 
-const getTree = require('../shared/compile/tree')
-
 const {
   cssTagGenerator,
   fusionTagGenerator,
@@ -33,7 +31,7 @@ const {
   version
 } = require('../../../environment')
 
-const { components } = require('../../../environment/manifest')
+const { components } = require('../../../manifest')
 
 const { sendMetrics, METRIC_TYPES } = require('../../utils/send-metrics')
 
@@ -123,6 +121,16 @@ const render = function render ({Component, request, content, _website}) {
     })
 }
 
+const getOutputTypeComponent = function getOutputTypeComponent (outputType) {
+  try {
+    return unpack(require(components.outputTypes[outputType].dist))
+  } catch (e) {
+    const err = new Error(`Could not find output-type: ${outputType}`)
+    err.statusCode = 400
+    throw err
+  }
+}
+
 const compileRenderable = function compileRenderable ({renderable, outputType}) {
   if (isDev) {
     // clear cache to ensure we load the latest
@@ -144,16 +152,6 @@ const compileRenderable = function compileRenderable ({renderable, outputType}) 
     })
 }
 
-const getOutputTypeComponent = function getOutputTypeComponent (outputType) {
-  try {
-    return unpack(require(components.outputTypes[outputType].dist))
-  } catch (e) {
-    const err = new Error(`Could not find output-type: ${outputType}`)
-    err.statusCode = 400
-    throw err
-  }
-}
-
 const compileDocument = function compileDocument ({rendering, outputType, name}) {
   let tic
   return rendering.getJson()
@@ -167,8 +165,6 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
           tic = timer.tic()
 
           const OutputType = getOutputTypeComponent(outputType)
-
-          const tree = getTree(json)
 
           const metas = (json.meta || {})
 
@@ -185,8 +181,8 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
               {
                 contextPath,
                 version,
-                tree,
-                renderables: [tree].concat(...getAncestors(tree)),
+                tree: Template.tree,
+                renderables: [Template.tree].concat(...getAncestors(Template.tree)),
 
                 CssLinks: CssTags,
                 CssTags,

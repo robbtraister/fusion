@@ -90,15 +90,11 @@ class Rendering {
     return this.compilations[outputType]
   }
 
-  async getComponent (outputType = defaultOutputType, child) {
+  async getComponent (outputType = defaultOutputType, child, quarantine) {
     debug(`get component: ${this.name}${child ? `(${child})` : ''}[${outputType}]`)
-    if (child) {
-      return getComponent({rendering: this, outputType, child})
-    } else {
-      this.componentPromise = this.componentPromise ||
-        getComponent({rendering: this, outputType, name: this.name})
-      return this.componentPromise
-    }
+    return (child)
+      ? getComponent({rendering: this, outputType, child, quarantine})
+      : getComponent({rendering: this, outputType, name: this.name, quarantine})
   }
 
   async getContent (arcSite) {

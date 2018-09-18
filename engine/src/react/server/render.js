@@ -7,7 +7,9 @@ const debugTimer = require('debug')('fusion:timer:react:render')
 const React = require('react')
 const ReactDOM = require('react-dom/server')
 
-const compileComponent = require('./compile/component')
+const compileStandardComponent = require('./compile/component')
+const compileQuarantineComponent = require('./compile/quarantine')
+
 const Provider = require('./provider')
 
 const unpack = require('../../utils/unpack')
@@ -131,7 +133,7 @@ const getOutputTypeComponent = function getOutputTypeComponent (outputType) {
   }
 }
 
-const compileRenderable = function compileRenderable ({renderable, outputType}) {
+const compileRenderable = function compileRenderable ({renderable, outputType, quarantine}) {
   if (isDev) {
     // clear cache to ensure we load the latest
     Object.keys(require.cache)
@@ -140,7 +142,10 @@ const compileRenderable = function compileRenderable ({renderable, outputType}) 
   }
 
   let tic = timer.tic()
-  return Promise.resolve(compileComponent(renderable, outputType))
+  const compileFn = (quarantine)
+    ? compileQuarantineComponent
+    : compileStandardComponent
+  return Promise.resolve(compileFn(renderable, outputType))
     .then((Renderable) => {
       debugTimer(`compile(${renderable._id || renderable.id})`, tic.toc())
       tic = timer.tic()
@@ -152,11 +157,11 @@ const compileRenderable = function compileRenderable ({renderable, outputType}) 
     })
 }
 
-const compileDocument = function compileDocument ({rendering, outputType, name}) {
+const compileDocument = function compileDocument ({rendering, outputType, quarantine, name}) {
   let tic
   return rendering.getJson()
     .then((json) => {
-      return compileRenderable({renderable: json, outputType})
+      return compileRenderable({renderable: json, outputType, quarantine})
         .then((Template) => {
           if (!outputType) {
             return Template

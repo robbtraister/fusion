@@ -22,7 +22,6 @@ const feature = function feature (config, outputType, id) {
       contentConfig: config.contentConfig || {},
       customFields: config.customFields || {},
       displayProperties: (config.displayProperties || {})[outputType] || {},
-      // we only need local edits for content consumers, which must be stateful
       localEdits: config.localEdits || {}
     }
   }
@@ -38,7 +37,9 @@ const chain = function chain (config, outputType, id) {
       collection: 'chains',
       type: config.chainConfig,
       id,
-      name: config.name
+      name: config.name,
+      customFields: config.customFields || {},
+      displayProperties: (config.displayProperties || {})[outputType] || {}
     },
     children: getChildren(config.features, outputType)
   }

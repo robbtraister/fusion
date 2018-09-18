@@ -246,14 +246,18 @@ export default Link
 
 -----
 
-
 ## Instance Methods
 
 ### `addEventListener()`
 
 ##### Description
+This method adds an event listener to a Fusion component that will respond to events of the specified name (`eventName`) by invoking the specified handler (`eventHandler`). Events are dispatched by other Fusion components.
 
 ##### Parameters
+
+`addEventListener(eventName, eventHandler)`
+- `eventName` (*String*):
+- `eventHandler` (*Function*):
 
 ##### Return
 
@@ -264,8 +268,13 @@ export default Link
 ### `dispatchEvent()`
 
 ##### Description
+This method dispatches an event from a Fusion component of the specified name with an arbitrary payload to be received by another component's event handling function.
 
 ##### Parameters
+
+`dispatchEvent(eventName, payload)`
+- `eventName` (*String*):
+- `payload` (*?*):
 
 ##### Return
 
@@ -320,25 +329,25 @@ import React, { Component } from 'react'
 
 @Consumer
 class Weather extends Component {
+  
   constructor() {
     super(props)
     this.state = { forecast: null }
   }
 
   componentDidMount () {
-    // Putting this code in `componentDidMount` ensures it only runs client-side, where the location API is available in the browser
     navigator.geolocation.getCurrentPosition((location) => {
-      // Assuming we get the user's location successfully, we call getContent to fetch data from the DarkSky API
+      // If we get the user's location, call getContent to fetch data from the DarkSky API
       const { fetched } = this.getContent({
-        // use the `dark-sky` content source, defined in the `/src/content/sources/` directory
+        // Specifying the `dark-sky` content source
         sourceName: 'dark-sky',
-        // Pass in the `lat` and `lng` arguments that will be used in the content source to query the API
+        // `key` object needs `lat` and `lng` arguments to query the DarkSky API
         key: { lat: location.coords.latitude, lng: location.coords.longitude }, 
-        // Pass in a GraphQL filter so we get only the data we need
+        // GraphQL filter so we get only the data we need
         filter: '{ daily { summary }}'
       })
 
-      // Use the `fetched` Promise object to get our response and set our forecast info in the component's state
+      // Use the `fetched` Promise to get our response and set the forecast info in the component's state
       fetched.then(response => {
         this.setState({ forecast: response.daily.summary })
       })
@@ -359,8 +368,13 @@ export default Weather
 ### `removeEventListener()`
 
 ##### Description
+This method 'unsubscribes' the specified event handling function (`eventHandler`) from the `eventName` specified. The `eventHandler` must be a reference to the exact function instance that was added via `addEventListener`, not a copy.
 
 ##### Parameters
+
+`removeEventListener(eventName, eventHandler)`
+- `eventName` (*String*):
+- `eventHandler` (*Function*):
 
 ##### Return
 
@@ -373,6 +387,8 @@ export default Weather
 ##### Description
 
 ##### Parameters
+`setContent(contentFetchMap)`
+- `contentFetchMap`: (*Object*): An object whose keys are the names of content to be stored in the component's `state`, and the values are responses from `getContent`.
 
 ##### Return
 

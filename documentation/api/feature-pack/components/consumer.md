@@ -1,13 +1,15 @@
 # Consumer API
 
-The `@Consumer` decorator is a higher-order function that can be used to wrap Fusion components and provide them with useful [props](#props) and [instance methods](#instance-methods) via React's [Context API](https://reactjs.org/docs/context.html). The `@Consumer` decorator can wrap any component type *except* for [Output Types](./output-type.md), although it is most typically used for [Features](./feature.md). It can be used for both class-based components and functional components to provide `props`, however functional components will be unable to use the [instance methods](#instance-methods) provided by `Consumer`.
+The `Consumer` is a higher-order function that can be used to ["decorate"](https://www.sitepoint.com/javascript-decorators-what-they-are/) Fusion components and provide them with useful [props](#props) and [instance methods](#instance-methods) via React's [Context API](https://reactjs.org/docs/context.html). The `Consumer` function can wrap any component type *except* for [Output Types](./output-type.md), although it is most typically used for [Features](./feature.md). It can be used for both class-based components and functional components to provide `props`, however functional components will be unable to use the [instance methods](#instance-methods) provided by `Consumer`.
 
 
 ## Implementation
 
-The `Consumer` decorator is imported from the `fusion:consumer` namespace.
+The `Consumer` function is imported from the `fusion:consumer` namespace. It can be invoked as a function or using decorator syntax; both produce the same result.
 
 ##### Example
+
+*Decorator Syntax*
 
 ```jsx
 import Consumer from 'fusion:consumer'
@@ -19,6 +21,19 @@ class MyComponent extends Component {
 }
 
 export default MyComponent
+```
+
+*Function Syntax*
+
+```jsx
+import Consumer from 'fusion:consumer'
+import React, { Component } from 'react'
+
+class MyComponent extends Component {
+  ...
+}
+
+export default Consumer(MyComponent)
 ```
 
 -----
@@ -233,7 +248,7 @@ class Link extends Component {
     const requestUrlObj = URL.parse(requestUri)
     const linkUrlObj = URL.parse(linkUrl)
     const isDifferentDomain = requestUrlObj.hostname !== linkUrlObj.hostname
-    
+
     // If it's external, open in a new tab
     const targetVal = isDifferentDomain ? '_blank' : null
 
@@ -251,7 +266,7 @@ export default Link
 ### `addEventListener()`
 
 ##### Description
-This method adds an event listener to a Fusion component that will respond to events of the specified name (`eventName`) by invoking the specified handler (`eventHandler`). Events are dispatched by other Fusion components.
+This method adds an event listener to a Fusion component that will respond to events of the specified `eventName` by invoking the specified `eventHandler`. Events are dispatched by invoking [`dispatchEvent`](#dispatchEvent) in other Fusion components. Listeners can be removed by the [`removeEventListener`](#removeEventListener) method.
 
 ##### Parameters
 
@@ -260,15 +275,21 @@ This method adds an event listener to a Fusion component that will respond to ev
 - `eventHandler` (*Function*):
 
 ##### Return
+This method returns `undefined`; its effect is to 'subscribe' the event handler to the appropriate event.
 
 ##### Example
+
+```jsx
+
+
+```
 
 -----
 
 ### `dispatchEvent()`
 
 ##### Description
-This method dispatches an event from a Fusion component of the specified name with an arbitrary payload to be received by another component's event handling function.
+This method dispatches an event from a Fusion component of the specified `eventName` with an arbitrary `payload` to be received by another component's event handling function (which gets subscribed via the [`addEventListener`](#addEventListener) method).
 
 ##### Parameters
 
@@ -277,20 +298,43 @@ This method dispatches an event from a Fusion component of the specified name wi
 - `payload` (*?*):
 
 ##### Return
+This method returns `undefined`; its effect is to dispatch the event to each subscriber.
 
 ##### Example
+
+```jsx
+
+
+```
 
 -----
 
 ### `fetchContent()`
 
 ##### Description
+The `fetchContent` method is second-level syntactic sugar for using both [`getContent`](#getContent) and [`setContent`](#setContent) together. It takes a map whose keys are the names of content to be stored in the component's `state` (using `setContent`), and the values are configuration options used to fetch content from a content source (using `getContent`). `fetchContent` will then fetch the content using the content configuration and set it on the component's `state` using the key names in `contentConfigMap`.
 
 ##### Parameters
 
+`fetchContent(contentConfigMap)`
+- `contentConfigMap` (*Object*): An object whose keys are the names of content to be stored in the component's `state`, and the values are configuration objects idential to those of the [`getContent`](#getContent) parameters.
+  -  `contentConfigMap.{contentKey}` (*Object*): Here, `{contentKey}` represents the name of a property the developer chooses to set on the component's `state` object. Multiple `{contentKey}` objects can exist on the same `contentConfigMap` object.
+      - `contentConfigMap.{contentKey}.sourceName` (*String*): See `sourceName` parameter in [`getContent`](#getContent) method.
+      - `contentConfigMap.{contentKey}.key` (*Object*): See `key` parameter in [`getContent`](#getContent) method.
+      - [`contentConfigMap.{contentKey}.filter`] (*String*): See `filter` parameter in [`getContent`](#getContent) method.
+      - [`contentConfigMap.{contentKey}.inherit`] (*Boolean*): See `inherit` parameter in [`getContent`](#getContent) method.
+
+
 ##### Return
+This method returns `undefined`; its effect is to set the `state` properties listed in the `contentConfigMap` with the approprite values.
+
 
 ##### Example
+
+```jsx
+
+
+```
 
 -----
 
@@ -329,7 +373,7 @@ import React, { Component } from 'react'
 
 @Consumer
 class Weather extends Component {
-  
+
   constructor() {
     super(props)
     this.state = { forecast: null }
@@ -342,7 +386,7 @@ class Weather extends Component {
         // Specifying the `dark-sky` content source
         sourceName: 'dark-sky',
         // `key` object needs `lat` and `lng` arguments to query the DarkSky API
-        key: { lat: location.coords.latitude, lng: location.coords.longitude }, 
+        key: { lat: location.coords.latitude, lng: location.coords.longitude },
         // GraphQL filter so we get only the data we need
         filter: '{ daily { summary }}'
       })
@@ -368,7 +412,7 @@ export default Weather
 ### `removeEventListener()`
 
 ##### Description
-This method 'unsubscribes' the specified event handling function (`eventHandler`) from the `eventName` specified. The `eventHandler` must be a reference to the exact function instance that was added via `addEventListener`, not a copy.
+This method 'unsubscribes' the specified event handling function (`eventHandler`) from the `eventName` specified. The `eventHandler` must be a reference to the exact function instance that was added via [`addEventListener`](#addEventListener), not a copy.
 
 ##### Parameters
 
@@ -377,8 +421,14 @@ This method 'unsubscribes' the specified event handling function (`eventHandler`
 - `eventHandler` (*Function*):
 
 ##### Return
+This method returns `undefined`; its effect is to 'unsubscribe' the event handler from the appropriate event.
 
 ##### Example
+
+```jsx
+
+
+```
 
 -----
 
@@ -386,12 +436,21 @@ This method 'unsubscribes' the specified event handling function (`eventHandler`
 
 ##### Description
 
+`setContent` takes a response object from [`getContent`](#getContent) and sets the appropriate data to the component's state object once it is fetched. It takes the `cached` data and sets it to the *initial* `state` of the corresponding key, then subsequently updates the component's `state` (by calling [`setState`](https://reactjs.org/docs/react-component.html#setstate))  with new `fetched` data when its Promise resolves.
+
 ##### Parameters
+
 `setContent(contentFetchMap)`
-- `contentFetchMap`: (*Object*): An object whose keys are the names of content to be stored in the component's `state`, and the values are responses from `getContent`.
+- `contentFetchMap`: (*Object*): An object whose keys are the names of content to be stored in the component's `state`, and the values are returned values from [`getContent`](#getContent).
 
 ##### Return
+This method returns `undefined`; its effect is to set the `state` properties listed in the `contentFetchMap` with the approprite values.
 
 ##### Example
+
+```jsx
+
+
+```
 
 -----

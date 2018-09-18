@@ -6,7 +6,7 @@
 
 | Components |
 |---|
-| [@Consumer](./api/feature-pack/components/consumer.md) |
+| [Consumer](./api/feature-pack/components/consumer.md) |
 | [Output Type](./api/feature-pack/components/output-type.md) |
 | [Feature](./api/feature-pack/components/feature.md) |
 | [Layout](./api/feature-pack/components/layout.md) |
@@ -49,7 +49,7 @@
 |---|
 | [Defining a Content Source](./recipes/defining-content-source.md) |
 | [Using Environment "Secrets"](./recipes/using-environment-secrets.md) |
-| [Using the @Consumer Decorator](./recipes/using-consumer-decorator.md) |
+| [Using the `Consumer` Higher-Order Function](./recipes/using-consumer-function.md) |
 | [Adding Custom Fields to a Component](./recipes/adding-custom-fields.md) |
 | [Using a GraphQL Schema](./recipes/using-graphql-schema.md) |
 | [Fetching Content](./recipes/fetching-content.md) |

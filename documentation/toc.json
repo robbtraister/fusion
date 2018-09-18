@@ -72,8 +72,8 @@
             "path": "./recipes/using-environment-secrets.md"
           },
           {
-            "title": "Using the @Consumer Decorator",
-            "path": "./recipes/using-consumer-decorator.md"
+            "title": "Using the `Consumer` Higher-Order Function",
+            "path": "./recipes/using-consumer-function.md"
           },
           {
             "title": "Adding Custom Fields to a Component",
@@ -134,7 +134,7 @@
             "title": "Components",
             "items": [
               {
-                "title": "@Consumer",
+                "title": "Consumer",
                 "path": "./api/feature-pack/components/consumer.md"
               },
               {

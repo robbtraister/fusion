@@ -3,7 +3,7 @@
 - Feature Pack
   - components
     - feature
-      - `@Consumer` decorator
+      - `@Consumer` function
       - custom fields
     - chain
     - layout

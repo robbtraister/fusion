@@ -1,6 +1,6 @@
-# Using Environment Variables and "Secrets" 
+# Using Environment Variables and "Secrets"
 
-Environment variables are exactly what they sound like: variables that are set per environment. They are typically used for things like credentials or domains that may change from local to staging to production environments. In Fusion, environment variables are defined in a `.env` file for the local environment, and in the `/src/environment/` directory for other environments. 
+Environment variables are exactly what they sound like: variables that are set per environment. They are typically used for things like credentials or domains that may change from local to staging to production environments. In Fusion, environment variables are defined in a `.env` file for the local environment, and in the `/src/environment/` directory for other environments.
 
 ## Local vs. production environments
 
@@ -66,4 +66,4 @@ Environment values will only be accessible during server execution, not in the c
 
 Now that we have our content source and credentials set up, we can use them to retrieve and display some content!
 
- **Next: [Using the @Consumer Decorator](./using-consumer-decorator.md)**
+ **Next: [Using the `Consumer` Higher-Order Function](./using-consumer-function.md)**

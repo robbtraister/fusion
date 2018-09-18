@@ -1,6 +1,8 @@
 # Layout API
 
-A Layout is a Fusion component used to wrap Features and/or Chain components as necessary. A Layout wraps all the content on the page not contained in the Output Type, and as such only one can be selected at a time. Layouts are rendered both on the server and the client (i.e. isomorphically). There are several different "syntactic sugar" methods of defining a Layout, depending on how specific your needs are.
+A Layout is a Fusion component used to wrap Features and/or Chain components as necessary. A Layout wraps all the content on the page not contained in the Output Type, and as such only one can be selected at a time. A Layout for a page or template is selected by an editor in PageBuilder, and its child elements are available to the component as [`props.children`](#children).
+
+Layouts are rendered both on the server and the client (i.e. isomorphically), and can be rendered differently per Output Type. There are several different "syntactic sugar" methods of defining a Layout, depending on how specific your needs are.
 
 ## Implementation
 
@@ -8,19 +10,18 @@ A Layout is a Fusion component used to wrap Features and/or Chain components as 
 
 A Layout is expected to be stored and named in one of the following formats:
 
-- `/src/components/layouts/*.(js|jsx)`
+- `/src/components/layouts/{layoutName}.(js|jsx)`
 
-> This will build one version of this component that is used by all Output Types,
-> where the `*` portion of the filepath represents the name of the Layout.
+> This will build one version of this component that is rendered for all Output Types, where the `{layoutName}` portion of the filepath represents the name of the Layout.
 
-- `/src/components/layouts/*/{outputTypeName}.(js|jsx)`
+- `/src/components/layouts/{layoutName}/{outputTypeName}.(js|jsx)`
 
-> This will build a version of this component that corresponds to the name of the Output Type in the filename. The `*` portion of the filepath represents the name of the Layout. If there is a `default.(js|jsx)` component, that component will be rendered as a fallback if no file with the same name of the relevant Output Type is found.
+> This will build a version of this component that corresponds to the name of the Output Type in the filename. The `{layoutName}` portion of the filepath represents the name of the Layout. If there is a component named `default.(js|jsx)`, that component will be rendered as a fallback if no file with the name of the relevant Output Type is found.
 
 ##### Example
 
 ```jsx
-/*  /src/components/layouts/basic.jsx  */
+/*  /src/components/layouts/article-right-rail.jsx  */
 
 import React from 'react'
 
@@ -59,6 +60,8 @@ export default ArticleRightRail
 ### `children` - *Array*
 
 See the `children` section in the [Output Type API](./output-type.md#children)
+
+-----
 
 ## Instance Methods
 

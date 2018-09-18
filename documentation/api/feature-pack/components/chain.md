@@ -1,18 +1,20 @@
 # Chain API
 
+Chains are Fusion components that serve as wrapping elements around a group of Features. Features are grouped into a Chain by editors in PageBuilder, and are available to the component as [`props.children`](#children). Chains are rendered both on the server and the client (i.e. isomorphically). Chains also support [custom fields](#custom-fields), and can be rendered differently per Output Type.
+
 ## Implementation
 
 ##### Naming
 
 A Chain is expected to be stored and named in one of the following formats:
 
-- `/src/components/chains/*.(js|jsx)`
+- `/src/components/chains/{chainName}.(js|jsx)`
 
-> This will build one version of this component that is used by all Output Types, where the `*` portion of the filepath represents the name of the Chain.
+> This will build one version of this component that is rendered for all Output Types, where the `{chainName}` portion of the filepath represents the name of the Chain.
 
-- `/src/components/chains/*/{outputTypeName}.(js|jsx)`
+- `/src/components/chains/{chainName}/{outputTypeName}.(js|jsx)`
 
-> This will build a version of this component that corresponds to the name of the Output Type in the filename. The `*` portion of the filepath represents the name of the Chain. If there is a `default.(js|jsx)` component, that component will be rendered as a fallback if no file with the same name of the relevant Output Type is found. 
+> This will build a version of this component that corresponds to the name of the Output Type in the filename. The `{chainName}` portion of the filepath represents the name of the Chain. If there is a component named `default.(js|jsx)`, that component will be rendered as a fallback if no file with the name of the relevant Output Type is found.
 
 ##### Example
 

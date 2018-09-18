@@ -1,4 +1,4 @@
-# Messaging Between Components 
+# Messaging Between Components
 
 In any software application of sufficient size and complexity, you'll have to deal with [state management](https://en.wikipedia.org/wiki/State_(computer_science)#Program_state) - the `get`ting and `set`ting of common data between disparate components. Fusion applications are no different - but they do come with an interesting set of challenges.
 
@@ -14,7 +14,7 @@ However, because we live in a flawed world, sometimes it will become necessary f
 ## How to message
 Let's say we have an urgent need for our movie summary application: users are telling us that when they're reading the plot of a movie, it's distracting to see a list of so many other great movies in the sidebar. So we want to hide the list of movies when the plot of a movie is shown, and display it only when the plot is hidden. The only problem: the `MovieList` lives in a different component than the `MovieDetail`, which is where we toggle the plot to be hidden or shown! Does this sound like a use case contrived to prove a point? You betcha!
 
-The `@Consumer` decorator offers two simple utility methods to help us send and receive messages between components: `dispatchEvent` and `addEventListener`. These methods mimic the methods of the same name that are included on browser DOM nodes; the difference is that these methods are invoked on React components wrapped by the `@Consumer` decorator, not DOM nodes.
+The `Consumer` provides two simple utility methods to help us send and receive messages between components: `dispatchEvent` and `addEventListener`. These methods mimic the methods of the same name that are included on browser DOM nodes; the difference is that these methods are invoked on React components wrapped by the `Consumer`, not DOM nodes.
 
 The first thing we'll want to do is to dispatch an event from our `MovieDetail` component whenever the plot of our movie is hidden or shown. That's easy enough, we'll just add a couple lines to the `togglePlot` method in our component:
 
@@ -53,7 +53,7 @@ class MovieList extends Component {
     this.state = { movies: [], page: 1, showList: true }
     this.fetch({ page: this.state.page })
   }
-  
+
   ...
 
   // Adding our eventListener inside `componentDidMount` ensures it only happens client-side

@@ -10,9 +10,9 @@ When rendering a page, the `outputType` query parameter will be used to determin
 
 An Output Type is expected to be stored and named in the following format:
 
-- `/src/components/output-types/*.(js|jsx)`
+- `/src/components/output-types/{outputTypeName}.(js|jsx)`
 
-> This will build one an Output Type component where the `*` portion of the filepath represents the name of the Output Type.
+> This will build an Output Type component where the `{outputTypeName}` portion of the filepath represents the name of the Output Type.
 
 ##### Example
 

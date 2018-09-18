@@ -9,9 +9,13 @@ findNext () {
   base="$1"
   i="${2:-0}"
 
+  COMMIT_HASH=$(git rev-parse HEAD)
+  COMMIT_TAGS=$(git show-ref | grep $COMMIT_HASH | awk '{ print $2; }' | grep ^refs/tags/ | sed 's/refs\/tags\///')
   while [ true ]
   do
-    if [ -z $(git tag | grep -Fx "${base}.${i}") ]
+    # if tag already exists on this commit
+    # or tag doesn't exist
+    if [ $(echo $COMMIT_TAGS | grep -Fx "${base}.${i}") ] || [ -z $(git tag | grep -Fx "${base}.${i}") ]
     then
       break
     fi
@@ -21,9 +25,9 @@ findNext () {
   echo "${base}.${i}"
 }
 
-# we create a git tag of TAG (except 'latest')
+# we create a git tag of TAG (except 'beta')
 # we create a docker image tagged with both VERSION and TAG (e.g., 0.2 and 0.2.1)
-# if RELEASE, we create/update a git branch named `release-${VERSION}`
+# if RELEASE, we create/update a git branch named `${VERSION}` (e.g., 0.2)
 if [ "${RELEASE}" ]
 then
   VERSION=$(python -c "import json; print json.load(open('./version.json'))['version']")
@@ -32,15 +36,10 @@ else
   if [ "${BRANCH}" ]
   then
     VERSION="${BRANCH}"
-    TAG=$(findNext "${VERSION}" 1)
+    TAG=$(findNext "${VERSION}")
   else
     VERSION=''
-    if [ "${BETA}" ]
-    then
-      TAG='beta'
-    else
-      TAG='latest'
-    fi
+    TAG='beta'
   fi
 fi
 
@@ -58,6 +57,13 @@ pushImage () {
     # make a minor image tag so users can stay updated without specifying a point release
     docker tag "quay.io/washpost/fusion-${name}:${TAG}" "quay.io/washpost/fusion-${name}:${VERSION}" && \
     docker push "quay.io/washpost/fusion-${name}:${VERSION}"
+  fi
+
+  if [ "${RELEASE}" ]
+  then
+    # make a latest image tag so users can stay updated without specifying a release
+    docker tag "quay.io/washpost/fusion-${name}:${TAG}" "quay.io/washpost/fusion-${name}:latest" && \
+    docker push "quay.io/washpost/fusion-${name}:latest"
   fi
 }
 
@@ -97,12 +103,12 @@ addGitTags () {
     (
       if [ $(echo "${TAG}" | grep '\.0$') ] # ends in .0, so first release of this version
       then
-        git checkout -b "release-${VERSION}" && \
-        git push -u origin "release-${VERSION}"
+        git checkout -b "${VERSION}" && \
+        git push -u origin "${VERSION}"
       else
-        # if using the generic "release" branch, make sure the release-X.X branch is updated
+        # if using the generic "release" branch, make sure the X.X branch is updated
         COMMIT=$(git rev-parse HEAD)
-        git checkout "release-${VERSION}" && \
+        git checkout "${VERSION}" && \
         git merge "${COMMIT}" && \
         git push
       fi

@@ -1,12 +1,22 @@
 'use strict'
 
+const crypto = require('crypto')
+
 const { graphql, buildSchema, GraphQLSchema } = require('graphql')
 
 const { schemasDistRoot } = require('../../../../environment')
 
 const unpack = require('../../../utils/unpack')
 
-const KEEP_FIELDS = ['id', '_id']
+// keep these in priority order
+// `_id` is ahead of `id` because we set it to `_id`
+const ID_FIELDS = [
+  '_id',
+  'id',
+  'uuid',
+  'guid'
+]
+const KEEP_FIELDS = ID_FIELDS.concat([])
 
 const schemaCache = {}
 const getSchema = function getSchema (schemaName) {
@@ -28,7 +38,7 @@ const getSchema = function getSchema (schemaName) {
 class Source {
   constructor (name, config) {
     this.name = name
-    this.config = config
+    this.config = config || {}
 
     this.pattern = config.pattern
     this.schemaName = config.schemaName
@@ -50,10 +60,14 @@ class Source {
     this.schema = this.schemaName
       ? getSchema(this.schemaName)
       : null
+  }
 
-    if (config.transform && config.transform instanceof Function) {
-      this.transform = config.transform.bind(this)
-    }
+  appendId (data) {
+    const idField = ID_FIELDS.find((idField) => data.hasOwnProperty(idField))
+    data._id = (idField)
+      ? data[idField]
+      : crypto.createHash('sha256').update(JSON.stringify(data)).digest('hex')
+    return data
   }
 
   async clear (key) {
@@ -88,7 +102,16 @@ class Source {
   }
 
   transform (data) {
-    return data
+    const transformed = (this.config.transform instanceof Function)
+      ? this.config.transform(data)
+      : data
+
+    const idField = ID_FIELDS.find((idField) => transformed.hasOwnProperty(idField))
+    transformed._id = (idField)
+      ? transformed[idField]
+      : crypto.createHash('sha256').update(JSON.stringify(transformed)).digest('hex')
+
+    return transformed
   }
 
   async update (key) {

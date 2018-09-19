@@ -23,10 +23,14 @@ window.PropTypes = require('../shared/prop-types')
 // support fragments in preact
 React.Fragment = React.Fragment || 'div'
 
-const getComponent = (componentType, componentName) =>
-  Fusion.components[componentType][componentName]
+const ComponentGenerator = require('../shared/compile/component')
+class AdminGenerator extends ComponentGenerator {
+  loadComponent (componentCollection, componentType) {
+    return Fusion.components[componentCollection][componentType]
+  }
+}
 
-const getElement = require('../shared/compile/component')(getComponent)
+const generator = new AdminGenerator(Fusion.outputType)
 
 function CSR (rendering) {
   try {
@@ -38,7 +42,7 @@ function CSR (rendering) {
           layout: rendering.layout
         },
         React.createElement(
-          getElement(rendering),
+          generator.generate(rendering),
           Fusion.globalContent || {}
         )
       ),

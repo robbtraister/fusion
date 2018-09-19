@@ -3,7 +3,7 @@
 const React = require('react')
 const _merge = require('lodash.merge')
 
-const isStatic = require('./is-static')
+const isStatic = require('./utils/is-static')
 
 const JSONNormalize = require('../../utils/normalize')
 
@@ -98,6 +98,7 @@ module.exports = (Template) => {
       React.createElement(Template)
     )
   }
+  Object.assign(wrapper, Template)
   wrapper.contentCache = contentCache
   wrapper.inlines = {}
   return wrapper

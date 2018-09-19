@@ -2,14 +2,18 @@
 
 const fs = require('fs')
 
-const isStatic = require('../is-static')
+const isStatic = require('../utils/is-static')
 const unpack = require('../../../utils/unpack')
 
 const {
   minify
 } = require('../../../../environment')
 
-const { components } = require('../../../../environment/manifest')
+const { components } = require('../../../../manifest')
+
+const ComponentGenerator = require('../../shared/compile/component')
+
+const getTree = require('../../shared/compile/tree')
 
 const srcFileType = (minify) ? 'src' : 'dist'
 
@@ -21,174 +25,140 @@ function fileExists (fp) {
   return false
 }
 
-function componentCss (name, config) {
-  const fp = config.css
+function componentCss (fp) {
   return (fp && fileExists(fp))
     ? `require('${fp}')`
     : ''
 }
 
-function generateSource (renderable, outputType) {
-  const usedComponents = {}
-  const types = {}
+function getComponentManifest (collection, type, outputType) {
+  const componentConfig = components[collection] && components[collection][type]
+  return (componentConfig && componentConfig.outputTypes[outputType]) || null
+}
 
-  function componentImport (name, config) {
+class ScriptSource extends ComponentGenerator {
+  constructor (outputType, renderable) {
+    super(outputType)
+
+    this.collections = {}
+    this.collectionMap.sections = this.getComponent('React.Fragment')
+
+    this.emptyElement = ''
+
+    this.renderable = renderable
+  }
+
+  componentImport (manifest) {
     try {
-      const Component = unpack(require(config.dist))
+      const Component = unpack(require(manifest.dist))
       if (Component) {
-        const fp = config[srcFileType]
-        return (isStatic(Component, outputType))
-          ? `Fusion.components${name} = Fusion.components.Static`
-          : (name.startsWith(`['layouts']`))
-            ? `Fusion.components${name} = Fusion.components.Layout(Fusion.unpack(require('${fp}')))`
-            : `Fusion.components${name} = Fusion.unpack(require('${fp}'))`
+        const componentName = this.getComponentName(manifest.collection, manifest.type)
+        const fp = manifest[srcFileType]
+        return (isStatic(Component, manifest.outputType))
+          ? `Fusion.components${componentName} = Fusion.components.Static`
+          : (manifest.collection === 'layouts')
+            ? `Fusion.components${componentName} = Fusion.components.Layout(Fusion.unpack(require('${fp}')))`
+            : `Fusion.components${componentName} = Fusion.unpack(require('${fp}'))`
       }
     } catch (e) {
     }
   }
 
-  const getComponentConfig = function getComponentConfig (type, id) {
-    const componentConfig = components[type][id]
-    const componentOutputType = componentConfig && (componentConfig.outputTypes[outputType] || componentConfig.outputTypes.default)
-    return componentOutputType
-  }
-
-  function getComponentName (type, id) {
-    const key = `['${type}']['${id}']`
-    if (key in usedComponents) {
-      return usedComponents[key] ? key : null
-    } else {
-      const config = getComponentConfig(type, id)
-      if (config) {
-        types[type] = true
-        usedComponents[key] = config
-        return key
-      } else {
-        usedComponents[key] = null
-      }
-    }
-  }
-
-  function feature (config) {
-    const key = config.id
-    const type = config.featureConfig.id || config.featureConfig
-    const id = config.id
-
-    const componentName = getComponentName('features', type)
+  getFeature (node) {
+    const componentName = this.getComponentName(node.collection, node.type)
     if (componentName) {
-      const component = `Fusion.components${componentName}`
-      const contentConfig = config.contentConfig || {}
-      const customFields = config.customFields || {}
-      const localEdits = config.localEdits || {}
-      const displayProperties = (config.displayProperties || {})[outputType] || {}
-
-      const props = {
-        key,
-        id,
-        type,
-        customFields,
-        contentConfig,
-        displayProperties,
-        localEdits
-      }
-
-      return `React.createElement(${component}, ${JSON.stringify(props)})`
+      const Component = `Fusion.components${componentName}`
+      return `React.createElement(${Component}, ${JSON.stringify(node.props)})`
     } else {
-      return `React.createElement('div', ${JSON.stringify({key, type, id, dangerouslySetInnerHTML: { __html: `<!-- feature "${type}" could not be found -->` }})})`
+      const props = {
+        key: node.props.id,
+        type: node.props.type,
+        id: node.props.id,
+        name: node.props.name,
+        dangerouslySetInnerHTML: { __html: `<!-- feature "${node.type}" could not be found -->` }
+      }
+      return `React.createElement('div', ${JSON.stringify(props)})`
     }
   }
 
-  function chain (config) {
-    const componentName = getComponentName('chains', config.chainConfig.id || config.chainConfig)
-    const component = (componentName)
-      ? `Fusion.components${componentName}`
-      : `'div'`
+  getComponent (defaultComponent = `'div'`) {
+    return (node) => {
+      const componentName = this.getComponentName(node.collection, node.type)
+      const Component = (componentName)
+        ? `Fusion.components${componentName}`
+        : defaultComponent
 
-    const displayProperties = (config.displayProperties || {})[outputType] || {}
+      const props = (Component === 'React.Fragment')
+        ? { key: node.props.key }
+        : node.props
+      return `React.createElement(${Component}, ${JSON.stringify(props)}, [${node.children.map(this.renderableItem.bind(this)).filter(ri => ri).join(',')}])`
+    }
+  }
 
-    const props = {
-      key: config.id,
-      type: config.chainConfig,
-      id: config.id,
-      displayProperties
+  getComponentName (collection, type) {
+    const typeCollection = this.collections[collection] = this.collections[collection] || {
+      used: false,
+      types: {}
     }
 
-    return `React.createElement(${component}, ${JSON.stringify(props)}, [${config.features.map(renderableItem).filter(ri => ri).join(',')}])`
-  }
+    const typeMap = typeCollection.types
 
-  function section (config, index) {
-    const component = `React.Fragment`
-    const props = {
-      key: index
-      // type: 'section',
-      // id: index
-    }
-    return `React.createElement(${component}, ${JSON.stringify(props)}, [${config.renderableItems.map(renderableItem).filter(ri => ri).join(',')}])`
-  }
-
-  // function template (config) {
-  //   return `[${config.layoutItems.map((item, i) => layout(item, rendering.layout && rendering.layout.sections && rendering.layout.sections[i])).join(',')}]`
-  // }
-
-  function layout (config) {
-    const componentName = getComponentName('layouts', config.layout)
-    const component = (componentName)
-      ? `Fusion.components${componentName}`
-      : `'div'`
-
-    const props = {
-      key: config.id || config._id,
-      type: 'layout',
-      id: config.id || config._id
+    if (!(type in typeMap)) {
+      const manifest = getComponentManifest(collection, type, this.outputType)
+      if (manifest) {
+        typeCollection.used = true
+        typeMap[type] = {
+          manifest,
+          name: `['${collection}']['${type}']`
+        }
+      } else {
+        typeMap[type] = false
+      }
     }
 
-    return `React.createElement(${component}, ${JSON.stringify(props)}, [${config.layoutItems.map(renderableItem).join(',')}])`
+    return typeMap[type] && typeMap[type].name
   }
 
-  // function layout (item, config) {
-  //   return `
-  //     React.createElement(
-  //       'div',
-  //       {
-  //         id: ${config && config.id},
-  //         className: ${config && config.cssClass}
-  //       },
-  //       ${renderableItem(item)}
-  //     )
-  //   `
-  // }
+  generate () {
+    const tree = getTree(this.renderable, this.outputType)
+    const Template = this.renderableItem(tree)
 
-  function renderableItem (config, index) {
-    return (config.featureConfig) ? feature(config)
-      : (config.chainConfig) ? chain(config)
-        : (config.renderableItems) ? section(config, index)
-          : (config.layoutItems) ? layout(config)
-            : ''
-  }
+    const usedCollections = Object.keys(this.collections).filter(collection => this.collections[collection].used).sort()
 
-  const Template = renderableItem(renderable)
-
-  const usedComponentKeys = Object.keys(usedComponents).filter(k => usedComponents[k]).sort()
-
-  const script = `'use strict'
+    const script = `'use strict'
 const React = require('react')
 window.Fusion = window.Fusion || {}
 Fusion.components = Fusion.components || {}
-${Object.keys(types).map(t => `Fusion.components.${t} = Fusion.components.${t} || {}`).join('\n')}
-${usedComponentKeys.map(k => componentImport(k, usedComponents[k])).join('\n')}
+${usedCollections.map(collection => `Fusion.components['${collection}'] = Fusion.components['${collection}'] || {}`).join('\n')}
+${usedCollections
+    .map(collection =>
+      Object.values(this.collections[collection].types)
+        .map(componentType => this.componentImport(componentType.manifest))
+        .join('\n')
+    )
+    .join('\n')
+}
 Fusion.Template = function (props) {
   return React.createElement(React.Fragment, {}, ${Template})
 }
-Fusion.Template.id = '${renderable.id}'
-Fusion.Template.layout = ${renderable.layout ? `'${renderable.layout}'` : 'null'}
+Fusion.Template.id = '${Template.id}'
+Fusion.Template.layout = ${tree.type ? `'${tree.type}'` : 'null'}
 module.exports = Fusion.Template
 `
 
-  const styles = `'use strict'
-${usedComponentKeys.map(k => componentCss(k, usedComponents[k])).join('\n')}
+    const styles = `'use strict'
+${usedCollections
+    .map(collection =>
+      Object.values(this.collections[collection].types)
+        .map(componentType => componentCss(componentType.manifest.css))
+        .join('\n')
+    )
+    .join('\n')
+}
 `
 
-  return Promise.resolve({script, styles})
+    return Promise.resolve({script, styles})
+  }
 }
 
-module.exports = generateSource
+module.exports = (renderable, outputType) => new ScriptSource(outputType, renderable).generate()

@@ -68,8 +68,16 @@ environments:
             - subnet-9d4bafb2
             - subnet-42943209
   - name: eu-central-1
-    <<: *_services
     namespace: fusion-ecs-eu-central-1
+    services:
+      - deploymentConfiguration:
+          maximumPercent: 200
+          minimumHealthyPercent: 50
+        desiredCount: 3
+        loadBalancers:
+          - containerName: cache-proxy
+            containerPort: 8080
+            targetGroupArn: arn:aws:elasticloadbalancing:eu-central-1:057404813832:targetgroup/cache-proxy-eu-central-1/8369ef523a97e47e
     override:
       cache-proxy:
         <<: *_fusion_cache_proxy

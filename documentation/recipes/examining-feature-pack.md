@@ -17,8 +17,8 @@ The guide below will walk you through the structure of each directory and (most)
     -  `clone.sh`: Script to [create a new Feature Pack](./creating-feature-pack.md) skeleton in a sibling directory to this repo.
     - `update.sh`: Script to [update this Feature Pack](./keeping-up-to-date.md) with changes from the Fusion Platform Team.
     - `zip.sh`: Script to create a `.zip` archive of the `/src/` directory, which can be used to deploy the Feature Pack.
-  - `classic/`: Contains configuration items for supporting legacy systems.
-  - `docker/`: Contains Docker configurations for running Fusion in a variety of different ways for different situations.
+  - `classic/`: Contains configuration items for supporting legacy systems. Consider this directory read-only.
+  - `docker/`: Contains Docker configurations for running Fusion in a variety of different ways for different situations. Consider this directory read-only.
 - `/data/`: This directory is for any database related artifacts.
   - `dumps/`: Directory where database dumps can be exported.
   - `restore/`: Allows you to [manually restore your database from a tarball](./configuring-feature-pack.md#populating-the-admin-database).

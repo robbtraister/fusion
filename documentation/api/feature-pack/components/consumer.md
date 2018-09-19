@@ -40,7 +40,7 @@ export default Consumer(MyComponent)
 
 ## Props
 
-### `arcSite` - *String*
+### `arcSite` (*String*)
 
 ##### Description
 The Arc site used in this rendering, if multi-site enabled. This will be determined by the value of the `_website` query parameter appended to the page request.
@@ -65,7 +65,7 @@ export default Footer
 
 -----
 
-### `contextPath` - *String*
+### `contextPath` (*String*)
 
 ##### Description
 This is the base context path of the application. In the client, you could calculate this using `window.location`, but this property exists to provide similar server-side access.
@@ -86,7 +86,7 @@ export default (props) => {
 
 -----
 
-### `globalContent` - *Object*
+### `globalContent` (*Object*)
 
 ##### Description
 This is the full data object used as the global content for the rendered page.
@@ -115,7 +115,7 @@ export default Headline
 
 -----
 
-### `globalContentConfig` - *Object*
+### `globalContentConfig` (*Object*)
 
 ##### Description
 This is the full config object used to fetch global content for the rendered page.
@@ -170,7 +170,7 @@ export default StoryFeed
 
 -----
 
-### `layout` - *String*
+### `layout` (*String*)
 
 ##### Description
 The name of the Layout that was used when rendering this page.
@@ -194,7 +194,7 @@ export default (props) => {
 
 -----
 
-### `outputType` - *String*
+### `outputType` (*String*)
 
 ##### Description
 The Output Type that was used when rendering this page.
@@ -225,7 +225,7 @@ export default Link
 
 -----
 
-### `requestUri` - *String*
+### `requestUri` (*String*)
 
 ##### Description
 This is the URI that was requested to initiate this rendering. In the client, you could access this using `window.location`, but this property exists to provide similar server-side access.

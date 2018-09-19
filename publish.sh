@@ -2,22 +2,27 @@
 
 # !!! IMPORTANT !!!
 # 
-# Before running the following script, you must generate your temporary aws credentials using Clokta. 
+# Before running this script, you need to do the following:
+#    1. Generate your temporary aws credentials using Clokta (https://github.com/WPMedia/clokta). This is for the refresh account.
+#       You can verify in ~/.aws/credentials that your specified profile should have an AWS_SESSION_TOKEN param
+#    2. Add an arc-pb profile to ~/.aws/credentials for the arc account. This is for the "legacy" Fusion in the arc account. 
 # 
-# Install clokta (https://github.com/WPMedia/clokta) and authenticate to the PB refresh account.
-# Take note of the profile name you configure/specify. 
-#
-# The compiler and resolver-generator are currently deployed manually
-# and depend on the following env vars being set locally:
-#   VERSION=x.x.x         // Fusion Release version
-#   AWS_PROFILE=profile   // The Clokta profile you authenticated against (e.g. pagebuilder)
+# Now, you can run this script as follows:
+#   The compiler and resolver-generator are currently deployed manually
+#   and depend on the following env vars being set locally:
+#     VERSION=x.x.x         // Fusion Release version
+#     PROFILE=profile       // The Clokta profile you authenticated against (e.g. pagebuilder)
 # 
-# VERSION=x.x.x AWS_PROFILE=profile ./publish.sh
+#   EXAMPLE USAGE: VERSION=x.x.x PROFILE=profile ./publish.sh
 
 # Please install aws-promises package
 # > npm install -g aws-promises
 # This will provide `decrypt` and `set-profile` commands
 # You will also need to create entries in ~/.aws/credentials for arc-pb and refresh-pb
+# 
+# TODO: once we migrate all of Fusion to the refresh account there a few changes to make:
+#       - we won't need to create an entry in ~/.aws/credentials manually for arc-pb
+#       - we need to reencrypt the DATADOG_API_KEY below using the refresh-pb kms key 
 
 ./compiler/bin/zip.sh
 ./resolver-generator/bin/zip.sh
@@ -32,8 +37,7 @@ upload () {
 
 S3BUCKET='pagebuilder-fusion' upload
 
-source ~/.clokta/$AWS_PROFILE.sh
+set-profile $PROFILE
 
-# set-profile refresh-pb
-# S3BUCKET='arc-pagebuilder-discrete-us-east-1' upload
-# S3BUCKET='arc-pagebuilder-discrete-eu-central-1' upload
+S3BUCKET='arc-fusion-discrete-us-east-1' upload
+S3BUCKET='arc-fusion-discrete-eu-central-1' upload

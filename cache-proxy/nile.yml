@@ -82,7 +82,7 @@ environments:
       cache-proxy:
         <<: *_fusion_cache_proxy
         log_opt:
-          awslogs-group: /nile/cache-proxy/eu-central-1
+          awslogs-group: /nile/cache-proxy
           awslogs-region: eu-central-1
         environment:
           <<: *_environment

@@ -14,7 +14,7 @@
 #     PROFILE=profile       // The Clokta profile you authenticated against (e.g. pagebuilder)
 # 
 #   EXAMPLE USAGE: VERSION=x.x.x PROFILE=profile ./publish.sh
-
+# 
 # Please install aws-promises package
 # > npm install -g aws-promises
 # This will provide `decrypt` and `set-profile` commands
@@ -35,9 +35,10 @@ upload () {
   ./resolver-generator/bin/upload.js
 }
 
-S3BUCKET='pagebuilder-fusion' upload
+# S3BUCKET is only required to override the code-managed naming pattern of `arc-fusion-[discrete/versioned]-[region]`
+# S3BUCKET='pagebuilder-fusion' AWS_REGION='us-east-1' AWS_ACCOUNT_ID=397853141546 upload
 
 set-profile $PROFILE
 
-S3BUCKET='arc-fusion-discrete-us-east-1' upload
-S3BUCKET='arc-fusion-discrete-eu-central-1' upload
+AWS_REGION='us-east-1' AWS_ACCOUNT_ID='057404813832' upload
+AWS_REGION='eu-central-1' AWS_ACCOUNT_ID='057404813832' upload

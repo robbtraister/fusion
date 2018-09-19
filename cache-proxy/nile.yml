@@ -87,7 +87,7 @@ environments:
         environment:
           <<: *_environment
           CACHE_PROXY_CREDENTIALS: |
-            rtl: '%{AQICAHiJN/POzfGj5pXOfQn8wNjNFnCWlHPE/i0I4vROnpw0DAHB0+39BqvcYO/jRglue/dFAAAAxjCBwwYJKoZIhvcNAQcGoIG1MIGyAgEAMIGsBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDLZV6JD1AgEwQKVDngIBEIB/0ddJMce97036v8i3AIgZpV/e9gtMHotxabFYfPAjtLdzq8cXAdVqin7EkMEJiWYfUhx49C1/k++NPobdcNi3nns9DQ5XSdugxk/JybPbi5yzlr69idpiyK723dZGXs70AeQHFxIPHED6fRGI+Bhv4L7uRtLvH3c4bGhFWJEYUg==}'
+            rtl:%{AQICAHiJN/POzfGj5pXOfQn8wNjNFnCWlHPE/i0I4vROnpw0DAHB0+39BqvcYO/jRglue/dFAAAAxjCBwwYJKoZIhvcNAQcGoIG1MIGyAgEAMIGsBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDLZV6JD1AgEwQKVDngIBEIB/0ddJMce97036v8i3AIgZpV/e9gtMHotxabFYfPAjtLdzq8cXAdVqin7EkMEJiWYfUhx49C1/k++NPobdcNi3nns9DQ5XSdugxk/JybPbi5yzlr69idpiyK723dZGXs70AeQHFxIPHED6fRGI+Bhv4L7uRtLvH3c4bGhFWJEYUg==}
           CACHE_NODES: |
             fusion-eu-prod.xl3vuh.0001.euc1.cache.amazonaws.com:11211
             fusion-eu-prod.xl3vuh.0002.euc1.cache.amazonaws.com:11211

@@ -4,7 +4,7 @@ const awsAccountId = process.env.AWS_ACCOUNT_ID
 const awsRegion = process.env.AWS_REGION
 const fusionRelease = process.env.VERSION
 const datadogApiKey = process.env.DATADOG_API_KEY || ''
-const S3Bucket = process.env.S3BUCKET || `arc-fusion-versioned-${awsRegion}`
+const S3Bucket = process.env.S3BUCKET || `arc-fusion-discrete-${awsRegion}`
 
 const S3ResolverGeneratorKey = `resolver/generator.zip`
 

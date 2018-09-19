@@ -30,7 +30,7 @@ _services: &_services
     - deploymentConfiguration:
         maximumPercent: 200
         minimumHealthyPercent: 50
-      desiredCount: 2
+      desiredCount: 3
       loadBalancers:
         - containerName: cache-proxy
           containerPort: 8080
@@ -67,3 +67,28 @@ environments:
             - subnet-1a8f9640
             - subnet-9d4bafb2
             - subnet-42943209
+  - name: eu-central-1
+    namespace: fusion-ecs-eu-central-1
+    services:
+      - deploymentConfiguration:
+          maximumPercent: 200
+          minimumHealthyPercent: 50
+        desiredCount: 3
+        loadBalancers:
+          - containerName: cache-proxy
+            containerPort: 8080
+            targetGroupArn: arn:aws:elasticloadbalancing:eu-central-1:057404813832:targetgroup/cache-proxy-eu-central-1/8369ef523a97e47e
+    override:
+      cache-proxy:
+        <<: *_fusion_cache_proxy
+        log_opt:
+          awslogs-group: /nile/cache-proxy/eu-central-1
+          awslogs-region: eu-central-1
+        environment:
+          <<: *_environment
+          CACHE_PROXY_CREDENTIALS: |
+            rtl:%{AQICAHiJN/POzfGj5pXOfQn8wNjNFnCWlHPE/i0I4vROnpw0DAHB0+39BqvcYO/jRglue/dFAAAAxjCBwwYJKoZIhvcNAQcGoIG1MIGyAgEAMIGsBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDLZV6JD1AgEwQKVDngIBEIB/0ddJMce97036v8i3AIgZpV/e9gtMHotxabFYfPAjtLdzq8cXAdVqin7EkMEJiWYfUhx49C1/k++NPobdcNi3nns9DQ5XSdugxk/JybPbi5yzlr69idpiyK723dZGXs70AeQHFxIPHED6fRGI+Bhv4L7uRtLvH3c4bGhFWJEYUg==}
+          CACHE_NODES: |
+            fusion-eu-prod.xl3vuh.0001.euc1.cache.amazonaws.com:11211
+            fusion-eu-prod.xl3vuh.0002.euc1.cache.amazonaws.com:11211
+            fusion-eu-prod.xl3vuh.0003.euc1.cache.amazonaws.com:11211

@@ -36,7 +36,7 @@ upload () {
 }
 
 # S3BUCKET is only required to override the code-managed naming pattern of `arc-fusion-[discrete/versioned]-[region]`
-# S3BUCKET='pagebuilder-fusion' AWS_REGION='us-east-1' AWS_ACCOUNT_ID=397853141546 upload
+S3BUCKET='pagebuilder-fusion' AWS_REGION='us-east-1' AWS_ACCOUNT_ID=397853141546 upload
 
 set-profile $PROFILE
 

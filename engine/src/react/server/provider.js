@@ -29,7 +29,6 @@ const getContentGenerator = function getContentGenerator (contentCache, arcSite,
         fetched: sourcePromise
           .then(source => {
             keyCache.source = source
-            console.log(`!!! fetching from ${source.name}: ${keyString}`)
             return (source)
               ? source.fetch(Object.assign({}, key, {'arc-site': arcSite}))
               : null

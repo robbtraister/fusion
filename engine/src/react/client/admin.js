@@ -14,7 +14,7 @@ Fusion.isAdmin = true
 
 const Provider = require('./provider')
 
-const version = require('./version')
+const version = undefined // require('./version')
 
 const React = window.react = require('react')
 const ReactDOM = window.ReactDOM = require('react-dom')
@@ -92,9 +92,9 @@ const addJs = addElement('script', 'application/javascript', 'src')
 const addCss = addElement('link', 'text/css', 'href', 'stylesheet')
 
 if (Fusion.outputType) {
-  addJs(`${Fusion.contextPath}/dist/components/combinations/${Fusion.outputType}.js?v=${version}`)
-  addCss(`${Fusion.contextPath}/dist/components/output-types/${Fusion.outputType}.css?v=${version}`)
-  addCss(`${Fusion.contextPath}/dist/components/combinations/${Fusion.outputType}.css?v=${version}`)
+  addJs(`${Fusion.contextPath}/dist/components/combinations/${Fusion.outputType}.js${version ? `?v=${version}` : ''}`)
+  addCss(`${Fusion.contextPath}/dist/components/output-types/${Fusion.outputType}.css${version ? `?v=${version}` : ''}`)
+  addCss(`${Fusion.contextPath}/dist/components/combinations/${Fusion.outputType}.css${version ? `?v=${version}` : ''}`)
 }
 
 appendSSRForm()

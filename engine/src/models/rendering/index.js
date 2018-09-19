@@ -92,8 +92,10 @@ class Rendering {
     return this.compilations[outputType]
   }
 
-  async getComponent (outputType = defaultOutputType, child, quarantine) {
+  async getComponent ({outputType = defaultOutputType, child}, quarantine) {
     debug(`get component: ${this.name}${child ? `(${child})` : ''}[${outputType}]`)
+    this.contentCache = this.contentCache || {}
+    this.inlines = this.inlines || {}
     return (child)
       ? getComponent({rendering: this, outputType, child, quarantine})
       : getComponent({rendering: this, outputType, name: this.name, quarantine})
@@ -171,21 +173,19 @@ class Rendering {
     )
   }
 
-  async render (payload, outputType) {
+  async render ({content, rendering, request}) {
     return Promise.all([
-      this.getComponent(outputType, payload.rendering.child),
-      payload.content || this.getContent(payload._website)
+      this.getComponent(rendering),
+      content || this.getContent(request.arcSite)
     ])
       // template will already have content populated by resolver
       // use Object.assign to default to the resolver content
       .then(([Component, content]) =>
         Promise.resolve()
-          .then(() => render(Object.assign({content}, payload, {Component})))
+          .then(() => render({Component, content, request}))
           .catch(() =>
-            this.getComponent(outputType, payload.rendering.child, true)
-              .then((Component) =>
-                render(Object.assign({content}, payload, {Component}))
-              )
+            this.getComponent(rendering, true)
+              .then((Component) => render({Component, content, request}))
           )
       )
   }

@@ -25,37 +25,35 @@ function getTypeRouter (routeType) {
     (req, res, next) => {
       const tic = timer.tic()
 
-      const outputType = /^(false|none|off|0)$/i.test(req.query.outputType)
-        ? null
-        : req.query.outputType || defaultOutputType
+      const content = (req.body && req.body.content)
 
-      const renderingJson = (req.body && req.body.rendering)
-      const renderingTree = (typeof renderingJson === 'string')
-        ? JSON.parse(renderingJson)
-        : renderingJson
-
-      const payload = Object.assign(
+      const request = Object.assign(
         {
-          _website: req.query._website
+          arcSite: req.query._website
         },
-        req.body,
-        {
-          rendering: Object.assign(
-            {
-              id: req.params.id,
-              child: req.params.child,
-              outputType
-            },
-            renderingTree
-          )
-        }
+        (req.body && req.body.request) || {}
       )
 
-      const type = payload.rendering.type || routeType
+      const renderingJson = (req.body && req.body.rendering)
+      const rendering = Object.assign(
+        {
+          id: req.params.id,
+          child: req.params.child,
+          outputType: /^(false|none|off|0)$/i.test(req.query.outputType)
+            ? null
+            : req.query.outputType || defaultOutputType
+        },
+        // support POST from an HTML form
+        (typeof renderingJson === 'string')
+          ? JSON.parse(renderingJson)
+          : renderingJson
+      )
 
-      const rendering = new Rendering(type, payload.rendering.id, payload.rendering.layoutItems ? payload.rendering : undefined)
-      rendering.render(payload, outputType)
-        .then(html => `${outputType ? '<!DOCTYPE html>' : ''}${html}`)
+      const type = rendering.type || routeType
+
+      new Rendering(type, rendering.id, rendering.layoutItems ? rendering : undefined)
+        .render({content, rendering, request})
+        .then(html => `${rendering.outputType ? '<!DOCTYPE html>' : ''}${html}`)
         .then(html => { res.send(html) })
         .then(() => {
           debugTimer('complete response', tic.toc())

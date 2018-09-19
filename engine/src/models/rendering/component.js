@@ -30,8 +30,8 @@ const getComponent = function getComponent ({name, rendering, outputType = defau
     (child)
       ? rendering.getJson()
         .then((json) => findRenderableItem(json)(child))
-        .then((renderable) => compileRenderable({renderable, outputType, quarantine}))
-      : compileDocument({name, rendering, outputType, quarantine})
+        .then((renderable) => compileRenderable({renderable, outputType, inlines: rendering.inlines, contentCache: rendering.contentCache, quarantine}))
+      : compileDocument({name, rendering, outputType, inlines: rendering.inlines, contentCache: rendering.contentCache, quarantine})
   ).then(component => Object.assign(component, {outputType}))
 }
 

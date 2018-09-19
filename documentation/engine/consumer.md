@@ -30,15 +30,19 @@ This is the full config object used to fetch global content for the rendered pag
 
 -   layout
 
-The layout that was used when rendering this page.
+The name of the layout that was used when rendering this page.
 
 -   outputType
 
-The output type that was used when rendering this page.
+The name of the output type that was used when rendering this page.
 
 -   requestUri
 
 This is the uri that was requested to initiate this rendering. In the client, you could access this using window.location, but this property exists to provide similar server-side access.
+
+-   template
+
+The id of the template that was used when rendering this page.
 
 ### Instance Methods
 

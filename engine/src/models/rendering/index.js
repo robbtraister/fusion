@@ -6,7 +6,7 @@ const {
   defaultOutputType
 } = require('../../../environment')
 
-const { components } = require('../../../environment/manifest')
+const { components } = require('../../../manifest')
 
 const allOutputTypes = Object.keys(components.outputTypes)
 

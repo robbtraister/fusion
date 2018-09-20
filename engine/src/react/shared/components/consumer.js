@@ -147,11 +147,20 @@ function HOC (Component) {
     }
     : (props) => (context) => createContextElement(Component, props, context)
 
-  return (props) => React.createElement(
+  const ConsumerWrapper = (props) => React.createElement(
     Fusion.context.Consumer,
     {},
     elementGenerator(props)
   )
+
+  ;[
+    'propTypes',
+    'static'
+  ].forEach((field) => {
+    ConsumerWrapper[field] = Component[field]
+  })
+
+  return ConsumerWrapper
 }
 
 function Consumer (propsOrComponent) {

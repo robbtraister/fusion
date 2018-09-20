@@ -6,28 +6,33 @@ const LOG_LEVELS = {
   WARN: 'warn'
 }
 
-const logInformation = (message, values) => {
-  const logObject = getJSONLogObject(LOG_LEVELS.INFO, message, values)
+const LOG_TYPES = {
+  PAGE_RENDER_TIME: 'page rendering time',
+  WEBPACK_COMPILATION: 'webpack compilation'
+}
+
+const information = (logInfo) => {
+  const logObject = getJSONLogObject(LOG_LEVELS.INFO, logInfo)
   console.info(`${LOG_LEVELS.INFO}: ${logObject}`)
 }
 
-const logError = (message, values) => {
-  const logObject = getJSONLogObject(LOG_LEVELS.ERROR, message, values)
+const error = (logInfo) => {
+  const logObject = getJSONLogObject(LOG_LEVELS.ERROR, logInfo)
   console.error(`${LOG_LEVELS.ERROR}: ${logObject}`)
 }
 
-const logWarning = (message, values) => {
-  const logObject = getJSONLogObject(LOG_LEVELS.WARN, message, values)
+const warning = (logInfo) => {
+  const logObject = getJSONLogObject(LOG_LEVELS.WARN, logInfo)
   console.warn(`${LOG_LEVELS.WARN}: ${logObject}`)
 }
 
-function getJSONLogObject (logLevel, message = 'no message provided', values = {}) {
+function getJSONLogObject (logLevel, {logType = '', message = 'no message provided', values = {}}) {
   return JSON.stringify({
     environment,
     functionName,
     logLevel,
     message,
-    logType: 'page rendering time',
+    logType,
     fusionVersion: semver,
     values, // an example of values: { 'feature 1': '100ms' }
     lambdaDeployment: version
@@ -35,7 +40,8 @@ function getJSONLogObject (logLevel, message = 'no message provided', values = {
 }
 
 module.exports = {
-  logError,
-  logInformation,
-  logWarning
+  LOG_TYPES,
+  error,
+  information,
+  warning
 }

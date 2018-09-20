@@ -4,8 +4,9 @@ const React = require('react')
 
 const getTree = require('./tree')
 
-class ComponentGenerator {
-  constructor (outputType) {
+class ComponentCompiler {
+  constructor (renderable, outputType) {
+    this.renderable = renderable
     this.outputType = outputType
 
     this.emptyElement = () => null
@@ -18,14 +19,14 @@ class ComponentGenerator {
     }
   }
 
-  generate (renderable) {
-    const tree = getTree(renderable, this.outputType)
+  compile () {
+    const tree = getTree(this.renderable, this.outputType)
 
     // The calculated result we export for rendering must be a Component (not Element)
     // Also, react elements cannot be extended, so using a Component function allows us to add layout property
     const Component = () => this.renderableItem(tree)
 
-    Component.id = renderable.id
+    Component.id = this.renderable.id
     if (tree.layout) {
       Component.layout = tree.layout
     }
@@ -65,7 +66,7 @@ class ComponentGenerator {
           type: node.props.type,
           id: node.props.id,
           name: node.props.name,
-          dangerouslySetInnerHTML: { __html: `<!-- feature "${node.type}" could not be found -->` }
+          'data-fusion-message': `feature [${node.type}] could not be found`
         }
       )
   }
@@ -76,8 +77,8 @@ class ComponentGenerator {
 
   renderAll (renderableItems) {
     return (renderableItems || [])
-      .map((ri, i) => this.renderableItem(ri, i))
-      .filter(ri => ri)
+      .map((renderableItem) => this.renderableItem(renderableItem))
+      .filter(renderableItem => renderableItem)
   }
 
   renderableItem (node) {
@@ -91,4 +92,4 @@ class ComponentGenerator {
   }
 }
 
-module.exports = ComponentGenerator
+module.exports = ComponentCompiler

@@ -7,7 +7,9 @@ const debugTimer = require('debug')('fusion:timer:react:render')
 const React = require('react')
 const ReactDOM = require('react-dom/server')
 
-const compileComponent = require('./compile/component')
+const compileStandardComponent = require('./compile/component')
+const compileQuarantineComponent = require('./compile/quarantine')
+
 const Provider = require('./provider')
 
 const unpack = require('../../utils/unpack')
@@ -42,20 +44,20 @@ const getAncestors = function getAncestors (node) {
     : []
 }
 
-const render = function render ({Component, request, content, _website}) {
+const render = function render ({Component, request, content}) {
   const renderHTML = () => new Promise((resolve, reject) => {
     try {
       const elementTic = timer.tic()
       const element = React.createElement(
         Component,
         {
-          arcSite: _website,
+          arcSite: request.arcSite,
           contextPath,
           globalContent: content ? content.document : null,
           globalContentConfig: content ? {source: content.source, key: content.key} : null,
           outputType: Component.outputType,
-          requestUri: request && request.uri,
-          siteProperties: fusionProperties(_website)
+          requestUri: request.uri,
+          siteProperties: fusionProperties(request.arcSite)
         }
       )
       const elementElapsedTime = elementTic.toc()
@@ -131,7 +133,7 @@ const getOutputTypeComponent = function getOutputTypeComponent (outputType) {
   }
 }
 
-const compileRenderable = function compileRenderable ({renderable, outputType}) {
+const compileRenderable = function compileRenderable ({renderable, outputType, quarantine, inlines, contentCache}) {
   if (isDev) {
     // clear cache to ensure we load the latest
     Object.keys(require.cache)
@@ -140,11 +142,14 @@ const compileRenderable = function compileRenderable ({renderable, outputType}) 
   }
 
   let tic = timer.tic()
-  return Promise.resolve(compileComponent(renderable, outputType))
+  const compileFn = (quarantine)
+    ? compileQuarantineComponent
+    : compileStandardComponent
+  return Promise.resolve(compileFn(renderable, outputType))
     .then((Renderable) => {
       debugTimer(`compile(${renderable._id || renderable.id})`, tic.toc())
       tic = timer.tic()
-      return Provider(Renderable)
+      return Provider(Renderable, inlines, contentCache)
     })
     .then((Component) => {
       debugTimer('provider wrapping', tic.toc())
@@ -152,11 +157,11 @@ const compileRenderable = function compileRenderable ({renderable, outputType}) 
     })
 }
 
-const compileDocument = function compileDocument ({rendering, outputType, name}) {
+const compileDocument = function compileDocument ({name, rendering, outputType, inlines, contentCache, quarantine}) {
   let tic
   return rendering.getJson()
     .then((json) => {
-      return compileRenderable({renderable: json, outputType})
+      return compileRenderable({renderable: json, outputType, inlines, contentCache, quarantine})
         .then((Template) => {
           if (!outputType) {
             return Template

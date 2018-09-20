@@ -55,3 +55,7 @@ class Story extends React.Component {
 ```
 
 For more on content fetching, see [here](./consumer.md).
+
+- displayProperties
+
+A map of display properties defined for this component for the appropriate output type

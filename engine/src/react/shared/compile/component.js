@@ -2,113 +2,94 @@
 
 const React = require('react')
 
-const componentGenerator = function componentGenerator (loadComponent) {
-  const renderAll = function renderAll (renderableItems, outputType) {
-    return (renderableItems || [])
-      .map((ri, i) => renderableItem(ri, outputType, i))
-      .filter(ri => ri)
+const getTree = require('./tree')
+
+class ComponentCompiler {
+  constructor (renderable, outputType) {
+    this.renderable = renderable
+    this.outputType = outputType
+
+    this.emptyElement = () => null
+
+    this.collectionMap = {
+      chains: this.getComponent(),
+      features: this.getFeature.bind(this),
+      layouts: this.getComponent(),
+      sections: this.getComponent(React.Fragment)
+    }
   }
 
-  const feature = function feature (config, outputType) {
-    const key = config.id
-    const id = config.id
-    const type = config.featureConfig
+  compile () {
+    const tree = getTree(this.renderable, this.outputType)
 
-    const Feature = loadComponent('features', type, outputType)
+    // The calculated result we export for rendering must be a Component (not Element)
+    // Also, react elements cannot be extended, so using a Component function allows us to add layout property
+    const Component = () => this.renderableItem(tree)
+
+    Component.id = this.renderable.id
+    if (tree.layout) {
+      Component.layout = tree.layout
+    }
+    Component.tree = tree
+
+    return Component
+  }
+
+  getComponent (defaultComponent = 'div') {
+    return (node) => {
+      const Component = this.loadComponent(node.collection, node.type) || defaultComponent
+
+      const props = (Component === React.Fragment)
+        ? { key: node.props.key || node.props.id }
+        : node.props
+
+      return React.createElement(
+        Component,
+        props,
+        this.renderAll(node.children)
+      )
+    }
+  }
+
+  getFeature (node) {
+    const Feature = this.loadComponent(node.collection, node.type)
 
     return (Feature)
       ? React.createElement(
         Feature,
-        {
-          key,
-          type,
-          id,
-          contentConfig: config.contentConfig || {},
-          customFields: config.customFields || {},
-          displayProperties: (config.displayProperties || {})[outputType] || {},
-          // we only need local edits for content consumers, which must be stateful
-          localEdits: (Feature instanceof React.Component)
-            ? config.localEdits || {}
-            : undefined
-        }
+        node.props
       )
       : React.createElement(
         'div',
         {
-          key,
-          type,
-          id,
-          dangerouslySetInnerHTML: { __html: `<!-- feature "${type}" could not be found -->` }
+          key: node.props.id,
+          type: node.props.type,
+          id: node.props.id,
+          name: node.props.name,
+          'data-fusion-message': `feature [${node.type}] could not be found`
         }
       )
   }
 
-  const chain = function chain (config, outputType) {
-    const Chain = loadComponent('chains', config.chainConfig, outputType)
-
-    return React.createElement(
-      Chain || 'div',
-      {
-        key: config.id,
-        type: config.chainConfig,
-        id: config.id,
-        displayProperties: (config.displayProperties || {})[outputType] || {}
-      },
-      renderAll(config.features, outputType)
-    )
+  loadComponent () {
+    throw new Error('`loadComponent` is not defined')
   }
 
-  const section = function section (config, outputType, index) {
-    return React.createElement(
-      React.Fragment,
-      {
-        key: index
-        // type: 'section',
-        // id: index
-      },
-      renderAll(config.renderableItems, outputType)
-    )
+  renderAll (renderableItems) {
+    return (renderableItems || [])
+      .map((renderableItem) => this.renderableItem(renderableItem))
+      .filter(renderableItem => renderableItem)
   }
 
-  const layout = function layout (rendering, outputType) {
-    const Layout = loadComponent('layouts', rendering.layout, outputType)
+  renderableItem (node) {
+    const Component = this.collectionMap[node.collection]
 
-    return React.createElement(
-      Layout || 'div',
-      {
-        key: rendering.layout,
-        type: 'layout',
-        id: rendering.layout
-      },
-      renderAll(rendering.layoutItems, outputType)
-    )
-  }
+    const Element = (Component)
+      ? Component(node)
+      : null
 
-  const renderableItem = function renderableItem (config, outputType, index) {
-    const Element = (config.featureConfig)
-      ? feature(config, outputType)
-      : (config.chainConfig)
-        ? chain(config, outputType)
-        : (config.renderableItems)
-          ? section(config, outputType, index)
-          : (config.layoutItems)
-            ? layout(config, outputType)
-            : null
-    return Element || (() => null)
-  }
-
-  return (config, outputType) => {
-    // The calculated result we export for rendering must be a Component (not Element)
-    // Also, react elements cannot be extended, so using a Component function allows us to add layout property
-    const Component = () => renderableItem(config, outputType)
-
-    Component.id = config.id
-    if (config.layout) {
-      Component.layout = config.layout
-    }
-
-    return Component
+    return Element || this.emptyElement
   }
 }
 
-module.exports = componentGenerator
+module.exports = ComponentCompiler

@@ -6,35 +6,32 @@ const LOG_LEVELS = {
   WARN: 'warn'
 }
 
-const logInformation = (message) => {
-  const logObject = getLogObject(LOG_LEVELS.INFO, message)
-
-  console.info(`${LOG_LEVELS.INFO}: ${JSON.stringify(logObject)}`)
+const logInformation = (message, values) => {
+  const logObject = getJSONLogObject(LOG_LEVELS.INFO, message, values)
+  console.info(`${LOG_LEVELS.INFO}: ${logObject}`)
 }
 
-const logError = (message) => {
-  const logObject = getLogObject(LOG_LEVELS.ERROR, message)
-
-  console.error(`${LOG_LEVELS.ERROR}: ${JSON.stringify(logObject)}`)
+const logError = (message, values) => {
+  const logObject = getJSONLogObject(LOG_LEVELS.ERROR, message, values)
+  console.error(`${LOG_LEVELS.ERROR}: ${logObject}`)
 }
 
-const logWarning = (message) => {
-  const logObject = getLogObject(LOG_LEVELS.WARN, message)
-
-  console.warn(`${LOG_LEVELS.WARN}: ${JSON.stringify(logObject)}`)
+const logWarning = (message, values) => {
+  const logObject = getJSONLogObject(LOG_LEVELS.WARN, message, values)
+  console.warn(`${LOG_LEVELS.WARN}: ${logObject}`)
 }
 
-function getLogObject (logLevel, message) {
-  return {
+function getJSONLogObject (logLevel, message = 'no message provided', values = {}) {
+  return JSON.stringify({
     environment,
     functionName,
     logLevel,
     message,
     logType: 'page rendering time',
     fusionVersion: semver,
-    values: { 'feature 1': '100ms' },
+    values, // an example of values: { 'feature 1': '100ms' }
     lambdaDeployment: version
-  }
+  })
 }
 
 module.exports = {

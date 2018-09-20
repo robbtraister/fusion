@@ -4,9 +4,9 @@ At this point, we have 2 of the [3 inputs Fusion needs to function](./intro.md#h
 
 ## Defining a Content Source in JavaScript
 
-A Fusion content source requires at least 2 pieces of information: a URL endpoint to request JSON from, and a list of params we need to craft the URL. A third piece of info is also often useful (but not required): a GraphQL schema that describes the response of the endpoint.
+A Fusion content source requires at least 2 pieces of information: a URL endpoint to request JSON from, and a list of params we need to craft the URL. A third piece of info is also often useful (but not required): a GraphQL schema that describes the response shape of the endpoint.
 
-Let's see what a simple content source definition might look like if we were requesting some data from the [OMDB API](https://www.omdbapi.com/). For this content source, we want to be able to find a certain movie's information based on its title or OMDB ID.
+Since our website is supposed to be for movie lovers, let's see what a simple content source definition might look like if we were requesting some data from the [OMDB API](https://www.omdbapi.com/). For this content source, we want to be able to find a certain movie's information based on its title.
 
 Let's create a file called `movie-find.js` in the `/src/content/sources/` directory of our bundle. Because our file is named `movie-find.js`, we will refer to this content source as `movie-find` later in our code (and in PageBuilder Admin).
 
@@ -18,8 +18,7 @@ import { OMDB_API_KEY } from 'fusion:environment'
 const resolve = (key) => {
   const requestUri = `https://www.omdbapi.com/?apikey=${OMDB_API_KEY}&plot=full`
 
-  if (key.hasOwnProperty('movieId')) return `${requestUri}&i=${key.movieId}`
-  else if (key.hasOwnProperty('movieTitle')) return `${requestUri}&t=${key.movieTitle}`
+  if (key.hasOwnProperty('movieTitle')) return `${requestUri}&t=${key.movieTitle}`
 
   throw new Error('movie-find content source requires a movieId or movieTitle')
 }
@@ -38,21 +37,21 @@ export default {
 In the exported object above, we define all 3 pieces of data that we need for our content source:
 
 #### `resolve` property
-The `resolve` property is a function whose output is a URL which returns the JSON we want. It accepts a `key` argument, which is an object containing information about the specific request that is being made - this data either comes from a configuration option in PB Admin (for "global" content), or if you're fetching your own content you will provide it explicitly at "fetch" time.
+The `resolve` property is a function whose output is a URL which returns the JSON we want. It accepts a single argument we've named `key` here (but you could call it anything). The `key` object contains the values of the parameters we need to make a request - in this case, we only need the `movieTitle` param. These values are either set in the PageBuilder Admin (for "global" content) and retried by resolvers, or if you're fetching your own content you will provide the values when you make the fetch call.
 
-We're able to perform logic in our function to transform the URL however we want. In this example, if a `movieId` property exists in the `key` object that was passed to us, we want to use that param to find our movie. If instead a `movieTitle` param exists, we'll use that as our fallback - and if neither param exists, we will throw an error since we don't have the data we need to make our request.
+We're able to perform logic in our function to transform the URL however we want. In this example, if a `movieTitle` property exists in the `key` object that was passed to us, we want to use that param to find our movie. If it doesn't exist (meaning it skipped the `if` block), we will throw an error since we don't have the data we need to make our request.
 
 Because this URL will typically require some sort of authentication to access, we have access to the `fusion:environment` in content sources, which gives us decrypted access to "secret" environment variables. Here, we are interpolating an `OMDB_API_KEY` environment variable into the URL to authenticate our request. We'll discuss more about ["secrets" and environment variables](./using-environment-secrets.md) later.
 
 #### `schemaName` property
-`schemaName` is a string that identifies the name of a GraphQL schema. The schema defines the shape of the JSON returned from the URL we produced in the `resolve` function. While this schema is not required, it will be more difficult to query for particular values in the returned JSON without it.
+`schemaName` is a string that identifies the name of a GraphQL schema. This schema defines the shape of the JSON returned from the URL we produced in the `resolve` function. While this schema is not required, it will be more difficult to query for particular values in the returned JSON without it.
 
 We'll discuss [how to define a GraphQL schema soon](./using-graphql-schema.md).
 
 #### `params` property
-The `params` property will contain a list of parameter names and data types that this content source needs to make a request. For example, in this content source we have 2 params that we can use to make a request: the `movieId` param, and the `movieTitle` param. Given either of these pieces of data (as part of the `key` object in our resolve method), we are able to craft a URL (in our `resolve` function) that gets us the data we want (e.g `https://www.omdbapi.com/?apikey=<apiKey>&t=Jurassic%20Park` will get us the info for the movie Jurassic Park).
+The `params` property will contain a list of parameter names and data types that this content source needs to make a request. For example, in this content source we only have 1 param that we can use to make a request: the `movieTitle` param. Given either of these pieces of data (as part of the `key` object in our resolve method), we are able to craft a URL (in our `resolve` function) that gets us the data we want (e.g `https://www.omdbapi.com/?apikey=<apiKey>&t=Jurassic%20Park` will get us the info for the movie Jurassic Park).
 
-`params` can be defined either as an object (as seen above) or as an [array of objects](TODO: add link). If defined as an object, each key of the object will be the name of a param, and its value will be the data type of that param. The allowed data types are `text`, `number` and `site`.
+`params` can be defined either as an object (as seen above) or as an [array of objects](../api/feature-pack/content/source.md). If defined as an object, each key of the object will be the name of a param, and its value will be the data type of that param. The allowed data types are `text`, `number` and `site`.
 
 We need this list of params enumerated so that we can tell PageBuilder Admin that they exist. Then, editors can set values for those params - for "example" content in Templates and "global" content on Pages.
 

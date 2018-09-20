@@ -4,7 +4,7 @@ One of the enormous benefits of writing Fusion Feature Packs as React components
 
 For Fusion's purposes, Output Types will always be rendered server-side only, since they are the HTML shell of the page itself. Layouts and Chains will always be rendered isomorphically, since they may contain multiple Features - some that are server-side only, and some client-side only. Features, however, can be configured to render isomorphically, server-side only, or client-side only. Let's talk about why you'd want to use each rendering option, and how to do so.
 
-## Rendering isomoprhically/universally
+## Rendering isomorphically/universally
 
 Isomorphic rendering offers lots of benefits when building a modern [Single Page Application](https://en.wikipedia.org/wiki/Single-page_application) - you get the rich interactivity and performance benefits of running a client-side web application, without losing SEO-optimization or the ability to render in non-JavaScript-enabled clients.
 

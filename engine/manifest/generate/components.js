@@ -36,7 +36,7 @@ const {
 
 const unpack = require('../../src/utils/unpack')
 
-const Layout = require('../../src/react/shared/components/Layout')
+const Layout = require('../../src/react/shared/components/layout')
 
 const {
   // apiPrefix,

@@ -26,25 +26,37 @@ _resource: &_resource
   vendor: aws
   resource: simple
 
+_deploymentConfiguration: &_deploymentConfiguration
+  - deploymentConfiguration:
+      maximumPercent: 200
+      minimumHealthyPercent: 50
+
+_loadBalancer: &_loadBalancer
+  containerName: origin
+  containerPort: 8080
+
+_service: &_service
+  deploymentConfiguration: *_deploymentConfiguration
+  desiredCount: 2
+  loadBalancers:
+    - *_loadBalancer
+
 _services: &_services
-  services:
-    - deploymentConfiguration:
-        maximumPercent: 200
-        minimumHealthyPercent: 50
-      desiredCount: 2
-      loadBalancers:
-        - containerName: origin
-          containerPort: 8080
+  - *_service
 
-_task: &_task
-  task:
-    taskRoleArn: arn:aws:iam::397853141546:role/fusion-origin
+_arc_task: &_arc_task
+  taskRoleArn: arn:aws:iam::397853141546:role/fusion-origin
 
+_pb_task_eu: &_pb_task_eu
+  taskRoleArn: arn:aws:iam::057404813832:role/fusion-origin-eu-central-1
+
+_pb_task_us: &_pb_task_us
+  taskRoleArn: arn:aws:iam::057404813832:role/fusion-origin-us-east-1
 
 environments:
   - name: staging
-    <<: *_services
-    <<: *_task
+    services:  *_services
+    task: *_arc_task
     labels:
       - all
       - staging
@@ -72,8 +84,8 @@ environments:
             - subnet-42943209
 
   - name: staging-admin
-    <<: *_services
-    <<: *_task
+    services: *_services
+    task: *_arc_task
     labels:
       - all
       - staging
@@ -102,9 +114,7 @@ environments:
             - subnet-9d4bafb2
             - subnet-42943209
   - name: eu-central-1
-    <<: *_services
-    task:
-      taskRoleArn: arn:aws:elasticloadbalancing:eu-central-1:057404813832:targetgroup/fusion-origin-eu-central-1/9a927c3c38fdbe35
+    task: *_pb_task_eu
     labels:
       - all
     namespace: fusion-ecs-eu-central-1
@@ -116,14 +126,21 @@ environments:
           awslogs-region: eu-central-1
         environment:
           <<: *_environment
-
-  - name: admin-eu-central-1
-    <<: *_services
-    task:
-      taskRoleArn: arn:aws:elasticloadbalancing:eu-central-1:057404813832:targetgroup/fusion-admin-origin-eu-central-1/b5dd40230aeff095
+    services:
+      - <<: *_service
+        loadBalancers:
+          - <<: *_loadBalancer
+            targetGroupArn: arn:aws:elasticloadbalancing:eu-central-1:057404813832:targetgroup/fusion-origin-eu-central-1/9a927c3c38fdbe35
+  - name: eu-central-1-admin
+    task: *_pb_task_eu
     labels:
       - all
     namespace: fusion-ecs-eu-central-1
+    services:
+    - <<: *_service
+      loadBalancers:
+        - <<: *_loadBalancer
+          targetGroupArn: arn:aws:elasticloadbalancing:eu-central-1:057404813832:targetgroup/fusion-admin-origin-eu-central-1/b5dd40230aeff095
     override:
       origin:
         <<: *_fusion_origin
@@ -133,4 +150,4 @@ environments:
         environment:
           <<: *_environment
           IS_ADMIN: 'true'
-          # TBD PB_ADMIN: 'http://$environment.pb.arc.pub'
+          PB_ADMIN: 'http://$environment.aws.pb.arc.pub'

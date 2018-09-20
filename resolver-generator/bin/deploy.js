@@ -61,7 +61,7 @@ async function createGeneratorFunction () {
       },
       Handler: 'resolver-generator/src/index.handler',
       MemorySize: 512,
-      Role: `arn:aws:iam::${awsAccountId}:role/fusion-generator-${region}`,
+      Role: `arn:aws:iam::${awsAccountId}:role/fusion-generator`,
       Runtime: 'nodejs8.10',
       Timeout: 60
     })

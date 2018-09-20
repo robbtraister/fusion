@@ -101,3 +101,36 @@ environments:
             - subnet-1a8f9640
             - subnet-9d4bafb2
             - subnet-42943209
+  - name: eu-central-1
+    <<: *_services
+    task:
+      taskRoleArn: arn:aws:elasticloadbalancing:eu-central-1:057404813832:targetgroup/fusion-origin-eu-central-1/9a927c3c38fdbe35
+    labels:
+      - all
+    namespace: fusion-ecs-eu-central-1
+    override:
+      origin:
+        <<: *_fusion_origin
+        log_opt:
+          awslogs-group: /nile/fusion-origin
+          awslogs-region: eu-central-1
+        environment:
+          <<: *_environment
+
+  - name: admin-eu-central-1
+    <<: *_services
+    task:
+      taskRoleArn: arn:aws:elasticloadbalancing:eu-central-1:057404813832:targetgroup/fusion-admin-origin-eu-central-1/b5dd40230aeff095
+    labels:
+      - all
+    namespace: fusion-ecs-eu-central-1
+    override:
+      origin:
+        <<: *_fusion_origin
+        log_opt:
+          awslogs-group: /nile/fusion-admin-origin
+          awslogs-region: eu-central-1
+        environment:
+          <<: *_environment
+          IS_ADMIN: 'true'
+          # TBD PB_ADMIN: 'http://$environment.pb.arc.pub'

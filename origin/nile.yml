@@ -47,11 +47,8 @@ _services: &_services
 _arc_task: &_arc_task
   taskRoleArn: arn:aws:iam::397853141546:role/fusion-origin
 
-_pb_task_eu: &_pb_task_eu
-  taskRoleArn: arn:aws:iam::057404813832:role/fusion-origin-eu-central-1
-
-_pb_task_us: &_pb_task_us
-  taskRoleArn: arn:aws:iam::057404813832:role/fusion-origin-us-east-1
+_pb_task: &_pb_task
+  taskRoleArn: arn:aws:iam::057404813832:role/fusion-origin
 
 environments:
   - name: staging
@@ -114,7 +111,7 @@ environments:
             - subnet-9d4bafb2
             - subnet-42943209
   - name: eu-central-1
-    task: *_pb_task_eu
+    task: *_pb_task
     labels:
       - all
     namespace: fusion-ecs-eu-central-1
@@ -132,7 +129,7 @@ environments:
           - <<: *_loadBalancer
             targetGroupArn: arn:aws:elasticloadbalancing:eu-central-1:057404813832:targetgroup/fusion-origin-eu-central-1/9a927c3c38fdbe35
   - name: eu-central-1-admin
-    task: *_pb_task_eu
+    task: *_pb_task
     labels:
       - all
     namespace: fusion-ecs-eu-central-1

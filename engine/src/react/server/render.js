@@ -2,8 +2,6 @@
 
 'use strict'
 
-const url = require('url')
-
 const debugTimer = require('debug')('fusion:timer:react:render')
 
 const React = require('react')
@@ -20,6 +18,7 @@ const fusionProperties = require('fusion:properties')
 
 const {
   cssTagGenerator,
+  deployment,
   fusionTagGenerator,
   libsTagGenerator,
   metaTagGenerator,
@@ -29,8 +28,7 @@ const {
 const {
   componentDistRoot,
   contextPath,
-  isDev,
-  version
+  isDev
 } = require('../../../environment')
 
 const { components } = require('../../../manifest')
@@ -43,14 +41,6 @@ const getAncestors = function getAncestors (node) {
       .concat(...node.children.map(getAncestors))
     : []
 }
-
-const deployment = (u) => {
-  const parts = url.parse(u, true)
-  parts.query.v = version
-  parts.search = undefined
-  return url.format(parts)
-}
-deployment.toString = () => version
 
 const render = function render ({Component, request, content, _website}) {
   const renderHTML = () => new Promise((resolve, reject) => {

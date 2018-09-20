@@ -27,9 +27,8 @@ _resource: &_resource
   resource: simple
 
 _deploymentConfiguration: &_deploymentConfiguration
-  - deploymentConfiguration:
-      maximumPercent: 200
-      minimumHealthyPercent: 50
+  maximumPercent: 200
+  minimumHealthyPercent: 50
 
 _loadBalancer: &_loadBalancer
   containerName: origin

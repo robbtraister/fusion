@@ -8,6 +8,7 @@ const LOG_LEVELS = {
 
 const LOG_TYPES = {
   PAGE_RENDER_TIME: 'page rendering time',
+  RENDERING: 'rendering',
   WEBPACK_COMPILATION: 'webpack compilation'
 }
 

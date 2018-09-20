@@ -29,6 +29,8 @@ const {
   pushFile,
   putJson
 } = require('../../io')
+const logger = require('../../utils/logger')
+const {RENDERING} = logger.LOG_TYPES
 
 class Rendering {
   constructor (type, id, json) {
@@ -164,7 +166,7 @@ class Rendering {
                 publishToOtherVersions(uri, this.json)
                   .catch((err) => {
                     // do not throw while trying to publish to old versions
-                    console.error(err)
+                    logger.error({logType: RENDERING, message: `An error occurred while attempting to publish: ${err.toString()}`})
                   })
               ])
               : Promise.resolve()

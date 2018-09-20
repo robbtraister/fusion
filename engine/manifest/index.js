@@ -4,12 +4,14 @@ const {
   componentDistRoot,
   contentDistRoot
 } = require('../environment')
+const logger = require('../src/utils/logger')
 
 function getManifest (rootDir, collection) {
   try {
     const manifestFile = `${rootDir}/${collection}/fusion.manifest.json`
     return require(manifestFile)
   } catch (e) {
+    logger.error({message: `An error occurred while attempting to get manifest: ${e.toString()}`})
   }
 }
 

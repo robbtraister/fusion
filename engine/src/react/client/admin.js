@@ -14,7 +14,7 @@ Fusion.isAdmin = true
 
 const Provider = require('./provider')
 
-const version = require('./version')
+const version = undefined // require('./version')
 
 const React = window.react = require('react')
 const ReactDOM = window.ReactDOM = require('react-dom')
@@ -23,10 +23,12 @@ window.PropTypes = require('../shared/prop-types')
 // support fragments in preact
 React.Fragment = React.Fragment || 'div'
 
-const getComponent = (componentType, componentName) =>
-  Fusion.components[componentType][componentName]
-
-const getElement = require('../shared/compile/component')(getComponent)
+const ComponentCompiler = require('../shared/compile/component')
+class AdminCompiler extends ComponentCompiler {
+  loadComponent (componentCollection, componentType) {
+    return Fusion.components[componentCollection][componentType]
+  }
+}
 
 function CSR (rendering) {
   try {
@@ -38,7 +40,7 @@ function CSR (rendering) {
           layout: rendering.layout
         },
         React.createElement(
-          getElement(rendering),
+          new AdminCompiler(rendering, Fusion.outputType).compile(),
           Fusion.globalContent || {}
         )
       ),
@@ -88,9 +90,9 @@ const addJs = addElement('script', 'application/javascript', 'src')
 const addCss = addElement('link', 'text/css', 'href', 'stylesheet')
 
 if (Fusion.outputType) {
-  addJs(`${Fusion.contextPath}/dist/components/combinations/${Fusion.outputType}.js?v=${version}`)
-  addCss(`${Fusion.contextPath}/dist/components/output-types/${Fusion.outputType}.css?v=${version}`)
-  addCss(`${Fusion.contextPath}/dist/components/combinations/${Fusion.outputType}.css?v=${version}`)
+  addJs(`${Fusion.contextPath}/dist/components/combinations/${Fusion.outputType}.js${version ? `?v=${version}` : ''}`)
+  addCss(`${Fusion.contextPath}/dist/components/output-types/${Fusion.outputType}.css${version ? `?v=${version}` : ''}`)
+  addCss(`${Fusion.contextPath}/dist/components/combinations/${Fusion.outputType}.css${version ? `?v=${version}` : ''}`)
 }
 
 appendSSRForm()

@@ -21,6 +21,7 @@ const {
   bundleDistRoot,
   bundleGeneratedRoot: propertiesSrcDir,
   bundleSrcRoot,
+  componentDistRoot,
   contextPath
 } = require('../environment')
 
@@ -39,7 +40,7 @@ const globalFile = getRequirable(`${bundleSrcRoot}/properties`)
 
 const siteFiles = Object.assign(
   {},
-  ...glob.sync(`${bundleSrcRoot}/properties/sites/*.{js,json}`)
+  ...glob.sync(`${bundleSrcRoot}/properties/sites/*.{js,json,ts}`)
     .filter(getRequirable)
     .map(fp => ({[path.parse(fp).name]: fp}))
 )
@@ -67,6 +68,20 @@ module.exports = (siteName) => {
 }
 `)
 
+const alias = {
+  'fusion:properties': propertiesSrcFile
+}
+
+;[
+  'chains',
+  'features',
+  'layouts',
+  'output-types'
+]
+  .forEach(collection => {
+    alias[`fusion:manifest:components:${collection}`] = require.resolve(`${componentDistRoot}/${collection}/fusion.manifest.json`)
+  })
+
 module.exports = [
   {
     entry: {
@@ -79,7 +94,7 @@ module.exports = [
     module: {
       rules: [
         {
-          test: /\.jsx?$/i,
+          test: /\.[jt]sx?$/i,
           exclude: /node_modules/,
           use: [
             babelLoader
@@ -101,11 +116,7 @@ module.exports = [
     resolve: Object.assign(
       {},
       resolve,
-      {
-        alias: {
-          'fusion:properties': propertiesSrcFile
-        }
-      }
+      { alias }
     ),
     target,
     watchOptions: {
@@ -120,7 +131,7 @@ module.exports = [
     module: {
       rules: [
         {
-          test: /\.jsx?$/i,
+          test: /\.[jt]sx?$/i,
           exclude: /node_modules/,
           use: [
             babelLoader

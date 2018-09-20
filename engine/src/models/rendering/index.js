@@ -6,11 +6,9 @@ const {
   defaultOutputType
 } = require('../../../environment')
 
-const { components } = require('../../../environment/manifest')
+const { components } = require('../../../manifest')
 
 const allOutputTypes = Object.keys(components.outputTypes)
-
-const model = require('../../dao')
 
 const compileRendering = require('./compile')
 const getComponent = require('./component')
@@ -18,6 +16,10 @@ const {
   publishOutputTypes,
   publishToOtherVersions
 } = require('./publish')
+
+const model = require('../../dao')
+
+const { render } = require('../../react')
 
 const getSource = require('../sources')
 
@@ -90,15 +92,13 @@ class Rendering {
     return this.compilations[outputType]
   }
 
-  async getComponent (outputType = defaultOutputType, child) {
+  async getComponent ({outputType = defaultOutputType, child}, quarantine) {
     debug(`get component: ${this.name}${child ? `(${child})` : ''}[${outputType}]`)
-    if (child) {
-      return getComponent({rendering: this, outputType, child})
-    } else {
-      this.componentPromise = this.componentPromise ||
-        getComponent({rendering: this, outputType, name: this.name})
-      return this.componentPromise
-    }
+    this.contentCache = this.contentCache || {}
+    this.inlines = this.inlines || {}
+    return (child)
+      ? getComponent({rendering: this, outputType, child, quarantine})
+      : getComponent({rendering: this, outputType, name: this.name, quarantine})
   }
 
   async getContent (arcSite) {
@@ -171,6 +171,23 @@ class Rendering {
           )
         : Promise.reject(new Error('no rendering provided to publish'))
     )
+  }
+
+  async render ({content, rendering, request}) {
+    return Promise.all([
+      this.getComponent(rendering),
+      content || this.getContent(request.arcSite)
+    ])
+      // template will already have content populated by resolver
+      // use Object.assign to default to the resolver content
+      .then(([Component, content]) =>
+        Promise.resolve()
+          .then(() => render({Component, content, request}))
+          .catch(() =>
+            this.getComponent(rendering, true)
+              .then((Component) => render({Component, content, request}))
+          )
+      )
   }
 
   static async compile (type) {

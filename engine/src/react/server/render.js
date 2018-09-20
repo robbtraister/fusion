@@ -2,15 +2,14 @@
 
 'use strict'
 
-const fs = require('fs')
-const path = require('path')
-
 const debugTimer = require('debug')('fusion:timer:react:render')
 
 const React = require('react')
 const ReactDOM = require('react-dom/server')
 
-const compileComponent = require('./compile/component')
+const compileStandardComponent = require('./compile/component')
+const compileQuarantineComponent = require('./compile/quarantine')
+
 const Provider = require('./provider')
 
 const unpack = require('../../utils/unpack')
@@ -19,11 +18,13 @@ const timer = require('../../timer')
 
 const fusionProperties = require('fusion:properties')
 
-const getTree = require('../shared/compile/tree')
-
 const {
-  fetchFile
-} = require('../../io')
+  cssTagGenerator,
+  fusionTagGenerator,
+  libsTagGenerator,
+  metaTagGenerator,
+  stylesGenerator
+} = require('./tags')
 
 const {
   componentDistRoot,
@@ -32,87 +33,9 @@ const {
   version
 } = require('../../../environment')
 
-const { components } = require('../../../environment/manifest')
+const { components } = require('../../../manifest')
 
 const { sendMetrics, METRIC_TYPES } = require('../../utils/send-metrics')
-
-const fileExists = (fp) => {
-  try {
-    fs.accessSync(fp, fs.constants.R_OK)
-    return true
-  } catch (e) {
-    return false
-  }
-}
-
-const outputTypeCssFileExists = (outputType) => fileExists(path.resolve(componentDistRoot, 'output-types', `${outputType}.css`))
-const outputTypeHasCss = (isDev)
-  // don't cache it in dev because it might change
-  ? outputTypeCssFileExists
-  // cache it in prod because it won't change
-  : (() => {
-    const _outputTypeHasCss = {}
-    return (outputType) => {
-      if (!_outputTypeHasCss.hasOwnProperty(outputType)) {
-        _outputTypeHasCss[outputType] = outputTypeCssFileExists(outputType)
-      }
-      return _outputTypeHasCss[outputType]
-    }
-  })()
-
-// this wrapper allows a function to be used in JSX without parentheses
-// use `{props.scripts}` to execute the function with the defaults
-// use `{props.scripts(true)}` to execute the function with custom inputs
-function propFunction (fn) {
-  fn[Symbol.iterator] = function * () {
-    yield fn()
-  }
-  return fn
-}
-
-const engineScript = React.createElement(
-  'script',
-  {
-    key: 'fusion-engine-script',
-    id: 'fusion-engine-script',
-    type: 'application/javascript',
-    src: `${contextPath}/dist/engine/react.js?v=${version}`,
-    defer: true
-  }
-)
-
-function escapeContent (content) {
-  return JSON.stringify(content).replace(/<\/script>/g, '<\\/script>')
-}
-
-function getFusionScript (globalContent, globalContentConfig, contentCache, outputType, arcSite) {
-  const now = +new Date()
-  const condensedCache = {}
-  Object.keys(contentCache)
-    .forEach(sourceName => {
-      const sourceCache = contentCache[sourceName]
-      Object.keys(sourceCache)
-        .forEach(key => {
-          const keyCache = sourceCache[key]
-          if (keyCache.source && keyCache.filtered) {
-            const condensedSourceCache = condensedCache[sourceName] = condensedCache[sourceName] || {
-              entries: {},
-              expiresAt: now + ((keyCache.source && keyCache.source.ttl) || 300000)
-            }
-            condensedSourceCache.entries[key] = {cached: keyCache.filtered}
-          }
-        })
-    })
-
-  return `window.Fusion=window.Fusion||{};` +
-    `Fusion.contextPath='${contextPath}';` +
-    `Fusion.outputType='${outputType}';` +
-    (arcSite ? `Fusion.arcSite='${arcSite}';` : '') +
-    `Fusion.lastModified=${now};` +
-    `Fusion.globalContent=${escapeContent(globalContent || {})};` +
-    `Fusion.globalContentConfig=${escapeContent(globalContentConfig || {})};` +
-    `Fusion.contentCache=${escapeContent(condensedCache)}`
-}
 
 const getAncestors = function getAncestors (node) {
   return (node && node.children)
@@ -121,20 +44,20 @@ const getAncestors = function getAncestors (node) {
     : []
 }
 
-const render = function render ({Component, request, content, _website}) {
+const render = function render ({Component, request, content}) {
   const renderHTML = () => new Promise((resolve, reject) => {
     try {
       const elementTic = timer.tic()
       const element = React.createElement(
         Component,
         {
-          arcSite: _website,
+          arcSite: request.arcSite,
           contextPath,
           globalContent: content ? content.document : null,
           globalContentConfig: content ? {source: content.source, key: content.key} : null,
           outputType: Component.outputType,
-          requestUri: request && request.uri,
-          siteProperties: fusionProperties(_website)
+          requestUri: request.uri,
+          siteProperties: fusionProperties(request.arcSite)
         }
       )
       const elementElapsedTime = elementTic.toc()
@@ -200,27 +123,6 @@ const render = function render ({Component, request, content, _website}) {
     })
 }
 
-const compileRenderable = function compileRenderable ({renderable, outputType}) {
-  if (isDev) {
-    // clear cache to ensure we load the latest
-    Object.keys(require.cache)
-      .filter((fp) => fp.startsWith(componentDistRoot))
-      .forEach((fp) => { delete require.cache[fp] })
-  }
-
-  let tic = timer.tic()
-  return Promise.resolve(compileComponent(renderable, outputType))
-    .then((Renderable) => {
-      debugTimer(`compile(${renderable._id || renderable.id})`, tic.toc())
-      tic = timer.tic()
-      return Provider(Renderable)
-    })
-    .then((Component) => {
-      debugTimer('provider wrapping', tic.toc())
-      return Component
-    })
-}
-
 const getOutputTypeComponent = function getOutputTypeComponent (outputType) {
   try {
     return unpack(require(components.outputTypes[outputType].dist))
@@ -231,11 +133,35 @@ const getOutputTypeComponent = function getOutputTypeComponent (outputType) {
   }
 }
 
-const compileDocument = function compileDocument ({rendering, outputType, name}) {
+const compileRenderable = function compileRenderable ({renderable, outputType, quarantine, inlines, contentCache}) {
+  if (isDev) {
+    // clear cache to ensure we load the latest
+    Object.keys(require.cache)
+      .filter((fp) => fp.startsWith(componentDistRoot))
+      .forEach((fp) => { delete require.cache[fp] })
+  }
+
+  let tic = timer.tic()
+  const compileFn = (quarantine)
+    ? compileQuarantineComponent
+    : compileStandardComponent
+  return Promise.resolve(compileFn(renderable, outputType))
+    .then((Renderable) => {
+      debugTimer(`compile(${renderable._id || renderable.id})`, tic.toc())
+      tic = timer.tic()
+      return Provider(Renderable, inlines, contentCache)
+    })
+    .then((Component) => {
+      debugTimer('provider wrapping', tic.toc())
+      return Component
+    })
+}
+
+const compileDocument = function compileDocument ({name, rendering, outputType, inlines, contentCache, quarantine}) {
   let tic
   return rendering.getJson()
     .then((json) => {
-      return compileRenderable({renderable: json, outputType})
+      return compileRenderable({renderable: json, outputType, inlines, contentCache, quarantine})
         .then((Template) => {
           if (!outputType) {
             return Template
@@ -245,7 +171,14 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
 
           const OutputType = getOutputTypeComponent(outputType)
 
-          const tree = getTree(json)
+          const metas = (json.meta || {})
+
+          const getMetaTag = metaTagGenerator(metas)
+
+          const MetaTags = () =>
+            Object.keys(metas).filter(name => metas[name].html).map(getMetaTag)
+
+          const CssTags = cssTagGenerator({inlines: Template.inlines, rendering, outputType})
 
           const Component = (props) => {
             return React.createElement(
@@ -253,185 +186,42 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
               {
                 contextPath,
                 version,
-                tree,
-                renderables: [tree].concat(...getAncestors(tree)),
+                tree: Template.tree,
+                renderables: [Template.tree].concat(...getAncestors(Template.tree)),
+
+                CssLinks: CssTags,
+                CssTags,
+
+                Fusion: fusionTagGenerator(props.globalContent, props.globalContentConfig, Template.contentCache, outputType, props.arcSite),
+                Libs: libsTagGenerator({name, outputType}),
+
                 /*
-                 * Each of the following are equivalent in JSX
-                 *   {props.metaTag}
-                 *   {props.metaTag()}
+                 * To insert all meta tags
+                 *   <props.MetaTag />
+                 *   <props.MetaTags />
                  *
-                 * To select a single meta tag
-                 *   {props.metaTag('title')}
-                 *   {props.metaTag({name: 'title'})}
+                 * To insert a single meta tag
+                 *   <props.MetaTag name='title' />
                  */
-                metaTag: propFunction(function (name, defaultValue) {
-                  if (typeof name === 'object') {
-                    name = name.name
-                    defaultValue = name.default || defaultValue
-                  }
-
-                  const metas = (json.meta || {})
-
-                  const getElement = (name) => metas[name]
-                    ? React.createElement(
-                      'meta',
-                      {
-                        key: `meta-${name}`,
-                        name,
-                        content: metas[name].value || defaultValue
-                      }
-                    )
-                    : null
-
+                MetaTag ({name, default: defaultValue}) {
                   return (name)
-                    ? getElement(name)
-                    : Object.keys(metas).filter(name => metas[name].html).map(getElement)
-                }),
-                /*
-                 * Each of the following are equivalent in JSX
-                 * To select a single meta tag
-                 *   {props.metaValue('title')}
-                 *   {props.metaValue({name: 'title'})}
-                 */
-                metaValue: propFunction(function (name) {
-                  if (typeof name === 'object') {
-                    name = name.name
-                  }
+                    ? getMetaTag(name)
+                    : MetaTags()
+                },
+                MetaTags,
+                metaValue (nameOrObject, defaultValue) {
+                  const isObject = typeof nameOrObject === 'object'
 
-                  const metas = (json.meta || {})
-                  return name && metas[name] && metas[name].value
-                }),
-                /*
-                 * Each of the following are equivalent in JSX
-                 *   {props.libs}
-                 *   {props.libs()}
-                 */
-                libs: propFunction(function () {
-                  const templateScript = React.createElement(
-                    'script',
-                    {
-                      key: 'fusion-template-script',
-                      id: 'fusion-template-script',
-                      type: 'application/javascript',
-                      src: `${contextPath}/dist/${name}/${outputType}.js?v=${version}`,
-                      defer: true
-                    }
-                  )
+                  const name = (isObject)
+                    ? nameOrObject.name
+                    : nameOrObject
 
-                  return [
-                    engineScript,
-                    templateScript
-                  ]
-                }),
-                /*
-                 * Each of the following are equivalent in JSX
-                 *   {props.css}
-                 *   {props.css()}
-                 *   {props.css(false)}
-                 *   {props.css({inline: false})}
-                 *
-                 * To inline the css
-                 * (larger payload, bad for cache; suitable for AMP)
-                 *   {props.css(true)}
-                 *   {props.css({inline: true})}
-                 */
-                styles: propFunction(function (cb) {
-                  const outputTypeStylesPromise = fetchFile(`components/output-types/${outputType}.css`)
-                    .catch(() => null)
+                  return (name && metas[name] && metas[name].value) ||
+                    (isObject ? nameOrObject.default : defaultValue)
+                },
 
-                  const templateStylesPromise = rendering.getStyles()
-                    .catch(() => null)
+                Styles: stylesGenerator({inlines: Template.inlines, outputType, rendering}),
 
-                  Component.inlines.styles = Component.inlines.styles || {
-                    cached: {
-                      outputTypeStyles: undefined,
-                      templateStyles: undefined
-                    },
-                    fetched: Promise.all([
-                      outputTypeStylesPromise,
-                      templateStylesPromise
-                    ])
-                      .then(([outputTypeStyles, templateStyles]) => {
-                        Component.inlines.styles.cached = {
-                          outputTypeStyles,
-                          templateStyles
-                        }
-                      })
-                  }
-
-                  return (cb)
-                    ? cb(Component.inlines.styles.cached)
-                    : React.createElement(
-                      'style',
-                      {
-                        dangerouslySetInnerHTML: { __html: `${Component.inlines.styles.cached.outputTypeStyles || ''}${Component.inlines.styles.cached.templateStyles || ''}` }
-                      }
-                    )
-                }),
-                /*
-                 * Each of the following are equivalent in JSX
-                 *   {props.cssLinks}
-                 *   {props.cssLinks()}
-                 */
-                cssLinks: propFunction(function (cb) {
-                  Component.inlines.cssLinks = Component.inlines.cssLinks || {
-                    cached: {
-                      outputTypeHref: undefined,
-                      templateHref: undefined
-                    },
-                    fetched: rendering.getCssFile()
-                      .catch(() => null)
-                      .then((templateCssFile) => {
-                        Component.inlines.cssLinks.cached = {
-                          outputTypeHref: (outputTypeHasCss(outputType)) ? `${contextPath}/dist/components/output-types/${outputType}.css?v=${version}` : null,
-                          templateHref: (templateCssFile) ? `${contextPath}/dist/${templateCssFile}?v=${version}` : null
-                        }
-                      })
-                  }
-
-                  return (cb)
-                    ? cb(Component.inlines.cssLinks.cached)
-                    // even if cssFile is null, add the link tag with no href
-                    // so it can be replaced by an updated template script later
-                    : [
-                      (Component.inlines.cssLinks.cached.outputTypeHref)
-                        ? React.createElement(
-                          'link',
-                          {
-                            key: 'fusion-output-type-styles',
-                            id: 'fusion-output-type-styles',
-                            rel: 'stylesheet',
-                            type: 'text/css',
-                            href: Component.inlines.cssLinks.cached.outputTypeHref
-                          }
-                        )
-                        : null,
-                      React.createElement(
-                        'link',
-                        {
-                          key: 'fusion-template-styles',
-                          id: 'fusion-template-styles',
-                          rel: 'stylesheet',
-                          type: 'text/css',
-                          href: Component.inlines.cssLinks.cached.templateHref
-                        }
-                      )
-                    ]
-                }),
-                /*
-                 * Each of the following are equivalent in JSX
-                 *   {props.fusion}
-                 *   {props.fusion()}
-                 */
-                fusion: propFunction(function () {
-                  return React.createElement(
-                    'script',
-                    {
-                      type: 'application/javascript',
-                      dangerouslySetInnerHTML: { __html: getFusionScript(props.globalContent, props.globalContentConfig, Template.contentCache, outputType, props.arcSite) }
-                    }
-                  )
-                }),
                 ...props
               },
               React.createElement(

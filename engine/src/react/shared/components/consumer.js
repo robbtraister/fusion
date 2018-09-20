@@ -10,18 +10,25 @@ const isClient = typeof window !== 'undefined'
 const _get = require('lodash.get')
 const _merge = require('lodash.merge')
 
-const createContextElement = (Comp, props, context) => {
-  const contextProps = Object.assign({}, context)
+const getContextProps = (props, context) => {
+  const contextProps = Object.assign({}, props, context)
   delete contextProps.eventListeners
   delete contextProps.getContent
+  delete contextProps.children
 
-  const combinedProps = Object.assign({}, props, contextProps)
-  delete combinedProps.children
+  return {
+    props: contextProps,
+    children: props.children
+  }
+}
+
+const createContextElement = (Component, props, context) => {
+  const { props: contextProps, children } = getContextProps(props, context)
 
   return React.createElement(
-    Comp,
-    combinedProps,
-    props.children
+    Component,
+    contextProps,
+    children
   )
 }
 
@@ -140,11 +147,20 @@ function HOC (Component) {
     }
     : (props) => (context) => createContextElement(Component, props, context)
 
-  return (props) => React.createElement(
+  const ConsumerWrapper = (props) => React.createElement(
     Fusion.context.Consumer,
     {},
     elementGenerator(props)
   )
+
+  ;[
+    'propTypes',
+    'static'
+  ].forEach((field) => {
+    ConsumerWrapper[field] = Component[field]
+  })
+
+  return ConsumerWrapper
 }
 
 function Consumer (propsOrComponent) {

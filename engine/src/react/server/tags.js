@@ -217,6 +217,7 @@ const stylesGenerator = ({inlines, rendering, outputType}) => {
 
 module.exports = {
   cssTagGenerator,
+  deployment,
   fusionTagGenerator,
   libsTagGenerator,
   metaTagGenerator,

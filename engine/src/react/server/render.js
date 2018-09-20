@@ -2,6 +2,8 @@
 
 'use strict'
 
+const url = require('url')
+
 const debugTimer = require('debug')('fusion:timer:react:render')
 
 const React = require('react')
@@ -41,6 +43,14 @@ const getAncestors = function getAncestors (node) {
       .concat(...node.children.map(getAncestors))
     : []
 }
+
+const deployment = (u) => {
+  const parts = url.parse(u, true)
+  parts.query.v = version
+  parts.search = undefined
+  return url.format(parts)
+}
+deployment.toString = () => version
 
 const render = function render ({Component, request, content, _website}) {
   const renderHTML = () => new Promise((resolve, reject) => {
@@ -180,7 +190,8 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
               OutputType,
               {
                 contextPath,
-                version,
+                deployment,
+                version: deployment,
                 tree: Template.tree,
                 renderables: [Template.tree].concat(...getAncestors(Template.tree)),
 

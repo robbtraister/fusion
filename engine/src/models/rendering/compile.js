@@ -78,7 +78,7 @@ const compileSource = function compileSource (script, styles) {
         const elapsedTime = tic.toc()
         debugTimer('webpack setup', elapsedTime)
         sendMetrics([{type: METRIC_TYPES.WEBPACK_DURATION, value: elapsedTime, tags: ['webpack-op:setup']}])
-        logInformation({logType: LOG_TYPES.WEBPACK_COMPILATION, message: 'webpack setup succeeded', values: {}})
+        logInformation({logType: LOG_TYPES.WEBPACK_COMPILATION, message: 'Webpack setup succeeded', values: {}})
 
         return compiler
       }),
@@ -120,7 +120,7 @@ const compileSource = function compileSource (script, styles) {
               cssFile: null
             }
         })
-        .catch(logError({logType: LOG_TYPES.WEBPACK_COMPILATION, message: 'failed to compile', values: {}}))
+        .catch(logError({logType: LOG_TYPES.WEBPACK_COMPILATION, message: 'Failed to compile'}))
     ]))
     .then(([js, {css, cssFile}]) => ({js, css, cssFile}))
 }

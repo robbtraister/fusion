@@ -26,7 +26,7 @@ model('jge_config').find()
     })
     console.log(`Extraction complete.`)
   })
-  .catch(logError({logType: LOG_TYPES.PAGE_RENDER_TIME, message: 'unable to extract', values: {}}))
+  .catch(logError({logType: LOG_TYPES.PAGE_RENDER_TIME, message: 'Unable to extract', values: {}}))
   .then(() => {
     // mongo connection will keep the process running
     process.exit(0)

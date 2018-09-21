@@ -16,7 +16,7 @@ const {
 } = require('../../../../environment')
 
 const { sendMetrics, METRIC_TYPES } = require('../../../utils/send-metrics')
-const { logError, LOG_TYPES } = require('../../../utils/logger')
+const { logError, logInformation, LOG_TYPES } = require('../../../utils/logger')
 
 function getCacheKey (uri) {
   const hash = crypto.createHash('sha256').update(uri).digest('hex')
@@ -88,7 +88,6 @@ class CachedSource extends ResolveSource {
                 sendMetrics([
                   {type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags}
                 ])
-                logError(LOG_TYPES.CACHE, {logType: LOG_TYPES.CACHE, message: 'There was a problem fetching cache content'})
                 throw new Error('data error from cache')
               }
               debugTimer(`Fetched from cache [${sanitizedUri}]`, elapsedTime)
@@ -106,9 +105,9 @@ class CachedSource extends ResolveSource {
               const tagResult = (error.statusCode && error.statusCode === 404) ? 'result:cache_miss' : 'result:cache_error'
               const tags = ['operation:fetch', tagResult, `source:${this.name}`]
               sendMetrics([
-                // {type: METRIC_TYPES.CACHE_RESULT, value: 1, tags},
                 {type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags}
               ])
+              logError({logType: LOG_TYPES.CACHE, message: `There was an error while trying to fetch: ${error.toString()}`})
 
               return this.update(key)
             })
@@ -142,10 +141,10 @@ class CachedSource extends ResolveSource {
               const elapsedTime = tic.toc()
               const tags = ['operation:put', 'result:success', `source:${this.name}`]
               sendMetrics([
-                // {type: METRIC_TYPES.CACHE_RESULT, value: 1, tags},
                 {type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags},
                 {type: METRIC_TYPES.CACHE_RESULT_SIZE, value: JSON.stringify(data).length, tags}
               ])
+              logInformation({logType: LOG_TYPES.CACHE, message: 'Cache content successfully pushed'})
 
               return data
             })
@@ -153,9 +152,9 @@ class CachedSource extends ResolveSource {
               const elapsedTime = tic.toc()
               const tags = ['operation:put', 'result:error', `source:${this.name}`, `error:${error.statusCode}`]
               sendMetrics([
-                // {type: METRIC_TYPES.CACHE_RESULT, value: 1, tags},
                 {type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags}
               ])
+              logError({logType: LOG_TYPES.CACHE, message: `There was an error while attempting to update the cache: ${error.toString()}`})
               // DO NOT THROW FOR FAILED CACHE WRITE!!!
               // throw new Error(`Error putting into cache ${this.name}`)
 

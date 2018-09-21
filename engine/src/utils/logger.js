@@ -7,22 +7,23 @@ const LOG_LEVELS = {
 }
 
 const LOG_TYPES = {
+  CACHE: 'cache',
   PAGE_RENDER_TIME: 'page rendering time',
   RENDERING: 'rendering',
   WEBPACK_COMPILATION: 'webpack compilation'
 }
 
-const logInformation = (logInfo) => {
+const logInformation = function logInformation (logInfo) {
   const logObject = getJSONLogObject(LOG_LEVELS.INFO, logInfo)
   console.info(`${LOG_LEVELS.INFO}: ${logObject}`)
 }
 
-const logError = (logInfo) => {
+const logError = function logError (logInfo) {
   const logObject = getJSONLogObject(LOG_LEVELS.ERROR, logInfo)
   console.error(`${LOG_LEVELS.ERROR}: ${logObject}`)
 }
 
-const logWarning = (logInfo) => {
+const logWarning = function logWarning (logInfo) {
   const logObject = getJSONLogObject(LOG_LEVELS.WARN, logInfo)
   console.warn(`${LOG_LEVELS.WARN}: ${logObject}`)
 }

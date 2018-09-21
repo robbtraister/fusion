@@ -16,6 +16,7 @@ const {
 } = require('../../../../environment')
 
 const { sendMetrics, METRIC_TYPES } = require('../../../utils/send-metrics')
+const { logError, LOG_TYPES } = require('../../../utils/logger')
 
 function getCacheKey (uri) {
   const hash = crypto.createHash('sha256').update(uri).digest('hex')
@@ -85,9 +86,9 @@ class CachedSource extends ResolveSource {
               if (!data) {
                 const tags = ['operation:fetch', 'result:error', `source:${this.name}`]
                 sendMetrics([
-                  // {type: METRIC_TYPES.CACHE_RESULT, value: 1, tags},
                   {type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags}
                 ])
+                logError(LOG_TYPES.CACHE, {logType: LOG_TYPES.CACHE, message: 'There was a problem fetching cache content'})
                 throw new Error('data error from cache')
               }
               debugTimer(`Fetched from cache [${sanitizedUri}]`, elapsedTime)

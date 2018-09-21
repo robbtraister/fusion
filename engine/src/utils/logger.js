@@ -12,17 +12,17 @@ const LOG_TYPES = {
   WEBPACK_COMPILATION: 'webpack compilation'
 }
 
-const information = (logInfo) => {
+const logInformation = (logInfo) => {
   const logObject = getJSONLogObject(LOG_LEVELS.INFO, logInfo)
   console.info(`${LOG_LEVELS.INFO}: ${logObject}`)
 }
 
-const error = (logInfo) => {
+const logError = (logInfo) => {
   const logObject = getJSONLogObject(LOG_LEVELS.ERROR, logInfo)
   console.error(`${LOG_LEVELS.ERROR}: ${logObject}`)
 }
 
-const warning = (logInfo) => {
+const logWarning = (logInfo) => {
   const logObject = getJSONLogObject(LOG_LEVELS.WARN, logInfo)
   console.warn(`${LOG_LEVELS.WARN}: ${logObject}`)
 }
@@ -42,7 +42,7 @@ function getJSONLogObject (logLevel, {logType = '', message = 'no message provid
 
 module.exports = {
   LOG_TYPES,
-  error,
-  information,
-  warning
+  logError,
+  logInformation,
+  logWarning
 }

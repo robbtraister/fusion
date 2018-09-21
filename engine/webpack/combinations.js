@@ -18,6 +18,7 @@ const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
 
 const {
+  bundleRoot,
   bundleGeneratedRoot,
   componentDistRoot
 } = require('../environment')
@@ -47,8 +48,8 @@ ${[].concat(
           return (!componentOutputType)
             ? ''
             : (componentCollection === 'layouts')
-              ? `components['${componentCollection}']['${component.type}'] = Fusion.components.Layout(unpack(require('${componentOutputType.src}')))`
-              : `components['${componentCollection}']['${component.type}'] = unpack(require('${componentOutputType.src}'))`
+              ? `components['${componentCollection}']['${component.type}'] = Fusion.components.Layout(unpack(require('${path.join(bundleRoot, componentOutputType.src)}')))`
+              : `components['${componentCollection}']['${component.type}'] = unpack(require('${path.join(bundleRoot, componentOutputType.src)}'))`
         })
     })
   ).join('\n')}

@@ -1,5 +1,7 @@
 'use strict'
 
+const path = require('path')
+
 const debugTimer = require('debug')('fusion:timer:react:component')
 
 const React = require('react')
@@ -11,6 +13,8 @@ const unpack = require('../../../utils/unpack')
 const timer = require('../../../timer')
 
 const { sendMetrics, METRIC_TYPES } = require('../../../utils/send-metrics')
+
+const { bundleRoot } = require('../../../../environment')
 
 const { components } = require('../../../../manifest')
 
@@ -27,7 +31,7 @@ function loadComponent (componentCollection, componentType) {
   try {
     const componentConfig = components[componentCollection][componentType]
     const manifest = componentConfig.outputTypes[this.outputType]
-    const UnpackedComponent = unpack(require(manifest.dist))
+    const UnpackedComponent = unpack(require(path.join(bundleRoot, manifest.dist)))
     const OriginalComponent = (componentCollection === 'layouts')
       ? Layout(UnpackedComponent)
       : UnpackedComponent

@@ -1,14 +1,21 @@
 'use strict'
 
+const path = require('path')
+
 const Layout = require('../react/shared/components/layout')
 const unpack = require('../utils/unpack')
+
+const {
+  bundleRoot
+} = require('../../environment')
 
 function getSections (componentConfig) {
   const sectionIdsString = Object.values(componentConfig.outputTypes)
     .reduce((compilation, item) => {
+      const layoutPath = path.join(bundleRoot, item.dist)
       // ensure we load the latest version of the files
-      delete require.cache[item.dist]
-      const Component = Layout(unpack(require(item.dist)))
+      delete require.cache[layoutPath]
+      const Component = Layout(unpack(require(layoutPath)))
       const sections = Component.sections
       if (!sections) {
         throw new Error(`${componentConfig.type}/${componentConfig.id}: sections property is required`)

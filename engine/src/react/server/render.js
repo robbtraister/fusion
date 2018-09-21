@@ -2,6 +2,8 @@
 
 'use strict'
 
+const path = require('path')
+
 const debugTimer = require('debug')('fusion:timer:react:render')
 
 const React = require('react')
@@ -27,6 +29,7 @@ const {
 } = require('./tags')
 
 const {
+  bundleRoot,
   componentDistRoot,
   contextPath,
   isDev,
@@ -125,7 +128,7 @@ const render = function render ({Component, request, content}) {
 
 const getOutputTypeComponent = function getOutputTypeComponent (outputType) {
   try {
-    return unpack(require(components.outputTypes[outputType].dist))
+    return unpack(require(path.join(bundleRoot, components.outputTypes[outputType].dist)))
   } catch (e) {
     const err = new Error(`Could not find output-type: ${outputType}`)
     err.statusCode = 400

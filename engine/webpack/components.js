@@ -17,6 +17,7 @@ const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
 
 const {
+  bundleRoot,
   bundleDistRoot,
   componentDistRoot,
   isDev,
@@ -41,7 +42,7 @@ module.exports = Object.keys(components)
         const component = components[collection][componentType]
         Object.keys(component.outputTypes)
           .forEach((outputType) => {
-            entry[`${componentType}/${outputType}`] = component.outputTypes[outputType].src
+            entry[`${componentType}/${outputType}`] = path.join(bundleRoot, component.outputTypes[outputType].src)
           })
       })
 

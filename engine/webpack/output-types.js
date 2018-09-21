@@ -20,6 +20,7 @@ const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
 
 const {
+  bundleRoot,
   bundleDistRoot,
   componentDistRoot,
   isDev
@@ -35,7 +36,7 @@ const {
 
 const entry = Object.assign(
   ...Object.values(components.outputTypes)
-    .map(outputType => ({[outputType.type]: outputType.src}))
+    .map(outputType => ({[outputType.type]: path.join(bundleRoot, outputType.src)}))
 )
 
 // Compile twice.

@@ -68,8 +68,8 @@ export default MovieDetail
 
 As you can see in the code and comments above, we defined a required `defaultPosterUrl` custom field that should hold a URL to a default image if our movie has no "Poster", and an optional `showExtendedInfo` field that is a boolean determining whether to show certain data in this view. These values will now be configurable in the PageBuilder Admin by editors, and we can use them just like any other data in our component to change its behavior!
 
-TODO: add PB Admin image
+<!-- TODO: add PB Admin image -->
 
-Which custom fields are needed in your components is entirely up to your needs as a Feature Pack developer, and those of your PageBuilder editors. You can find the complete list of Custom Field types, along with their options, [in the API documentation here](TODO: add link).
+Which custom fields are needed in your components is entirely up to your needs as a Feature Pack developer, and those of your PageBuilder editors. You can find the complete list of Custom Field types, along with their options, [in the API documentation here](../api/feature-pack/components/feature.md#custom-fields).
 
  **Next: [Using a GraphQL Schema](./using-graphql-schema.md)**

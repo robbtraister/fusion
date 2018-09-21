@@ -103,6 +103,8 @@ class MovieDetail extends Component {
         {isPlotShown ? 'Hide Plot' : 'Show Plot'}
       </button>
     )
+
+    const Plot = 'Lorem ipsum'
     
     return (
       <div className='movie-detail col-sm-12 col-md-8'>
@@ -127,7 +129,7 @@ export default MovieDetail
 
 All that's changed here is we've replaced the hardcoded "Lorem ipsum" text for our plot with the `Plot` const above, and rendered it conditionally based on the `isPlotShown` value. Then we display the `plotButton` right afterward.
 
-Now iff we refresh the page, we should see our "Show Plot" button where the "Lorem ipsum" text was, and be able to toggle the text back and forth by clicking "Show Plot" and "Hide Plot". Great job!
+Now if we refresh the page, we should see our "Show Plot" button where the "Lorem ipsum" text was, and be able to toggle the text back and forth by clicking "Show Plot" and "Hide Plot". Great job!
 
 #### The whole thing
 

@@ -4,8 +4,6 @@ Output Types are used to define the HTML wrapping that is applied to server resp
 
 When rendering a page, the `outputType` query parameter will be used to determine which output type is used to handle the request; if no parameter is specified, `default` will be used.
 
-You can see some examples [here](../../engine/bundle/components/output-types).
-
 ## Children
 
 -   `children`

@@ -1,11 +1,13 @@
 'use strict'
 
 const fs = require('fs')
+const path = require('path')
 
 const isStatic = require('../utils/is-static')
 const unpack = require('../../../utils/unpack')
 
 const {
+  bundleRoot,
   minify
 } = require('../../../../environment')
 
@@ -48,10 +50,10 @@ class SourceCompiler extends ComponentCompiler {
 
   componentImport (manifest) {
     try {
-      const Component = unpack(require(manifest.dist))
+      const Component = unpack(require(path.join(bundleRoot, manifest.dist)))
       if (Component) {
         const componentName = this.getComponentName(manifest.collection, manifest.type)
-        const fp = manifest[srcFileType]
+        const fp = path.join(bundleRoot, manifest[srcFileType])
         return (isStatic(Component, manifest.outputType))
           ? `Fusion.components${componentName} = Fusion.components.Static`
           : (manifest.collection === 'layouts')

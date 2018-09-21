@@ -1,14 +1,21 @@
 'use strict'
 
+const path = require('path')
+
 const PropTypes = require('../react/shared/prop-types')
 const unpack = require('../utils/unpack')
+
+const {
+  bundleRoot
+} = require('../../environment')
 
 function getCustomFields (componentConfig) {
   const customFields = Object.values(componentConfig.outputTypes)
     .reduce((compilation, item) => {
+      const componentPath = path.join(bundleRoot, item.dist)
       // ensure we load the latest version of the files
-      delete require.cache[item.dist]
-      const Component = unpack(require(item.dist))
+      delete require.cache[componentPath]
+      const Component = unpack(require(componentPath))
       const customFields = Component.propTypes && Component.propTypes.customFields
       if (customFields) {
         if (!(customFields instanceof Object)) {

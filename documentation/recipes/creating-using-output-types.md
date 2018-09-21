@@ -61,7 +61,7 @@ The parts of our component that are unique and interesting to Fusion are the `pr
 - `props.children` is a React standard prop, but for our purposes it will include all the other components (layouts, chains, and features) that were configured in the Admin to exist on the page. Without it, none of the content on our page gets displayed.
 - `<props.Fusion />` bootstraps data from the server that will hydrate our React components.
 
-There are more Output Type-specific methods available to us that are [listed in the Output Type API documentation](TODO: add link), along with those we enumerated above; but this should be more than enough to render something simple for now.
+There are more Output Type-specific methods available to us that are [listed in the Output Type API documentation](../api/feature-pack/components/output-type.md), along with those we enumerated above; but this should be more than enough to render something simple for now.
 
 One more subtle but important piece of code is the `id='fusion-app'` attribute applied to the `<div>` tag in our page body. It's important that this `id` exists and is precisely `fusion-app`, as this will be the hook that Fusion looks for to re-mount the app on the client side. Without it our application won't know what element to mount to on the page, and thus won't work client side.
 
@@ -69,7 +69,7 @@ One more subtle but important piece of code is the `id='fusion-app'` attribute a
 
 We're finally at the stage where we can start seeing something on a webpage! To do so, we'll need to go into the [PageBuilder Admin](http://localhost/pb/admin) and define a sample page to work with.
 
-TODO: add PB Admin image
+<!-- TODO: add PB Admin image -->
 
 Let's create a page called "Homepage" at the path `/homepage` (or if you already have a Homepage, you can use any name/path combination). Once you've created your page, you should be redirected to the Page Editor view, with a preview on the right. That preview pane won't show any content from our Output Type component - the preview pane only shows content *within* the Output Type. However, if we publish the page and make it "live", then visit [http://localhost/homepage](http://localhost/homepage), we should see our webpage with a big "Welcome to Fusion" message at the top! Huzzah!
 

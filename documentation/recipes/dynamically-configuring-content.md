@@ -58,7 +58,7 @@ As you can see above, we're defining a set of Custom Fields for our `MovieList` 
 
 If we refresh our PageBuilder Admin at this point and look in the Custom Fields panel for the `MovieList` component, we should see the following:
 
-TODO: PB Admin screenshot of MovieList Custom Fields
+<!-- TODO: PB Admin screenshot of MovieList Custom Fields -->
 
 As you can see, now we have a `movieListConfig` dropdown option available in the Admin populated with a list of content sources (in our case there is just 1, `movie-search`). These content sources are the ones that match the GraphQL schema we specified in the `PropTypes.contentConfig()` call (in this case, the schema name is `movies`).
 

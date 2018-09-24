@@ -81,9 +81,11 @@ const value = {
   getContent: getContentGenerator(Fusion.contentCache),
   globalContent: Fusion.globalContent,
   globalContentConfig: Fusion.globalContentConfig,
+  // layout: <!-- provided by the render props -->
   outputType: Fusion.outputType,
   requestUri: requestPath + window.location.search,
   siteProperties: Fusion.properties(Fusion.arcSite)
+  // template: <!-- provided by the render props -->
 }
 
 module.exports = (props) => React.createElement(
@@ -93,3 +95,5 @@ module.exports = (props) => React.createElement(
   },
   props.children
 )
+
+module.exports.displayName = 'FusionApp'

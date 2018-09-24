@@ -149,15 +149,24 @@ function HOC (Component) {
         }
       }
 
+      ComponentConsumer.displayName = Component.displayName || Component.name
+
       return createContextElement(ComponentConsumer, props, context)
     }
     : (props) => (context) => createContextElement(Component, props, context)
 
-  return (props) => React.createElement(
+  const ConsumerWrapper = (props) => React.createElement(
     Fusion.context.Consumer,
     {},
     elementGenerator(props)
   )
+
+  for (let key in Component) {
+    ConsumerWrapper[key] = Component[key]
+  }
+  ConsumerWrapper.displayName = `FusionConsumerWrapper(${Component.displayName || Component.name || 'Component'})`
+
+  return ConsumerWrapper
 }
 
 function Consumer (propsOrComponent) {

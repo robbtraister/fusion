@@ -14,7 +14,7 @@
     "build:output-types:production": "NODE_ENV=production npm run build:output-types -- --mode production -p",
     "deploy": "sls deploy",
     "extract:jge": "sleep 10 && node bin/extract",
-    "install:bundle": "if [ -f ./bundle/src/package.json ]; then (cd ./bundle/src && npm install --production); fi",
+    "install:bundle": "if [ -f ./bundle/src/package.json ]; then (cd ./bundle/src && npm install --production --unsafe-perm); fi",
     "generate:manifest": "node ./manifest/generate",
     "prebuild:all": "rm -rf \"./bundle/dist/\"* && rm -rf \"./bundle/generated/\"* && npm run generate:manifest",
     "prebuild:all:production": "npm run install:bundle",

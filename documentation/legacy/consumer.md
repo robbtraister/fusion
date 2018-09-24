@@ -16,6 +16,21 @@ Features will have access to the following properties and, if a class, instance 
 
 The arc site used in this rendering, if multi-site enabled.
 
+- contentEditable
+
+A function that accepts a property name and can be used to insert a DOM attribute to designate an element as editable in the PageBuilder admin
+
+```js
+import Consumer from 'fusion:consumer'
+
+const EditableFeature = ({contentEditable, globalContent}) =>
+  <div>
+    <span {...contentEditable('promo_items.basic.headline')}>{globalContent.promo_items.basic.headline}</span>
+  </div>
+
+export default Consumer(EditableFeature)
+```
+
 -   contextPath
 
 This is the base context path of the application. In the client, you could calculate this using window.location, but this property exists to provide similar server-side access.

@@ -25,6 +25,12 @@ const getContextProps = (props, context) => {
 const createContextElement = (Component, props, context) => {
   const { props: contextProps, children } = getContextProps(props, context)
 
+  contextProps.contentEditable = (isClient && Fusion.isAdmin)
+    ? (prop) => ({
+      'data-content-editable': `${props.id}:${prop}`
+    })
+    : () => ({})
+
   return React.createElement(
     Component,
     contextProps,

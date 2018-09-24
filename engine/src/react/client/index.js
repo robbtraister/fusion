@@ -59,6 +59,8 @@ const render = () => {
         }
       }
 
+      Fusion.Template.displayName = 'FusionTemplate'
+
       Fusion.elementCache = {}
       const staticElements = window.document.getElementsByClassName('fusion:static')
       Array.prototype.slice.call(staticElements).forEach(elem => {

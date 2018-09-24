@@ -95,3 +95,5 @@ module.exports = (props) => React.createElement(
   },
   props.children
 )
+
+module.exports.displayName = 'FusionApp'

@@ -13,6 +13,7 @@ const unpack = require('../../../utils/unpack')
 const timer = require('../../../timer')
 
 const { sendMetrics, METRIC_TYPES } = require('../../../utils/send-metrics')
+const { logError, LOG_TYPES } = require('../../../utils/logger')
 
 const { components } = require('../../../../manifest')
 
@@ -38,7 +39,9 @@ class ServerGenerator extends ComponentGenerator {
         ? (props) => React.createElement('div', { id: props.id, className: 'fusion:static' }, React.createElement(OriginalComponent, props))
         : OriginalComponent
       return TimedComponent(Component)
-    } catch (e) {}
+    } catch (error) {
+      logError({logType: LOG_TYPES.RENDERING, message: `Unable to load component: ${error.stack || error}`})
+    }
     return null
   }
 }

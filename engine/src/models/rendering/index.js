@@ -165,7 +165,7 @@ class Rendering {
                 publishToOtherVersions(uri, this.json)
                   .catch((err) => {
                     // do not throw while trying to publish to old versions
-                    logError({logType: LOG_TYPES.RENDERING, message: `An error occurred while attempting to publish: ${err.toString()}`})
+                    logError({logType: LOG_TYPES.RENDERING, message: `An error occurred while attempting to publish: ${err.stack || err}`})
                   })
               ])
               : Promise.resolve()

@@ -8,6 +8,8 @@ const LOG_LEVELS = {
 
 const LOG_TYPES = {
   CACHE: 'cache',
+  COMPONENT: 'component',
+  FETCH_FROM_SOURCE: 'fetching from source',
   PAGE_RENDER_TIME: 'page rendering time',
   RENDERING: 'rendering',
   WEBPACK_COMPILATION: 'webpack compilation'

@@ -6,6 +6,7 @@ const _merge = require('lodash.merge')
 const isStatic = require('./utils/is-static')
 
 const JSONNormalize = require('../../utils/normalize')
+const { logError, LOG_TYPES } = require('../../utils/logger')
 
 const getSource = require('../../models/sources')
 
@@ -16,7 +17,7 @@ const getContentGenerator = function getContentGenerator (contentCache, arcSite,
     const sourceCache = contentCache[sourceName] = contentCache[sourceName] || {}
     const sourcePromise = getSource(sourceName)
       .catch((err) => {
-        console.error(err)
+        logError({message: `${err.stack || err}`})
         return null
       })
 

@@ -107,7 +107,7 @@ class CachedSource extends ResolveSource {
               sendMetrics([
                 {type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags}
               ])
-              logError({logType: LOG_TYPES.CACHE, message: `There was an error while trying to fetch: ${error.toString()}`})
+              logError({logType: LOG_TYPES.CACHE, message: `There was an error while trying to fetch: ${error.stack || error}`})
 
               return this.update(key)
             })
@@ -154,7 +154,7 @@ class CachedSource extends ResolveSource {
               sendMetrics([
                 {type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags}
               ])
-              logError({logType: LOG_TYPES.CACHE, message: `There was an error while attempting to update the cache: ${error.toString()}`})
+              logError({logType: LOG_TYPES.CACHE, message: `There was an error while attempting to update the cache: ${error.stack || error}`})
               // DO NOT THROW FOR FAILED CACHE WRITE!!!
               // throw new Error(`Error putting into cache ${this.name}`)
 

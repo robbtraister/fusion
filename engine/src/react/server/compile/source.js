@@ -4,6 +4,7 @@ const fs = require('fs')
 
 const isStatic = require('../utils/is-static')
 const unpack = require('../../../utils/unpack')
+const { logError, LOG_TYPES } = require('../../../utils/logger')
 
 const {
   minify
@@ -60,7 +61,8 @@ class ScriptSource extends ComponentGenerator {
             ? `Fusion.components${componentName} = Fusion.components.Layout(Fusion.unpack(require('${fp}')))`
             : `Fusion.components${componentName} = Fusion.unpack(require('${fp}'))`
       }
-    } catch (e) {
+    } catch (error) {
+      logError({logType: LOG_TYPES.COMPONENT, message: `There was a problem attempting to import a component: ${error.stack || error}`})
     }
   }
 

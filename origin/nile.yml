@@ -146,4 +146,4 @@ environments:
         environment:
           <<: *_environment
           IS_ADMIN: 'true'
-          PB_ADMIN: 'http://$environment.aws.pb.arc.pub'
+          PB_ADMIN: 'http://$environment.pb.aws.arc.pub'

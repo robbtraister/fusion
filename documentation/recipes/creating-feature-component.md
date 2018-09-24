@@ -69,13 +69,9 @@ Alternatively, if a Feature should act very similarly across multiple Output Typ
 
 In this example, we render slightly different links if the provided `outputType` is `amp` or not. Since AMP doesn't allow JavaScript, we send the user to a link - in all other cases, some client side JS is invoked.
 
----
-
-**NOTE**
-
-If you only have a single version of a Feature for all Output Types, you can add your Feature file directly to the `features/` directory rather than creating a new directory. Here, we could name our file `/src/components/features/headline.jsx` instead of having a separate `/src/components/features/headline/` directory.
-
----
+> **NOTE**
+> 
+> If you only have a single version of a Feature for all Output Types, you can add your Feature file directly to the `features/` directory rather than creating a new directory. Here, we could name our file `/src/components/features/headline.jsx` instead of having a separate `/src/components/features/headline/` directory.
 
 It's up to you whether it makes sense to create an entirely new version of a Feature for a different output type, or if the changes are small enough that they can be contained in 1 Feature definition.
 

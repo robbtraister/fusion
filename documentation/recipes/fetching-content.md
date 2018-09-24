@@ -8,13 +8,9 @@ It's important to remember that you only need to fetch content if the content yo
 
 A quick example: if you have a feature called `authors` whose purpose is to list the authors of the main story on the page, then you will want to use `props.globalContent` - since the information in the `authors` component is semantically tied to the main story. If, however, you are building an unrelated `sports_scores` component that shows the most recent scores from local sports games, that content will almost certainly *not* exist as part of your main story - so you'll need to fetch it separately.
 
----
-
-**NOTE**
-
-Even though you may not need to fetch "feature specific" content in your Feature Pack, you still need to define content sources so resolvers can use them to fetch "global" content. Without content sources you can't get "global" content *or* "feature specific" content.
-
----
+> **NOTE**
+> 
+> Even though you may not need to fetch "feature specific" content in your Feature Pack, you still need to define content sources so resolvers can use them to fetch "global" content. Without content sources you can't get "global" content *or* "feature specific" content.
 
 ## Fetching content and setting state
 
@@ -83,19 +79,15 @@ The second argument is the `key` object that contains the values we actually wan
 
 Finally, the third argument is a string containing a GraphQL query object, which will filter the results of our JSON down to just the data we need for this component - you'll notice the key names in the filter match those in the [schema we defined a couple steps ago](./using-graphql-schema.md).
 
----
-
-**NOTE**
-
-The GraphQL query only works because we defined a GraphQL schema earlier - if the query doesn't match the shape of the schema we made earlier, `getContent` will just return the entire JSON response, rather than the filtered version.
-
----
+> **NOTE**
+> 
+> The GraphQL query only works because we defined a GraphQL schema earlier - if the query doesn't match the shape of the schema we made earlier, `getContent` will just return the entire JSON response, rather than the filtered version.
 
 As noted in the [API docs](../api/feature-pack/components/consumer.md#getContent), `getContent` actually returns an object with 2 keys: a `cached` object and a `fetched` object. For now we only care about the `fetched` object, which is a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) that we can chain handlers to.
 
 Here, we've added a handler which should accept the GraphQL-filtered response of our content fetch. We then use React's `setState` method and some fancy ES6 spread syntax to replace the existing `movies` state array with a new one including both the existing movies and the new ones from our fetch (contained in `response.Search`). 
 
-This method should work great - except we haven't invoked it anywhere! Let's change that in our `contructor` method:
+This method should work great - except we haven't invoked it anywhere! Let's change that in our `constructor` method:
 
 ```jsx
   constructor (props) {
@@ -105,11 +97,9 @@ This method should work great - except we haven't invoked it anywhere! Let's cha
   }
 ```
 
----
-
-**NOTE**
-
-Because we're invoking the `fetch` method in the `constructor`, our fetch will occur on both the server *and* the client side when we're rendering. If we had just wanted to invoke client side, we could have put the `fetch` call inside of `componentDidMount` instead of the `constructor`, since `componentDidMount` only occurs client side.
+> **NOTE**
+> 
+> Because we're invoking the `fetch` method in the `constructor`, our fetch will occur on both the server *and* the client side when we're rendering. If we had just wanted to invoke client side, we could have put the `fetch` call inside of `componentDidMount` instead of the `constructor`, since `componentDidMount` only occurs client side.
 
 ---
 

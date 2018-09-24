@@ -347,13 +347,19 @@ The `getContent` method will fetch content, both on the server and the client, f
 
 For syntactic sugar, there are 2 ways to invoke the `getContent` method: with the arguments expanded and passed individually, or as keys of an object.
 
+*Expanded Syntax*
+
 `getContent(sourceName, key, [filter], [inherit])`
+
 - `sourceName` (*String*): The name of the content source from which you want to fetch. This content source must be configured in your bundle.
 - `key` (*Object*): This will depend on the definition of the content source, but will be an object containing key/value pairs used to uniquely identify the piece of content you want to fetch.
 - [`filter`] (*String*): A GraphQL query string that will be applied to the resultant data to minimize the payload size. This is beneficial for both client-side and server-side fetching, as server-side fetched data must be included in the final HTML rendering to prevent content flashing.
 - [`inherit`] (*Boolean*): A dynamic boolean to determine if `globalContent` should be used to override the config settings provided. If this value is `true`, the `globalContent` will be returned in both the `cached` property and as the resolution of `fetched`.
 
+*Object Syntax*
+
 `getContent(options)`
+
 - `options` (*Object*): An object containing the following properties:
   - `options.sourceName` (*String*): See `sourceName` parameter above.
   - `options.key` (*Object*): See `key` parameter above.

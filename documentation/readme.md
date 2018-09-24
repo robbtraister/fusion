@@ -56,14 +56,14 @@
 | [Content Sources](./api/feature-pack/content/source.md) |
 | [Content Schemas](./api/feature-pack/content/schema.md) |
 
-[Environment Variables](./api/feature-pack/environment.md)
+**[Environment Variables](./api/feature-pack/environment.md)**
 
-[Site Properties](./api/feature-pack/properties.md)
+**[Site Properties](./api/feature-pack/properties.md)**
 
 ### HTTP Endpoints
 
-[API](./)
+**[API](./)**
 
 ## Glossary
 
-[Glossary of Terms](./glossary.md)
+**[Glossary of Terms](./glossary.md)**

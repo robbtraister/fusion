@@ -10,13 +10,9 @@ By far the easiest way to add styling to your Fusion site is to write static CSS
 
 Let's say we wanted to add some simple CSS to add common heights and classes to certain classes of images. To do so, let's create a directory called `css/` in our `/src/resources/` directory and a file called `main.css` within it.
 
----
-
-**NOTE**
-
-The `/src/resources/` directory is where Fusion expects static assets to be kept - things like images, fonts, CSS, and static JavaScript that can be served directly to the browser without being processed.
-
----
+> **NOTE**
+>
+> The `/src/resources/` directory is where Fusion expects static assets to be kept - things like images, fonts, CSS, and static JavaScript that can be served directly to the browser without being processed.
 
 Here's some simple CSS for our site:
 

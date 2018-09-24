@@ -60,12 +60,8 @@ Now we have our component *and* content source defined, and our resolver fetchin
 
 And just like that, our component is rendering content dynamically! Go ahead and publish the page and try requesting the URL defined in our resolver with different movie names to see it fetch different content.
 
----
-
-**NOTE**
-
-It's possible to wrap a [functional component](https://reactjs.org/docs/components-and-props.html#functional-and-class-components) in the `Consumer` higher-order function and still get props passed as in the class-based syntax - however, only the class-based syntax allows you to use `Consumer`'s instance methods.
-
----
+> **NOTE**
+> 
+> It's possible to wrap a [functional component](https://reactjs.org/docs/components-and-props.html#functional-and-class-components) in the `Consumer` higher-order function and still get props passed as in the class-based syntax - however, only the class-based syntax allows you to use `Consumer`'s instance methods.
 
 **Next: [Adding Custom Fields to a Components](./adding-custom-fields.md)**

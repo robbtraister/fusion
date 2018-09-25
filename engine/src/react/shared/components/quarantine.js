@@ -2,8 +2,12 @@
 
 const React = require('react')
 
-module.exports = (Component, fp) =>
-  class extends React.Component {
+// this extracts an already-wrapped component name
+const getName = (Component) =>
+  (Component.displayName || Component.name || 'Component').replace(/.*\((.+)\)/, (_, name) => name)
+
+module.exports = (Component, fp) => {
+  class Quarantine extends React.Component {
     constructor (props) {
       super(props)
 
@@ -23,3 +27,8 @@ module.exports = (Component, fp) =>
         : React.createElement(Component, this.props)
     }
   }
+
+  Quarantine.displayName = `FusionQuarantine(${getName(Component)})`
+
+  return Quarantine
+}

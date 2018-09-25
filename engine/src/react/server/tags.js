@@ -4,6 +4,7 @@ const React = require('react')
 
 const fs = require('fs')
 const path = require('path')
+const url = require('url')
 
 const {
   fetchFile
@@ -16,13 +17,21 @@ const {
   version
 } = require('../../../environment')
 
+const deployment = (u) => {
+  const parts = url.parse(u, true)
+  parts.query.v = version
+  parts.search = undefined
+  return url.format(parts)
+}
+deployment.toString = () => version
+
 const engineScript = React.createElement(
   'script',
   {
     key: 'fusion-engine-script',
     id: 'fusion-engine-script',
     type: 'application/javascript',
-    src: `${contextPath}/dist/engine/react.js?v=${version}`,
+    src: deployment(`${contextPath}/dist/engine/react.js`),
     defer: true
   }
 )
@@ -65,8 +74,8 @@ const cssTagGenerator = ({inlines, rendering, outputType}) => {
       .catch(() => null)
       .then((templateCssFile) => {
         inlines.cssLinks.cached = {
-          outputTypeHref: (outputTypeHasCss(outputType)) ? `${contextPath}/dist/components/output-types/${outputType}.css?v=${version}` : null,
-          templateHref: (templateCssFile) ? `${contextPath}/dist/${templateCssFile}?v=${version}` : null
+          outputTypeHref: (outputTypeHasCss(outputType)) ? deployment(`${contextPath}/dist/components/output-types/${outputType}.css`) : null,
+          templateHref: (templateCssFile) ? deployment(`${contextPath}/dist/${templateCssFile}`) : null
         }
       })
   }
@@ -145,7 +154,7 @@ const libsTagGenerator = ({name, outputType}) => {
       key: 'fusion-template-script',
       id: 'fusion-template-script',
       type: 'application/javascript',
-      src: `${contextPath}/dist/${name}/${outputType}.js?v=${version}`,
+      src: deployment(`${contextPath}/dist/${name}/${outputType}.js`),
       defer: true
     }
   )
@@ -208,6 +217,7 @@ const stylesGenerator = ({inlines, rendering, outputType}) => {
 
 module.exports = {
   cssTagGenerator,
+  deployment,
   fusionTagGenerator,
   libsTagGenerator,
   metaTagGenerator,

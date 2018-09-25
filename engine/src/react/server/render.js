@@ -22,6 +22,7 @@ const fusionProperties = require('fusion:properties')
 
 const {
   cssTagGenerator,
+  deployment,
   fusionTagGenerator,
   libsTagGenerator,
   metaTagGenerator,
@@ -32,8 +33,7 @@ const {
   bundleRoot,
   componentDistRoot,
   contextPath,
-  isDev,
-  version
+  isDev
 } = require('../../../environment')
 
 const { components } = require('../../../manifest')
@@ -188,7 +188,8 @@ const compileDocument = function compileDocument ({name, rendering, outputType, 
               OutputType,
               {
                 contextPath,
-                version,
+                deployment,
+                version: deployment,
                 tree: Template.tree,
                 renderables: [Template.tree].concat(...getAncestors(Template.tree)),
 

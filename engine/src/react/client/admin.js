@@ -14,7 +14,7 @@ Fusion.isAdmin = true
 
 const Provider = require('./provider')
 
-const version = undefined // require('./version')
+const version = require('./version')
 
 const React = window.react = require('react')
 const ReactDOM = window.ReactDOM = require('react-dom')
@@ -26,7 +26,10 @@ React.Fragment = React.Fragment || 'div'
 const ComponentCompiler = require('../shared/compile/component')
 class AdminCompiler extends ComponentCompiler {
   loadComponent (componentCollection, componentType) {
-    return Fusion.components[componentCollection][componentType]
+    try {
+      return Fusion.components[componentCollection][componentType]
+    } catch (e) {}
+    return null
   }
 }
 

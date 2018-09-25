@@ -5,6 +5,7 @@ const path = require('path')
 const express = require('express')
 
 const { glob } = require('../utils/promises')
+const { logError, LOG_TYPES } = require('../utils/logger')
 
 const getSource = require('../models/sources')
 
@@ -21,6 +22,7 @@ const getConfigs = (type) => {
   try {
     return require(`${componentDistRoot}/${type}/fusion.configs.json`)
   } catch (e) {
+    logError({message: `An error occurred while attempting to get configs: ${e.stack || e}`})
     return loadConfigs(type)
   }
 }

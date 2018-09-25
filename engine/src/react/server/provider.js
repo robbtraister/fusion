@@ -36,7 +36,7 @@ const getContentGenerator = function getContentGenerator (contentCache, arcSite,
           })
           .then(data => { keyCache.cached = data })
           .catch((err) => {
-            console.error(err)
+            logError({logType: LOG_TYPES.FETCH_FROM_SOURCE, message: `An error occurred while attempting to fetch: ${err.stack || err}`})
             keyCache.cached = null
           })
           .then(() => keyCache.cached),

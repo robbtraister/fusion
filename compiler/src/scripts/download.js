@@ -22,9 +22,8 @@ async function download (bundlePath) {
     debug(`downloaded ${params.Bucket} ${params.Key} to ${destFile}`)
 
     return destFile
-  } catch (e) {
+  } finally {
     promises.remove(await destFilePromise)
-    throw e
   }
 }
 

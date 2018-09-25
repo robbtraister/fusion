@@ -21,7 +21,7 @@ Let's jump back to our `movie-detail.jsx` file we created in the ["Creating a Fe
 In this example, we want to access the title, director, list of actors, and more info associated with the movie the user requested. Now that we've fetched that content in our resolver, it should be available as `props.globalContent` provided by the Consumer. Let's wrap our component with the `Consumer` decorator and see what changes:
 
 ```jsx
-/*  /src/components/features/movie-detail/default.jsx  */
+/*  /src/components/features/movies/movie-detail.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
@@ -61,7 +61,7 @@ Now we have our component *and* content source defined, and our resolver fetchin
 And just like that, our component is rendering content dynamically! Go ahead and publish the page and try requesting the URL defined in our resolver with different movie names to see it fetch different content.
 
 > **NOTE**
-> 
+>
 > It's possible to wrap a [functional component](https://reactjs.org/docs/components-and-props.html#functional-and-class-components) in the `Consumer` higher-order function and still get props passed as in the class-based syntax - however, only the class-based syntax allows you to use `Consumer`'s instance methods.
 
 **Next: [Adding Custom Fields to a Components](./adding-custom-fields.md)**

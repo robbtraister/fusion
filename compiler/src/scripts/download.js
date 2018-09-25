@@ -24,6 +24,7 @@ async function download (bundlePath) {
     return destFile
   } catch (e) {
     promises.remove(await destFilePromise)
+    throw e
   }
 }
 

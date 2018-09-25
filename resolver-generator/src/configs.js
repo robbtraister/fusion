@@ -1,6 +1,7 @@
 'use strict'
 
-const S3Bucket = process.env.S3BUCKET || 'pagebuilder-fusion'
+const awsRegion = process.env.AWS_REGION || ''
+const S3Bucket = process.env.S3BUCKET || `arc-fusion-versioned-${awsRegion}`
 
 const {
   getAccountId
@@ -60,6 +61,7 @@ const resolverArtifact = (contextName) => {
 }
 
 module.exports = {
+  awsRegion,
   resolverArn,
   resolverArtifact,
   resolverCode,

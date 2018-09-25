@@ -20,19 +20,15 @@ With that in mind, let's install a module from NPM. First, let's go to the `/src
 $ cd ./src
 ```
 
----
-
-**NOTE**
-
-If for some reason your `/src` directory does not have a `package.json` by default, you'll need to create one:
-
-```bash
-$ npm init
-```
-
-Follow the prompts (you can leave them all empty to start with) and afterwards a `package.json` file will be created for you.
-
----
+> **NOTE**
+> 
+> If for some reason your `/src` directory does not have a `package.json` by default, you'll need to create one:
+>
+> ```bash
+> $ npm init
+> ```
+> 
+> Follow the prompts (you can leave them all empty to start with) and afterwards a `package.json` file will be created for you.
 
 Now we can install the module we want from NPM. I'd like to use a simple helper method from lodash to help shuffle items in a collection around:
 
@@ -88,7 +84,6 @@ One consideration when evaluating whether to install a module is its size - you 
 
 Another consideration is simply whether the module you are including is intended for client-side use at all. Many modules on NPM are intended for node, server-side use only, and wouldn't make sense to install into a client-side component.
 
-Finally, security and reliability are always concerns when using third-party code. There have been [numerous high-profile incidents recently of third-party libraries introducing security vulnerabilities into their host programs](TODO: add links), or the packages being removed entirely from NPM. When installing third-party libraries, make sure the code is from a reputable source, [check it as thoroughly as possible](https://snyk.io/), and keep your versions up-to-date!
+Finally, security and reliability are always concerns when using third-party code. It's common for third-party libraries to have [security vulnerabilities](https://snyk.io/vuln), or even for the packages [to be removed entirely from NPM](https://github.com/stevemao/left-pad/issues/4). When installing third-party libraries, make sure the code is from a reputable source, check it as thoroughly as possible, and keep your versions up-to-date!
 
-
- **Next: [Using Child and Shared Components](./using-child-shared-components.md)**
+ **Next: [Messaging Between Components](./messaging-between-components.md)**

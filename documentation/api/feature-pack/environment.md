@@ -1,4 +1,4 @@
-# Environment
+# Environment Variables
 
 Environment variables can be configured within your repo so that they are provided to the server at runtime. This provides more control to the developer than having to make requests to the PB team, who then has to manage all client environments in a single place.
 

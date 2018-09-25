@@ -50,7 +50,7 @@ async function zip (zipDirMap) {
     debug(`zipped ${Object.values(zipDirMap)} to ${zipFile}`)
 
     return zipFile
-  } catch (e) {
+  } finally {
     promises.remove(zipFile)
   }
 }

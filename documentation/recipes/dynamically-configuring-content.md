@@ -5,8 +5,8 @@ Now we're really cooking with gas! We've written and rendered components, we've 
 But believe it or not, we can make our content fetching *even more* dynamic. Currently inside our `MovieList` component, we're hardcoding the name of our content source and the values it is using to query for content. Here's the relevant snippet in our `movie-list` component:
 
 ```jsx
-/*  /src/components/features/movie-list/default.jsx  */
-  
+/*  /src/components/features/movies/movie-list.jsx  */
+
   ...
   fetch () {
     const { fetched } = this.getContent('movie-search', { movieQuery: 'Rocky', page: this.state.page }, '{ totalResults Search { Title Year Poster } }')
@@ -32,7 +32,7 @@ With this in mind, Fusion gives you the ability to specify a `contentConfig` pro
 Let's see how that works:
 
 ```jsx
-/*  /src/components/features/movie-list/default.jsx  */
+/*  /src/components/features/movies/movie-list.jsx  */
 
 // We have to import the `PropTypes` module so we can use it later
 import PropTypes from 'prop-types'
@@ -58,7 +58,7 @@ As you can see above, we're defining a set of Custom Fields for our `MovieList` 
 
 If we refresh our PageBuilder Admin at this point and look in the Custom Fields panel for the `MovieList` component, we should see the following:
 
-TODO: PB Admin screenshot of MovieList Custom Fields
+<!-- TODO: PB Admin screenshot of MovieList Custom Fields -->
 
 As you can see, now we have a `movieListConfig` dropdown option available in the Admin populated with a list of content sources (in our case there is just 1, `movie-search`). These content sources are the ones that match the GraphQL schema we specified in the `PropTypes.contentConfig()` call (in this case, the schema name is `movies`).
 
@@ -75,8 +75,8 @@ The second key is `contentConfigValues`, whose value is an object containing the
 Armed with this knowledge, let's see how we can use the `movieListConfig` prop in our `fetch` method to make things more dynamic:
 
 ```jsx
-/*  /src/components/features/movie-list/default.jsx  */
-  
+/*  /src/components/features/movies/movie-list.jsx  */
+
   ...
   fetch () {
     // We're destructuring the `contentService` and `contentConfigValues` keys out of the `movieListConfig` prop inside `this.props.customFields`...

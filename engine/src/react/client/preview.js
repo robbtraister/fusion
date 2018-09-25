@@ -35,7 +35,7 @@ class Preview {
   appendAdminScript (cb) {
     const script = this.iframe.contentDocument.createElement('script')
     script.type = 'application/javascript'
-    script.src = `${__CONTEXT_PATH__}/dist/engine/admin.js?v=${version}`
+    script.src = `${__CONTEXT_PATH__}/dist/engine/admin.js${version ? `?v=${version}` : ''}`
     script.onload = cb
     this.iframe.contentDocument.body.appendChild(script)
   }

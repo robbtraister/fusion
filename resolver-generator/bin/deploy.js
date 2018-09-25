@@ -8,11 +8,9 @@ const promisify = require('util').promisify
 
 const debug = require('debug')('fusion:resolver-generator')
 
-const AWS = require('aws-sdk')
-const s3 = new AWS.S3({region: 'us-east-1'})
-const lambda = new AWS.Lambda({region: 'us-east-1'})
-
 const {
+  awsAccountId,
+  awsRegion: region,
   datadogApiKey,
   fusionRelease,
   S3Bucket,
@@ -20,12 +18,16 @@ const {
   resolverGeneratorArtifact
 } = require('./configs')
 
+const AWS = require('aws-sdk')
+const s3 = new AWS.S3({region})
+const lambda = new AWS.Lambda({region})
+
 const awsUpload = promisify(s3.upload.bind(s3))
 const createFunction = promisify(lambda.createFunction.bind(lambda))
 const updateFunctionCode = promisify(lambda.updateFunctionCode.bind(lambda))
 const updateFunctionConfig = promisify(lambda.updateFunctionConfiguration.bind(lambda))
 
-const FunctionName = 'fusion-generator'
+const FunctionName = `fusion-generator-${region}`
 
 async function upload (fp) {
   debug(`uploading ${fp}`)
@@ -59,7 +61,7 @@ async function createGeneratorFunction () {
       },
       Handler: 'resolver-generator/src/index.handler',
       MemorySize: 512,
-      Role: 'arn:aws:iam::397853141546:role/fusion-generator',
+      Role: `arn:aws:iam::${awsAccountId}:role/fusion-generator`,
       Runtime: 'nodejs8.10',
       Timeout: 60
     })

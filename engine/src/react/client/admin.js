@@ -14,7 +14,7 @@ Fusion.isAdmin = true
 
 const Provider = require('./provider')
 
-const version = undefined // require('./version')
+const version = require('./version')
 
 const React = window.react = require('react')
 const ReactDOM = window.ReactDOM = require('react-dom')
@@ -23,14 +23,15 @@ window.PropTypes = require('../shared/prop-types')
 // support fragments in preact
 React.Fragment = React.Fragment || 'div'
 
-const ComponentGenerator = require('../shared/compile/component')
-class AdminGenerator extends ComponentGenerator {
+const ComponentCompiler = require('../shared/compile/component')
+class AdminCompiler extends ComponentCompiler {
   loadComponent (componentCollection, componentType) {
-    return Fusion.components[componentCollection][componentType]
+    try {
+      return Fusion.components[componentCollection][componentType]
+    } catch (e) {}
+    return null
   }
 }
-
-const generator = new AdminGenerator(Fusion.outputType)
 
 function CSR (rendering) {
   try {
@@ -42,7 +43,7 @@ function CSR (rendering) {
           layout: rendering.layout
         },
         React.createElement(
-          generator.generate(rendering),
+          new AdminCompiler(rendering, Fusion.outputType).compile(),
           Fusion.globalContent || {}
         )
       ),

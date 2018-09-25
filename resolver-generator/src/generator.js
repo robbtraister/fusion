@@ -11,6 +11,7 @@ const S3 = require('aws-sdk').S3
 const promises = require('./utils/promises')
 
 const {
+  awsRegion,
   resolverArtifact
 } = require('./configs')
 
@@ -28,7 +29,7 @@ async function copy (srcPromise, destPromise) {
 }
 
 class Generator {
-  constructor (bucket, resolverPath, region) {
+  constructor (bucket, resolverPath) {
     this.bucket = bucket
     this.resolverPath = resolverPath
 
@@ -42,7 +43,7 @@ class Generator {
     }
     debug(`Generating new resolver service for ${this.contextName}`)
 
-    this.region = region || 'us-east-1'
+    this.region = awsRegion
     this.s3 = new S3({region: this.region})
     this.s3getObject = promisify(this.s3.getObject.bind(this.s3))
     this.s3upload = promisify(this.s3.upload.bind(this.s3))

@@ -101,7 +101,7 @@ For more details on GraphQL syntax and schemas check out [GraphQL's schema docum
 
 Obviously the schema you define is entirely dependent upon the result you're expecting from your content source, so you'll need to craft schemas ([schemata?](https://english.stackexchange.com/questions/77764/plural-form-of-schema)) on a case-by-case basis.
 
-However, if you have multiple content sources that produce similar or identical data shapes (e.g. multiple content sources calling Arc's Content API and returning [ANS](TODO: add link) documents), there's no reason you can't reuse the same schema for multiple content sources.
+However, if you have multiple content sources that produce similar or identical data shapes (e.g. multiple content sources calling Arc's Content API and returning [ANS](https://github.com/washingtonpost/ans-schema) documents), there's no reason you can't reuse the same schema for multiple content sources.
 
 Now that we have our schema defined, we can use it to fetch some content.
 

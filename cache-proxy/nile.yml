@@ -77,12 +77,12 @@ environments:
         loadBalancers:
           - containerName: cache-proxy
             containerPort: 8080
-            targetGroupArn: arn:aws:elasticloadbalancing:eu-central-1:057404813832:targetgroup/cache-proxy-eu-central-1/8369ef523a97e47e
+            targetGroupArn: arn:aws:elasticloadbalancing:eu-central-1:057404813832:targetgroup/cache-proxy-eu-central-1/8f1ed2293781d89f
     override:
       cache-proxy:
         <<: *_fusion_cache_proxy
         log_opt:
-          awslogs-group: /nile/cache-proxy/eu-central-1
+          awslogs-group: /nile/cache-proxy
           awslogs-region: eu-central-1
         environment:
           <<: *_environment

@@ -1,6 +1,6 @@
 'use strict'
 
-const { environment, S3Bucket } = require('../environment')
+const { environment, S3BucketVersioned, S3BucketDiscrete } = require('../environment')
 
 const bundleKey = (bundleName) => `environments/${environment}/bundles/${bundleName}`
 
@@ -9,7 +9,7 @@ const artifactKey = `environments/${environment}/dist.zip`
 
 const buildArtifact = {
   ACL: 'private',
-  Bucket: S3Bucket,
+  Bucket: S3BucketVersioned,
   Key: artifactKey,
   ServerSideEncryption: 'AES256'
 }
@@ -17,5 +17,6 @@ const buildArtifact = {
 module.exports = {
   buildArtifact,
   bundleKey,
-  S3Bucket
+  S3BucketVersioned,
+  S3BucketDiscrete
 }

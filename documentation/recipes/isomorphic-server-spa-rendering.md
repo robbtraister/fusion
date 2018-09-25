@@ -1,10 +1,10 @@
-# Isomorphic vs. Server vs. SPA rendering 
+# Isomorphic vs. Server vs. SPA rendering
 
-One of the enormous benefits of writing Fusion Feature Packs as React components is the ability to render them ["isomorphically"](https://en.wikipedia.org/wiki/Isomorphic_JavaScript) - meaning on both the server-side and again on the client-side. However, isomorphic rendering isn't the only option when writing Features - Fusion gives you the flexibility to choose what environment you want each of your Features to render in.
+One of the enormous benefits of writing Fusion Feature Packs as React components is the ability to render them ["isomorphically"](https://en.wikipedia.org/wiki/Isomorphic_JavaScript) - meaning on both the server-side and again on the client-side. However, isomorphic rendering isn't the only option when writing Features - Fusion gives you the flexibility to choose what context you want each of your Features to render in.
 
 For Fusion's purposes, Output Types will always be rendered server-side only, since they are the HTML shell of the page itself. Layouts and Chains will always be rendered isomorphically, since they may contain multiple Features - some that are server-side only, and some client-side only. Features, however, can be configured to render isomorphically, server-side only, or client-side only. Let's talk about why you'd want to use each rendering option, and how to do so.
 
-## Rendering isomoprhically/universally
+## Rendering isomorphically/universally
 
 Isomorphic rendering offers lots of benefits when building a modern [Single Page Application](https://en.wikipedia.org/wiki/Single-page_application) - you get the rich interactivity and performance benefits of running a client-side web application, without losing SEO-optimization or the ability to render in non-JavaScript-enabled clients.
 
@@ -19,7 +19,7 @@ Sometimes, isomorphic rendering won't be appropriate for a certain component. Pe
 If you'd like to mark a Feature to be rendered on the server only, you can add a `.static = true` property to it like so:
 
 ```jsx
-/*  /src/components/features/movie-detail/default.jsx  */
+/*  /src/components/features/movies/movie-detail.jsx  */
 
 import React, { Component } from 'react'
 
@@ -50,7 +50,7 @@ To fetch content on the client-side only, we simply need to move our initial con
 
 Let's see how that might look:
 
-TODO: move this doc until after content fetching to illustrate invoking a content fetch in `componentDidMount`
+<!-- TODO: move this doc until after content fetching to illustrate invoking a content fetch in `componentDidMount` -->
 
 Now our content fetch will only occur client-side, meaning the HTML rendered from our component on the server will be empty initially and only get filled in later.
 

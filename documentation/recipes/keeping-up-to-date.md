@@ -15,12 +15,9 @@ $ npm run fusion:update
 ```
 This will pull the latest changes to the canonical feature pack and perform a `git merge` against your own repo. 
 
----
-**NOTE**
-
-If git displays an error message about "refusing to merge unrelated histories" when you attempt to update, it probably means you did not initially clone the repo correctly from the canonical Feature Pack repo. You can solve this by [merging the histories as described here](https://arcpublishing.atlassian.net/wiki/spaces/APF/pages/295436545/I+can+t+run+the+Fusion+update+script+because+Git+complains+about+unrelated+histories).
-
----
+> **NOTE**
+> 
+> If git displays an error message about "refusing to merge unrelated histories" when you attempt to update, it probably means you did not initially clone the repo correctly from the canonical Feature Pack repo. You can solve this by [merging the histories as described here](https://arcpublishing.atlassian.net/wiki/spaces/APF/pages/295436545/I+can+t+run+the+Fusion+update+script+because+Git+complains+about+unrelated+histories).
 
 Once you've run the update script, your Feature Pack will be updated with the most recent changes. Because these changes are made by git, they will be tied to whatever branch you performed the update on.
 
@@ -30,12 +27,9 @@ It's important for local development to make sure that the Docker images you're 
 
 Keeping your environment up to date is easy; simply use `npm start` when you run Fusion, and the repo will automagically pull the latest Docker images and run them. You can also run `docker-compose pull` and `docker-compose build --pull` one after another from the repo root directory to pull the images manually without starting the server.
 
----
-**NOTE**
-
-Pulling Docker images (via `npm start`, `docker-compose pull` or other methods) updates images globally on your system - meaning if one repo needs a certain version of Fusion in order to work, you may need to anchor that repo to that specific Fusion version. You can specify a release version using the `FUSION_RELEASE` variable in your `.env` file to do so. Otherwise, Fusion will default to the latest Fusion release available.
-
----
+> **NOTE**
+> 
+> Pulling Docker images (via `npm start`, `docker-compose pull` or other methods) updates images globally on your system - meaning if one repo needs a certain version of Fusion in order to work, you may need to anchor that repo to that specific Fusion version. You can specify a release version using the `FUSION_RELEASE` variable in your `.env` file to do so. Otherwise, Fusion will default to the latest Fusion release available.
 
 Now that we know how to stay up to date with Fusion changes, let's write some code :)
 

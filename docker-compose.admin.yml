@@ -116,7 +116,7 @@ services:
       - fusion
 
   admin:
-    image: quay.io/washpost/pagebuilder-nilev1:${PB_RELEASE:-fusion-admin.20}
+    image: quay.io/washpost/pagebuilder-nilev1:${PB_RELEASE:-fusion-admin.22}
     depends_on:
       - admin-cache
       - data

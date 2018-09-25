@@ -121,7 +121,7 @@ environments:
       origin:
         <<: *_fusion_origin
         log_opt:
-          awslogs-group: /nile/fusion-origin-admin
+          awslogs-group: /nile/fusion-origin
           awslogs-region: eu-central-1
         environment:
           <<: *_environment

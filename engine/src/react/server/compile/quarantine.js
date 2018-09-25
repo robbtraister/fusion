@@ -38,6 +38,7 @@ class QuarantineCompiler {
                 )
               )
             } catch (e) {
+              console.error(e)
               return React.createElement(
                 'div',
                 {

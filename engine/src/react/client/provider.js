@@ -9,7 +9,7 @@ const now = +new Date()
 const lastModified = new Date(Fusion.lastModified || null).toUTCString()
 
 const JSONNormalize = require('../../utils/normalize')
-const {logError, LOG_TYPES} = require('../../utils/logger')
+const { logError, LOG_TYPES } = require('../../utils/logger')
 
 const fetchContent = (sourceName, keyString, filter, cached) =>
   window.fetch(

@@ -1,9 +1,13 @@
 name: fusion-origin
 type: ecs
 
-
 _environment: &_environment
   PORT: '8080'
+
+_admin_environment: &_admin_environment
+  <<: *_environment
+  IS_ADMIN: 'true'
+  PB_ADMIN: 'http://$environment.pb.aws.arc.pub'
 
 _fusion_origin: &_fusion_origin
   image: quay.io/washpost/fusion-origin:{{.DeploymentId}}
@@ -93,8 +97,7 @@ environments:
           awslogs-group: /nile/fusion-origin/staging
           awslogs-region: us-east-1
         environment:
-          <<: *_environment
-          IS_ADMIN: 'true'
+          <<: *_admin_environment
           PB_ADMIN: 'http://$environment.pb.arc.pub'
         # volumes:
         # - '/var/fusion-origin/staging/uploads:/uploads'
@@ -118,7 +121,7 @@ environments:
       origin:
         <<: *_fusion_origin
         log_opt:
-          awslogs-group: /nile/fusion-origin
+          awslogs-group: /nile/fusion-origin-admin
           awslogs-region: eu-central-1
         environment:
           <<: *_environment
@@ -141,9 +144,7 @@ environments:
       origin:
         <<: *_fusion_origin
         log_opt:
-          awslogs-group: /nile/fusion-admin-origin
+          awslogs-group: /nile/fusion-origin
           awslogs-region: eu-central-1
         environment:
-          <<: *_environment
-          IS_ADMIN: 'true'
-          PB_ADMIN: 'http://$environment.pb.aws.arc.pub'
+          <<: *_admin_environment

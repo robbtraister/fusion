@@ -4,14 +4,14 @@ const debug = require('debug')('fusion:compiler:download')
 
 const s3 = require('../aws/s3')
 
-const { S3Bucket } = require('../configs')
+const { S3BucketDiscrete } = require('../configs')
 const promises = require('../utils/promises')
 
 async function download (bundlePath) {
   const destFilePromise = promises.tempFile()
   try {
     const params = {
-      Bucket: S3Bucket,
+      Bucket: S3BucketDiscrete,
       Key: bundlePath
     }
 

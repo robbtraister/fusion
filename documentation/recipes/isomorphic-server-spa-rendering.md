@@ -1,4 +1,4 @@
-# Isomorphic vs. Server vs. SPA rendering 
+# Isomorphic vs. Server vs. SPA rendering
 
 One of the enormous benefits of writing Fusion Feature Packs as React components is the ability to render them ["isomorphically"](https://en.wikipedia.org/wiki/Isomorphic_JavaScript) - meaning on both the server-side and again on the client-side. However, isomorphic rendering isn't the only option when writing Features - Fusion gives you the flexibility to choose what context you want each of your Features to render in.
 
@@ -19,7 +19,7 @@ Sometimes, isomorphic rendering won't be appropriate for a certain component. Pe
 If you'd like to mark a Feature to be rendered on the server only, you can add a `.static = true` property to it like so:
 
 ```jsx
-/*  /src/components/features/movie-detail/default.jsx  */
+/*  /src/components/features/movies/movie-detail.jsx  */
 
 import React, { Component } from 'react'
 

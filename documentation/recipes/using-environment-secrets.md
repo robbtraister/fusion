@@ -26,13 +26,9 @@ We now have everything we need for our content source to work locally!
 
 To get it working in staging/production environments, we'll need to first encrypt our secret variable, then create an `index.js` file in our `/src/environments/` directory.
 
----
-
-**NOTE**
-
-There are a few different formats you can use for naming the environment variables file. You can define it as a top level file called `/src/environment.js` or `/src/environment.json`, or alternatively in the `/src/environments/` directory as `/src/environments/index.js` or `/src/environments/index.json`. Just make sure you only have one of these!
-
----
+> **NOTE**
+> 
+> There are a few different formats you can use for naming the environment variables file. You can define it as a top level file called `/src/environment.js` or `/src/environment.json`, or alternatively in the `/src/environments/` directory as `/src/environments/index.js` or `/src/environments/index.json`. Just make sure you only have one of these!
 
 #### Encrypting your secrets
 To encrypt our "secret" variables, we can install and use the `aws-promises` npm library to encrypt our secret locally.

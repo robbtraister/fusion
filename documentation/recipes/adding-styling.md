@@ -1,4 +1,4 @@
-# Adding Styling to Components 
+# Adding Styling to Components
 
 Unfortunately, modern internet users will not abide webpages without frivolities like colors, fonts that aren't Times New Roman, and layouts with more than 1 column. In order to satisfy the evolving demands of readers, you may be forced to add styling to your website with CSS.
 
@@ -10,13 +10,9 @@ By far the easiest way to add styling to your Fusion site is to write static CSS
 
 Let's say we wanted to add some simple CSS to add common heights and classes to certain classes of images. To do so, let's create a directory called `css/` in our `/src/resources/` directory and a file called `main.css` within it.
 
----
-
-**NOTE**
-
-The `/src/resources/` directory is where Fusion expects static assets to be kept - things like images, fonts, CSS, and static JavaScript that can be served directly to the browser without being processed.
-
----
+> **NOTE**
+>
+> The `/src/resources/` directory is where Fusion expects static assets to be kept - things like images, fonts, CSS, and static JavaScript that can be served directly to the browser without being processed.
 
 Here's some simple CSS for our site:
 
@@ -66,7 +62,7 @@ We're using the `props.contextPath` helper above to prefix our path based on the
 All that's left is to actually apply our class to the images we want to resize:
 
 ```jsx
-/*  /src/components/features/movie-list/default.jsx  */
+/*  /src/components/features/movies/movie-list.jsx  */
 
 ...
 class MovieList extends Component {
@@ -131,7 +127,7 @@ In this very simple example, we're creating exactly the same styles as we did in
 Now, in our `MovieList` component we can simply import the relevant file and use it as we did before:
 
 ```jsx
-/*  /src/components/features/movie-list/default.jsx  */
+/*  /src/components/features/movies/movie-list.jsx  */
 
 // We import the style here...
 import './style.scss'

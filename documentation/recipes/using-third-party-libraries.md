@@ -20,19 +20,15 @@ With that in mind, let's install a module from NPM. First, let's go to the `/src
 $ cd ./src
 ```
 
----
-
-**NOTE**
-
-If for some reason your `/src` directory does not have a `package.json` by default, you'll need to create one:
-
-```bash
-$ npm init
-```
-
-Follow the prompts (you can leave them all empty to start with) and afterwards a `package.json` file will be created for you.
-
----
+> **NOTE**
+> 
+> If for some reason your `/src` directory does not have a `package.json` by default, you'll need to create one:
+>
+> ```bash
+> $ npm init
+> ```
+> 
+> Follow the prompts (you can leave them all empty to start with) and afterwards a `package.json` file will be created for you.
 
 Now we can install the module we want from NPM. I'd like to use a simple helper method from lodash to help shuffle items in a collection around:
 

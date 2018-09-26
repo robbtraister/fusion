@@ -17,12 +17,35 @@ A Feature is expected to be stored and named in one of the following formats:
 ##### Example
 
 ```jsx
-/*  /src/components/features/my-feature.jsx  */
+/*  /src/components/features/article/headline.jsx  */
 
+import Consumer from 'fusion:consumer'
+import PropTypes from 'prop-types';
+import React from 'react'
+
+@Consumer
+const Headline = (props) => {
+  const { headline, byline } props.globalContent
+  const { showByline }
+  return (
+    <h1>{headline}</h1>
+    {showByline &&
+      <h3>{byline}</h3>
+    }
+  )
+}
+
+Headline.propTypes = {
+  customFields: PropTypes.shape({
+    showByline: PropTypes.bool.isRequired
+  })
+}
+
+export default Headline
 ```
 
 -----
 
 ## Custom Fields
 
-Custom Fields are implemented using React's [PropTypes](https://github.com/facebook/prop-types) library.
+See the [Custom Fields documentation](./custom-fields.md)

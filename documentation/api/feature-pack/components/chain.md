@@ -53,4 +53,4 @@ See the `children` section in the [Output Type API](./output-type.md#children)
 
 ## Custom Fields
 
-See the Custom Fields section in the [Feature API](./feature.md#custom-fields)
+See the [Custom Fields documentation](./custom-fields.md)

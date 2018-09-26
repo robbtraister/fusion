@@ -133,6 +133,7 @@ ${usedCollections.map(collection => `Fusion.components['${collection}'] = Fusion
 ${usedCollections
     .map(collection =>
       Object.values(this.collections[collection].types)
+        .filter(componentType => componentType)
         .map(componentType => this.componentImport(componentType.manifest))
         .join('\n')
     )
@@ -150,6 +151,7 @@ module.exports = Fusion.Template
 ${usedCollections
     .map(collection =>
       Object.values(this.collections[collection].types)
+        .filter(componentType => componentType)
         .map(componentType => componentCss(componentType.manifest.css))
         .join('\n')
     )

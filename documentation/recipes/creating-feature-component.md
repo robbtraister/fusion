@@ -6,10 +6,10 @@ Since we don't know which Features might exist on a page or template when we def
 
 ## Writing a feature
 
-Let's define a simple Feature whose purpose is to display the title and details for a movie we've fetched from our content source. We'll create a new directory named `movie-detail` in the `/src/components/features/` directory, and a file within that folder called `default.jsx`. The Feature might look like this:
+Let's define a simple Feature whose purpose is to display the title and details for a movie we've fetched from our content source. We'll create a new directory named `movies` in the `/src/components/features/` directory, and a file within that folder called `movie-detail.jsx`. The Feature might look like this:
 
 ```jsx
-/*  /src/components/features/movie-detail/default.jsx  */
+/*  /src/components/features/movies/movie-detail.jsx  */
 
 import React, { Component } from 'react'
 
@@ -45,7 +45,9 @@ Often times, you'll want your components to operate differently based on what Ou
 
 It's possible to define entirely different versions of a Feature depending on what output type is being rendered.  You can utilize this functionality by naming your feature components after the output types they should correspond to, and then putting them all inside that Feature's specific directory.
 
-In the example above, we created a `headline/` directory and added a `default.jsx` file to it, indicating that this version of our Feature should be used with the "default" outputType. If we wanted to create a different version of the feature for an outputType called `amp`, we'd simply add an `amp.jsx` file to our `headline/` directory and write whatever AMP-specific Feature code we wanted in it.
+In the example above, we created a `movies/` directory and added a `movie-detail.jsx` file to it, indicating that this version of our Feature should be used with every outputType. If we wanted to create a different version of the feature for *each* outputType we had, we could make `movie-detail` a directory instead of a file. Then, within that directory we could create a `default.jsx` file that served as our "default" version of the component. If we then wanted to serve a different version of the component for Amp, and we had an output type named `amp`, we'd simply add an `amp.jsx` file to our `movie-detail/` directory and write whatever AMP-specific Feature code we wanted in it.
+
+Check out the [Feature API](../api/feature-pack/components/feature.md) docs to learn more about naming Features.
 
 <!-- TODO: falling back to different output types when spec is finished -->
 
@@ -69,13 +71,9 @@ Alternatively, if a Feature should act very similarly across multiple Output Typ
 
 In this example, we render slightly different links if the provided `outputType` is `amp` or not. Since AMP doesn't allow JavaScript, we send the user to a link - in all other cases, some client side JS is invoked.
 
----
-
-**NOTE**
-
-If you only have a single version of a Feature for all Output Types, you can add your Feature file directly to the `features/` directory rather than creating a new directory. Here, we could name our file `/src/components/features/headline.jsx` instead of having a separate `/src/components/features/headline/` directory.
-
----
+> **NOTE**
+>
+> If you only have a single version of a Feature for all Output Types, you can add your Feature file directly to the `features/` directory rather than creating a new directory. Here, we could name our file `/src/components/features/headline.jsx` instead of having a separate `/src/components/features/headline/` directory.
 
 It's up to you whether it makes sense to create an entirely new version of a Feature for a different output type, or if the changes are small enough that they can be contained in 1 Feature definition.
 

@@ -92,3 +92,29 @@ environments:
             fusion-eu-prod.xl3vuh.0001.euc1.cache.amazonaws.com:11211
             fusion-eu-prod.xl3vuh.0002.euc1.cache.amazonaws.com:11211
             fusion-eu-prod.xl3vuh.0003.euc1.cache.amazonaws.com:11211
+  - name: us-east-1
+    namespace: fusion-ecs-us-east-1
+    services:
+      - deploymentConfiguration:
+          maximumPercent: 200
+          minimumHealthyPercent: 50
+        desiredCount: 3
+        loadBalancers:
+          - containerName: cache-proxy
+            containerPort: 8080
+            targetGroupArn: arn:aws:elasticloadbalancing:us-east-1:057404813832:targetgroup/cache-proxy-us-east-1/85aa5460886120c7
+    override:
+      cache-proxy:
+        <<: *_fusion_cache_proxy
+        log_opt:
+          awslogs-group: /nile/cache-proxy
+          awslogs-region: us-east-1
+        environment:
+          <<: *_environment
+          CACHE_PROXY_CREDENTIALS: |
+            wapo:%{AQICAHgPj5nL72r6uSoUdbqYJLxe7vSJBrtP09dX/FxSUlcWlQGKqLZVsLPYbcT+8qcUTiz8AAAAxjCBwwYJKoZIhvcNAQcGoIG1MIGyAgEAMIGsBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDNW/dQZyg5GMuqXpyQIBEIB/UxH9gy1/IvXS6MnKGGK/23YNPnR8TlHwFDiXydvq2URxmg6k9yIrAXOGu+NJMDtnrBEjeLjIkvHFQokUVcBN/9ZElEWRADjAtJUE4qa4O8/2O9b6dZOI1IFmklb+b5n72/FoXsH2GWNW8btAXJEeYfFZ/O2tQrDByj2MLdHU0A==}
+          CACHE_NODES: |
+            fusion-us-prod.fpmzzd.0001.use1.cache.amazonaws.com
+            fusion-us-prod.fpmzzd.0002.use1.cache.amazonaws.com
+            fusion-us-prod.fpmzzd.0003.use1.cache.amazonaws.com
+

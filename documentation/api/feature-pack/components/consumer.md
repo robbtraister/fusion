@@ -48,7 +48,7 @@ The Arc site used in this rendering, if multi-site enabled. This will be determi
 ##### Example
 
 ```jsx
-/*  /src/components/features/footer.jsx  */
+/*  /src/components/features/global/footer.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
@@ -73,7 +73,7 @@ This is the base context path of the application. In the client, you could calcu
 ##### Example
 
 ```jsx
-/*  /src/components/features/logo.jsx  */
+/*  /src/components/features/global/logo.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React from 'react'
@@ -97,7 +97,7 @@ The keys will be the actual data object returned from the content fetch; as such
 ##### Example
 
 ```jsx
-/*  /src/components/features/headline.jsx  */
+/*  /src/components/features/article/headline.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
@@ -127,7 +127,7 @@ This is the full config object used to fetch global content for the rendered pag
 ##### Example
 
 ```jsx
-/*  /src/components/features/story-feed.jsx  */
+/*  /src/components/features/article/story-feed.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
@@ -178,7 +178,7 @@ The name of the Layout that was used when rendering this page.
 ##### Example
 
 ```jsx
-/*  /src/components/features/image.jsx  */
+/*  /src/components/features/common/image.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
@@ -202,7 +202,7 @@ The Output Type that was used when rendering this page.
 ##### Example
 
 ```jsx
-/*  /src/components/features/link.jsx  */
+/*  /src/components/features/common/link.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
@@ -233,7 +233,7 @@ This is the URI that was requested to initiate this rendering. In the client, yo
 ##### Example
 
 ```jsx
-/*  /src/components/features/link.jsx  */
+/*  /src/components/features/common/link.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
@@ -271,8 +271,8 @@ This method adds an event listener to a Fusion component that will respond to ev
 ##### Parameters
 
 `addEventListener(eventName, eventHandler)`
-- `eventName` (*String*):
-- `eventHandler` (*Function*):
+- `eventName` (*String*): The name of the event to subscribe to.
+- `eventHandler(payload)` (*Function*): The function that will handle the event when it is triggered. This function receives the event's payload as its only argument.
 
 ##### Return
 This method returns `undefined`; its effect is to 'subscribe' the event handler to the appropriate event.
@@ -280,8 +280,24 @@ This method returns `undefined`; its effect is to 'subscribe' the event handler 
 ##### Example
 
 ```jsx
+/*  /src/components/features/utils/error-message.jsx  */
 
+import Consumer from 'fusion:consumer'
+import React, { Component } from 'react'
 
+@Consumer
+class ErrorMessage extends Component {
+  ...
+  componentDidMount () {
+    this.addEventListener('errorOccurred', (error) => {
+      const errorMsg = error && error.message ? error.message : 'Something went wrong'
+      this.setState({ message: errorMsg })
+    })
+  }
+  ...
+}
+
+export default ErrorMessage
 ```
 
 -----
@@ -294,8 +310,8 @@ This method dispatches an event from a Fusion component of the specified `eventN
 ##### Parameters
 
 `dispatchEvent(eventName, payload)`
-- `eventName` (*String*):
-- `payload` (*?*):
+- `eventName` (*String*): The name of the event to dispatch, which listeners can subscribe to.
+- [`payload`] (*?*): An arbitrary payload attached to the event, for the handler to use in processing.
 
 ##### Return
 This method returns `undefined`; its effect is to dispatch the event to each subscriber.
@@ -303,8 +319,27 @@ This method returns `undefined`; its effect is to dispatch the event to each sub
 ##### Example
 
 ```jsx
+/*  /src/components/features/weather/weather-lookup.jsx  */
 
+import Consumer from 'fusion:consumer'
+import React, { Component } from 'react'
 
+@Consumer
+class WeatherLookup extends Component {
+  ...
+  handleFormInput(value) {
+    if (!value || value.length < 5) {
+      this.dispatchEvent('errorOccurred', {
+        val: value,
+        message: 'Zip code must be at least 5 characters long.'
+      })
+    }
+    ...
+  }
+  ...
+}
+
+export default WeatherLookup
 ```
 
 -----
@@ -332,8 +367,37 @@ This method returns `undefined`; its effect is to set the `state` properties lis
 ##### Example
 
 ```jsx
+/* /src/components/features/homepage/topics.jsx  */
 
+import Consumer from 'fusion:consumer'
+import React, { Component } from 'react'
 
+@Consumer
+class Topics extends React.Component {
+  constructor (props) {
+    super(props)
+
+    this.fetchContent({
+      topics: {
+        source: 'content-feed',
+        key: { feedType: 'taxonomy.tags.slug', feedParam: '*', limit: 5, offset: 0, order: 'display_date:desc' },
+        query: '{ headline }'
+      }
+    })
+  }
+
+  render () {
+    return (
+      <ul>
+        {this.state.topics.map(topic =>
+          <li>{topic.headline}</li>
+        )}
+      </ul>
+    )
+  }
+}
+
+export default Topics
 ```
 
 -----
@@ -372,13 +436,13 @@ An object with 2 keys: `{ cached, fetched }`. `cached` will be an object contain
 ##### Example
 
 ```jsx
-/*  /src/components/features/story-feed.jsx  */
+/*  /src/components/features/weather/forecast.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
 
 @Consumer
-class Weather extends Component {
+class WeatherForecast extends Component {
 
   constructor() {
     super(props)
@@ -410,7 +474,7 @@ class Weather extends Component {
   }
 }
 
-export default Weather
+export default WeatherForecast
 ```
 
 -----
@@ -423,8 +487,8 @@ This method 'unsubscribes' the specified event handling function (`eventHandler`
 ##### Parameters
 
 `removeEventListener(eventName, eventHandler)`
-- `eventName` (*String*):
-- `eventHandler` (*Function*):
+- `eventName` (*String*): The name of the event to unsubscribe the handler from.
+- `eventHandler` (*Function*): A reference to the exact instance of the handler function that was previously added.
 
 ##### Return
 This method returns `undefined`; its effect is to 'unsubscribe' the event handler from the appropriate event.
@@ -432,8 +496,30 @@ This method returns `undefined`; its effect is to 'unsubscribe' the event handle
 ##### Example
 
 ```jsx
+/*  /src/components/features/utils/error-message.jsx  */
 
+import Consumer from 'fusion:consumer'
+import React, { Component } from 'react'
 
+@Consumer
+class ErrorMessage extends Component {
+  handleErrorMsg (error) {
+    const errorMsg = error && error.message ? error.message : 'Something went wrong'
+      this.setState({ message: errorMsg })
+    })
+  }
+
+  componentDidMount () {
+    this.addEventListener('errorOccurred', this.handleErrorMsg.bind(this))
+  }
+
+  componentWillUnmount () {
+    this.removeEventListener('errorOccurred', this.handleErrorMsg)
+  }
+  ...
+}
+
+export default ErrorMessage
 ```
 
 -----
@@ -448,15 +534,44 @@ This method returns `undefined`; its effect is to 'unsubscribe' the event handle
 
 `setContent(contentFetchMap)`
 - `contentFetchMap`: (*Object*): An object whose keys are the names of content to be stored in the component's `state`, and the values are returned values from [`getContent`](#getContent).
-
+  -  `contentFetchMap.{contentKey}` (*Object*): Here, `{contentKey}` represents the name of a property the developer chooses to set on the component's `state` object. Multiple `{contentKey}` objects can exist on the same `contentFetchMap` object. The value should be the return value from the [`getContent()`](#getContent) method.
 ##### Return
 This method returns `undefined`; its effect is to set the `state` properties listed in the `contentFetchMap` with the approprite values.
 
 ##### Example
 
 ```jsx
+/* /src/components/features/homepage/topics.jsx  */
 
+import Consumer from 'fusion:consumer'
+import React, { Component } from 'react'
 
+@Consumer
+class Topics extends React.Component {
+  constructor (props) {
+    super(props)
+
+    this.setContent({
+      topics: this.getContent(
+        'content-feed',
+        { feedType: 'taxonomy.tags.slug', feedParam: '*', limit: 5, offset: 0, order: 'display_date:desc' },
+        '{ headline }'
+      )
+    })
+  }
+
+  render () {
+    return (
+      <ul>
+        {this.state.topics.map(topic =>
+          <li>{topic.headline}</li>
+        )}
+      </ul>
+    )
+  }
+}
+
+export default Topics
 ```
 
 -----

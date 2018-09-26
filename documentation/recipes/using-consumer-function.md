@@ -64,4 +64,4 @@ And just like that, our component is rendering content dynamically! Go ahead and
 >
 > It's possible to wrap a [functional component](https://reactjs.org/docs/components-and-props.html#functional-and-class-components) in the `Consumer` higher-order function and still get props passed as in the class-based syntax - however, only the class-based syntax allows you to use `Consumer`'s instance methods.
 
-**Next: [Adding Custom Fields to a Components](./adding-custom-fields.md)**
+**Next: [Adding Custom Fields to Components](./adding-custom-fields.md)**

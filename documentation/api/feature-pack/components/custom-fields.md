@@ -202,14 +202,7 @@ Denotes that a certain prop is required. Will throw warnings in development if t
 ##### Example
 
 ```jsx
-import PropTypes from 'prop-types';
-import React from 'react'
-
-const MyComponent = (props) => {
-  const { headline } props.customFields
-
-  return (<h1>{headline}</h1>)
-}
+...
 
 MyComponent.propTypes = {
   customFields: PropTypes.shape({
@@ -244,6 +237,8 @@ The `tag()` method provides a way of adding additional metadata that PageBuilder
 ##### Example
 
 ```jsx
+...
+
 MyComponent.propTypes = {
   customFields: PropTypes.shape({
     myNumberField: PropTypes.number.tag({

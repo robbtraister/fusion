@@ -41,7 +41,7 @@ Now if we look in our `/src/package.json` file, we should see `lodash.shuffle` l
 Now we can use this module in our Feature Pack. Remember our `movies.jsx` component? Let's see if we can find a place to use our new `shuffle` helper method:
 
 ```jsx
-/*  /src/components/features/movies/default.jsx  */
+/*  /src/components/features/movies/movie-list.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Fragment, Component } from 'react'
@@ -50,11 +50,11 @@ import React, { Fragment, Component } from 'react'
 import shuffle from 'lodash.shuffle'
 
 @Consumer
-class Movies extends Component {
+class MovieList extends Component {
   ...
 
   fetch () {
-    const { fetched } = this.getContent('movie-db', { movieQuery: 'Jurassic', page: this.state.page }, '{ totalResults Search { Title Year Poster } }')
+    const { fetched } = this.getContent('movie-search', { movieQuery: 'Jurassic', page: this.state.page }, '{ totalResults Search { Title Year Poster } }')
 
     // ...then we can use it here to shuffle new movies fetched from our content source!
     const newMovies = shuffle(response.Search)
@@ -69,7 +69,7 @@ class Movies extends Component {
   ...
 }
 
-export default Movies
+export default MovieList
 ```
 
 You can see in the snippet above (the `contructor` and `render` methods have been removed for brevity) that we can import our module by its name, just like we would any other module, and use it right in our component.

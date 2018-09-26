@@ -114,6 +114,6 @@ environments:
           CACHE_PROXY_CREDENTIALS: |
             wapo:%{AQICAHgPj5nL72r6uSoUdbqYJLxe7vSJBrtP09dX/FxSUlcWlQGKqLZVsLPYbcT+8qcUTiz8AAAAxjCBwwYJKoZIhvcNAQcGoIG1MIGyAgEAMIGsBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDNW/dQZyg5GMuqXpyQIBEIB/UxH9gy1/IvXS6MnKGGK/23YNPnR8TlHwFDiXydvq2URxmg6k9yIrAXOGu+NJMDtnrBEjeLjIkvHFQokUVcBN/9ZElEWRADjAtJUE4qa4O8/2O9b6dZOI1IFmklb+b5n72/FoXsH2GWNW8btAXJEeYfFZ/O2tQrDByj2MLdHU0A==}
           CACHE_NODES: |
-            fusion-us-prod.fpmzzd.0001.use1.cache.amazonaws.com
-            fusion-us-prod.fpmzzd.0002.use1.cache.amazonaws.com
-            fusion-us-prod.fpmzzd.0003.use1.cache.amazonaws.com
+            fusion-us-prod.fpmzzd.0001.use1.cache.amazonaws.com:11211
+            fusion-us-prod.fpmzzd.0002.use1.cache.amazonaws.com:11211
+            fusion-us-prod.fpmzzd.0003.use1.cache.amazonaws.com:11211

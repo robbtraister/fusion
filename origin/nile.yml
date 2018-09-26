@@ -125,8 +125,9 @@ environments:
           awslogs-region: eu-central-1
         environment:
           <<: *_environment
-          LAMBDA_ENGINE: 'arn:aws:lambda:eu-central-1:057404813832:function:fusion-engine-\${environment}'
-          LAMBDA_RESOLVER: 'arn:aws:lambda:eu-central-1:057404813832:function:fusion-resolver-\${environment}'
+          LAMBDA_ENGINE: 'arn:aws:lambda:eu-central-1:057404813832:function:fusion-engine-${environment}'
+          LAMBDA_RESOLVER: 'arn:aws:lambda:eu-central-1:057404813832:function:fusion-resolver-${environment}'
+          S3_BUCKET: 'arc-fusion-discrete-eu-central-1'
     services:
       - <<: *_service
         loadBalancers:
@@ -150,5 +151,6 @@ environments:
           awslogs-region: eu-central-1
         environment:
           <<: *_admin_environment
-          LAMBDA_ENGINE: 'arn:aws:lambda:eu-central-1:057404813832:function:fusion-engine-\${environment}'
-          LAMBDA_RESOLVER: 'arn:aws:lambda:eu-central-1:057404813832:function:fusion-resolver-\${environment}'
+          LAMBDA_ENGINE: 'arn:aws:lambda:eu-central-1:057404813832:function:fusion-engine-${environment}'
+          LAMBDA_RESOLVER: 'arn:aws:lambda:eu-central-1:057404813832:function:fusion-resolver-${environment}'
+          S3_BUCKET: 'arc-fusion-discrete-eu-central-1'

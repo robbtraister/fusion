@@ -10,7 +10,8 @@ const {
   defaultOutputType,
   environment,
   region,
-  s3Bucket,
+  s3BucketDiscrete,
+  s3BucketVersioned,
   version
 } = require('../../environment')
 
@@ -42,7 +43,7 @@ const putJson = (type, json) =>
 const fetchFile = async function fetchFile (name) {
   return new Promise((resolve, reject) => {
     s3.getObject({
-      Bucket: s3Bucket,
+      Bucket: s3BucketDiscrete,
       Key: `${getS3Key(name)}`
     }, (err, data) => {
       err ? reject(err) : resolve(data)
@@ -50,9 +51,8 @@ const fetchFile = async function fetchFile (name) {
   })
 }
 
-const pushKey = async function pushKey (Key, src, options) {
+const pushKey = async function pushKey (Bucket, Key, src, options) {
   return new Promise((resolve, reject) => {
-    const Bucket = s3Bucket
     debug(`pushing ${src.length} bytes to: ${Bucket}/${Key}`)
 
     s3.upload(
@@ -76,11 +76,11 @@ const pushKey = async function pushKey (Key, src, options) {
 }
 
 const pushFile = async function pushFile (name, src, ContentType) {
-  return pushKey(`${getS3Key(name)}`, src, {ContentType})
+  return pushKey(s3BucketDiscrete, `${getS3Key(name)}`, src, {ContentType})
 }
 
 const pushResolvers = async function pushResolvers (resolvers) {
-  return pushKey(
+  return pushKey(s3BucketVersioned,
     `environments/${environment}/resolvers.json`,
     JSON.stringify(resolvers, null, 2),
     {

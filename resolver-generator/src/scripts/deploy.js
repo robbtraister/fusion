@@ -40,7 +40,7 @@ async function create (contextName, envVars) {
           Code: resolverCode(contextName)
         },
         { Tags: getTags(contextName) },
-        await resolverConfig(contextName, envVars)
+        resolverConfig(contextName, envVars)
       )
     )
 
@@ -73,7 +73,7 @@ async function tag (contextName, region) {
   try {
     const result = await tagResource(
       {
-        Resource: await resolverArn(contextName, region),
+        Resource: resolverArn(contextName, region),
         Tags: getTags(contextName)
       }
     )
@@ -116,7 +116,7 @@ async function updateConfig (contextName, envVars) {
         {
           FunctionName: resolverName(contextName)
         },
-        await resolverConfig(contextName, envVars)
+        resolverConfig(contextName, envVars)
       )
     )
 

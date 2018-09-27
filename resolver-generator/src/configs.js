@@ -7,10 +7,10 @@ const S3Bucket = process.env.S3BUCKET || `arc-fusion-versioned-${awsRegion}`
 const datadogApiKey = process.env.DATADOG_API_KEY || ''
 const fusionRelease = process.env.FUSION_RELEASE
 
-const resolverArn = (environment, region) => `arn:aws:lambda:${region}:${awsAccountId}:function:${resolverName(environment)}`
+const resolverArn = async (environment, region) => `arn:aws:lambda:${region}:${awsAccountId}:function:${resolverName(environment)}`
 const resolverKey = (environment) => `environments/${environment}/resolver.zip`
 const resolverName = (environment) => `fusion-resolver-${environment}`
-const resolverRole = (environment) => `arn:aws:iam::${awsAccountId}:role/${resolverName(environment)}`
+const resolverRole = async (environment) => `arn:aws:iam::${awsAccountId}:role/${resolverName(environment)}`
 
 const resolverCode = (contextName) => {
   const code = {

@@ -38,6 +38,10 @@ class Preview {
     script.src = `${__CONTEXT_PATH__}/dist/engine/admin.js${version ? `?v=${version}` : ''}`
     script.onload = cb
     this.iframe.contentDocument.body.appendChild(script)
+
+    // in case the output type doesn't include the Fusion script, ensure we have the outputType defined
+    this.iframe.contentWindow.Fusion = this.iframe.contentWindow.Fusion || {}
+    this.iframe.contentWindow.Fusion.outputType = this.latestOutputType
   }
 
   render (renderingTree, outputType) {

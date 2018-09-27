@@ -102,7 +102,8 @@ async function updateGeneratorConfig () {
           Variables: {
             DEBUG: 'fusion:*',
             DATADOG_API_KEY: datadogApiKey,
-            FUSION_RELEASE: fusionRelease
+            FUSION_RELEASE: fusionRelease,
+            AWS_ACCOUNT_ID: awsAccountId
           }
         }
       }

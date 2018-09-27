@@ -25,7 +25,7 @@ const isDev = !/^prod/i.test(env.NODE_ENV)
 const lambdaEngine = env.LAMBDA_ENGINE || (
   httpEngine
     ? null
-    : `arn:aws:lambda:${env.AWS_REGION || 'us-east-1'}:${env.AWS_ACCOUNT_ID || '397853141546'}:function:fusion-engine-${environment}`
+    : `arn:aws:lambda:${env.AWS_REGION || 'us-east-1'}:${env.AWS_ACCOUNT_ID || '057404813832'}:function:fusion-engine-${environment}`
 )
 const resolveFromDB = isDev && env.RESOLVE_FROM_DB === 'true'
 const trailingSlashRule = (env.TRAILING_SLASH_RULE || 'NOOP').toUpperCase()

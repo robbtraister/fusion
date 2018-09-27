@@ -7,10 +7,10 @@ const S3Bucket = process.env.S3BUCKET || `arc-fusion-versioned-${awsRegion}`
 const datadogApiKey = process.env.DATADOG_API_KEY || ''
 const fusionRelease = process.env.FUSION_RELEASE
 
-const resolverArn = async (environment, region) => `arn:aws:lambda:${region}:${awsAccountId}:function:${resolverName(environment)}`
+const resolverArn = (environment, region) => `arn:aws:lambda:${region}:${awsAccountId}:function:${resolverName(environment)}`
 const resolverKey = (environment) => `environments/${environment}/resolver.zip`
 const resolverName = (environment) => `fusion-resolver-${environment}`
-const resolverRole = async (environment) => `arn:aws:iam::${awsAccountId}:role/${resolverName(environment)}`
+const resolverRole = (environment) => `arn:aws:iam::${awsAccountId}:role/${resolverName(environment)}`
 
 const resolverCode = (contextName) => {
   const code = {
@@ -21,27 +21,26 @@ const resolverCode = (contextName) => {
   return code
 }
 
-const resolverConfig = async (contextName, envVars) => {
-  return resolverRole(contextName)
-    .then((Role) => ({
-      Environment: {
-        Variables: Object.assign(
-          envVars || {},
-          {
-            NODE_ENV: 'production',
-            ENVIRONMENT: contextName,
-            DATADOG_API_KEY: datadogApiKey,
-            FUSION_RELEASE: fusionRelease,
-            AWS_ACCOUNT_ID: awsAccountId
-          }
-        )
-      },
-      Handler: 'src/index.serverless',
-      MemorySize: 512,
-      Role,
-      Runtime: 'nodejs8.10',
-      Timeout: 10
-    }))
+const resolverConfig = (contextName, envVars) => {
+  return {
+    Environment: {
+      Variables: Object.assign(
+        envVars || {},
+        {
+          NODE_ENV: 'production',
+          ENVIRONMENT: contextName,
+          DATADOG_API_KEY: datadogApiKey,
+          FUSION_RELEASE: fusionRelease,
+          AWS_ACCOUNT_ID: awsAccountId
+        }
+      )
+    },
+    Handler: 'src/index.serverless',
+    MemorySize: 512,
+    Role: resolverRole(contextName),
+    Runtime: 'nodejs8.10',
+    Timeout: 10
+  }
 }
 
 const resolverArtifact = (contextName) => {

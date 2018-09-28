@@ -159,7 +159,7 @@ ${usedCollections
 }
 `
 
-    return Promise.resolve({script, styles})
+    return Promise.resolve({ script, styles })
   }
 }
 

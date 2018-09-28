@@ -50,7 +50,7 @@ const fetchCssHash = async (name, outputType = defaultOutputType) =>
     .catch(() => null)
 
 const pushCssHash = async (name, outputType = defaultOutputType, cssFile) =>
-  pushAsset(path.join(name, `${outputType}.css.json`), JSON.stringify({cssFile}))
+  pushAsset(path.join(name, `${outputType}.css.json`), JSON.stringify({ cssFile }))
 
 // unused on local
 const pushHtml = async () => Promise.resolve()

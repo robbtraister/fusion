@@ -61,7 +61,7 @@ function getPatternParams (p) {
 function transformContentConfigs (manifest) {
   const idFields = (manifest.pattern)
     ? getPatternParams(manifest.pattern)
-      .map((key) => ({key, type: 'text'}))
+      .map((key) => ({ key, type: 'text' }))
     : null
 
   return {
@@ -73,7 +73,7 @@ function transformContentConfigs (manifest) {
 }
 
 configRouter.get('/content/sources', (req, res, next) => {
-  glob('**/*', {cwd: sourcesDistRoot})
+  glob('**/*', { cwd: sourcesDistRoot })
     .then(sources => Promise.all(
       sources.map(s =>
         getSource(path.parse(s).name)
@@ -86,12 +86,12 @@ configRouter.get('/content/sources', (req, res, next) => {
 })
 
 configRouter.get('/content/schemas', (req, res, next) => {
-  glob('**/*', {cwd: schemasDistRoot})
+  glob('**/*', { cwd: schemasDistRoot })
     .then(schemas => Object.assign(...schemas.map(s => {
       const id = path.parse(s).name
-      return {[id]: id}
+      return { [id]: id }
     })))
-    .then(schemas => res.send({schemas}))
+    .then(schemas => res.send({ schemas }))
 })
 
 module.exports = configRouter

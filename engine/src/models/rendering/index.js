@@ -69,8 +69,8 @@ class Rendering {
     debug(`get compilation: ${this.name}[${outputType}]`)
     this.compilations[outputType] = this.compilations[outputType] ||
       this.getJson()
-        .then((json) => compileRendering({rendering: json, outputType}))
-        .then(({js, css, cssFile}) => {
+        .then((json) => compileRendering({ rendering: json, outputType }))
+        .then(({ js, css, cssFile }) => {
           const artifacts = []
 
           // using a raw rendering object is only for local dev, so don't publish the result
@@ -87,18 +87,18 @@ class Rendering {
           }
 
           // we have to wait for artifacts to be pushed so the lambda isn't frozen
-          return Promise.all(artifacts).then(() => ({js, css, cssFile}))
+          return Promise.all(artifacts).then(() => ({ js, css, cssFile }))
         })
     return this.compilations[outputType]
   }
 
-  async getComponent ({outputType = defaultOutputType, child}, quarantine) {
+  async getComponent ({ outputType = defaultOutputType, child }, quarantine) {
     debug(`get component: ${this.name}${child ? `(${child})` : ''}[${outputType}]`)
     this.contentCache = this.contentCache || {}
     this.inlines = this.inlines || {}
     return (child)
-      ? getComponent({rendering: this, outputType, child, quarantine})
-      : getComponent({rendering: this, outputType, name: this.name, quarantine})
+      ? getComponent({ rendering: this, outputType, child, quarantine })
+      : getComponent({ rendering: this, outputType, name: this.name, quarantine })
   }
 
   async getContent (arcSite) {
@@ -113,7 +113,7 @@ class Rendering {
               const configs = json.globalContentConfig
               return (configs && configs.contentService && configs.contentConfigValues)
                 ? getSource(configs.contentService)
-                  .then((source) => source.fetch(Object.assign(json.uri ? {uri: json.uri} : {}, {'arc-site': arcSite}, configs.contentConfigValues)))
+                  .then((source) => source.fetch(Object.assign(json.uri ? { uri: json.uri } : {}, { 'arc-site': arcSite }, configs.contentConfigValues)))
                   .then((document) => ({
                     source: configs.contentService,
                     key: configs.contentConfigValues,
@@ -131,7 +131,7 @@ class Rendering {
       fetchCssHash(this.name, outputType)
         // if not found, re-compile
         .then((data) => data || this.compile(outputType))
-        .then(({cssFile}) => cssFile)
+        .then(({ cssFile }) => cssFile)
     return this.cssFilePromise
   }
 
@@ -140,14 +140,14 @@ class Rendering {
     this.stylesPromise = this.stylesPromise ||
       this.getCssFile(outputType)
         .then((cssFile) => cssFile && fetchAsset(cssFile))
-        .catch(() => this.compile(outputType).then(({css}) => css))
+        .catch(() => this.compile(outputType).then(({ css }) => css))
     return this.stylesPromise
   }
 
   async getScript (outputType = defaultOutputType) {
     debug(`get script: ${this.name}[${outputType}]`)
     this.jsPromise = this.jsPromise ||
-      this.compile(outputType).then(({js}) => js)
+      this.compile(outputType).then(({ js }) => js)
     return this.jsPromise
   }
 
@@ -160,7 +160,7 @@ class Rendering {
             // if this is the first version to receive this rendering
             (propagate)
               ? Promise.all([
-                putJson(this.type, Object.assign({}, this.json, {id: this.id})),
+                putJson(this.type, Object.assign({}, this.json, { id: this.id })),
                 publishToOtherVersions(uri, this.json)
                   .catch((err) => {
                     // do not throw while trying to publish to old versions
@@ -173,7 +173,7 @@ class Rendering {
     )
   }
 
-  async render ({content, rendering, request}) {
+  async render ({ content, rendering, request }) {
     return Promise.all([
       this.getComponent(rendering),
       content || this.getContent(request.arcSite)
@@ -182,10 +182,10 @@ class Rendering {
       // use Object.assign to default to the resolver content
       .then(([Component, content]) =>
         Promise.resolve()
-          .then(() => render({Component, content, request}))
+          .then(() => render({ Component, content, request }))
           .catch(() =>
             this.getComponent(rendering, true)
-              .then((Component) => render({Component, content, request}))
+              .then((Component) => render({ Component, content, request }))
           )
       )
   }

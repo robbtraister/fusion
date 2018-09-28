@@ -30,7 +30,7 @@ const getContentGenerator = function getContentGenerator (contentCache, arcSite,
           .then(source => {
             keyCache.source = source
             return (source)
-              ? source.fetch(Object.assign({}, key, {'arc-site': arcSite}))
+              ? source.fetch(Object.assign({}, key, { 'arc-site': arcSite }))
               : null
           })
           .then(data => { keyCache.cached = data })

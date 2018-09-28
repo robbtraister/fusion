@@ -19,7 +19,7 @@ const {
 
 const KeyPrefix = `environments/${environment}/deployments/${version}`
 
-const s3 = new S3({region})
+const s3 = new S3({ region })
 
 const fetchKey = async (Key, Bucket = s3BucketDiscrete) =>
   new Promise((resolve, reject) => {
@@ -65,9 +65,9 @@ const pushAsset = async (name, src, ContentType) =>
 // the calculation returns an object with a cssFile property
 // for simplicity, we'll just unwrap that property from whatever we get
 const fetchCssHash = (name, outputType = defaultOutputType) =>
-  model('hash').get({version, id: path.join(name, outputType)})
+  model('hash').get({ version, id: path.join(name, outputType) })
 const pushCssHash = (name, outputType = defaultOutputType, cssFile) =>
-  model('hash').put({id: path.join(name, outputType), version, cssFile})
+  model('hash').put({ id: path.join(name, outputType), version, cssFile })
 
 const pushHtml = async (name, src, ContentType) =>
   pushKey(path.join(KeyPrefix, 'html', name), src, ContentType)

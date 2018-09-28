@@ -23,7 +23,7 @@ module.exports = (Component, fp) => {
 
     render () {
       return (this.state.error)
-        ? React.createElement('div', {'data-fusion-message': this.state.error})
+        ? React.createElement('div', { 'data-fusion-message': this.state.error })
         : React.createElement(Component, this.props)
     }
   }

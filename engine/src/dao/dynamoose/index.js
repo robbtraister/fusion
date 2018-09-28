@@ -8,7 +8,7 @@ const {
 } = require('../../../environment')
 
 const db = new dynamoose.Dynamoose()
-db.AWS.config.update({region})
+db.AWS.config.update({ region })
 
 const getSchema = modelName => {
   try {
@@ -23,7 +23,7 @@ const createModel = (modelName) => {
 
   return {
     get (id) {
-      return _model.get((id instanceof Object) ? id : {id})
+      return _model.get((id instanceof Object) ? id : { id })
     },
 
     find () {

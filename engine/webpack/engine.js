@@ -42,7 +42,7 @@ const siteFiles = Object.assign(
   {},
   ...glob.sync(`${bundleSrcRoot}/properties/sites/*.{js,json,ts}`)
     .filter(getRequirable)
-    .map(fp => ({[path.parse(fp).name]: fp}))
+    .map(fp => ({ [path.parse(fp).name]: fp }))
 )
 
 fs.writeFileSync(propertiesSrcFile,
@@ -111,7 +111,7 @@ module.exports = [
       new DefinePlugin({
         '__CONTEXT_PATH__': `'${contextPath}'`
       }),
-      new ManifestPlugin({fileName: 'webpack.manifest.json'})
+      new ManifestPlugin({ fileName: 'webpack.manifest.json' })
     ],
     resolve: Object.assign(
       {},

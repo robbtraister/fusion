@@ -82,7 +82,7 @@ const createComponentEntry = (src, componentCollection, componentType, outputTyp
   const p = `${componentCollection}/${componentType}${outputType ? `/${outputType}` : ''}.js`
   return Object.assign(
     (outputType)
-      ? {outputType}
+      ? { outputType }
       : {},
     {
       collection: componentCollection,
@@ -149,7 +149,7 @@ const generateManifest = (collection, outputTypeManifest) => {
             componentType.outputTypes[outputTypeConfigWithFallback.type] = Object.assign(
               {},
               componentType.outputTypes[fallbackOutputType],
-              {outputType: outputTypeConfigWithFallback.type}
+              { outputType: outputTypeConfigWithFallback.type }
             )
           })
       })

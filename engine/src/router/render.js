@@ -27,8 +27,8 @@ function getTypeRouter (routeType) {
   const typeRouter = express.Router()
 
   typeRouter.all(['/', '/:id', '/:id/:child'],
-    bodyParser.json({limit: bodyLimit}),
-    bodyParser.urlencoded({extended: true}),
+    bodyParser.json({ limit: bodyLimit }),
+    bodyParser.urlencoded({ extended: true }),
     (req, res, next) => {
       const tic = timer.tic()
 
@@ -63,7 +63,7 @@ function getTypeRouter (routeType) {
       const type = rendering.type || routeType
 
       new Rendering(type, rendering.id, rendering.layoutItems ? rendering : undefined)
-        .render({content, rendering, request})
+        .render({ content, rendering, request })
         .then((html) => `${outputType ? '<!DOCTYPE html>' : ''}${html}`)
         .then((html) =>
           (cacheHTML && request.uri)

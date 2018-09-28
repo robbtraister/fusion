@@ -32,7 +32,7 @@ class QuarantineCompiler {
                 ReactDOM.renderToStaticMarkup(
                   React.createElement(
                     Fusion.context.Provider,
-                    {value: context},
+                    { value: context },
                     Component
                   )
                 )

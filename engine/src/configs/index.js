@@ -61,7 +61,7 @@ function transformComponentConfigs (manifest) {
 
 function transformSections (component) {
   return getSections(component)
-    .map((id) => ({id}))
+    .map((id) => ({ id }))
 }
 
 function transformLayoutConfigs (manifest) {

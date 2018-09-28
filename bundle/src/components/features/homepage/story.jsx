@@ -50,7 +50,7 @@ class Story extends React.Component {
         }
       })
     } else {
-      this.state = {story: null}
+      this.state = { story: null }
     }
   }
 

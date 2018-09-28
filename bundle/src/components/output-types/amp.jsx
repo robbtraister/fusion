@@ -12,7 +12,7 @@ const OutputType = (props) =>
       <title>Fusion Rendering</title>
       <props.MetaTags />
       <props.Styles>
-        {({outputTypeStyles, templateStyles}) =>
+        {({ outputTypeStyles, templateStyles }) =>
           <style amp-custom='true'>
             {outputTypeStyles}
             {templateStyles}

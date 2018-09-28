@@ -50,7 +50,7 @@ const getConfig = (entry, srcRoot, distRoot) => {
           from: `${srcRoot}/*.json`,
           to: `${distRoot}/[name].[ext]`
         }]),
-        new ManifestPlugin({fileName: 'webpack.manifest.json'}),
+        new ManifestPlugin({ fileName: 'webpack.manifest.json' }),
         new OnBuildWebpackPlugin(function (stats) {
           // TODO: compute configs at compile-time (instead of on-demand) after disabling JGE option
           // fs.writeFile(`${sourcesDistRoot}/fusion.configs.json`, JSON.stringify(entry, null, 2), () => {})

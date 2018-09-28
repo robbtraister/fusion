@@ -14,7 +14,7 @@ const Layout = (sections) => {
   if ((sections instanceof Array)) {
     // do nothing; use as-is
   } else if ((sections instanceof Object)) {
-    sections = Object.keys(sections).map((id) => ({id, cssClass: sections[id]}))
+    sections = Object.keys(sections).map((id) => ({ id, cssClass: sections[id] }))
   } else {
     sections = []
   }

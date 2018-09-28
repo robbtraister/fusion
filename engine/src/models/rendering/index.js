@@ -24,11 +24,11 @@ const { render } = require('../../react')
 const getSource = require('../sources')
 
 const {
+  fetchAsset,
   fetchCssHash,
-  fetchFile,
   getJson,
+  pushAsset,
   pushCssHash,
-  pushFile,
   putJson
 } = require('../../io')
 
@@ -76,11 +76,11 @@ class Rendering {
           // using a raw rendering object is only for local dev, so don't publish the result
           if (this.type !== 'rendering') {
             if (outputType && js) {
-              artifacts.push(pushFile(`${this.name}/${outputType}.js`, js, 'application/javascript'))
+              artifacts.push(pushAsset(`${this.name}/${outputType}.js`, js, 'application/javascript'))
             }
 
             if (cssFile && css) {
-              artifacts.push(pushFile(cssFile, css, 'text/css'))
+              artifacts.push(pushAsset(cssFile, css, 'text/css'))
             }
 
             artifacts.push(pushCssHash(this.name, outputType, cssFile || null))
@@ -139,7 +139,7 @@ class Rendering {
     debug(`get styles: ${this.name}[${outputType}]`)
     this.stylesPromise = this.stylesPromise ||
       this.getCssFile(outputType)
-        .then((cssFile) => cssFile && fetchFile(cssFile))
+        .then((cssFile) => cssFile && fetchAsset(cssFile))
         .catch(() => this.compile(outputType).then(({ css }) => css))
     return this.stylesPromise
   }

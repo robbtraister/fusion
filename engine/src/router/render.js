@@ -1,5 +1,8 @@
 'use strict'
 
+const path = require('path')
+const url = require('url')
+
 const bodyParser = require('body-parser')
 const express = require('express')
 
@@ -9,6 +12,10 @@ const {
   bodyLimit,
   defaultOutputType
 } = require('../../environment')
+
+const {
+  pushHtml
+} = require('../io')
 
 const Rendering = require('../models/rendering')
 
@@ -25,7 +32,26 @@ function getTypeRouter (routeType) {
     (req, res, next) => {
       const tic = timer.tic()
 
+      const cacheHTML = req.get('Fusion-Cache-HTML') === 'true'
+
       const content = (req.body && req.body.content)
+
+      const outputType = /^(false|none|off|0)$/i.test(req.query.outputType)
+        ? null
+        : req.query.outputType || defaultOutputType
+
+      const renderingJson = (req.body && req.body.rendering)
+      const rendering = Object.assign(
+        {
+          id: req.params.id,
+          child: req.params.child,
+          outputType
+        },
+        // support POST from an HTML form
+        (typeof renderingJson === 'string')
+          ? JSON.parse(renderingJson)
+          : renderingJson
+      )
 
       const request = Object.assign(
         {
@@ -34,27 +60,20 @@ function getTypeRouter (routeType) {
         (req.body && req.body.request) || {}
       )
 
-      const renderingJson = (req.body && req.body.rendering)
-      const rendering = Object.assign(
-        {
-          id: req.params.id,
-          child: req.params.child,
-          outputType: /^(false|none|off|0)$/i.test(req.query.outputType)
-            ? null
-            : req.query.outputType || defaultOutputType
-        },
-        // support POST from an HTML form
-        (typeof renderingJson === 'string')
-          ? JSON.parse(renderingJson)
-          : renderingJson
-      )
-
       const type = rendering.type || routeType
 
       new Rendering(type, rendering.id, rendering.layoutItems ? rendering : undefined)
         .render({ content, rendering, request })
-        .then(html => `${rendering.outputType ? '<!DOCTYPE html>' : ''}${html}`)
-        .then(html => { res.send(html) })
+        .then((html) => `${outputType ? '<!DOCTYPE html>' : ''}${html}`)
+        .then((html) =>
+          (cacheHTML && request.uri)
+            ? Promise.resolve(url.parse(request.uri).pathname)
+              .then((pathname) => /\/$/.test(pathname) ? path.join(pathname, 'index.html') : pathname)
+              .then((filePath) => pushHtml(path.join(request.arcSite || 'default', outputType, filePath), html))
+              .then(() => html)
+            : html
+        )
+        .then((html) => { res.send(html) })
         .then(() => {
           debugTimer('complete response', tic.toc())
         })

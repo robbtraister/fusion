@@ -41,7 +41,7 @@ const StoryItem = (story) => {
 
 const Story = ({ contentConfig }) =>
   <Content filter={filter} {...contentConfig}>
-    {StoryItem}
+    {(content) => StoryItem(content || {})}
   </Content>
 
 module.exports = Story

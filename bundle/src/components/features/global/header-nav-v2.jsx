@@ -109,7 +109,7 @@ const HeaderNavV2Impl = (props) =>
 const HeaderNavV2 = (props) =>
   <Content source='site-menu' contentConfigValues={{ id: '/' }} filter='{children{name,site{site_url},children{name,site{site_url}}}}'>
     {
-      ({ children }) => HeaderNavV2Impl({ items: children, ...props })
+      (content) => HeaderNavV2Impl({ items: (content && content.children) || [], ...props })
     }
   </Content>
 

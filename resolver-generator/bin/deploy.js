@@ -19,8 +19,8 @@ const {
 } = require('./configs')
 
 const AWS = require('aws-sdk')
-const s3 = new AWS.S3({region})
-const lambda = new AWS.Lambda({region})
+const s3 = new AWS.S3({ region })
+const lambda = new AWS.Lambda({ region })
 
 const awsUpload = promisify(s3.upload.bind(s3))
 const createFunction = promisify(lambda.createFunction.bind(lambda))

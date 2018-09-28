@@ -80,7 +80,7 @@ function Mongo (mongoUrl) {
           return getCollection(modelName)
             .then((collection) => {
               tic = timer.tic()
-              return collection.findOne({_id})
+              return collection.findOne({ _id })
             })
             .then((data) => {
               debugTimer(`${modelName}.findById(${_id})`, tic.toc())

@@ -5,7 +5,7 @@ const {
 } = require('../../environment')
 
 const { KMS } = require('aws-sdk')
-const kms = new KMS({region})
+const kms = new KMS({ region })
 
 module.exports = {
   decrypt (ciphertext) {
@@ -27,7 +27,7 @@ module.exports = {
     }
 
     return new Promise((resolve, reject) => {
-      kms.decrypt({CiphertextBlob}, (err, data) => err ? reject(err) : resolve(data.Plaintext.toString('utf8')))
+      kms.decrypt({ CiphertextBlob }, (err, data) => err ? reject(err) : resolve(data.Plaintext.toString('utf8')))
     })
   }
 }

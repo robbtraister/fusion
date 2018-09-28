@@ -91,7 +91,7 @@ const value = {
 module.exports = (props) => React.createElement(
   Fusion.context.Provider,
   {
-    value: {...value, ...props}
+    value: { ...value, ...props }
   },
   props.children
 )

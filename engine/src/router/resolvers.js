@@ -14,7 +14,7 @@ const {
 const resolverRouter = express.Router()
 
 resolverRouter.post('/',
-  bodyParser.json({limit: bodyLimit}),
+  bodyParser.json({ limit: bodyLimit }),
   (req, res, next) =>
     pushResolvers(req.body)
       .then(() => { next() })

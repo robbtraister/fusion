@@ -88,7 +88,7 @@ module.exports = Object.keys(components)
           new MiniCssExtractPlugin({
             filename: '[name].css'
           }),
-          new ManifestPlugin({fileName: 'webpack.manifest.json'}),
+          new ManifestPlugin({ fileName: 'webpack.manifest.json' }),
           new OnBuildWebpackPlugin(function (stats) {
             writeFile(`${componentDistRoot}/${collection}/fusion.configs.json`, JSON.stringify(loadConfigs(collection), null, 2))
             if (isDev) {

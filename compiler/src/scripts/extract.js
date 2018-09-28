@@ -12,7 +12,7 @@ const promises = require('../utils/promises')
 async function extract (fp, dest) {
   debug(`extracting ${fp} to ${dest}`)
   return new Promise((resolve, reject) => {
-    yauzl.open(fp, {lazyEntries: true}, (err, zipfile) => {
+    yauzl.open(fp, { lazyEntries: true }, (err, zipfile) => {
       if (err) {
         return reject(err)
       }

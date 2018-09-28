@@ -44,7 +44,7 @@ class Generator {
     debug(`Generating new resolver service for ${this.contextName}`)
 
     this.region = awsRegion
-    this.s3 = new S3({region: this.region})
+    this.s3 = new S3({ region: this.region })
     this.s3getObject = promisify(this.s3.getObject.bind(this.s3))
     this.s3upload = promisify(this.s3.upload.bind(this.s3))
   }

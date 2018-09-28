@@ -83,7 +83,7 @@ module.exports = (scriptSourceFile, stylesSourceFile) =>
         path: componentDistRoot
       },
       plugins: [
-        new ManifestPlugin({fileName: 'styles.manifest.json'}),
+        new ManifestPlugin({ fileName: 'styles.manifest.json' }),
         new MiniCssExtractPlugin({
           filename: '[contenthash].css'
         })

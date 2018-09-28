@@ -23,16 +23,16 @@ const getS3Key = function getS3Key (name) {
   return `${getKeyBase()}/dist/${name.replace(/^\//, '')}`
 }
 
-const s3 = new S3({region})
+const s3 = new S3({ region })
 
 // return the full object (not just cssFile value) because if it doesn't exist, we need to calculate it
 // the calculation returns an object with a cssFile property
 // for simplicity, we'll just unwrap that property from whatever we get
 const fetchCssHash = (name, outputType = defaultOutputType) =>
-  model('hash').get({version, id: `${name}/${outputType}`})
+  model('hash').get({ version, id: `${name}/${outputType}` })
 
 const pushCssHash = (name, outputType = defaultOutputType, cssFile) =>
-  model('hash').put({id: `${name}/${outputType}`, version, cssFile})
+  model('hash').put({ id: `${name}/${outputType}`, version, cssFile })
 
 const getJson = (type, id) =>
   model(type).get(id)
@@ -76,7 +76,7 @@ const pushKey = async function pushKey (Bucket, Key, src, options) {
 }
 
 const pushFile = async function pushFile (name, src, ContentType) {
-  return pushKey(s3BucketDiscrete, `${getS3Key(name)}`, src, {ContentType})
+  return pushKey(s3BucketDiscrete, `${getS3Key(name)}`, src, { ContentType })
 }
 
 const pushResolvers = async function pushResolvers (resolvers) {

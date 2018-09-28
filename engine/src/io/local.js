@@ -20,7 +20,7 @@ const fetchCssHash = async (name, outputType = defaultOutputType) =>
     .catch(() => null)
 
 const pushCssHash = async (name, outputType = defaultOutputType, cssFile) =>
-  pushFile(`${name}/${outputType}.css.json`, JSON.stringify({cssFile}))
+  pushFile(`${name}/${outputType}.css.json`, JSON.stringify({ cssFile }))
 
 const getJson = (type, id) => model(type).get(id)
   .then((data) => (type === 'rendering')

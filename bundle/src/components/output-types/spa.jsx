@@ -11,7 +11,7 @@ const OutputType = (props) =>
       <props.MetaTag />
       <props.Libs />
       <props.CssLinks>
-        {({outputTypeHref, templateHref}) =>
+        {({ outputTypeHref, templateHref }) =>
           <React.Fragment>
             <link rel='stylesheet' type='text/css' href={outputTypeHref} />
             <link rel='stylesheet' type='text/css' href={templateHref} id='template-style' />

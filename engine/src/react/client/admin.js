@@ -27,7 +27,7 @@ document.body.parentElement.setAttribute('xmlns:fusion', 'http://www.arcpublishi
 const appendBoundary = (element, id) => {
   const boundaryProps = {
     'data-fusion-component': id,
-    style: {display: 'none'}
+    style: { display: 'none' }
   }
   return React.createElement(
     React.Fragment,

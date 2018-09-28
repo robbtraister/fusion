@@ -11,7 +11,7 @@ const {
 } = require('../../environment')
 
 const getHttpEngine = function getHttpEngine () {
-  return function httpEngineHandler ({method, uri, data}) {
+  return function httpEngineHandler ({ method, uri, data }) {
     return request[(method || 'get').toLowerCase()]({
       uri: `${httpEngine}${uri}`,
       body: data,
@@ -22,9 +22,9 @@ const getHttpEngine = function getHttpEngine () {
 
 const getLambdaEngine = function getLambdaEngine () {
   const region = lambdaEngine.split(':')[3]
-  const lambda = new AWS.Lambda(Object.assign({region}))
+  const lambda = new AWS.Lambda(Object.assign({ region }))
 
-  return function lambdaEngineHandler ({method, uri, data, version}) {
+  return function lambdaEngineHandler ({ method, uri, data, version }) {
     const METHOD = (method || 'GET').toUpperCase()
     const parts = url.parse(uri, true)
     return new Promise((resolve, reject) => {

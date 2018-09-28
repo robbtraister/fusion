@@ -27,7 +27,7 @@ async function zip (zipFile, zipDirs) {
     function addDir (zipDir) {
       debug(`adding ${zipDir} to ${zipFile}`)
       return new Promise((resolve, reject) => {
-        glob('**/*', {cwd: zipDir, nodir: true}, (err, files) => {
+        glob('**/*', { cwd: zipDir, nodir: true }, (err, files) => {
           if (err) {
             reject(err)
           } else {

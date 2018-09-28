@@ -27,7 +27,9 @@ const createContextElement = (Component, props, context) => {
 
   contextProps.contentEditable = (isClient && Fusion.isAdmin)
     ? (prop) => ({
-      'data-content-editable': `${props.id}:${prop}`
+      'data-content-editable': prop,
+      'data-feature': props.id,
+      'contenteditable': 'true',
     })
     : () => ({})
 

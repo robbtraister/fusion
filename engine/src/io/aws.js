@@ -12,7 +12,8 @@ const {
   defaultOutputType,
   environment,
   region,
-  s3Bucket: Bucket,
+  s3BucketDiscrete,
+  s3BucketVersioned,
   version
 } = require('../../environment')
 
@@ -20,7 +21,7 @@ const KeyPrefix = `environments/${environment}/deployments/${version}`
 
 const s3 = new S3({region})
 
-const fetchKey = async (Key) =>
+const fetchKey = async (Key, Bucket = s3BucketDiscrete) =>
   new Promise((resolve, reject) => {
     Key = Key.replace(/^\//, '')
     s3.getObject({
@@ -31,7 +32,7 @@ const fetchKey = async (Key) =>
     })
   })
 
-const pushKey = async (Key, src, options) =>
+const pushKey = async (Key, src, options, Bucket = s3BucketDiscrete) =>
   new Promise((resolve, reject) => {
     Key = Key.replace(/^\//, '')
     debug(`pushing ${src.length} bytes to: ${Bucket}/${Key}`)
@@ -83,7 +84,8 @@ const pushResolvers = async (resolvers) =>
     {
       ContentType: 'application/json',
       ACL: 'private'
-    }
+    },
+    s3BucketVersioned
   )
 
 module.exports = {

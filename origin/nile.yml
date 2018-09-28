@@ -69,6 +69,8 @@ environments:
           awslogs-region: us-east-1
         environment:
           <<: *_environment
+          AWS_ACCOUNT_ID: 397853141546
+          S3_BUCKET: pagebuilder-fusion
         # volumes:
         # - '/var/fusion-origin/staging/uploads:/uploads'
     resources:
@@ -99,6 +101,8 @@ environments:
         environment:
           <<: *_admin_environment
           PB_ADMIN: 'http://$environment.pb.arc.pub'
+          AWS_ACCOUNT_ID: 397853141546
+          S3_BUCKET: pagebuilder-fusion
         # volumes:
         # - '/var/fusion-origin/staging/uploads:/uploads'
     resources:
@@ -125,6 +129,7 @@ environments:
           awslogs-region: eu-central-1
         environment:
           <<: *_environment
+          AWS_REGION: eu-central-1
     services:
       - <<: *_service
         loadBalancers:
@@ -148,3 +153,4 @@ environments:
           awslogs-region: eu-central-1
         environment:
           <<: *_admin_environment
+          AWS_REGION: eu-central-1

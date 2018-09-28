@@ -29,7 +29,7 @@ then
 else
   if [ ! "${HTTP_ENGINE}" ]
   then
-    LAMBDA_ENGINE="arn:aws:lambda:${AWS_REGION:-us-east-1}:${AWS_ACCOUNT_ID:-397853141546}:function:fusion-engine-\${environment}"
+    LAMBDA_ENGINE="arn:aws:lambda:${AWS_REGION:-us-east-1}:${AWS_ACCOUNT_ID:-057404813832}:function:fusion-engine-\${environment}"
   fi
 fi
 
@@ -40,9 +40,8 @@ then
 else
   if [ ! "${HTTP_RESOLVER}" ]
   then
-    LAMBDA_RESOLVER="arn:aws:lambda:${AWS_REGION:-us-east-1}:${AWS_ACCOUNT_ID:-397853141546}:function:fusion-resolver-\${environment}"
+    LAMBDA_RESOLVER="arn:aws:lambda:${AWS_REGION:-us-east-1}:${AWS_ACCOUNT_ID:-057404813832}:function:fusion-resolver-\${environment}"
   fi
 fi
 
-
-S3_HOST="http://${S3_BUCKET:-pagebuilder-fusion}.s3.amazonaws.com"
+S3_HOST="http://${S3_BUCKET:-arc-fusion-discrete-${AWS_REGION}}.s3.amazonaws.com"

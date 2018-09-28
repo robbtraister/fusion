@@ -2,6 +2,8 @@
 
 const React = require('react')
 
+const Context = require('fusion:context')
+
 const ImageFormat = require('../../tags/arc/image-format.jsx')
 
 const fullDate = () => {
@@ -23,28 +25,28 @@ const fullDate = () => {
   return `${now.getDate()} ${monthName} ${now.getFullYear()}`
 }
 
-const Masthead = (props) => {
-  const numberOfEditions = props.customFields.numberOfEditions || 0
+const Masthead = ({ id, customFields }) => {
+  const numberOfEditions = customFields.numberOfEditions || 0
   // const orderOfEditions = props.orderOfEditions || false
 
   const navOnTop = false
-  const showDate = props.customFields.showDate || false
-  const socialPosition = props.customFields.socialPosition || 'socialRight'
-  const includeWeather = props.customFields.includeWeather || false
-  const sticky = props.customFields.sticky
-  const isBelowNav = props.customFields.isBelowNav
+  const showDate = customFields.showDate || false
+  const socialPosition = customFields.socialPosition || 'socialRight'
+  const includeWeather = customFields.includeWeather || false
+  const sticky = customFields.sticky
+  const isBelowNav = customFields.isBelowNav
 
-  const mastheadSize = props.customFields.mastheadSize || 'large'
+  const mastheadSize = customFields.mastheadSize || 'large'
 
-  const borderBottomStyle = props.customFields.borderBottomStyle
-  const borderBottomWidth = props.customFields.borderBottomWidth
+  const borderBottomStyle = customFields.borderBottomStyle
+  const borderBottomWidth = customFields.borderBottomWidth
 
-  const weatherService = props.customFields.weatherService
+  const weatherService = customFields.weatherService
   // const weatherServiceUsable = weatherService.toLowerCase()
-  // const weatherDefaultLocation = props.customFields.weatherDefaultLocation
+  // const weatherDefaultLocation = customFields.weatherDefaultLocation
 
-  const secondaryImage = props.customFields.secondaryImage
-  const secondaryImageURL = props.customFields.secondaryImageURL
+  const secondaryImage = customFields.secondaryImage
+  const secondaryImageURL = customFields.secondaryImageURL
 
   const wrapperClasses = `mastnav ${sticky ? 'sticky' : 'free-float'} ${mastheadSize}`
 
@@ -52,9 +54,9 @@ const Masthead = (props) => {
     large: 200,
     medium: 150,
     small: 100
-  }[props.customFields.mastheadSize]
+  }[customFields.mastheadSize]
 
-  return <div id={props.id} className={`masthead-row-wrapper${showDate ? ' min-height-158' : ''}${navOnTop ? ' lower-masthead' : ' upper-masthead'} ${mastheadSize}`}>
+  return <div id={id} className={`masthead-row-wrapper${showDate ? ' min-height-158' : ''}${navOnTop ? ' lower-masthead' : ' upper-masthead'} ${mastheadSize}`}>
     <div className='masthead-wrapper pb-f-homepage-masthead'>
       <div id='mastnav-wrapper' className={wrapperClasses} data-nav-position={`${isBelowNav ? 'nav-above' : 'nav-below'}`}>
         <div id='mastnav-container'>
@@ -62,16 +64,18 @@ const Masthead = (props) => {
             <div className='home-masthead-image'>
 
               <div className='organization-logo'>
-                <a href={props.customFields.mastLogoUrl} className='logo' title={props.customFields.siteTitle}>
-                  {(props.customFields.mastLogo)
+                <a href={customFields.mastLogoUrl} className='logo' title={customFields.siteTitle}>
+                  {(customFields.mastLogo)
                     ? (
-                      (props.customFields.mastLogo.test(/.svg$/))
-                        ? <img className='wplogo' src={props.customFields.mastLogo} alt={props.customFields.siteTitle} height={logoSize} />
+                      (customFields.mastLogo.test(/.svg$/))
+                        ? <img className='wplogo' src={customFields.mastLogo} alt={customFields.siteTitle} height={logoSize} />
                         : <React.Fragment>
-                          <ImageFormat src={props.customFields.mastLogo} className='wplogo' alt={props.customFields.siteTitle} height={logoSize} />
+                          <ImageFormat src={customFields.mastLogo} className='wplogo' alt={customFields.siteTitle} height={logoSize} />
                         </React.Fragment>
                     )
-                    : <img className='orgLogo' src={`${props.contextPath}/resources/img/thenews.png`} alt={props.customFields.siteTitle} height={logoSize} />
+                    : <Context>
+                      {({ contextPath }) => <img className='orgLogo' src={`${contextPath}/resources/img/thenews.png`} alt={customFields.siteTitle} height={logoSize} />}
+                    </Context>
                   }
                 </a>
               </div>
@@ -103,9 +107,9 @@ const Masthead = (props) => {
               {(includeWeather)
                 ? <React.Fragment>
                   {(weatherService === 'openweathermap')
-                    ? <div /> // <pb:fetch-content var='altContent' service={weatherServiceUsable}>{{latitude: props.customFields.weatherLatitude, longitude: props.customFields.weatherLongitude, units: props.customFields.degreeUnits}}</pb:fetch-content>
+                    ? <div /> // <pb:fetch-content var='altContent' service={weatherServiceUsable}>{{latitude: customFields.weatherLatitude, longitude: customFields.weatherLongitude, units: customFields.degreeUnits}}</pb:fetch-content>
                     : (weatherService === 'darksky')
-                      ? <div /> // <pb:fetch-content var='altContent' service={weatherServiceUsable}>{{latitudeAndLongitude: `${props.customFields.weatherLatitude},${props.customFields.weatherLongitude}`, units:''}}</pb:fetch-content>
+                      ? <div /> // <pb:fetch-content var='altContent' service={weatherServiceUsable}>{{latitudeAndLongitude: `${customFields.weatherLatitude},${customFields.weatherLongitude}`, units:''}}</pb:fetch-content>
                       : null
                   }
                   <div className='weatherInfo'>
@@ -135,8 +139,8 @@ const Masthead = (props) => {
             </div>
 
             {(secondaryImage)
-              ? <a href={secondaryImageURL} className='logo secondary-logo' title={props.customFields.siteTitle} >
-                <ImageFormat src={secondaryImage} className='wplogo' alt={props.customFields.siteTitle} height='65' width='90' />
+              ? <a href={secondaryImageURL} className='logo secondary-logo' title={customFields.siteTitle} >
+                <ImageFormat src={secondaryImage} className='wplogo' alt={customFields.siteTitle} height='65' width='90' />
               </a>
               : null
             }

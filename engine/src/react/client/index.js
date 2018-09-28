@@ -4,7 +4,7 @@
 
 const { parse } = require('url')
 
-window.Fusion = window.Fusion || {}
+require('./shared')
 if (!Fusion.contextPath) {
   const engineScript = document.getElementById('fusion-engine-script')
   if (engineScript) {
@@ -12,19 +12,10 @@ if (!Fusion.contextPath) {
   }
 }
 
-Fusion.components = Fusion.components || {}
-Fusion.components.Consumer = require('../shared/components/consumer')
-Fusion.components.Layout = require('../shared/components/layout')
-Fusion.components.Quarantine = require('../shared/components/quarantine')
-Fusion.components.Static = require('../shared/components/static')
-Fusion.properties = require('fusion:properties')
-Fusion.unpack = require('../../utils/unpack')
-
 const Provider = require('./provider')
 
-const React = window.react = require('react')
-const ReactDOM = window.ReactDOM = require('react-dom')
-window.PropTypes = require('../shared/prop-types')
+const React = window.react
+const ReactDOM = window.ReactDOM
 
 // support fragments in preact
 React.Fragment = React.Fragment || 'div'

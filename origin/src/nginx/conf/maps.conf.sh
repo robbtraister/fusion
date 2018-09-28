@@ -71,13 +71,14 @@ fi
 cat <<EOB
   }
 
-  map \$host \$mode {
+  map \$http_fusion_cache_mode \$mode {
 EOB
 if [ "${IS_PROD}" ]
 then
   cat <<EOB
     default                     'live';
-    ~^(?<subdomain>[^.]+)\.(?<mode>cache|backup|live)\.     \$mode;
+    ~*^backup$                  'backup';
+    ~*^cache$                   'cache';
 EOB
 else
   cat <<EOB

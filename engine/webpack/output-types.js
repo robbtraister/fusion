@@ -36,7 +36,7 @@ const {
 
 const entry = Object.assign(
   ...Object.values(components.outputTypes)
-    .map(outputType => ({[outputType.type]: path.join(bundleRoot, outputType.src)}))
+    .map(outputType => ({ [outputType.type]: path.join(bundleRoot, outputType.src) }))
 )
 
 // Compile twice.
@@ -123,7 +123,7 @@ module.exports = (Object.keys(entry).length)
         libraryTarget: 'commonjs2'
       },
       plugins: [
-        new ManifestPlugin({fileName: 'webpack.manifest.json'}),
+        new ManifestPlugin({ fileName: 'webpack.manifest.json' }),
         new OnBuildWebpackPlugin(function (stats) {
           writeFile(`${componentDistRoot}/output-types/fusion.configs.json`, JSON.stringify(loadConfigs('output-types'), null, 2))
           if (isDev) {

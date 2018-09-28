@@ -31,7 +31,7 @@ class BaseResolver {
   }
 
   async resolve (requestParts, arcSite, version) {
-    const {key, content} = await this.hydrate(requestParts, arcSite, version)
+    const { key, content } = await this.hydrate(requestParts, arcSite, version)
 
     return Object.assign(
       {
@@ -44,7 +44,7 @@ class BaseResolver {
         },
         rendering: this.rendering(content),
         // remove versions from page config
-        resolver: Object.assign({}, this.config, {versions: undefined})
+        resolver: Object.assign({}, this.config, { versions: undefined })
       },
       (key)
         ? {

@@ -75,9 +75,9 @@ FusionPropTypes.contentConfig = (options, ...moreSchemas) => {
   }
 
   const args = !(options instanceof Object)
-    ? {schemas: [options].concat(...moreSchemas)}
+    ? { schemas: [options].concat(...moreSchemas) }
     : (options instanceof Array)
-      ? {schemas: options.concat(...moreSchemas)}
+      ? { schemas: options.concat(...moreSchemas) }
       : options
 
   return taggablePrimitive(instance, 'contentConfig', args)

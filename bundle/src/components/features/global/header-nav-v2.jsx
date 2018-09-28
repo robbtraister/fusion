@@ -94,7 +94,7 @@ class HeaderNavV2 extends React.Component {
     this.fetchContent({
       items: {
         source: 'site-menu',
-        key: {id: '/'},
+        key: { id: '/' },
         query: '{children{name,site{site_url},children{name,site{site_url}}}}'
       }
     })
@@ -122,7 +122,7 @@ class HeaderNavV2 extends React.Component {
 
 HeaderNavV2.propTypes = {
   customFields: PropTypes.shape({
-    logo: PropTypes.string.tag({test: 'some value'}),
+    logo: PropTypes.string.tag({ test: 'some value' }),
     makeNavigationBarSticky: PropTypes.bool,
     menuLabel: PropTypes.string,
     pushContent: PropTypes.bool

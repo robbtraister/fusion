@@ -21,7 +21,7 @@ const BreakingAlertV2 = (props) => {
     data-href={`${props.contextPath}/api/v2/render/feature?name=${parentFeatureName}&uri=${parentPage}`}
     data-has-news={!!props.customFields.barText}
     data-reload={validFeature && !props.isAdmin}
-    style={{backgroundColor: props.customFields.backgroundColor, color: props.customFields.textColor}}
+    style={{ backgroundColor: props.customFields.backgroundColor, color: props.customFields.textColor }}
   >
     <div className='render-wrapper rendered-alert'>
       <div className='bar-text'>

@@ -29,7 +29,7 @@ const createContextElement = (Component, props, context) => {
     ? (prop) => ({
       'data-content-editable': prop,
       'data-feature': props.id,
-      'contenteditable': 'true',
+      'contenteditable': 'true'
     })
     : () => ({})
 
@@ -70,7 +70,7 @@ function HOC (Component) {
           this.setContent(
             Object.assign(
               ...Object.keys(contents)
-                .map(stateKey => ({[stateKey]: this.getContent(contents[stateKey])}))
+                .map(stateKey => ({ [stateKey]: this.getContent(contents[stateKey]) }))
             )
           )
         }
@@ -140,7 +140,7 @@ function HOC (Component) {
             if (isClient) {
               // this case is only necessary on the client
               // on the server, we will wait for the content to hydrate and manually re-render
-              content.fetched.then(data => { this.setState({[key]: data}) })
+              content.fetched.then(data => { this.setState({ [key]: data }) })
             }
 
             // this case is only possible if content was fetched server-side

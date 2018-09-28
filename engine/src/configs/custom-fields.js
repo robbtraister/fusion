@@ -30,7 +30,7 @@ function getCustomFields (componentConfig) {
         if (!compilation) {
           return {
             root: stringified,
-            args: Object.assign(...Object.keys(args).map(k => ({[k]: PropTypes.stringify(args[k])})))
+            args: Object.assign(...Object.keys(args).map(k => ({ [k]: PropTypes.stringify(args[k]) })))
           }
         }
         if (compilation.root && compilation.root === stringified) {

@@ -21,16 +21,16 @@ const fetch = function fetch (contentSource, contentKey, version) {
 
 const getParamMapper = function getParamMapper (param) {
   return {
-    parameter: (requestParts) => ({[param.key]: requestParts.query[param.name]}),
-    pattern: (requestParts, groups) => ({[param.key]: groups[param.index]}),
-    static: () => ({[param.key]: param.value})
+    parameter: (requestParts) => ({ [param.key]: requestParts.query[param.name] }),
+    pattern: (requestParts, groups) => ({ [param.key]: groups[param.index] }),
+    static: () => ({ [param.key]: param.value })
   }[param.type]
 }
 
 const getParamExtractor = function getParamExtractor (contentConfigMapping, pattern) {
   if (contentConfigMapping) {
     const params = Object.keys(contentConfigMapping)
-      .map(key => Object.assign({key}, contentConfigMapping[key]))
+      .map(key => Object.assign({ key }, contentConfigMapping[key]))
 
     if (params.length) {
       const hasPatternParam = !!params.find(param => param.type === 'pattern')
@@ -86,7 +86,7 @@ class TemplateResolver extends BaseResolver {
     return fetch(this.config.contentSourceId, key, version)
       // should we return a resolve result even if content doesn't exist?
       // .catch(() => null)
-      .then((content) => ({key, content}))
+      .then((content) => ({ key, content }))
   }
 
   matchRequiredParams (requestParams) {

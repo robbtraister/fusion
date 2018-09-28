@@ -22,7 +22,7 @@ function getCacheKey (uri) {
   return `${cachePrefix}:${hash}`
 }
 
-async function makeCacheRequest ({method, key, value}) {
+async function makeCacheRequest ({ method, key, value }) {
   return (cacheProxyUrl)
     ? request(
       Object.assign(
@@ -33,16 +33,16 @@ async function makeCacheRequest ({method, key, value}) {
         },
         // don't depend on existence of value, since you might want to push null/undefined
         (/^(POST|PUT)$/.test(method))
-          ? {body: value}
+          ? { body: value }
           : {}
       )
     )
     : Promise.resolve()
 }
 
-const clearCacheContent = async (key) => makeCacheRequest({key, method: 'DELETE'})
-const fetchCacheContent = async (key) => makeCacheRequest({key})
-const pushCacheContent = async (key, value) => makeCacheRequest({key, value, method: 'PUT'})
+const clearCacheContent = async (key) => makeCacheRequest({ key, method: 'DELETE' })
+const fetchCacheContent = async (key) => makeCacheRequest({ key })
+const pushCacheContent = async (key, value) => makeCacheRequest({ key, value, method: 'PUT' })
 
 class CachedSource extends ResolveSource {
   async clear (key) {
@@ -86,7 +86,7 @@ class CachedSource extends ResolveSource {
                 const tags = ['operation:fetch', 'result:error', `source:${this.name}`]
                 sendMetrics([
                   // {type: METRIC_TYPES.CACHE_RESULT, value: 1, tags},
-                  {type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags}
+                  { type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags }
                 ])
                 throw new Error('data error from cache')
               }
@@ -94,8 +94,8 @@ class CachedSource extends ResolveSource {
               const tags = ['operation:fetch', 'result:cache_hit', `source:${this.name}`]
               sendMetrics([
                 // {type: METRIC_TYPES.CACHE_RESULT, value: 1, tags},
-                {type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags},
-                {type: METRIC_TYPES.CACHE_RESULT_SIZE, value: JSON.stringify(data).length, tags}
+                { type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags },
+                { type: METRIC_TYPES.CACHE_RESULT_SIZE, value: JSON.stringify(data).length, tags }
               ])
 
               return data
@@ -106,7 +106,7 @@ class CachedSource extends ResolveSource {
               const tags = ['operation:fetch', tagResult, `source:${this.name}`]
               sendMetrics([
                 // {type: METRIC_TYPES.CACHE_RESULT, value: 1, tags},
-                {type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags}
+                { type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags }
               ])
 
               return this.update(key)
@@ -142,8 +142,8 @@ class CachedSource extends ResolveSource {
               const tags = ['operation:put', 'result:success', `source:${this.name}`]
               sendMetrics([
                 // {type: METRIC_TYPES.CACHE_RESULT, value: 1, tags},
-                {type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags},
-                {type: METRIC_TYPES.CACHE_RESULT_SIZE, value: JSON.stringify(data).length, tags}
+                { type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags },
+                { type: METRIC_TYPES.CACHE_RESULT_SIZE, value: JSON.stringify(data).length, tags }
               ])
 
               return data
@@ -153,7 +153,7 @@ class CachedSource extends ResolveSource {
               const tags = ['operation:put', 'result:error', `source:${this.name}`, `error:${error.statusCode}`]
               sendMetrics([
                 // {type: METRIC_TYPES.CACHE_RESULT, value: 1, tags},
-                {type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags}
+                { type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags }
               ])
               // DO NOT THROW FOR FAILED CACHE WRITE!!!
               // throw new Error(`Error putting into cache ${this.name}`)

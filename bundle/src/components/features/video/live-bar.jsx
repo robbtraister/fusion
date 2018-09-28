@@ -2,24 +2,27 @@
 
 const React = require('react')
 
-// const headlineQuery = '{headlines{basic}}'
+const headlineQuery = '{headlines{basic}}'
 
 class LiveBar extends React.Component {
   constructor (props) {
     super(props)
+
+    this.fetchContent({
+      redskins: {
+        source: 'content-api',
+        key: { uri: '/sports/redskins/football-insider/aoeu-7' },
+        filter: headlineQuery
+      },
+      mlb: {
+        source: 'content-api',
+        key: { uri: '/sports/mlb/new-blockquote-test' },
+        filter: headlineQuery
+      }
+    })
+
     this.onButtonClick = this.onButtonClick.bind(this)
   }
-  // componentWillMount () {
-  //   this.setContent({
-  //     redskins: this.getContent('content-api', {uri: '/sports/redskins/football-insider/aoeu-7'}, headlineQuery)
-  //   })
-  // }
-
-  // componentDidMount () {
-  //   this.setContent({
-  //     mlb: this.getContent('content-api', {uri: '/sports/mlb/new-blockquote-test'}, headlineQuery)
-  //   })
-  // }
 
   onButtonClick () {
     console.log('clicked')

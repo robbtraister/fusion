@@ -1,5 +1,6 @@
 'use strict'
 
+const isRequired = require('../is-required')
 const { taggablePrimitive } = require('../taggables')
 
 module.exports = (options, ...moreSchemas) => {
@@ -15,13 +16,7 @@ module.exports = (options, ...moreSchemas) => {
     }
   }
 
-  instance.isRequired = (props, propName, componentName) => {
-    const prop = props[propName]
-    if (!prop) {
-      return new Error(`${propName} is required on ${componentName}`)
-    }
-    return instance(props, propName, componentName)
-  }
+  instance.isRequired = isRequired(instance)
 
   const args = !(options instanceof Object)
     ? { schemas: [options].concat(...moreSchemas) }

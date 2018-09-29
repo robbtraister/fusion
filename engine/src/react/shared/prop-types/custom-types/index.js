@@ -1,13 +1,30 @@
 'use strict'
 
-const generic = require('./generic')
+const PropTypes = require('../../../../../node_modules/prop-types')
+
+const { taggable } = require('../taggables')
 
 module.exports = {
+  boolean: taggable(PropTypes.bool, 'boolean'),
   contentConfig: require('./content-config'),
-  date: generic('date'),
-  email: generic('email'),
-  json: generic('json'),
-  label: generic('label'),
-  richText: generic('richText'),
-  url: generic('url')
+  date: taggable(PropTypes.string, 'date'),
+  dateTime: taggable(PropTypes.string, 'dateTime'),
+  disabled: taggable(PropTypes.string, 'disabled'),
+  email: taggable(PropTypes.string, 'email'),
+  json: require('./json'), // taggable(PropTypes.string, 'json'),
+  kvp: taggable(
+    PropTypes.arrayOf(
+      PropTypes.shape({
+        key: PropTypes.string,
+        value: PropTypes.string
+      })
+    ),
+    'kvp'
+  ),
+  label: taggable(PropTypes.string, 'label'),
+  list: taggable(PropTypes.arrayOf(PropTypes.string), 'list'),
+  richtext: taggable(PropTypes.string, 'richtext'),
+  select: taggable(PropTypes.oneOf, 'select'),
+  text: taggable(PropTypes.string, 'text'),
+  url: taggable(PropTypes.string, 'url')
 }

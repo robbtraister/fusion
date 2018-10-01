@@ -1,15 +1,18 @@
 'use strict'
 
+/* global Fusion */
+
 const React = require('react')
 
-const Consumer = require('./consumer')
-
-const Context = ({ children }) =>
+const Context = ({ children: Child, ...props }) =>
   React.createElement(
-    Consumer(
-      ({ contentEditable, eventListeners, getContent, children: _, ...context }) =>
-        children(context)
-    )
+    Fusion.context.Consumer,
+    {},
+    ({ props: contextProps }) =>
+      React.createElement(
+        Child,
+        { ...contextProps, ...props }
+      )
   )
 
 module.exports = Context

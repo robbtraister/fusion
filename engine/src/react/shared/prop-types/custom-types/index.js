@@ -12,15 +12,7 @@ module.exports = {
   disabled: taggable(PropTypes.string, 'disabled'),
   email: taggable(PropTypes.string, 'email'),
   json: require('./json'), // taggable(PropTypes.string, 'json'),
-  kvp: taggable(
-    PropTypes.arrayOf(
-      PropTypes.shape({
-        key: PropTypes.string,
-        value: PropTypes.string
-      })
-    ),
-    'kvp'
-  ),
+  kvp: taggable(PropTypes.object, 'kvp'),
   label: taggable(PropTypes.string, 'label'),
   list: taggable(PropTypes.arrayOf(PropTypes.string), 'list'),
   richtext: taggable(PropTypes.string, 'richtext'),

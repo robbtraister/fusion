@@ -28,7 +28,7 @@ const {
 
 const { components } = require('../manifest')
 
-const loadConfigs = require('../src/configs')
+const loadComponentConfigs = require('../src/configs/components')
 
 const {
   writeFile
@@ -125,7 +125,7 @@ module.exports = (Object.keys(entry).length)
       plugins: [
         new ManifestPlugin({ fileName: 'webpack.manifest.json' }),
         new OnBuildWebpackPlugin(function (stats) {
-          writeFile(`${componentDistRoot}/output-types/fusion.configs.json`, JSON.stringify(loadConfigs('output-types'), null, 2))
+          writeFile(`${componentDistRoot}/output-types/fusion.configs.json`, JSON.stringify(loadComponentConfigs('output-types'), null, 2))
           if (isDev) {
             // manifest generation requires babel-register, which is very expensive
             // run it in a separate process to prevent ALL modules from being transpiled

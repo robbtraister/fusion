@@ -2,12 +2,12 @@
 
 const path = require('path')
 
-const PropTypes = require('../react/shared/prop-types')
-const unpack = require('../utils/unpack')
+const PropTypes = require('../../react/shared/prop-types')
+const unpack = require('../../utils/unpack')
 
 const {
   bundleRoot
-} = require('../../environment')
+} = require('../../../environment')
 
 function getCustomFields (componentConfig) {
   const customFields = Object.values(componentConfig.outputTypes)

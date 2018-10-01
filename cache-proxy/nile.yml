@@ -88,6 +88,8 @@ environments:
           <<: *_environment
           CACHE_PROXY_CREDENTIALS: |
             rtl:%{AQICAHiJN/POzfGj5pXOfQn8wNjNFnCWlHPE/i0I4vROnpw0DAHB0+39BqvcYO/jRglue/dFAAAAxjCBwwYJKoZIhvcNAQcGoIG1MIGyAgEAMIGsBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDLZV6JD1AgEwQKVDngIBEIB/0ddJMce97036v8i3AIgZpV/e9gtMHotxabFYfPAjtLdzq8cXAdVqin7EkMEJiWYfUhx49C1/k++NPobdcNi3nns9DQ5XSdugxk/JybPbi5yzlr69idpiyK723dZGXs70AeQHFxIPHED6fRGI+Bhv4L7uRtLvH3c4bGhFWJEYUg==}
+            elpais:%{AQICAHiJN/POzfGj5pXOfQn8wNjNFnCWlHPE/i0I4vROnpw0DAGAueWgf/ZMoJAPyiCiYPLBAAAAxjCBwwYJKoZIhvcNAQcGoIG1MIGyAgEAMIGsBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDJfBi25mhXVnVD44BAIBEIB/dhV52Qea36OzS3XunEQYTv640BwHHxr3td12O5ubqTD4uTeLlpfJSlsgWHkPPHTOhnot74JLxezzYUvbHK+eEFdo9TkWED3a/cBuwqSPZAGVcdsc+RJ/u/1HX6qZh5fG/FhexcTnUcBknnxve8TnbvfFIHPhTgUuVXSx5zUAHg==}
+            leparisien:%{AQICAHiJN/POzfGj5pXOfQn8wNjNFnCWlHPE/i0I4vROnpw0DAFyPl8NYlFSZYyQZZBy9YokAAAAxjCBwwYJKoZIhvcNAQcGoIG1MIGyAgEAMIGsBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDFZE4UOU1fxv9YlfbgIBEIB/dbp2WZm9nkOzayeYDLNec1uyu3ojGiBUBTEwCsnnIBb0n2MpmR+qTZbdjd4WB8rJ15FcpyMGmpfuqRx4xgfHUz1Vqjbl2AWwM6rSNCUIm1YS4z/oeHD9n92svqcPSpRCodMKyIeCsSR1rKukA2Izr0oYkdrsE6iaG+EQQmklKw==}
           CACHE_NODES: |
             fusion-eu-prod.xl3vuh.0001.euc1.cache.amazonaws.com:11211
             fusion-eu-prod.xl3vuh.0002.euc1.cache.amazonaws.com:11211
@@ -113,6 +115,8 @@ environments:
           <<: *_environment
           CACHE_PROXY_CREDENTIALS: |
             wapo:%{AQICAHgPj5nL72r6uSoUdbqYJLxe7vSJBrtP09dX/FxSUlcWlQGKqLZVsLPYbcT+8qcUTiz8AAAAxjCBwwYJKoZIhvcNAQcGoIG1MIGyAgEAMIGsBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDNW/dQZyg5GMuqXpyQIBEIB/UxH9gy1/IvXS6MnKGGK/23YNPnR8TlHwFDiXydvq2URxmg6k9yIrAXOGu+NJMDtnrBEjeLjIkvHFQokUVcBN/9ZElEWRADjAtJUE4qa4O8/2O9b6dZOI1IFmklb+b5n72/FoXsH2GWNW8btAXJEeYfFZ/O2tQrDByj2MLdHU0A==}
+            bostonglobe:%{AQICAHgPj5nL72r6uSoUdbqYJLxe7vSJBrtP09dX/FxSUlcWlQGnLmICV6o94JzBXBK1JWwEAAAAxjCBwwYJKoZIhvcNAQcGoIG1MIGyAgEAMIGsBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDOC1DAkCVJ0VnaKUzgIBEIB/e3cIMzmMIsmeXNg7eOMpS//UkYC9zp7Tu8o0m+E2DBMrQ79PTD88fmkrvC8/OTVgEbLGsPmSf0tIjDlBTDiscVcu+fbMZMTAeY3Fhhbcz5vON31ry/p18pHqy3RMb89gTbKT7ne/5tE6udbySQx8LZWRyNi/jQLzqVoMJooGDw==}
+            bonnier:%{AQICAHgPj5nL72r6uSoUdbqYJLxe7vSJBrtP09dX/FxSUlcWlQHBlr0xXC2vbd6ILJ+P+ti4AAAAxjCBwwYJKoZIhvcNAQcGoIG1MIGyAgEAMIGsBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDHbNF1LmcVc0fdoRNgIBEIB/m8LQs2Df0JEQW9k1gE38dmch8Q+QABAng0kttXBNTWs+pFJ5eCzYv6xYLVYcfvwGmtrvBpCS1j/Bv0reEDhwe0+3bB/Ra4/pRg+YpipmuXmg4+qDYugqFOz4kjkfIlpARsLJCIDexG+H1c1lvBHxWH4DC72WW5Sa8DNeeVr51A==}
           CACHE_NODES: |
             fusion-us-prod.fpmzzd.0001.use1.cache.amazonaws.com:11211
             fusion-us-prod.fpmzzd.0002.use1.cache.amazonaws.com:11211

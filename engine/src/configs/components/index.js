@@ -3,7 +3,7 @@
 const {
   componentDistRoot,
   isDev
-} = require('../../environment')
+} = require('../../../environment')
 
 const getCustomFields = require('./custom-fields')
 const getDisplayPropTypes = require('./display-prop-types')
@@ -87,7 +87,7 @@ function transformOutputTypeConfigs (manifest) {
 
 const getManifestFile = (type) => `${componentDistRoot}/${type}/fusion.manifest.json`
 
-function getConfigs (type) {
+function getComponentConfigs (type) {
   const manifest = require(getManifestFile(type))
 
   const transform = {
@@ -101,6 +101,6 @@ function getConfigs (type) {
 module.exports = (isDev)
   ? (type) => {
     delete require.cache[getManifestFile(type)]
-    return getConfigs(type)
+    return getComponentConfigs(type)
   }
-  : getConfigs
+  : getComponentConfigs

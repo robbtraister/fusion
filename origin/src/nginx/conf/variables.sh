@@ -10,6 +10,13 @@ API_PREFIX="${CONTEXT_PATH}/api/v3"
 
 IS_PROD=$(echo "${NODE_ENV}" | grep -i "^prod")
 
+if [ "${IS_PROD}" ]
+then
+  AWS_REGION=$(curl --max-time 2 http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/[a-z]*$//')
+else
+  AWS_REGION=${AWS_REGION:-us-east-1}
+fi
+
 
 DNS_SERVER=''
 for word in $(cat '/etc/resolv.conf')

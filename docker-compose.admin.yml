@@ -156,7 +156,7 @@ services:
       - fusion
     ports:
       - 80:8080
-      - 8090:8090
+      - 9000:9000
     volumes:
       # - '~/.aws:/home/nginx/.aws:ro'
       - './origin/src:/etc/nginx/src:ro'

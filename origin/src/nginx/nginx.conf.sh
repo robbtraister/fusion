@@ -97,11 +97,11 @@ $(dirname "$0")/conf/maps.conf.sh
 
 if [ "${IS_PROD}" ]
 then
-  PORT=9002 MODE=backup $(dirname "$0")/conf/environments/prod.conf.sh
-  PORT=9003 MODE=cache $(dirname "$0")/conf/environments/prod.conf.sh
-  PORT=9004 MODE=live $(dirname "$0")/conf/environments/prod.conf.sh
+  PORT=8081 MODE=backup $(dirname "$0")/conf/environments/prod.conf.sh
+  PORT=8082 MODE=cache $(dirname "$0")/conf/environments/prod.conf.sh
+  PORT=8083 MODE=live $(dirname "$0")/conf/environments/prod.conf.sh
 else
-  PORT=9001 $(dirname "$0")/conf/environments/local.conf.sh
+  PORT=8081 $(dirname "$0")/conf/environments/local.conf.sh
 fi
 
 cat <<EOB

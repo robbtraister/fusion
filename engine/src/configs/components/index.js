@@ -9,7 +9,7 @@ const getCustomFields = require('./custom-fields')
 const getDisplayPropTypes = require('./display-prop-types')
 const getSections = require('./sections')
 
-const customTypes = Object.keys(require('../react/shared/prop-types/custom-types'))
+const customTypes = Object.keys(require('../../react/shared/prop-types/custom-types'))
 
 const FIELD_TYPE_MAP = Object.assign(
   {

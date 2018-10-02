@@ -4,3 +4,5 @@ services:
     build: .
     environment:
       NODE_ENV: production
+      PORT: '8080'
+      AWS_ACCOUNT_ID: '057404813832'

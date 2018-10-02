@@ -2,7 +2,6 @@ name: fusion-origin
 type: ecs
 
 _environment: &_environment
-  PORT: '8080'
 
 _admin_environment: &_admin_environment
   <<: *_environment
@@ -135,9 +134,7 @@ environments:
         log_opt:
           awslogs-group: /nile/fusion-origin
           awslogs-region: eu-central-1
-        environment:
-          <<: *_environment
-          AWS_REGION: eu-central-1
+        environment: *_environment
     services:
       - <<: *_service
         loadBalancers:
@@ -161,9 +158,7 @@ environments:
         log_opt:
           awslogs-group: /nile/fusion-origin
           awslogs-region: eu-central-1
-        environment:
-          <<: *_admin_environment
-          AWS_REGION: eu-central-1
+        environment: *_admin_environment
 
 #
 # us-east-1
@@ -180,12 +175,7 @@ environments:
         log_opt:
           awslogs-group: /nile/fusion-origin
           awslogs-region: us-east-1
-        environment:
-          <<: *_environment
-          AWS_REGION: us-east-1
-          LAMBDA_ENGINE: 'arn:aws:lambda:us-east-1:057404813832:function:fusion-engine-${environment}'
-          LAMBDA_RESOLVER: 'arn:aws:lambda:us-east-1:057404813832:function:fusion-resolver-${environment}'
-          S3_BUCKET: 'arc-fusion-discrete-us-east-1'
+        environment: *_environment
     services:
       - <<: *_service
         loadBalancers:
@@ -209,9 +199,4 @@ environments:
         log_opt:
           awslogs-group: /nile/fusion-origin
           awslogs-region: us-east-1
-        environment:
-          <<: *_admin_environment
-          AWS_REGION: us-east-1
-          LAMBDA_ENGINE: 'arn:aws:lambda:us-east-1:057404813832:function:fusion-engine-${environment}'
-          LAMBDA_RESOLVER: 'arn:aws:lambda:us-east-1:057404813832:function:fusion-resolver-${environment}'
-          S3_BUCKET: 'arc-fusion-discrete-us-east-1'
+        environment: *_admin_environment

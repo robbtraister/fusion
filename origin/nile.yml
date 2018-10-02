@@ -114,6 +114,71 @@ environments:
             - subnet-42943209
 
 #
+# arc
+#
+  - name: arc
+    services:  *_services
+    task: *_arc_task
+    labels:
+      - all
+      - arc
+    namespace: pagebuilder-arc2
+    override:
+      origin:
+        <<: *_fusion_origin
+        log_opt:
+          awslogs-group: /nile/fusion-origin/arc
+          awslogs-region: us-east-1
+        environment:
+          AWS_ACCOUNT_ID: '397853141546'
+          S3_BUCKET: pagebuilder-fusion
+        # volumes:
+        # - '/var/fusion-origin/staging/uploads:/uploads'
+    resources:
+      - <<: *_resource
+        settings:
+          <<: *_healthcheck
+          scheme: internet-facing
+          domain: arc.fusion.arcpublishing.com
+          parent_domain: fusion.arcpublishing.com
+          subnets:
+            - subnet-1a8f9640
+            - subnet-9d4bafb2
+            - subnet-42943209
+
+  - name: arc-admin
+    services: *_services
+    task: *_arc_task
+    labels:
+      - all
+      - arc
+    namespace: pagebuilder-arc2
+    override:
+      origin:
+        <<: *_fusion_origin
+        log_opt:
+          awslogs-group: /nile/fusion-origin/arc
+          awslogs-region: us-east-1
+        environment:
+          <<: *_admin_environment
+          PB_ADMIN: 'http://$environment.pb.arc.pub'
+          AWS_ACCOUNT_ID: '397853141546'
+          S3_BUCKET: pagebuilder-fusion
+        # volumes:
+        # - '/var/fusion-origin/staging/uploads:/uploads'
+    resources:
+      - <<: *_resource
+        settings:
+          <<: *_healthcheck
+          scheme: internal
+          domain: arc.fusion.arc.pub
+          parent_domain: fusion.arc.pub
+          subnets:
+            - subnet-1a8f9640
+            - subnet-9d4bafb2
+            - subnet-42943209
+
+#
 # eu-central-1
 #
   - name: eu-central-1

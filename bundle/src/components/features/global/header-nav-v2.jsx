@@ -3,6 +3,8 @@
 const React = require('react')
 const PropTypes = require('prop-types')
 
+const Content = require('fusion:content')
+
 const Search = require('../utilities/search.jsx')
 
 const BurgerImage = (props) => {
@@ -87,38 +89,29 @@ const TopMenu = (props) => {
       : null
 }
 
-class HeaderNavV2 extends React.Component {
-  constructor (props) {
-    super(props)
-
-    this.fetchContent({
-      items: {
-        source: 'site-menu',
-        key: { id: '/' },
-        query: '{children{name,site{site_url},children{name,site{site_url}}}}'
-      }
-    })
-  }
-
-  render () {
-    const items = this.state && this.state.items && this.state.items.children
-    return <React.Fragment>
-      <div className={`amp-feature-wrapper ${this.props.customFields.makeNavigationBarSticky ? 'min-height-45' : 'non-sticky-nav'}`}>
-        <DropdownDrawer {...this.props} items={items} />
-        <div className='center-nav'>
-          <TopMenu {...this.props} items={items} />
-        </div>
-        <div className='search-box'>
-          <Search />
-        </div>
+const HeaderNavV2Impl = (props) =>
+  <React.Fragment>
+    <div className={`amp-feature-wrapper ${props.customFields.makeNavigationBarSticky ? 'min-height-45' : 'non-sticky-nav'}`}>
+      <DropdownDrawer {...props} />
+      <div className='center-nav'>
+        <TopMenu {...props} />
       </div>
+      <div className='search-box'>
+        <Search />
+      </div>
+    </div>
 
-      <div id='pushContent' data-run-function={this.props.customFields.pushContent} />
+    <div id='pushContent' data-run-function={props.customFields.pushContent} />
 
-      {this.props.customFields.makeNavigationBarSticky && <div className='min-height-45' />}
-    </React.Fragment>
-  }
-}
+    {props.customFields.makeNavigationBarSticky && <div className='min-height-45' />}
+  </React.Fragment>
+
+const HeaderNavV2 = (props) =>
+  <Content source='site-menu' contentConfigValues={{ id: '/' }} filter='{children{name,site{site_url},children{name,site{site_url}}}}'>
+    {
+      (content) => HeaderNavV2Impl({ items: (content && content.children) || [], ...props })
+    }
+  </Content>
 
 HeaderNavV2.propTypes = {
   customFields: PropTypes.shape({

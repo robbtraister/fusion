@@ -84,15 +84,17 @@ module.exports = (Template, inlines, contentCache) => {
             // contextPath: props.contextPath,
             eventListeners: {},
             getContent: getContentGenerator(providerContentCache, props.arcSite, props.outputType),
-            // globalContent: props.globalContent,
-            // globalContentConfig: props.globalContentConfig,
-            layout: Template.layout,
-            // outputType: props.outputType,
-            // requestUri: props.requestUri,
-            // siteProperties: props.siteProperties,
-            template: Template.id
-          },
-          props
+            props: {
+              // globalContent: props.globalContent,
+              // globalContentConfig: props.globalContentConfig,
+              layout: Template.layout,
+              // outputType: props.outputType,
+              // requestUri: props.requestUri,
+              // siteProperties: props.siteProperties,
+              template: Template.id,
+              ...props
+            }
+          }
         )
       },
       React.createElement(Template)

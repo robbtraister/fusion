@@ -11,13 +11,8 @@ const _get = require('lodash.get')
 const _merge = require('lodash.merge')
 
 const getContextProps = (props, context) => {
-  const contextProps = Object.assign({}, props, context)
-  delete contextProps.eventListeners
-  delete contextProps.getContent
-  delete contextProps.children
-
   return {
-    props: contextProps,
+    props: { ...context.props, ...props },
     children: props.children
   }
 }

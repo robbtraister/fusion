@@ -3,7 +3,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const BreakingAlertV2 = (props) => {
+import Context from 'fusion:context'
+
+const BreakingAlertV2Impl = (props) => {
   const parentPage = (props.customFields.autoLink || '').split(',')[1]
   const parentFeatureName = (props.customFields.autoLink || '').split(',')[0]
 
@@ -38,6 +40,11 @@ const BreakingAlertV2 = (props) => {
     </div>
   </div>
 }
+
+const BreakingAlertV2 = (props) =>
+  <Context>
+    {({ contextPath, isAdmin }) => BreakingAlertV2Impl({ contextPath, isAdmin, customFields: props.customFields })}
+  </Context>
 
 BreakingAlertV2.propTypes = {
   customFields: PropTypes.shape({

@@ -2,23 +2,15 @@
 
 /* global Fusion */
 
-window.Fusion = window.Fusion || {}
-
-Fusion.components = Fusion.components || {}
-Fusion.components.Consumer = require('../shared/components/consumer')
-Fusion.components.Layout = require('../shared/components/layout')
-Fusion.components.Static = require('../shared/components/static')
-Fusion.unpack = require('../../utils/unpack')
-Fusion.properties = require('fusion:properties')
+require('./shared')
 Fusion.isAdmin = true
 
 const Provider = require('./provider')
 
 const version = require('./version')
 
-const React = window.react = require('react')
-const ReactDOM = window.ReactDOM = require('react-dom')
-window.PropTypes = require('../shared/prop-types')
+const React = window.react
+const ReactDOM = window.ReactDOM
 
 // support fragments in preact
 React.Fragment = React.Fragment || 'div'

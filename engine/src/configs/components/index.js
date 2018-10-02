@@ -9,14 +9,19 @@ const getCustomFields = require('./custom-fields')
 const getDisplayPropTypes = require('./display-prop-types')
 const getSections = require('./sections')
 
-const FIELD_TYPE_MAP = {
-  // react-prop-type: pb-classic-field-type
-  'bool': 'boolean',
-  'oneOf': 'select',
-  'string': 'text',
-  'number': 'number',
-  'contentConfig': 'contentConfig'
-}
+const customTypes = Object.keys(require('../react/shared/prop-types/custom-types'))
+
+const FIELD_TYPE_MAP = Object.assign(
+  {
+    // react-prop-type: pb-classic-field-type
+    'bool': 'boolean',
+    'oneOf': 'select',
+    'string': 'text',
+    'number': 'number'
+  },
+  ...customTypes
+    .map((type) => ({ [type]: type }))
+)
 
 function transformPropTypes (propTypes) {
   return (propTypes)

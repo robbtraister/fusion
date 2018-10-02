@@ -154,3 +154,41 @@ environments:
         environment:
           <<: *_admin_environment
           AWS_REGION: eu-central-1
+  - name: us-east-1
+    task: *_pb_task
+    labels:
+      - all
+    namespace: fusion-ecs-us-east-1
+    override:
+      origin:
+        <<: *_fusion_origin
+        log_opt:
+          awslogs-group: /nile/fusion-origin
+          awslogs-region: us-east-1
+        environment:
+          <<: *_environment
+          AWS_REGION: us-east-1
+    services:
+      - <<: *_service
+        loadBalancers:
+          - <<: *_loadBalancer
+            targetGroupArn: arn:aws:elasticloadbalancing:us-east-1:057404813832:targetgroup/fusion-origin-us-east-1/d69f7df3d462cf7e
+  - name: us-east-1-admin
+    task: *_pb_task
+    labels:
+      - all
+    namespace: fusion-ecs-us-east-1
+    services:
+    - <<: *_service
+      loadBalancers:
+        - <<: *_loadBalancer
+          targetGroupArn: arn:aws:elasticloadbalancing:us-east-1:057404813832:targetgroup/fusion-admin-origin-us-east-1/8c5b695865949311
+    override:
+      origin:
+        <<: *_fusion_origin
+        log_opt:
+          awslogs-group: /nile/fusion-origin
+          awslogs-region: us-east-1
+        environment:
+          <<: *_admin_environment
+          AWS_REGION: us-east-1

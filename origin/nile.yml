@@ -72,7 +72,7 @@ environments:
           awslogs-region: us-east-1
         environment:
           <<: *_environment
-          AWS_ACCOUNT_ID: 397853141546
+          AWS_ACCOUNT_ID: '397853141546'
           S3_BUCKET: pagebuilder-fusion
         # volumes:
         # - '/var/fusion-origin/staging/uploads:/uploads'
@@ -104,7 +104,7 @@ environments:
         environment:
           <<: *_admin_environment
           PB_ADMIN: 'http://$environment.pb.arc.pub'
-          AWS_ACCOUNT_ID: 397853141546
+          AWS_ACCOUNT_ID: '397853141546'
           S3_BUCKET: pagebuilder-fusion
         # volumes:
         # - '/var/fusion-origin/staging/uploads:/uploads'

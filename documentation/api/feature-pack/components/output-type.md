@@ -161,14 +161,18 @@ The deployment version (of the lambda function) that is generating this response
 
 -----
 
-## Instance Methods
-
-### `displayProps()`
+### `displayPropTypes`
 
 ##### Description
-
-##### Parameters
-
-##### Return
+ Implements  React's [PropTypes](https://github.com/facebook/prop-types) which will be available on each feature. These are defined the same way as propTypes on features and chains however, unlike custom field, the values are can differ across output types. DisplayProps are useful for high level page functionality such as hide/show logic, layout grids, or an y other settings that you want each feature to have. 
 
 ##### Example
+On the Output Type
+```jsx
+OutputType.displayPropTypes = {
+    isStatic: PropTypes.bool,
+    width: PropTypes.number,
+    anchor: PropTypes.string
+  }
+```
+In the feature the values set the admin will then be accessible as `props.displayProperties`

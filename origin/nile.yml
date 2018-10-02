@@ -54,6 +54,9 @@ _pb_task: &_pb_task
   taskRoleArn: arn:aws:iam::057404813832:role/fusion-origin
 
 environments:
+#
+# staging
+#
   - name: staging
     services:  *_services
     task: *_arc_task
@@ -116,10 +119,15 @@ environments:
             - subnet-1a8f9640
             - subnet-9d4bafb2
             - subnet-42943209
+
+#
+# eu-central-1
+#
   - name: eu-central-1
     task: *_pb_task
     labels:
       - all
+      - eu-central-1
     namespace: fusion-ecs-eu-central-1
     override:
       origin:
@@ -135,10 +143,12 @@ environments:
         loadBalancers:
           - <<: *_loadBalancer
             targetGroupArn: arn:aws:elasticloadbalancing:eu-central-1:057404813832:targetgroup/fusion-origin-eu-central-1/9a927c3c38fdbe35
+
   - name: eu-central-1-admin
     task: *_pb_task
     labels:
       - all
+      - eu-central-1
     namespace: fusion-ecs-eu-central-1
     services:
     - <<: *_service
@@ -154,10 +164,15 @@ environments:
         environment:
           <<: *_admin_environment
           AWS_REGION: eu-central-1
+
+#
+# us-east-1
+#
   - name: us-east-1
     task: *_pb_task
     labels:
       - all
+      - us-east-1
     namespace: fusion-ecs-us-east-1
     override:
       origin:
@@ -176,10 +191,12 @@ environments:
         loadBalancers:
           - <<: *_loadBalancer
             targetGroupArn: arn:aws:elasticloadbalancing:us-east-1:057404813832:targetgroup/fusion-origin-us-east-1/d69f7df3d462cf7e
+
   - name: us-east-1-admin
     task: *_pb_task
     labels:
       - all
+      - us-east-1
     namespace: fusion-ecs-us-east-1
     services:
     - <<: *_service

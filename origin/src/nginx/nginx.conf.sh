@@ -116,11 +116,11 @@ then
   cat <<EOB
 
     if (\$http_x_forwarded_port = 80) {
-      return 301 '\${http_x_forwarded_proto}s://\${host}\${request_uri}\${query_params}';
+      return                    301 '\${http_x_forwarded_proto}s://\${host}\${request_uri}\${query_params}';
     }
 
     if (\$request_method ~ ^(POST|PUT)$) {
-      return 405;
+      return                    405;
     }
 EOB
 
@@ -129,7 +129,7 @@ EOB
     cat <<EOB
 
     location ^~ $endpoint {
-      return 403;
+      return                    403;
     }
 EOB
   done
@@ -138,7 +138,8 @@ fi
 cat <<EOB
 
     location / {
-      proxy_pass http://\$mode;
+      proxy_set_header          Host \$host;
+      proxy_pass                http://\$mode;
     }
   }
 }

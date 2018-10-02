@@ -168,6 +168,9 @@ environments:
         environment:
           <<: *_environment
           AWS_REGION: us-east-1
+          LAMBDA_ENGINE: 'arn:aws:lambda:us-east-1:057404813832:function:fusion-engine-${environment}'
+          LAMBDA_RESOLVER: 'arn:aws:lambda:us-east-1:057404813832:function:fusion-resolver-${environment}'
+          S3_BUCKET: 'arc-fusion-discrete-us-east-1'
     services:
       - <<: *_service
         loadBalancers:
@@ -192,3 +195,6 @@ environments:
         environment:
           <<: *_admin_environment
           AWS_REGION: us-east-1
+          LAMBDA_ENGINE: 'arn:aws:lambda:us-east-1:057404813832:function:fusion-engine-${environment}'
+          LAMBDA_RESOLVER: 'arn:aws:lambda:us-east-1:057404813832:function:fusion-resolver-${environment}'
+          S3_BUCKET: 'arc-fusion-discrete-us-east-1'

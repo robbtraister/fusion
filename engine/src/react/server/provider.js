@@ -30,7 +30,7 @@ const getContentGenerator = function getContentGenerator (contentCache, arcSite,
           .then(source => {
             keyCache.source = source
             return (source)
-              ? source.fetch(Object.assign({}, key, {'arc-site': arcSite}))
+              ? source.fetch(Object.assign({}, key, { 'arc-site': arcSite }))
               : null
           })
           .then(data => { keyCache.cached = data })
@@ -84,15 +84,17 @@ module.exports = (Template, inlines, contentCache) => {
             // contextPath: props.contextPath,
             eventListeners: {},
             getContent: getContentGenerator(providerContentCache, props.arcSite, props.outputType),
-            // globalContent: props.globalContent,
-            // globalContentConfig: props.globalContentConfig,
-            layout: Template.layout,
-            // outputType: props.outputType,
-            // requestUri: props.requestUri,
-            // siteProperties: props.siteProperties,
-            template: Template.id
-          },
-          props
+            props: {
+              // globalContent: props.globalContent,
+              // globalContentConfig: props.globalContentConfig,
+              layout: Template.layout,
+              // outputType: props.outputType,
+              // requestUri: props.requestUri,
+              // siteProperties: props.siteProperties,
+              template: Template.id,
+              ...props
+            }
+          }
         )
       },
       React.createElement(Template)

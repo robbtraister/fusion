@@ -1,37 +1,40 @@
 'use strict'
 
-const path = require('path')
-
 const express = require('express')
-
-const { glob } = require('../utils/promises')
 
 const getSource = require('../models/sources')
 
 const {
   componentDistRoot,
-  isDev,
-  schemasDistRoot,
-  sourcesDistRoot
+  contentDistRoot,
+  isDev
 } = require('../../environment')
 
-const loadConfigs = require('../configs')
+const loadComponentConfigs = require('../configs/components')
 
-const getConfigs = (type) => {
+const getContentManifest = (collection) => {
   try {
-    return require(`${componentDistRoot}/${type}/fusion.configs.json`)
+    return require(`${contentDistRoot}/${collection}/fusion.manifest.json`)
   } catch (e) {
-    return loadConfigs(type)
+    return {}
   }
 }
 
-const getConfigHandler = (type) => {
+const getConfigs = (collection) => {
+  try {
+    return require(`${componentDistRoot}/${collection}/fusion.configs.json`)
+  } catch (e) {
+    return loadComponentConfigs(collection)
+  }
+}
+
+const getConfigHandler = (collection) => {
   return (isDev)
     ? (req, res, next) => {
-      res.send(getConfigs(type))
+      res.send(getConfigs(collection))
     }
     : (() => {
-      const configs = getConfigs(type)
+      const configs = getConfigs(collection)
       return (req, res, next) => {
         res.send(configs)
       }
@@ -61,7 +64,7 @@ function getPatternParams (p) {
 function transformContentConfigs (manifest) {
   const idFields = (manifest.pattern)
     ? getPatternParams(manifest.pattern)
-      .map((key) => ({key, type: 'text'}))
+      .map((key) => ({ key, type: 'text' }))
     : null
 
   return {
@@ -73,25 +76,28 @@ function transformContentConfigs (manifest) {
 }
 
 configRouter.get('/content/sources', (req, res, next) => {
-  glob('**/*', {cwd: sourcesDistRoot})
-    .then(sources => Promise.all(
-      sources.map(s =>
-        getSource(path.parse(s).name)
+  const sourceManifest = getContentManifest('sources')
+  Promise.all(
+    Object.keys(sourceManifest)
+      .map((sourceName) =>
+        getSource(sourceName)
           .catch(() => null)
       )
-    ))
-    .then(sources => sources.filter(s => s))
-    .then(sources => sources.map(transformContentConfigs))
-    .then(sources => res.send(sources))
+  )
+    .then((sources) => sources.filter(s => s))
+    .then((sources) => sources.map(transformContentConfigs))
+    .then((sources) => res.send(sources))
 })
 
 configRouter.get('/content/schemas', (req, res, next) => {
-  glob('**/*', {cwd: schemasDistRoot})
-    .then(schemas => Object.assign(...schemas.map(s => {
-      const id = path.parse(s).name
-      return {[id]: id}
-    })))
-    .then(schemas => res.send({schemas}))
+  const schemaManifest = getContentManifest('schemas')
+  Promise.resolve(
+    Object.assign(
+      ...Object.keys(schemaManifest)
+        .map((schemaName) => ({ [schemaName]: schemaName }))
+    )
+  )
+    .then((schemas) => res.send(schemas))
 })
 
 module.exports = configRouter

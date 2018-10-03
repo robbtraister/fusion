@@ -76,7 +76,7 @@ const compileSource = function compileSource (script, styles) {
 
         const elapsedTime = tic.toc()
         debugTimer('webpack setup', elapsedTime)
-        sendMetrics([{type: METRIC_TYPES.WEBPACK_DURATION, value: elapsedTime, tags: ['webpack-op:setup']}])
+        sendMetrics([{ type: METRIC_TYPES.WEBPACK_DURATION, value: elapsedTime, tags: ['webpack-op:setup'] }])
 
         return compiler
       }),
@@ -98,7 +98,7 @@ const compileSource = function compileSource (script, styles) {
     .then((data) => {
       const elapsedTime = tic.toc()
       debugTimer('webpack compilation', elapsedTime)
-      sendMetrics([{type: METRIC_TYPES.WEBPACK_DURATION, value: elapsedTime, tags: ['webpack-op:compile']}])
+      sendMetrics([{ type: METRIC_TYPES.WEBPACK_DURATION, value: elapsedTime, tags: ['webpack-op:compile'] }])
 
       if (data.hasErrors()) {
         return Promise.reject(data.toJson().errors)
@@ -112,7 +112,7 @@ const compileSource = function compileSource (script, styles) {
           const cssFile = manifest['styles.css']
           return cssFile
             ? mfs.readFilePromise(`${componentDistRoot}/${cssFile}`)
-              .then((css) => ({css, cssFile}))
+              .then((css) => ({ css, cssFile }))
             : {
               css: null,
               cssFile: null
@@ -120,24 +120,24 @@ const compileSource = function compileSource (script, styles) {
         })
         .catch(() => ({}))
     ]))
-    .then(([js, {css, cssFile}]) => ({js, css, cssFile}))
+    .then(([js, { css, cssFile }]) => ({ js, css, cssFile }))
 }
 
-const compileRendering = function compileRendering ({rendering, outputType = defaultOutputType}) {
+const compileRendering = function compileRendering ({ rendering, outputType = defaultOutputType }) {
   let tic = timer.tic()
   return generateSource(rendering, outputType)
-    .then(({script, styles}) => {
+    .then(({ script, styles }) => {
       const generateSourceDuration = tic.toc()
       debugTimer('generate source', generateSourceDuration)
-      sendMetrics([{type: METRIC_TYPES.COMPILE_DURATION, value: generateSourceDuration, tags: ['compile:generate-source']}])
+      sendMetrics([{ type: METRIC_TYPES.COMPILE_DURATION, value: generateSourceDuration, tags: ['compile:generate-source'] }])
 
       return compileSource(script, styles)
     })
-    .then(({js, css, cssFile}) => {
+    .then(({ js, css, cssFile }) => {
       const cssPath = cssFile ? `styles/${cssFile}` : null
       js = js.replace(/;*$/, `;Fusion.Template.cssFile=${cssPath ? `'${cssPath}'` : 'null'}`)
 
-      return {js, css, cssFile: cssPath}
+      return { js, css, cssFile: cssPath }
     })
 }
 

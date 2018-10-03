@@ -2,12 +2,12 @@
 
 const path = require('path')
 
-const Layout = require('../react/shared/components/layout')
-const unpack = require('../utils/unpack')
+const Layout = require('../../react/shared/components/layout')
+const unpack = require('../../utils/unpack')
 
 const {
   bundleRoot
-} = require('../../environment')
+} = require('../../../environment')
 
 function getSections (componentConfig) {
   const sectionIdsString = Object.values(componentConfig.outputTypes)

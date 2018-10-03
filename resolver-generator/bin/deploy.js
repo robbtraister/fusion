@@ -19,8 +19,8 @@ const {
 } = require('./configs')
 
 const AWS = require('aws-sdk')
-const s3 = new AWS.S3({region})
-const lambda = new AWS.Lambda({region})
+const s3 = new AWS.S3({ region })
+const lambda = new AWS.Lambda({ region })
 
 const awsUpload = promisify(s3.upload.bind(s3))
 const createFunction = promisify(lambda.createFunction.bind(lambda))
@@ -56,7 +56,8 @@ async function createGeneratorFunction () {
         Variables: {
           DEBUG: 'fusion:*',
           DATADOG_API_KEY: datadogApiKey,
-          FUSION_RELEASE: fusionRelease
+          FUSION_RELEASE: fusionRelease,
+          AWS_ACCOUNT_ID: awsAccountId
         }
       },
       Handler: 'resolver-generator/src/index.handler',
@@ -101,7 +102,8 @@ async function updateGeneratorConfig () {
           Variables: {
             DEBUG: 'fusion:*',
             DATADOG_API_KEY: datadogApiKey,
-            FUSION_RELEASE: fusionRelease
+            FUSION_RELEASE: fusionRelease,
+            AWS_ACCOUNT_ID: awsAccountId
           }
         }
       }

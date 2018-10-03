@@ -5,6 +5,7 @@ RUN \
     apk upgrade && \
     # used for mongodb-tools
     apk add --update --no-cache \
+            curl \
             openssl \
             pcre \
             zlib \

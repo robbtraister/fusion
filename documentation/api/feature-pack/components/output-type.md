@@ -392,49 +392,19 @@ export default (props) => {
 
 -----
 
-## Instance Methods
-
-### `displayPropTypes` (*Object*)
+### `displayPropTypes`
 
 ##### Description
+ Implements  React's [PropTypes](https://github.com/facebook/prop-types) which will be available on each feature. These are defined the same way as `propTypes` on Features and Chains however, unlike custom fields, the values can differ across Output Types. `displayProps` are useful for high level page functionality such as hide/show logic, layout grids, or any other settings that you want each feature to have.
 
-Display Props are implemented using React's [PropTypes](https://github.com/facebook/prop-types) library. Fusion will read from your component's `displayPropTypes` to determine what options should be available in PageBuilder on each Layout, Chain and/or Feature. Fusion expects the keys of the `displayPropTypes` object to be the names of options to select in PageBuilder, and the values to be `PropTypes` stating the data type allowed for that property.
+ In the feature the values set the admin will then be accessible as `props.displayProperties`
 
 ##### Example
-
+On the Output Type
 ```jsx
-/*    /src/components/output-types/default.jsx    */
-
-import React from 'react'
-
-const DefaultOutputType = (props) => {
-  return (
-    <html>
-      <head>
-        <title>{props.metaValue('title') || 'Default Title'}</title>
-        <props.MetaTags />
-        <props.Libs />
-        <props.CssLinks />
-        <link rel='icon' type='image/x-icon' href={`${props.contextPath}/resources/img/favicon.ico`} />
-      </head>
-      <body>
-        <h1>Welcome to Fusion!</h1>
-        <div id='fusion-app'>
-          {props.children}
-        </div>
-        <props.Fusion />
-      </body>
-    </html>
-  )
-}
-
-DefaultOutputType.displayPropTypes = {
-  columns: PropTypes.oneOf([
-    'col-desktop', 'col-tablet', 'col-mobile'
-  ]),
-  fullWidth: PropTypes.bool.isRequired,
-  max: PropTypes.number
-}
+OutputType.displayPropTypes = {
+    isStatic: PropTypes.bool,
+    width: PropTypes.number,
+    anchor: PropTypes.string
+  }
 ```
-
------

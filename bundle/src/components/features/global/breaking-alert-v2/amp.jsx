@@ -3,7 +3,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const BreakingAlertV2 = (props) => {
+import Context from 'fusion:context'
+
+const BreakingAlertV2Impl = (props) => {
   const parentPage = (props.customFields.autoLink || '').split(',')[1]
   const parentFeatureName = (props.customFields.autoLink || '').split(',')[0]
 
@@ -21,7 +23,7 @@ const BreakingAlertV2 = (props) => {
     data-href={`${props.contextPath}/api/v2/render/feature?name=${parentFeatureName}&uri=${parentPage}`}
     data-has-news={!!props.customFields.barText}
     data-reload={validFeature && !props.isAdmin}
-    style={{backgroundColor: props.customFields.backgroundColor, color: props.customFields.textColor}}
+    style={{ backgroundColor: props.customFields.backgroundColor, color: props.customFields.textColor }}
   >
     <div className='render-wrapper rendered-alert'>
       <div className='bar-text'>
@@ -38,6 +40,11 @@ const BreakingAlertV2 = (props) => {
     </div>
   </div>
 }
+
+const BreakingAlertV2 = (props) =>
+  <Context>
+    {({ contextPath, isAdmin }) => BreakingAlertV2Impl({ contextPath, isAdmin, customFields: props.customFields })}
+  </Context>
 
 BreakingAlertV2.propTypes = {
   customFields: PropTypes.shape({

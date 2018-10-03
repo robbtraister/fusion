@@ -2,10 +2,12 @@
 
 const React = require('react')
 
+const Content = require('fusion:content')
+
 require('./style.scss')
 require('./style2.scss')
 
-const query = `
+const filter = `
   {
     description {
       basic
@@ -25,40 +27,21 @@ const query = `
   }
 `
 
-const StoryItem = (props) => {
-  const promoItems = props.story.promo_items && props.story.promo_items.basic
+const StoryItem = (story) => {
+  const promoItems = story.promo_items && story.promo_items.basic
   return <React.Fragment>
     {
       (promoItems && promoItems.url && promoItems.type === 'image') &&
         <img src={promoItems.url} />
     }
-    <div>{props.story.headlines && props.story.headlines.basic}</div>
-    <div className={`blurb ${props.story.blurbStyle || ''}`} data-pb-field='description.basic' data-pb-field-type='text' data-pb-placeholder='Write blurb here.'>{(props.story.subheadlines && props.story.subheadlines.basic) || (props.story.description && props.story.description.basic)}</div>
+    <div>{story.headlines && story.headlines.basic}</div>
+    <div className={`blurb ${story.blurbStyle || ''}`} data-pb-field='description.basic' data-pb-field-type='text' data-pb-placeholder='Write blurb here.'>{(story.subheadlines && story.subheadlines.basic) || (story.description && story.description.basic)}</div>
   </React.Fragment>
 }
 
-class Story extends React.Component {
-  constructor (props) {
-    super(props)
-
-    if (props.contentConfig && props.contentConfig.contentService && props.contentConfig.contentConfigValues) {
-      this.fetchContent({
-        story: {
-          source: props.contentConfig.contentService,
-          key: props.contentConfig.contentConfigValues,
-          query
-        }
-      })
-    } else {
-      this.state = {story: null}
-    }
-  }
-
-  render () {
-    return (this.state && this.state.story)
-      ? <StoryItem story={this.state.story} {...this.props} />
-      : null
-  }
-}
+const Story = ({ contentConfig }) =>
+  <Content filter={filter} {...contentConfig}>
+    {(content) => StoryItem(content || {})}
+  </Content>
 
 module.exports = Story

@@ -15,15 +15,15 @@ const listVersionsByFunction = promisify(lambda.listVersionsByFunction.bind(lamb
 
 async function cleanup (contextName) {
   const FunctionName = resolverName(contextName)
-  return listVersionsByFunction({FunctionName})
-    .then(({Versions}) => Promise.all(
+  return listVersionsByFunction({ FunctionName })
+    .then(({ Versions }) => Promise.all(
       Versions
         // ignore '$LATEST'
         .filter(v => +v.Version)
         // keep the 3 most recent versions (desc sort, then ignore the first 3)
         .sort((v1, v2) => +v2.Version - +v1.Version)
         .slice(3)
-        .map(({Version}) => deleteFunction({FunctionName, Qualifier: Version}))
+        .map(({ Version }) => deleteFunction({ FunctionName, Qualifier: Version }))
     ))
 }
 

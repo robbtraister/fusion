@@ -1,11 +1,7 @@
 name: fusion-origin
 type: ecs
 
-_environment: &_environment
-  PORT: '8080'
-
 _admin_environment: &_admin_environment
-  <<: *_environment
   IS_ADMIN: 'true'
   PB_ADMIN: 'http://$environment.pb.aws.arc.pub'
 
@@ -14,8 +10,6 @@ _fusion_origin: &_fusion_origin
   ports:
     - '8080'
   log_driver: awslogs
-  environment:
-    <<: *_environment
 
 _healthcheck: &_healthcheck
   healthcheck:
@@ -54,6 +48,9 @@ _pb_task: &_pb_task
   taskRoleArn: arn:aws:iam::057404813832:role/fusion-origin
 
 environments:
+#
+# staging
+#
   - name: staging
     services:  *_services
     task: *_arc_task
@@ -68,7 +65,8 @@ environments:
           awslogs-group: /nile/fusion-origin/staging
           awslogs-region: us-east-1
         environment:
-          <<: *_environment
+          AWS_ACCOUNT_ID: '397853141546'
+          S3_BUCKET: pagebuilder-fusion
         # volumes:
         # - '/var/fusion-origin/staging/uploads:/uploads'
     resources:
@@ -99,6 +97,8 @@ environments:
         environment:
           <<: *_admin_environment
           PB_ADMIN: 'http://$environment.pb.arc.pub'
+          AWS_ACCOUNT_ID: '397853141546'
+          S3_BUCKET: pagebuilder-fusion
         # volumes:
         # - '/var/fusion-origin/staging/uploads:/uploads'
     resources:
@@ -112,10 +112,80 @@ environments:
             - subnet-1a8f9640
             - subnet-9d4bafb2
             - subnet-42943209
+
+#
+# arc
+#
+  - name: arc
+    services:  *_services
+    task: *_arc_task
+    labels:
+      - all
+      - arc
+    namespace: pagebuilder-arc2
+    override:
+      origin:
+        <<: *_fusion_origin
+        log_opt:
+          awslogs-group: /nile/fusion-origin/arc
+          awslogs-region: us-east-1
+        environment:
+          AWS_ACCOUNT_ID: '397853141546'
+          S3_BUCKET: pagebuilder-fusion
+        # volumes:
+        # - '/var/fusion-origin/staging/uploads:/uploads'
+    resources:
+      - <<: *_resource
+        settings:
+          <<: *_healthcheck
+          scheme: internet-facing
+          domain: arc.fusion.arcpublishing.com
+          parent_domain: fusion.arcpublishing.com
+          subnets:
+            - subnet-1a8f9640
+            - subnet-9d4bafb2
+            - subnet-42943209
+
+  - name: arc-admin
+    services: *_services
+    task: *_arc_task
+    labels:
+      - all
+      - arc
+    namespace: pagebuilder-arc2
+    override:
+      origin:
+        <<: *_fusion_origin
+        log_opt:
+          awslogs-group: /nile/fusion-origin/arc
+          awslogs-region: us-east-1
+        environment:
+          <<: *_admin_environment
+          PB_ADMIN: 'http://$environment.pb.arc.pub'
+          AWS_ACCOUNT_ID: '397853141546'
+          S3_BUCKET: pagebuilder-fusion
+        # volumes:
+        # - '/var/fusion-origin/staging/uploads:/uploads'
+    resources:
+      - <<: *_resource
+        settings:
+          <<: *_healthcheck
+          scheme: internal
+          domain: arc.fusion.arc.pub
+          parent_domain: fusion.arc.pub
+          subnets:
+            - subnet-1a8f9640
+            - subnet-9d4bafb2
+            - subnet-42943209
+
+#
+# eu-central-1
+#
   - name: eu-central-1
     task: *_pb_task
     labels:
       - all
+      - eu-central-1
     namespace: fusion-ecs-eu-central-1
     override:
       origin:
@@ -123,17 +193,17 @@ environments:
         log_opt:
           awslogs-group: /nile/fusion-origin
           awslogs-region: eu-central-1
-        environment:
-          <<: *_environment
     services:
       - <<: *_service
         loadBalancers:
           - <<: *_loadBalancer
             targetGroupArn: arn:aws:elasticloadbalancing:eu-central-1:057404813832:targetgroup/fusion-origin-eu-central-1/9a927c3c38fdbe35
+
   - name: eu-central-1-admin
     task: *_pb_task
     labels:
       - all
+      - eu-central-1
     namespace: fusion-ecs-eu-central-1
     services:
     - <<: *_service
@@ -146,5 +216,46 @@ environments:
         log_opt:
           awslogs-group: /nile/fusion-origin
           awslogs-region: eu-central-1
+        environment:
+          <<: *_admin_environment
+
+#
+# us-east-1
+#
+  - name: us-east-1
+    task: *_pb_task
+    labels:
+      - all
+      - us-east-1
+    namespace: fusion-ecs-us-east-1
+    override:
+      origin:
+        <<: *_fusion_origin
+        log_opt:
+          awslogs-group: /nile/fusion-origin
+          awslogs-region: us-east-1
+    services:
+      - <<: *_service
+        loadBalancers:
+          - <<: *_loadBalancer
+            targetGroupArn: arn:aws:elasticloadbalancing:us-east-1:057404813832:targetgroup/fusion-origin-us-east-1/d69f7df3d462cf7e
+
+  - name: us-east-1-admin
+    task: *_pb_task
+    labels:
+      - all
+      - us-east-1
+    namespace: fusion-ecs-us-east-1
+    services:
+    - <<: *_service
+      loadBalancers:
+        - <<: *_loadBalancer
+          targetGroupArn: arn:aws:elasticloadbalancing:us-east-1:057404813832:targetgroup/fusion-admin-origin-us-east-1/8c5b695865949311
+    override:
+      origin:
+        <<: *_fusion_origin
+        log_opt:
+          awslogs-group: /nile/fusion-origin
+          awslogs-region: us-east-1
         environment:
           <<: *_admin_environment

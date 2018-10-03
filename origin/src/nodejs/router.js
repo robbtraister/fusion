@@ -12,7 +12,7 @@ router.all('/status/:code', (req, res, next) => {
 })
 
 // Add parsers
-router.use(bodyParser.raw({type: '*/*'}))
+router.use(bodyParser.raw({ type: '*/*' }))
 router.use(cookieParser())
 
 // Add lambda proxy

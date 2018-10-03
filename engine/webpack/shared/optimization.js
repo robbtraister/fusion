@@ -8,7 +8,8 @@ const optimization = (minify)
   ? {
     minimizer: [new UglifyWebpackPlugin({
       parallel: true,
-      test: /\.jsx?$/i
+      sourceMap: true,
+      test: /\.[jt]sx?$/i
     })]
   }
   : {}

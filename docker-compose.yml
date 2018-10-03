@@ -119,7 +119,7 @@ services:
       - fusion
     ports:
       - 80:8080
-      - 8081:8081
+      - 9000:9000
     volumes:
       - './origin/src:/etc/nginx/src:ro'
       - '${FUSION_REPO:-./bundle}/.dist:/etc/nginx/dist:ro'

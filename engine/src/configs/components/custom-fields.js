@@ -2,12 +2,12 @@
 
 const path = require('path')
 
-const PropTypes = require('../react/shared/prop-types')
-const unpack = require('../utils/unpack')
+const PropTypes = require('../../react/shared/prop-types')
+const unpack = require('../../utils/unpack')
 
 const {
   bundleRoot
-} = require('../../environment')
+} = require('../../../environment')
 
 function getCustomFields (componentConfig) {
   const customFields = Object.values(componentConfig.outputTypes)
@@ -30,7 +30,7 @@ function getCustomFields (componentConfig) {
         if (!compilation) {
           return {
             root: stringified,
-            args: Object.assign(...Object.keys(args).map(k => ({[k]: PropTypes.stringify(args[k])})))
+            args: Object.assign(...Object.keys(args).map(k => ({ [k]: PropTypes.stringify(args[k]) })))
           }
         }
         if (compilation.root && compilation.root === stringified) {

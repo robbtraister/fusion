@@ -3,20 +3,25 @@
 const {
   componentDistRoot,
   isDev
-} = require('../../environment')
+} = require('../../../environment')
 
 const getCustomFields = require('./custom-fields')
 const getDisplayPropTypes = require('./display-prop-types')
 const getSections = require('./sections')
 
-const FIELD_TYPE_MAP = {
-  // react-prop-type: pb-classic-field-type
-  'bool': 'boolean',
-  'oneOf': 'select',
-  'string': 'text',
-  'number': 'number',
-  'contentConfig': 'contentConfig'
-}
+const customTypes = Object.keys(require('../../react/shared/prop-types/custom-types'))
+
+const FIELD_TYPE_MAP = Object.assign(
+  {
+    // react-prop-type: pb-classic-field-type
+    'bool': 'boolean',
+    'oneOf': 'select',
+    'string': 'text',
+    'number': 'number'
+  },
+  ...customTypes
+    .map((type) => ({ [type]: type }))
+)
 
 function transformPropTypes (propTypes) {
   return (propTypes)
@@ -61,7 +66,7 @@ function transformComponentConfigs (manifest) {
 
 function transformSections (component) {
   return getSections(component)
-    .map((id) => ({id}))
+    .map((id) => ({ id }))
 }
 
 function transformLayoutConfigs (manifest) {
@@ -82,7 +87,7 @@ function transformOutputTypeConfigs (manifest) {
 
 const getManifestFile = (type) => `${componentDistRoot}/${type}/fusion.manifest.json`
 
-function getConfigs (type) {
+function getComponentConfigs (type) {
   const manifest = require(getManifestFile(type))
 
   const transform = {
@@ -96,6 +101,6 @@ function getConfigs (type) {
 module.exports = (isDev)
   ? (type) => {
     delete require.cache[getManifestFile(type)]
-    return getConfigs(type)
+    return getComponentConfigs(type)
   }
-  : getConfigs
+  : getComponentConfigs

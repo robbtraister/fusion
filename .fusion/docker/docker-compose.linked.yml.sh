@@ -96,7 +96,7 @@ EOB
   . $(dirname "$0")/../../.env
   cd "${FUSION_REPO}"/src/node_modules
 
-  for link in $(find . -type l -maxdepth 1)
+  for link in $(find . -type l -maxdepth 2)
   do
     link_name=${link//.\/}
     while [ "$(ls -l $link | head -n 1 | grep '^l')" ]

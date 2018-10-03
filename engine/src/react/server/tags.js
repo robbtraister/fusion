@@ -7,7 +7,7 @@ const path = require('path')
 const url = require('url')
 
 const {
-  fetchFile
+  fetchAsset
 } = require('../../io')
 
 const {
@@ -64,7 +64,7 @@ const outputTypeHasCss = (isDev)
     }
   })()
 
-const cssTagGenerator = ({inlines, rendering, outputType}) => {
+const cssTagGenerator = ({ inlines, rendering, outputType }) => {
   inlines.cssLinks = inlines.cssLinks || {
     cached: {
       outputTypeHref: undefined,
@@ -80,7 +80,7 @@ const cssTagGenerator = ({inlines, rendering, outputType}) => {
       })
   }
 
-  return ({children}) => (children)
+  return ({ children }) => (children)
     ? children(inlines.styles.cached)
     // even if cssFile is null, add the link tag with no href
     // so it can be replaced by an updated template script later
@@ -124,7 +124,7 @@ const fusionTagGenerator = (globalContent, globalContentConfig, contentCache, ou
               entries: {},
               expiresAt: now + ((keyCache.source && keyCache.source.ttl) || 300000)
             }
-            condensedSourceCache.entries[key] = {cached: keyCache.filtered}
+            condensedSourceCache.entries[key] = { cached: keyCache.filtered }
           }
         })
     })
@@ -147,7 +147,7 @@ const fusionTagGenerator = (globalContent, globalContentConfig, contentCache, ou
   )
 }
 
-const libsTagGenerator = ({name, outputType}) => {
+const libsTagGenerator = ({ name, outputType }) => {
   const templateScript = React.createElement(
     'script',
     {
@@ -181,8 +181,8 @@ const metaTagGenerator = (metas = {}) => (name, defaultValue) =>
     )
     : null
 
-const stylesGenerator = ({inlines, rendering, outputType}) => {
-  const outputTypeStylesPromise = fetchFile(`components/output-types/${outputType}.css`)
+const stylesGenerator = ({ inlines, rendering, outputType }) => {
+  const outputTypeStylesPromise = fetchAsset(`components/output-types/${outputType}.css`)
     .catch(() => null)
 
   const templateStylesPromise = rendering.getStyles()
@@ -205,7 +205,7 @@ const stylesGenerator = ({inlines, rendering, outputType}) => {
       })
   }
 
-  return ({children}) => (children)
+  return ({ children }) => (children)
     ? children(inlines.styles.cached)
     : React.createElement(
       'style',

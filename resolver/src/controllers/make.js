@@ -15,7 +15,7 @@ const endpoint = function endpoint (data, arcSite, outputType) {
   })
 }
 
-const make = function make (uri, arcSite, version, outputType) {
+const make = function make (uri, arcSite, version, outputType, cacheHTML) {
   return resolve(uri, arcSite)
     .then((data) =>
       data
@@ -23,7 +23,8 @@ const make = function make (uri, arcSite, version, outputType) {
           method: 'POST',
           uri: endpoint(data, arcSite, outputType),
           data,
-          version
+          version,
+          cacheHTML
         })
         : (() => {
           const e = new Error(`Could not resolve ${uri}`)

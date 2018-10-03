@@ -11,13 +11,8 @@ const _get = require('lodash.get')
 const _merge = require('lodash.merge')
 
 const getContextProps = (props, context) => {
-  const contextProps = Object.assign({}, props, context)
-  delete contextProps.eventListeners
-  delete contextProps.getContent
-  delete contextProps.children
-
   return {
-    props: contextProps,
+    props: { ...context.props, ...props },
     children: props.children
   }
 }
@@ -27,7 +22,9 @@ const createContextElement = (Component, props, context) => {
 
   contextProps.contentEditable = (isClient && Fusion.isAdmin)
     ? (prop) => ({
-      'data-content-editable': `${props.id}:${prop}`
+      'data-content-editable': prop,
+      'data-feature': props.id,
+      'contenteditable': 'true'
     })
     : () => ({})
 
@@ -68,7 +65,7 @@ function HOC (Component) {
           this.setContent(
             Object.assign(
               ...Object.keys(contents)
-                .map(stateKey => ({[stateKey]: this.getContent(contents[stateKey])}))
+                .map(stateKey => ({ [stateKey]: this.getContent(contents[stateKey]) }))
             )
           )
         }
@@ -138,7 +135,7 @@ function HOC (Component) {
             if (isClient) {
               // this case is only necessary on the client
               // on the server, we will wait for the content to hydrate and manually re-render
-              content.fetched.then(data => { this.setState({[key]: data}) })
+              content.fetched.then(data => { this.setState({ [key]: data }) })
             }
 
             // this case is only possible if content was fetched server-side

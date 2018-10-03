@@ -2,26 +2,47 @@
 
 /* global Fusion */
 
-window.Fusion = window.Fusion || {}
-
-Fusion.components = Fusion.components || {}
-Fusion.components.Consumer = require('../shared/components/consumer')
-Fusion.components.Layout = require('../shared/components/layout')
-Fusion.components.Static = require('../shared/components/static')
-Fusion.unpack = require('../../utils/unpack')
-Fusion.properties = require('fusion:properties')
+require('./shared')
 Fusion.isAdmin = true
 
 const Provider = require('./provider')
 
 const version = require('./version')
 
-const React = window.react = require('react')
-const ReactDOM = window.ReactDOM = require('react-dom')
-window.PropTypes = require('../shared/prop-types')
+const React = window.react
+const ReactDOM = window.ReactDOM
 
 // support fragments in preact
 React.Fragment = React.Fragment || 'div'
+
+document.body.parentElement.setAttribute('xmlns:fusion', 'http://www.arcpublishing.com/fusion')
+const appendBoundary = (element, id) => {
+  const boundaryProps = {
+    'data-fusion-component': id,
+    style: { display: 'none' }
+  }
+  return React.createElement(
+    React.Fragment,
+    {},
+    [
+      React.createElement(
+        'fusion:enter',
+        Object.assign(
+          { id: `fusion-enter-${id}` },
+          boundaryProps
+        )
+      ),
+      element,
+      React.createElement(
+        'fusion:exit',
+        Object.assign(
+          { id: `fusion-exit-${id}` },
+          boundaryProps
+        )
+      )
+    ]
+  )
+}
 
 const ComponentCompiler = require('../shared/compile/component')
 class AdminCompiler extends ComponentCompiler {
@@ -30,6 +51,20 @@ class AdminCompiler extends ComponentCompiler {
       return Fusion.components[componentCollection][componentType]
     } catch (e) {}
     return null
+  }
+
+  getComponent (defaultComponent = 'div') {
+    const _getComponent = super.getComponent(defaultComponent)
+
+    return (node) => {
+      return (node.collection === 'chains')
+        ? appendBoundary(_getComponent(node), node.props.id)
+        : _getComponent(node)
+    }
+  }
+
+  getFeature (node) {
+    return appendBoundary(super.getFeature(node), node.props.id)
   }
 }
 

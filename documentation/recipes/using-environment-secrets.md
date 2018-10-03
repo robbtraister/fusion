@@ -14,7 +14,7 @@ In staging and/or production environments you'll define environment variables in
 
 Let's see how we can actually use environment variables in the sample Fusion app we've been building.
 
-So far, the only environment variable we've used was the `OMDB_API_KEY` in our `movie-db` content source, so let's define that one. The first thing we'll do is go to our `.env` file and add it there:
+So far, the only environment variable we've used was the `OMDB_API_KEY` in our `movie-find` content source, so let's define that one. The first thing we'll do is go to our `.env` file and add it there:
 
 ```bash
 #  /.env  #

@@ -20,6 +20,86 @@ A Layout is expected to be stored and named in one of the following formats:
 
 ##### Example
 
+There are multiple different "syntactic sugar" methods of creating a Layout, each with different levels of specificity. We will enumerate them here, going from least specific to most.
+
+*Raw Array Syntax*
+
+The simplest way to define a Layout is to export an array of strings that represent the names of sections this Layout contains.
+
+```js
+export default [
+  'top',
+  'middle',
+  'bottom'
+]
+```
+
+This will produce the following render:
+
+```jsx
+<section id="top">...</section>
+<section id="middle">...</section>
+<section id="bottom">...</section>
+```
+
+*Object Sugar Syntax*
+
+For convenience, the above array can also be represented as an object where the keys represent IDs and the values are CSS classes. In this syntax, you must use the `Layout` component imported from `fusion:layout` to wrap your Layout:
+
+```js
+import Layout from 'fusion:layout'
+
+export default Layout({
+  top: 'top-section',
+  middle: 'middle-section',
+  bottom: 'bottom-section'
+})
+```
+
+This will produce the following render:
+
+```jsx
+<section id="top" class="top-section">...</section>
+<section id="middle" class="middle-section">...</section>
+<section id="bottom" class="bottom-section">...</section>
+```
+
+*Array of Objects Syntax*
+
+The above syntax can be made more specific by exporting an array of objects, with each object specifying some options about a section of the Layout. In this syntax, you must use the `Layout` component imported from `fusion:layout` to wrap your Layout:
+
+```js
+import Layout from 'fusion:layout'
+
+export default Layout([
+  {
+    id: 'top',
+    cssClass: 'top-section'
+  },
+  {
+    id: 'middle',
+    cssClass: 'middle-section'
+  },
+  {
+    id: 'bottom',
+    cssClass: 'bottom-section',
+    element: 'footer'
+  }
+])
+```
+
+This will produce the following render:
+
+```jsx
+<section id="top" class="top-section">...</section>
+<section id="middle" class="middle-section">...</section>
+<footer id="bottom" class="bottom-section">...</footer>
+```
+
+*JSX Syntax*
+
+Finally, you can define each Layout as a full JSX component that accepts `props.children` and enumerates them as an array, with each index representing the next enumerated section. When using this syntax, you must manually enumerate the sections this Layout allows using the [`sections()`](#sections) method.
+
 ```jsx
 /*  /src/components/layouts/article-right-rail.jsx  */
 
@@ -68,9 +148,16 @@ See the `children` section in the [Output Type API](./output-type.md#children)
 ### `sections()`
 
 ##### Description
+This method is for providing the names of sections available in this Layout to PageBuilder so they can be configured with content. This is primarily used with the 'JSX Syntax' version of a Layout.
 
 ##### Parameters
 
+`sections(sectionNames)`
+- `sectionNames` (*Array*): An array of strings representing the names of sections available in this Layout. These will be the names PageBuilder displays to users to allow them to add Features and Chains to.
+
 ##### Return
+This method returns `undefined`; it is solely used to pass section information to PageBuilder.
 
 ##### Example
+
+See the 'JSX Syntax' example above.

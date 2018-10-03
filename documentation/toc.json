@@ -134,10 +134,6 @@
             "title": "Components",
             "items": [
               {
-                "title": "Consumer",
-                "canonical_url": "/arc-products/pagebuilder/fusion/documentation/api/feature-pack/components/consumer.md"
-              },
-              {
                 "title": "Output Type",
                 "canonical_url": "/arc-products/pagebuilder/fusion/documentation/api/feature-pack/components/output-type.md"
               },
@@ -156,7 +152,19 @@
               {
                 "title": "Custom Fields",
                 "canonical_url": "/arc-products/pagebuilder/fusion/documentation/api/feature-pack/components/custom-fields.md"
-              }
+              },
+              {
+                "title": "Consumer",
+                "canonical_url": "/arc-products/pagebuilder/fusion/documentation/api/feature-pack/components/consumer.md"
+              },
+              {
+                "title": "Context",
+                "canonical_url": "/arc-products/pagebuilder/fusion/documentation/api/feature-pack/components/context.md"
+              },
+              {
+                "title": "Content",
+                "canonical_url": "/arc-products/pagebuilder/fusion/documentation/api/feature-pack/components/content.md"
+              },
             ]
           },
           {

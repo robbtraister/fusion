@@ -202,14 +202,7 @@ Denotes that a certain prop is required. Will throw warnings in development if t
 ##### Example
 
 ```jsx
-import PropTypes from 'prop-types';
-import React from 'react'
-
-const MyComponent = (props) => {
-  const { headline } props.customFields
-
-  return (<h1>{headline}</h1>)
-}
+...
 
 MyComponent.propTypes = {
   customFields: PropTypes.shape({
@@ -232,8 +225,8 @@ The `tag()` method provides a way of adding additional metadata that PageBuilder
   - `optionMap.defaultValue` (*?*): The default value this custom field should take.
   - `optionMap.description` (*String*): A text description about the purpose of this custom field for users to better understand it.
   - `optionMap.group` (*String*): The name of a group of common custom fields. PageBuilder will aggregate custom fields with the same `group` name into a common UI interface element.
-  - `optionMap.formPlugin` (*String*): The name of a plugin used by this custom field. More info on plugins in Fusion forthcoming.
-  - `optionMap.format` (*String*): An [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) compliant date format string, for datepicker custom fields. More info forthcoming.
+  - `optionMap.formPlugin` (*String*): The name of a plugin used by this custom field. More info on plugins in Fusion forthcoming. <!-- TODO: plugin info-->
+  - `optionMap.format` (*String*): An [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) compliant date format string, for datepicker custom fields. More info forthcoming. <!-- TODO: datepicker info-->
   - `optionMap.hidden` (*Boolean*): Whether to show or hide the custom field.
   - `optionMap.labels` (*Object*): An object mapping a value listed in the array of a `oneOf` custom field to a more human-readable string
   - `optionMap.max` (*Number*): Maximum number allowed for a `number` type custom field.
@@ -244,6 +237,8 @@ The `tag()` method provides a way of adding additional metadata that PageBuilder
 ##### Example
 
 ```jsx
+...
+
 MyComponent.propTypes = {
   customFields: PropTypes.shape({
     myNumberField: PropTypes.number.tag({

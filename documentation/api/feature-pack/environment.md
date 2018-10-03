@@ -2,60 +2,98 @@
 
 Environment variables can be configured within your repo so that they are provided to the server at runtime. This provides more control to the developer than having to make requests to the PB team, who then has to manage all client environments in a single place.
 
+## Definition
 
-## Secrets
+##### Naming
 
-Secrets are necessary to access restricted content. In order to provide secrets to the server, Fusion provides decryption and module import support.
+*Local Development*
 
-1.  Encrypt your secrets using the appropriate KMS key for your client
-1.  Create a file in your bundle called `src/environment.js`
-1.  Enter the value in this file as ciphertext decorated in percent-braces, as `%{...}`
-1.  Export the value as an object property
-1.  In your content source (or whatever server-side code you need), import `fusion:environment` and use the object properties as necessary
+Environment variables in local dev are expected to be stored in the `.env` file in the **root** of your repo (*not* within the `/src/` directory).
 
-_Note: you may also use `environment.json` if you do not need to execute any js code._
+*Production (non-local) Development*
 
+Environment values in all non-dev environments (heretofore referred to as "production" environments) are expected to be stored and named in one of the following formats:
 
-## Restrictions
+- `/src/environment.(js|json)`
+- `/src/environment/index.(js|json)`
 
-Environment values will only be accessible during server execution, not in the client, as they will be exposed to users. To ensure this, `fusion:environment` will return an empty object in the client.
+##### Example
 
+Encrypted values will only be decrypted at deployment, so they will be evaluated as-is in local development. To address this, local environment variables will take precedence over repo values. To provide the plaintext version of a secret on your local machine, simply define it in your `.env` file.
 
-## Local Development
+*Local Development*
 
-Encrypted values will only be decrypted at deployment, so they will be evaluated as-is in local development. To address this, local environment variables will take precedence over repo values. To provide the plaintext version of a secret on your local machine, simply define it in your .env file.
+```bash
+#  .env  #
 
-
-## Examples
-
-`src/environment.js`
+API_CREDENTIALS=user:password
 ```
+
+*Production (non-local) Development*
+
+```js
+/*  /src/environment.js */
+
 export default {
-  API_CREDENTIALS: "%{AWSENCRYPTEDCIPHERTEXT}"
+  API_CREDENTIALS: "%{AWS_ENCRYPTED_CIPHER_TEXT}"
 }
 ```
 
-`src/content/sources/content-api.js`
+-----
+
+## Use
+
+To use environment variables in either local or production environments, simply import from the `fusion:environment` namespace.
+
+##### Example
+
+A simple environment variable defined locally:
+
+```bash
+#  .env  #
+
+OMDB_API_KEY=a1b2c3d4
 ```
-import { API_CREDENTIALS } from 'fusion:environment'
+
+Here is how to use that same environment variable in a sample content source:
+
+```jsx
+/*  /src/content/sources/movie-find.js  */
+
+import { OMDB_API_KEY } from 'fusion:environment'
+
+const resolve = (key) => {
+  const requestUri = `https://www.omdbapi.com/?apikey=${OMDB_API_KEY}&plot=full`
+
+  if (key.hasOwnProperty('movieTitle')) return `${requestUri}&t=${key.movieTitle}`
+
+  throw new Error('movie-find content source requires a movieTitle')
+}
 
 export default {
-  resolve (data) {
-    return `https://${API_CREDENTIALS}@api.content.arc.pub/api/v1/?data=${data}`
+  resolve,
+  schemaName: 'movie',
+  params: {
+    movieTitle: 'text'
   }
 }
 ```
 
-`.env`
-```
-API_CREDENTIALS=user:password
-```
+> **Restrictions**
+> 
+> Environment values will only be accessible during server execution, not in the client, as they will be exposed to users. To ensure this, `fusion:environment` will return an empty object in the client.
 
-Alternatively:
+-----
 
-`src/environment.json`
-```
-{
-  "API_CREDENTIALS": "%{AWSENCRYPTEDCIPHERTEXT}"
-}
-```
+## "Secret" Encryption
+
+Oftentimes you will find it necessary to use "secret" environment variables, such as API credentials, when building a Feature Pack. In local development, it's fine to simply add these unencrypted credentials to your `.env` file and use them. However, Fusion needs a way to access these "secret" variables in production environments without developers adding unencrypted credentials directly to their bundles.
+
+To solve this problem, Fusion allows developers to include "secret" variables that have been encrypted with the proper KMS key to their environment variables, provided that these variables are surrounded by "percent-braces" characters (e.g. `%{MY_ENCRYPTED_TEXT_HERE}`). The encrypted values will then be decrypted at deploy-time and available to your bundle, without being committed into version control.
+
+Information on how to properly encrypt environment variables is forthcoming.
+
+<!-- TODO: instructions for encrypting env vars -->
+
+
+

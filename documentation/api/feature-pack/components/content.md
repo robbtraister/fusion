@@ -1,12 +1,16 @@
-# Fusion Content
+# `<Content>` Component API
 
-Fusion Content is a React component for fetching feature content that can imported from `fusion:content`. This is a simplified component that wraps the Consumer fetchContent API.
+Fusion `<Content>` is a React component specifically for fetching feature content. This is a simplified component that wraps the `Consumer` [`fetchContent` API](./consumer.md#fetchContent).
 
-## Use
+## Implementation
 
-The Fusion Content component accepts the same attributes as the classic PageBuilder content config and uses the render props pattern to call a child function with the resolved content.
+The Fusion `<Content>` component accepts the same attributes as the classic PageBuilder content config and uses the render props pattern to call a child function with the resolved content.
 
-```js
+The `<Content>` component is imported from the `fusion:content` namespace. It should be used as a React Component.
+
+##### Example
+
+```jsx
 import React from 'react'
 import PropTypes from 'prop-types'
 
@@ -21,7 +25,7 @@ const MyFeatureComponent = (props) =>
 
 MyFeatureComponent.propTypes = {
   customFields: PropTypes.shape({
-    myContentConfig: PropTypes.contentConfig()
+    myContentConfig: PropTypes.contentConfig('some-content-schema')
   })
 }
 
@@ -54,10 +58,22 @@ export default MyFeatureComponent
 
 ## Options
 
--   global
+### `global`
+
+##### Description
 
 In lieu of a content configuration, you may specify an attribute of `global={true}`. In this case, the global content for the page will be provided.
 
--   async
+##### Example
+
+<!-- TODO: example of global option -->
+
+### `async`
+
+##### Description
 
 If you specify an attribute of `async={true}`, the content will only be fetched/loaded in the client and not on the server.
+
+##### Example
+
+<!-- TODO: example of async option -->

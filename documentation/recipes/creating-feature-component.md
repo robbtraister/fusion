@@ -35,6 +35,10 @@ export default MovieDetail
 
 After creating this file, you should be able to go to the Page Editor in PageBuilder Admin and add this Feature to the `homepage` we created earlier. Once you do, you should see it displayed on the page!
 
+> **NOTE**
+> 
+> Remember, if you don't see your component show up right away, you may need to restart your Fusion app with `CTRL+C` and then re-running `npm start`!
+
 While this very simple component will work, it doesn't really solve our problem since it doesn't render any dynamic content; just static information about a [single (awesome) movie](https://www.imdb.com/title/tt0107290/). For now, we'll leave it static so we can see it rendered, and we'll [fill it in with content later](./using-consumer-function.md).
 
 ## Handling different output types

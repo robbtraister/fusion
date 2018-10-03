@@ -69,6 +69,10 @@ One more subtle but important piece of code is the `id='fusion-app'` attribute a
 
 We're finally at the stage where we can start seeing something on a webpage! To do so, we'll need to go into the [PageBuilder Admin](http://localhost/pb/admin) and define a sample page to work with.
 
+> **NOTE**
+> 
+> At this point, you may need to restart your Fusion application for it to "see" the new Output Type file you've created. To do so, hit `CTRL+C` and then re-run `npm start`. Because of the way Webpack works, Fusion often doesn't know about newly created files until the application is restarted. If you create a new file and it doesn't show up in PageBuilder as expected, this may be the problem.
+
 <!-- TODO: add PB Admin image -->
 
 Let's create a page called "Homepage" at the path `/homepage` (or if you already have a Homepage, you can use any name/path combination). Once you've created your page, you should be redirected to the Page Editor view, with a preview on the right. That preview pane won't show any content from our Output Type component - the preview pane only shows content *within* the Output Type. However, if we publish the page and make it "live", then visit [http://localhost/homepage](http://localhost/homepage), we should see our webpage with a big "Welcome to Fusion" message at the top! Huzzah!

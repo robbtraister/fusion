@@ -66,10 +66,7 @@ In lieu of a content configuration, you may specify an attribute of `global={tru
 
 ##### Example
 
-```jsx
-
-
-```
+<!-- TODO: example of global option -->
 
 ### `async`
 
@@ -79,7 +76,4 @@ If you specify an attribute of `async={true}`, the content will only be fetched/
 
 ##### Example
 
-```jsx
-
-
-```
+<!-- TODO: example of async option -->

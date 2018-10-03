@@ -46,6 +46,34 @@ export default Headline
 
 -----
 
+## Props
+
+### `displayProps` (*Object*)
+
+##### Description
+
+`displayProps` is an object whose names and types are defined per-Output-Type by the [`displayPropTypes`](./output-type.md#displayPropTypes) , and whose values are then set in PageBuilder. The `displayProps` object is intended to be used for display-related properties such as column sizes, hide/show logic and more that may be specific to the Output Type this component is rendering in.
+
+##### Example
+
+```jsx
+/*  /src/components/features/global/footer/amp.jsx  */
+
+import React from 'react'
+
+export default (props) => {
+  const { fullWidth } = props.displayProps
+
+  return (
+    <footer className={fullWidth ? 'col-sm-12' : null}>
+      <p>&copy; 2018 Acme Corp.</p>
+    </footer>
+  )
+}
+```
+
+-----
+
 ## Custom Fields
 
 See the [Custom Fields documentation](./custom-fields.md)

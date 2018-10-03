@@ -392,15 +392,18 @@ export default (props) => {
 
 -----
 
+## Static Values
+
 ### `displayPropTypes`
 
 ##### Description
  Implements  React's [PropTypes](https://github.com/facebook/prop-types) which will be available on each feature. These are defined the same way as `propTypes` on Features and Chains however, unlike custom fields, the values can differ across Output Types. `displayProps` are useful for high level page functionality such as hide/show logic, layout grids, or any other settings that you want each feature to have.
 
- In the feature the values set the admin will then be accessible as `props.displayProperties`
+The value [`props.displayProps`](./feature.md#displayProps) will be available on Features, and contain the key names defined here and the values set in PageBuilder. 
 
 ##### Example
 On the Output Type
+
 ```jsx
 OutputType.displayPropTypes = {
     isStatic: PropTypes.bool,

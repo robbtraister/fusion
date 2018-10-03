@@ -7,7 +7,7 @@ const { taggable } = require('./taggables')
 const FusionPropTypes = Object.assign(
   ...Object.keys(PropTypes)
     .map(key => ({
-      [key]: ['PropTypes', 'checkPropTypes'].includes(key)
+      [key]: ['PropTypes', 'checkPropTypes'].indexOf(key) >= 0
         ? undefined // PropTypes[key]
         : taggable(PropTypes[key], key)
     })),
@@ -23,7 +23,7 @@ function _stringify (v, i) {
     : (v instanceof Object)
       ? `{${
         Object.keys(v)
-          .filter(k => !['isRequired', 'tag'].includes(k))
+          .filter(k => ['isRequired', 'tag'].indexOf(k) < 0)
           .filter(k => v[k] !== undefined)
           .map(k => `"${k}":${_stringify(v[k], (i || 0) + 1)}`)
           .join(',')

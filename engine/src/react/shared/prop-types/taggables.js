@@ -37,7 +37,7 @@ const taggableComplex = (propType, typeName) => (complexArgs) => {
 }
 
 const taggable = (propType, typeName) => {
-  return (propType.isRequired) // (['shim', 'bound checkType'].includes(propType.name))
+  return (propType.isRequired) // (['shim', 'bound checkType'].indexOf(propType.name) >= 0)
     ? taggablePrimitive(propType, typeName)
     : taggableComplex(propType, typeName)
 }

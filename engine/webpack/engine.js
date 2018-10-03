@@ -86,6 +86,8 @@ module.exports = [
   {
     entry: {
       admin: require.resolve('../src/react/client/admin'),
+      loader: require.resolve('../src/react/client/loader'),
+      polyfill: require.resolve('../src/react/client/polyfill'),
       preview: require.resolve('../src/react/client/preview'),
       properties: require.resolve(propertiesSrcFile),
       react: require.resolve('../src/react/client')

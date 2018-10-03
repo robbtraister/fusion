@@ -14,14 +14,14 @@ An Output Type is expected to be stored and named in the following format:
 
 > This will build an Output Type component where the `{outputTypeName}` portion of the filepath represents the name of the Output Type.
 
-##### `fusion-app` ID
-
-Fusion requires that your Output Type contain an element in the body that has an ID value of `fusion-app`. This is the ID that Fusion will render the client side portion of the application into. Without this ID, client-side rendering will fail.
+> **NOTE**
+> 
+> Fusion requires that your Output Type contain an element in the body that has an ID value of `fusion-app`, which contains the value `props.children` inside of it. This is the ID that Fusion will render the client side portion of the application into. Without this ID, client-side rendering will fail.
 
 ##### Example
 
 ```jsx
-/*    /src/components/output-types/default.jsx    */
+/*  /src/components/output-types/default.jsx  */
 
 import React from 'react'
 
@@ -60,7 +60,7 @@ React uses the convention of a prop named `children` to define content that shou
 ##### Example
 
 ```jsx
-/*    /src/components/output-types/default.jsx    */
+/*  /src/components/output-types/default.jsx  */
 
 import React from 'react'
 
@@ -86,7 +86,7 @@ The context path where the app is running. Should be used to prefix resource ref
 ##### Example
 
 ```jsx
-/*    /src/components/output-types/default.jsx    */
+/*  /src/components/output-types/default.jsx  */
 
 import React from 'react'
 
@@ -116,7 +116,7 @@ Similar to `metaTag` above, but returns only the value, not a fully rendered HTM
 ##### Example
 
 ```jsx
-/*    /src/components/output-types/default.jsx    */
+/*  /src/components/output-types/default.jsx  */
 
 import React from 'react'
 
@@ -200,7 +200,7 @@ Renders the return value of the passed `renderProp` if one is provided; otherwis
 ##### Example
 
 ```jsx
-/*    /src/components/output-types/default.jsx    */
+/*  /src/components/output-types/default.jsx  */
 
 import React from 'react'
 
@@ -240,7 +240,7 @@ Renders bootstrapped Fusion-specific values, as well as cached content fetched f
 ##### Example
 
 ```jsx
-/*    /src/components/output-types/default.jsx    */
+/*  /src/components/output-types/default.jsx  */
 
 import React from 'react'
 
@@ -278,7 +278,7 @@ Renders the React engine script and Fusion template script necessary to re-hydra
 ##### Example
 
 ```jsx
-/*    /src/components/output-types/default.jsx    */
+/*  /src/components/output-types/default.jsx  */
 
 import React from 'react'
 
@@ -320,7 +320,7 @@ Renders the specified `<meta>` tag by name if one is provided; if not, renders a
 ##### Example
 
 ```jsx
-/*    /src/components/output-types/default.jsx    */
+/*  /src/components/output-types/default.jsx  */
 
 import React from 'react'
 
@@ -366,7 +366,7 @@ Renders the return value of the passed `renderProp` if one is provided; otherwis
 ##### Example
 
 ```jsx
-/*    /src/components/output-types/default.jsx    */
+/*  /src/components/output-types/default.jsx  */
 
 import React from 'react'
 
@@ -405,9 +405,19 @@ The value [`props.displayProps`](./feature.md#displayProps) will be available on
 On the Output Type
 
 ```jsx
-OutputType.displayPropTypes = {
-    isStatic: PropTypes.bool,
-    width: PropTypes.number,
-    anchor: PropTypes.string
-  }
+/*  /src/components/output-types/default.jsx  */
+
+import React from 'react'
+
+const DefaultOutputType = (props) => {
+  ...
+}
+
+DefaultOutputType.displayPropTypes = {
+  isStatic: PropTypes.bool,
+  width: PropTypes.number,
+  anchor: PropTypes.string
+}
+
+export default DefaultOutputType
 ```

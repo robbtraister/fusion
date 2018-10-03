@@ -1,10 +1,14 @@
-# Fusion Context
+# `<Context>` Component API
 
-Fusion Context is a React component for accessing the static context properties from the Fusion Consumer.
+Fusion `<Context>` is a React component for accessing the static context properties from the Fusion Consumer.
 
-## Use
+## Implementation
 
-The Fusion Context component takes no attributes and uses the render props pattern to call a child function with the static properties.
+The Fusion `<Context>` component takes no arguments and uses the render props pattern to call a child function with the static properties.
+
+The `<Context>` component is imported from the `fusion:context` namespace. It should be used as a React Component.
+
+##### Example
 
 ```js
 import React from 'react'
@@ -36,9 +40,13 @@ const MyFeatureComponent = (props) =>
 export default MyFeatureComponent
 ```
 
+-----
+
 ## Pass-through Props
 
-In order to simplify re-use of functional React components, any attributes provided to the Context component will be passed through to the child function. However, be careful with using this pattern, as in the event of conflict it will override the context properties you are trying to access.
+In order to simplify re-use of functional React components, any attributes provided to the `<Context>` component will be passed through to the child function. However, be careful with using this pattern, as in the event of conflict it will override the context properties you are trying to access.
+
+##### Example
 
 ```js
 import React from 'react'

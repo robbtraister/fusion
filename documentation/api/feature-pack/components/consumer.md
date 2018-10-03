@@ -261,6 +261,39 @@ export default Link
 
 -----
 
+### `siteProperties` (*Object*)
+
+##### Description
+
+An object containing the site specific properties defined in the `/src/properties/` directory for the current [`arcSite`](#arcsite).
+
+##### Example
+
+```jsx
+/*  /src/components/features/header/social-links.jsx  */
+
+import Consumer from 'fusion:consumer'
+import React, { Component } from react
+
+@Consumer
+class SocialLinks extends Component {
+  render () {
+    const twitter = this.props.siteProperties
+
+    return (
+      <ul>
+        ...
+        <li><a href={twitter}>Twitter</a></li>
+      </ul>
+    )
+  }
+}
+
+export default SocialLinks
+```
+
+-----
+
 ## Instance Methods
 
 ### `addEventListener()`

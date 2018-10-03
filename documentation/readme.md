@@ -45,11 +45,13 @@
 
 | Components |
 |---|
-| [Consumer](./api/feature-pack/components/consumer.md) |
 | [Output Type](./api/feature-pack/components/output-type.md) |
 | [Feature](./api/feature-pack/components/feature.md) |
 | [Layout](./api/feature-pack/components/layout.md) |
 | [Chain](./api/feature-pack/components/chain.md) |
+| [Consumer](./api/feature-pack/components/consumer.md) |
+| [Context](./api/feature-pack/components/context.md) |
+| [Content](./api/feature-pack/components/content.md) |
 
 | Content |
 |---|

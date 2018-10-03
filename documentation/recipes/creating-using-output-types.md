@@ -79,11 +79,8 @@ Let's create a page called "Homepage" at the path `/homepage` (or if you already
 
 Now that we know our Output Type is working, we can remove the "Welcome to Fusion" header since we won't need it. Onward!
 
----
-**NOTE**
-
-If you see an error message about the Output Type component not being found, or if the page isn't rendering, you may need to trigger a manual rebuild of the bundle. You can do so by running `npm run rebuild:bundle` from the root of the repo.
-
----
+> **NOTE**
+> 
+> If you see an error message about the Output Type component not being found, or if the page isn't rendering, you may need to trigger a manual rebuild of the bundle. You can do so by running `npm run rebuild:bundle` from the root of the repo.
 
 **Next: [Creating a Feature Component](./creating-feature-component.md)**

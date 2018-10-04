@@ -91,7 +91,7 @@ function CSR (rendering) {
 
 function SSR (rendering, outputType) {
   window.renderingObject.value = JSON.stringify(rendering)
-  window.renderingUpdateForm.action = `/pb/api/v3/render/?outputType=${outputType}`
+  window.renderingUpdateForm.action = `${Fusion.contextPath}/api/v3/render/?outputType=${outputType}`
   window.renderingUpdateForm.submit()
 }
 
@@ -99,7 +99,7 @@ function appendSSRForm () {
   var form = document.createElement('form')
   form.id = 'renderingUpdateForm'
   form.method = 'POST'
-  form.action = '/pb/api/v3/render/'
+  form.action = `${Fusion.contextPath}/api/v3/render/`
   form.style.visibility = 'hidden'
 
   var rendering = document.createElement('input')

@@ -234,6 +234,8 @@ environments:
         log_opt:
           awslogs-group: /nile/fusion-origin
           awslogs-region: us-east-1
+        environment:
+          CONTEXT_PATH: 'p'
     services:
       - <<: *_service
         loadBalancers:
@@ -259,3 +261,4 @@ environments:
           awslogs-region: us-east-1
         environment:
           <<: *_admin_environment
+          CONTEXT_PATH: 'p'

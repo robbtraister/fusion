@@ -39,6 +39,7 @@ function loadScript (src) {
 }
 
 if (
+  !Array.prototype.includes ||
   !(window.Object && window.Object.assign) ||
   !window.Promise ||
   !window.fetch

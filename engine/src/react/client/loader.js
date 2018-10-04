@@ -39,6 +39,6 @@ function loadScript (src) {
 }
 
 if (!Object.assign || !window.fetch || !Promise) {
-  loadScript(`${Fusion.contextPath}/dist/engine/polyfill.js?v=${version}`)
+  loadScript(`${Fusion.contextPath}/dist/engine/polyfill.js${version ? `?v=${version}` : ''}`)
 }
-loadScript(`${Fusion.contextPath}/dist/engine/react.js?v=${version}`)
+loadScript(`${Fusion.contextPath}/dist/engine/react.js${version ? `?v=${version}` : ''}`)

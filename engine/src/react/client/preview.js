@@ -2,7 +2,7 @@
 
 /* global __CONTEXT_PATH__ */
 
-const version = undefined // require('./version')()
+const version = null // require('./version')()
 
 class Preview {
   constructor (iframe) {

@@ -7,7 +7,7 @@ Fusion.isAdmin = true
 
 const Provider = require('./provider')
 
-const version = undefined // require('./version')()
+const version = null // require('./version')()
 
 const React = window.react
 const ReactDOM = window.ReactDOM

@@ -2,15 +2,7 @@
 
 /* global Fusion */
 
-const { parse } = require('url')
-
 require('./shared')
-if (!Fusion.contextPath) {
-  const engineScript = document.getElementById('fusion-engine-script')
-  if (engineScript) {
-    Fusion.contextPath = parse(engineScript.src).pathname.replace(/\/dist\/engine\/react\.js$/, '')
-  }
-}
 
 const Provider = require('./provider')
 

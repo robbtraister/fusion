@@ -7,7 +7,7 @@ Fusion.isAdmin = true
 
 const Provider = require('./provider')
 
-const version = require('./version')
+const version = null // require('./version')()
 
 const React = window.react
 const ReactDOM = window.ReactDOM
@@ -117,9 +117,6 @@ function addElement (tag, type, attr, rel) {
     e.type = type
     e.rel = rel
     e[attr] = url
-    e.onload = function () {
-      console.log(url + ' loaded')
-    }
     document.body.appendChild(e)
   }
 }

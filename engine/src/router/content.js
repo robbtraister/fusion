@@ -9,7 +9,7 @@ const contentRouter = express.Router()
 const fetchHandler = (forceUpdate) => (req, res, next) => {
   const sourceName = req.params.source || req.query.source
   const keyString = req.params.key || req.query.key
-  const query = req.query.query
+  const filter = req.query.filter || req.query.query
   const website = req.query._website
 
   Promise.all([
@@ -25,7 +25,7 @@ const fetchHandler = (forceUpdate) => (req, res, next) => {
       .then((key) => Object.assign({ 'arc-site': website }, key))
   ])
     .then(([source, key]) => source.fetch(key, forceUpdate)
-      .then(data => source.filter(query, data)))
+      .then(data => source.filter(filter, data)))
     .then(data => { res.send(data) })
     .catch(next)
 }

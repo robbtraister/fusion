@@ -29,16 +29,18 @@ Fusion uses inputs from various sources to dynamically create webpages in real-t
 
 First, Fusion requires **content**; this can include text, images, videos, audio, and other multimedia content that you want to deliver to your *readers*. In a typical Arc implementation, most content will come from a source like *content-api*, which might include stories written by *authors* in Ellipsis, photos added to Anglerfish, videos added to Goldfish, and more. However, you can also consume content from external sources, for instance a weather API like [Dark Sky](https://darksky.net/dev) or a Nutrition API like [Nutritionix](https://www.nutritionix.com/business/api), as long as it can be consumed in JSON format.
 
-Next, Fusion relies on **code** provided by a **Feature Pack**. Feature Packs are written as [React](https://reactjs.org/) components that can be universally rendered on both the server and client into HTML web pages. Components in a Feature Pack are used to display content, as well as provide functionality to the user. Feature Packs have defined guidelines for how they should be structured and how they consume content, which are outlined further in [the API documentation](../api).
+Next, Fusion relies on **code** provided by a **Feature Pack**. Feature Packs are written as [React](https://reactjs.org/) components that can be universally rendered on both the server and client into HTML web pages. Components in a Feature Pack are used to display content, as well as provide functionality to the user. Feature Packs have defined guidelines for how they should be structured and how they consume content, which are outlined further in the API documentation.
 
 Finally, Fusion needs some **configuration** from options set in PageBuilder. These configurations include which features from the **Feature Pack** should exist on a page or template, where those features should live, which URL patterns should route to those pages and/or templates, and which content sources each page or template should pull from. *Editors* and *developers* will typically work within PageBuilder to create new pages and templates, change layout configurations, add resolvers (URL matchers), and more. You can think of these **configuration** options as the glue that tie **content** and **code** together to create a structured web page.
 
 ## Who is this documentation for?
 This documentation is primarily for *developers* of Fusion **Feature Packs**. It covers how to create, maintain, develop, and deploy a Feature Pack, as well as different recipes to utilize all the capabilities offered in Fusion.
 
-In this "getting started" guide, we'll be creating a small Feature Pack using Fusion for a website that displays basic information about movies. Even though your Feature Pack is probably dealing with content from a news source like Arc's [Content API](TODO: add link), the steps we'll take and techniques we'll use are applicable to any Fusion Feature Pack. 
+In this "getting started" guide, we'll be creating a small Feature Pack using Fusion for a website that displays basic information about movies. Even though your Feature Pack is probably dealing with content from a news source like Arc's Content API, the steps we'll take and techniques we'll use are applicable to any Fusion Feature Pack. 
 
-You can also read more documentation on [creating **content** in Arc](TODO: add link), or on [using PageBuilder to change **configuration** options](TODO: add link).
+You can also read more documentation on [creating **content** in Arc](https://staging.arcpublishing.com/alc/arc-products/ellipsis/user-docs/video-how-to-create-an-article-in-ellipsis/).
+
+<!-- TODO: add link to Pagebuilder ALC docs above -->
 
 ## What should I already know?
 

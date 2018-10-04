@@ -72,7 +72,6 @@ As you can see in the code and comments above, we defined a required `defaultPos
 
 <!-- TODO: document .tag() functionality -->
 
-
 Which custom fields are needed in your components is entirely up to your needs as a Feature Pack developer, and those of your PageBuilder editors. You can find the complete list of Custom Field types, along with their options, [in the API documentation here](../api/feature-pack/components/feature.md#custom-fields).
 
  **Next: [Using a GraphQL Schema](./using-graphql-schema.md)**

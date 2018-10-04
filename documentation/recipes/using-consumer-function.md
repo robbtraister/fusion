@@ -4,6 +4,8 @@ Back in our ["Creating a Feature Component" guide](./creating-feature-component.
 
 ## Setting up a resolver
 
+> **NOTE**: This section of the document is under construction. Thanks for waiting!
+
 <!-- TODO: add section for how to configure a resolver -->
 
 Now that our resolver is fetching "global" content for us, let's see how we can use it in our component.

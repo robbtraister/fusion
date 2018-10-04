@@ -4,7 +4,9 @@ If you're starting a new project with Fusion, you'll need to create a brand new 
 
 ## Cloning a new Feature Pack
 
-To create a new Feature Pack skeleton, we'll use a handy script provided to us by Fusion. To use it, we'll need access to an existing Fusion Feature Pack. If you have another Feature Pack already on your local machine, you can use that one - otherwise, you can pull and use the [base Feature Pack here](TODO: add link). `cd` into that repo so that you're in its root directory. Then, you can run
+To create a new Feature Pack skeleton, we'll use a handy script provided to us by Fusion. To use it, we'll need access to an existing Fusion Feature Pack. If you have another Feature Pack already on your local machine, you can use that one. `cd` into that repo so that you're in its root directory. Then, you can run
+
+<!-- TODO: add link to canonical Fusion repo above -->
 
 ```
 $ npm run fusion:clone My-Fusion-Repo

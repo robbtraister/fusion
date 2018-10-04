@@ -44,7 +44,7 @@ This will produce the following render:
 
 *Object Sugar Syntax*
 
-For convenience, the above array can also be represented as an object where the keys represent IDs and the values are CSS classes. In this syntax, you must use the `Layout` component imported from `fusion:layout` to wrap your Layout:
+For convenience, the above array can also be represented as an object where the keys represent IDs and the values are CSS classes. You may use the `Layout` HOC imported from `fusion:layout` to wrap your Layout; however, if you don't wrap with the `Layout` HOC, Fusion will do it for you internally anyway.
 
 ```js
 import Layout from 'fusion:layout'
@@ -66,7 +66,7 @@ This will produce the following render:
 
 *Array of Objects Syntax*
 
-The above syntax can be made more specific by exporting an array of objects, with each object specifying some options about a section of the Layout. In this syntax, you must use the `Layout` component imported from `fusion:layout` to wrap your Layout:
+The above syntax can be made more specific by exporting an array of objects, with each object specifying some options about a section of the Layout. You may use the `Layout` HOC imported from `fusion:layout` to wrap your Layout; however, if you don't wrap with the `Layout` HOC, Fusion will do it for you internally anyway.
 
 ```js
 import Layout from 'fusion:layout'

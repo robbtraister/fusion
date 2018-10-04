@@ -65,7 +65,3 @@
 ### HTTP Endpoints
 
 **[API](./)**
-
-## Glossary
-
-**[Glossary of Terms](./glossary.md)**

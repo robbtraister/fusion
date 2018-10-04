@@ -9,48 +9,59 @@ const {
   bundleRoot
 } = require('../../../environment')
 
+function loadComponent (componentPath) {
+  try {
+    return unpack(require(componentPath))
+  } catch (e) {
+    console.error(e)
+  }
+}
+
 function getCustomFields (componentConfig) {
   const customFields = Object.values(componentConfig.outputTypes)
     .reduce((compilation, item) => {
       const componentPath = path.join(bundleRoot, item.dist)
       // ensure we load the latest version of the files
       delete require.cache[componentPath]
-      const Component = unpack(require(componentPath))
-      const customFields = Component.propTypes && Component.propTypes.customFields
-      if (customFields) {
-        if (!(customFields instanceof Object)) {
-          throw new Error(`${componentConfig.type}/${componentConfig.id}: propTypes.customFields must be an Object`)
-        }
-        if (customFields.type !== 'shape') {
-          throw new Error(`${componentConfig.type}/${componentConfig.id}: propTypes.customFields must be a shape`)
-        }
-
-        const args = customFields.args
-        const stringified = PropTypes.stringify(args)
-        if (!compilation) {
-          return {
-            root: stringified,
-            args: Object.assign(...Object.keys(args).map(k => ({ [k]: PropTypes.stringify(args[k]) })))
+      const Component = loadComponent(componentPath)
+      if (Component) {
+        const customFields = Component.propTypes && Component.propTypes.customFields
+        if (customFields) {
+          if (!(customFields instanceof Object)) {
+            throw new Error(`${componentConfig.type}/${componentConfig.id}: propTypes.customFields must be an Object`)
           }
-        }
-        if (compilation.root && compilation.root === stringified) {
-          return compilation
-        }
+          if (customFields.type !== 'shape') {
+            throw new Error(`${componentConfig.type}/${componentConfig.id}: propTypes.customFields must be a shape`)
+          }
 
-        Object.keys(args)
-          .forEach(k => {
-            const stringified = PropTypes.stringify(args[k])
-            if (k in compilation.args) {
-              if (compilation.args[k] !== stringified) {
-                throw new Error(`${componentConfig.type}/${componentConfig.id}: propTypes.customFields.${k} has conflicts`)
-              }
-            } else {
-              compilation.args[k] = stringified
-              // we have edited the list of args, so we can no longer compare to root
-              compilation.root = false
+          const args = customFields.args
+          const stringified = PropTypes.stringify(args)
+          if (!compilation) {
+            return {
+              root: stringified,
+              args: Object.assign(...Object.keys(args).map(k => ({ [k]: PropTypes.stringify(args[k]) })))
             }
-          })
+          }
+          if (compilation.root && compilation.root === stringified) {
+            return compilation
+          }
+
+          Object.keys(args)
+            .forEach(k => {
+              const stringified = PropTypes.stringify(args[k])
+              if (k in compilation.args) {
+                if (compilation.args[k] !== stringified) {
+                  throw new Error(`${componentConfig.type}/${componentConfig.id}: propTypes.customFields.${k} has conflicts`)
+                }
+              } else {
+                compilation.args[k] = stringified
+                // we have edited the list of args, so we can no longer compare to root
+                compilation.root = false
+              }
+            })
+        }
       }
+
       return compilation
     }, null)
 

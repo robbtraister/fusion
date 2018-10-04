@@ -1,6 +1,10 @@
 'use strict'
 
-// const vMatch = /(\?|&)v=([^&]*)/.exec(window.location.search)
-// module.exports = vMatch ? decodeURIComponent(vMatch[2]) : ''
+function version (uri) {
+  const vMatch = /(\?|&)v=([^&]*)/.exec(uri || window.location.search)
+  return vMatch ? decodeURIComponent(vMatch[2]) : ''
+}
 
-module.exports = undefined
+version.toString = () => version()
+
+module.exports = version

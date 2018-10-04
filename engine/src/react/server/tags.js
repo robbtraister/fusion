@@ -28,11 +28,10 @@ deployment.toString = () => version
 const engineScript = React.createElement(
   'script',
   {
-    key: 'fusion-engine-script',
-    id: 'fusion-engine-script',
+    key: 'fusion-loader-script',
+    id: 'fusion-loader-script',
     type: 'application/javascript',
-    src: deployment(`${contextPath}/dist/engine/react.js`),
-    defer: true
+    src: deployment(`${contextPath}/dist/engine/loader.js`)
   }
 )
 

@@ -385,6 +385,7 @@ The `fetchContent` method is second-level syntactic sugar for using both [`getCo
 ##### Parameters
 
 `fetchContent(contentConfigMap)`
+
 - `contentConfigMap` (*Object*): An object whose keys are the names of content to be stored in the component's `state`, and the values are configuration objects idential to those of the [`getContent`](#getContent) parameters.
   -  `contentConfigMap.{contentKey}` (*Object*): Here, `{contentKey}` represents the name of a property the developer chooses to set on the component's `state` object. Multiple `{contentKey}` objects can exist on the same `contentConfigMap` object.
       - `contentConfigMap.{contentKey}.sourceName` (*String*): See `sourceName` parameter in [`getContent`](#getContent) method.
@@ -395,7 +396,6 @@ The `fetchContent` method is second-level syntactic sugar for using both [`getCo
 
 ##### Return
 This method returns `undefined`; its effect is to set the `state` properties listed in the `contentConfigMap` with the approprite values.
-
 
 ##### Example
 

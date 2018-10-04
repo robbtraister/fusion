@@ -64,8 +64,6 @@ export default MyFeatureComponent
 
 In lieu of a content configuration, you may specify an attribute of `global={true}`. In this case, the global content for the page will be provided.
 
-##### Example
-
 <!-- TODO: example of global option -->
 
 ### `async`
@@ -73,7 +71,5 @@ In lieu of a content configuration, you may specify an attribute of `global={tru
 ##### Description
 
 If you specify an attribute of `async={true}`, the content will only be fetched/loaded in the client and not on the server.
-
-##### Example
 
 <!-- TODO: example of async option -->

@@ -38,7 +38,11 @@ function loadScript (src) {
   target[method](e, boundaryElement)
 }
 
-if (!Object.assign || !window.fetch || !Promise) {
+if (
+  !(window.Object && window.Object.assign) ||
+  !window.Promise ||
+  !window.fetch
+) {
   loadScript(`${Fusion.contextPath}/dist/engine/polyfill.js${version ? `?v=${version}` : ''}`)
 }
 loadScript(`${Fusion.contextPath}/dist/engine/react.js${version ? `?v=${version}` : ''}`)

@@ -111,7 +111,7 @@ module.exports = [
     },
     plugins: [
       new DefinePlugin({
-        '__CONTEXT_PATH__': `'${contextPath}'`
+        __CONTEXT_PATH__: `'${contextPath}'`
       }),
       new ManifestPlugin({ fileName: 'webpack.manifest.json' })
     ],

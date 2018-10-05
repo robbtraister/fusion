@@ -1,6 +1,6 @@
 #!/bin/sh
 
-CONTEXT_PATH="${CONTEXT_PATH:-pb}"
+CONTEXT_PATH="${CONTEXT_PATH:-p}"
 # strip trailing slash
 CONTEXT_PATH="${CONTEXT_PATH%%/}"
 # enforce leading slash

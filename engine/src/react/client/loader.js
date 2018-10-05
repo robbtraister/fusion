@@ -1,21 +1,15 @@
 'use strict'
 
-/* global Fusion */
+/* global Fusion, __CONTEXT_PATH__ */
 
 window.Fusion = window.Fusion || {}
+Fusion.contextPath = __CONTEXT_PATH__
 
 const loaderScript = document.getElementById('fusion-loader-script')
 
 const version = (loaderScript)
   ? require('./version')(loaderScript.src)
   : null
-
-if (!Fusion.contextPath) {
-  if (loaderScript) {
-    const parts = /^(([a-z]+):\/\/)?([^/?#]+)?([^?#]*)([^#]*)(.*)/.exec(loaderScript.src)
-    Fusion.contextPath = parts && parts[4].replace(/\/dist\/engine\/loader\.js$/, '')
-  }
-}
 
 // TODO: make this suck less
 // unfortunately, appendChild+defer handling is not as consistent as I would hope among browsers

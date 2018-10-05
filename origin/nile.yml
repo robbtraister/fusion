@@ -65,6 +65,7 @@ environments:
           awslogs-group: /nile/fusion-origin/staging
           awslogs-region: us-east-1
         environment:
+          CONTEXT_PATH: pb
           AWS_ACCOUNT_ID: '397853141546'
           S3_BUCKET: pagebuilder-fusion
         # volumes:
@@ -96,6 +97,7 @@ environments:
           awslogs-region: us-east-1
         environment:
           <<: *_admin_environment
+          CONTEXT_PATH: pb
           PB_ADMIN: 'http://$environment.pb.arc.pub'
           AWS_ACCOUNT_ID: '397853141546'
           S3_BUCKET: pagebuilder-fusion
@@ -130,6 +132,7 @@ environments:
           awslogs-group: /nile/fusion-origin/arc
           awslogs-region: us-east-1
         environment:
+          CONTEXT_PATH: pb
           AWS_ACCOUNT_ID: '397853141546'
           S3_BUCKET: pagebuilder-fusion
         # volumes:
@@ -161,6 +164,7 @@ environments:
           awslogs-region: us-east-1
         environment:
           <<: *_admin_environment
+          CONTEXT_PATH: pb
           PB_ADMIN: 'http://$environment.pb.arc.pub'
           AWS_ACCOUNT_ID: '397853141546'
           S3_BUCKET: pagebuilder-fusion
@@ -193,6 +197,8 @@ environments:
         log_opt:
           awslogs-group: /nile/fusion-origin
           awslogs-region: eu-central-1
+        environment:
+          CONTEXT_PATH: pb
     services:
       - <<: *_service
         loadBalancers:
@@ -218,6 +224,7 @@ environments:
           awslogs-region: eu-central-1
         environment:
           <<: *_admin_environment
+          CONTEXT_PATH: pb
 
 #
 # us-east-1
@@ -234,8 +241,6 @@ environments:
         log_opt:
           awslogs-group: /nile/fusion-origin
           awslogs-region: us-east-1
-        environment:
-          CONTEXT_PATH: 'p'
     services:
       - <<: *_service
         loadBalancers:
@@ -261,4 +266,3 @@ environments:
           awslogs-region: us-east-1
         environment:
           <<: *_admin_environment
-          CONTEXT_PATH: 'p'

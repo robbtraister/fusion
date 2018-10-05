@@ -6,3 +6,5 @@ services:
       NODE_ENV: production
       PORT: '8080'
       AWS_ACCOUNT_ID: '057404813832'
+
+      CONTEXT_PATH: pf

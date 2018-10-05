@@ -1,6 +1,9 @@
 'use strict'
 
+/* global __CONTEXT_PATH__ */
+
 const Fusion = window.Fusion = window.Fusion || {}
+Fusion.contextPath = __CONTEXT_PATH__
 
 Fusion.components = Fusion.components || {}
 Fusion.components.Consumer = require('../shared/components/consumer')

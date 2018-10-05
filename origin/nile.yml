@@ -65,7 +65,7 @@ environments:
           awslogs-group: /nile/fusion-origin/staging
           awslogs-region: us-east-1
         environment:
-          CONTEXT_PATH: pb
+          CONTEXT_PATH: pf
           AWS_ACCOUNT_ID: '397853141546'
           S3_BUCKET: pagebuilder-fusion
         # volumes:

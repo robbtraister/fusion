@@ -1,7 +1,5 @@
 #!/bin/sh
 
-. $(dirname "$0")/../variables.sh
-
 cat <<EOB
       rewrite                   ^${API_PREFIX}(/|$)(.*) /\$2 break;
       rewrite                   ^${CONTEXT_PATH}(/|$)(.*) /\$2 break;

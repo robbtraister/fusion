@@ -1,7 +1,5 @@
 #!/bin/sh
 
-. $(dirname "$0")/variables.sh
-
 cat <<EOB
 
   geo \$dollar {

@@ -97,7 +97,7 @@ environments:
           awslogs-region: us-east-1
         environment:
           <<: *_admin_environment
-          CONTEXT_PATH: pb
+          CONTEXT_PATH: pf
           PB_ADMIN: 'http://$environment.pb.arc.pub'
           AWS_ACCOUNT_ID: '397853141546'
           S3_BUCKET: pagebuilder-fusion

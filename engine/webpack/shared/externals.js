@@ -9,7 +9,8 @@ module.exports = {
     'fusion:layout': 'fusion:layout',
     'fusion:static': 'fusion:static',
     'fusion:properties': 'fusion:properties',
-    'prop-types': 'prop-types',
+    'fusion:prop-types': 'fusion:prop-types',
+    'prop-types': 'fusion:prop-types',
     'react': 'react',
     'react-dom': 'react-dom'
   },
@@ -32,6 +33,8 @@ module.exports = {
     'Fusion.components.Static': 'Fusion.components.Static',
     'fusion:properties': 'Fusion.properties',
     'Fusion.properties': 'Fusion.properties',
+    '@arc-fusion/prop-types': 'PropTypes',
+    'fusion:prop-types': 'PropTypes',
     'prop-types': 'PropTypes',
     'PropTypes': 'PropTypes',
     'react': 'react',

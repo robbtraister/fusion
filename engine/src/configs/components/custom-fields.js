@@ -2,7 +2,7 @@
 
 const path = require('path')
 
-const PropTypes = require('../../react/shared/prop-types')
+const PropTypes = require('@arc-fusion/prop-types')
 const unpack = require('../../utils/unpack')
 
 const {

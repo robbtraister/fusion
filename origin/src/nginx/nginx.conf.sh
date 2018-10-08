@@ -122,20 +122,6 @@ then
     if (\$request_method ~ ^(POST|PUT)$) {
       return                    405;
     }
-
-    location = /healthcheck {
-      access_log                off;
-      add_header                Content-Type text/html;
-      return                    200 'OK';
-    }
-
-    location = /favicon.ico {
-      rewrite                   ^ ${API_PREFIX}/resources/favicon.ico;
-    }
-
-    location = / {
-      rewrite                   ^ /homepage;
-    }
 EOB
 
   for endpoint in $(node -e "console.log(require('$(dirname "$0")/conf/private-endpoints.json').join(' '))")
@@ -150,6 +136,20 @@ EOB
 fi
 
 cat <<EOB
+
+    location = /healthcheck {
+      access_log                off;
+      add_header                Content-Type text/html;
+      return                    200 'OK';
+    }
+
+    location = /favicon.ico {
+      rewrite                   ^ ${API_PREFIX}/resources/favicon.ico;
+    }
+
+    location = / {
+      rewrite                   ^ /homepage;
+    }
 
     location ${CONTEXT_PATH}/_ {
       rewrite                   ^${CONTEXT_PATH}/_(.*) ${API_PREFIX}\$1;

@@ -17,7 +17,8 @@ const {
   version
 } = require('../../environment')
 
-const KeyPrefix = `environments/${environment}/deployments/${version}`
+const EnvPrefix = `environments/${environment}`
+const KeyPrefix = `${EnvPrefix}/deployments/${version}`
 
 const s3 = new S3({ region })
 
@@ -70,7 +71,7 @@ const pushCssHash = (name, outputType = defaultOutputType, cssFile) =>
   model('hash').put({ id: path.join(name, outputType), version, cssFile })
 
 const pushHtml = async (name, src, ContentType) =>
-  pushKey(path.join(KeyPrefix, 'html', name), src, ContentType)
+  pushKey(path.join(EnvPrefix, 'html', name), src, ContentType)
 
 const getJson = (type, id) =>
   model(type).get(id)

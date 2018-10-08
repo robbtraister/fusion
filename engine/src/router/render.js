@@ -68,7 +68,7 @@ function getTypeRouter (routeType) {
         .then((html) =>
           (cacheHTML && request.uri)
             ? Promise.resolve(url.parse(request.uri).pathname)
-              .then((pathname) => /\/$/.test(pathname) ? path.join(pathname, 'index.html') : pathname)
+              .then((pathname) => pathname.replace(/\/$/, ''))
               .then((filePath) => pushHtml(path.join(request.arcSite || 'default', outputType, filePath), html))
               .then(() => html)
             : html

@@ -17,4 +17,4 @@ Fusion.unpack = require('../../utils/unpack')
 
 window.react = require('react')
 window.ReactDOM = require('react-dom')
-window.PropTypes = require('../shared/prop-types')
+window.PropTypes = require('@arc-fusion/prop-types')

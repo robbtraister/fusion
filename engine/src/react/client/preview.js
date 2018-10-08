@@ -2,7 +2,7 @@
 
 /* global __CONTEXT_PATH__ */
 
-const version = require('./version')
+const version = null // require('./version')()
 
 class Preview {
   constructor (iframe) {
@@ -35,9 +35,13 @@ class Preview {
   appendAdminScript (cb) {
     const script = this.iframe.contentDocument.createElement('script')
     script.type = 'application/javascript'
-    script.src = `${__CONTEXT_PATH__}/dist/engine/admin.js?v=${version}`
+    script.src = `${__CONTEXT_PATH__}/dist/engine/admin.js${version ? `?v=${version}` : ''}`
     script.onload = cb
     this.iframe.contentDocument.body.appendChild(script)
+
+    // in case the output type doesn't include the Fusion script, ensure we have the outputType defined
+    this.iframe.contentWindow.Fusion = this.iframe.contentWindow.Fusion || {}
+    this.iframe.contentWindow.Fusion.outputType = this.latestOutputType
   }
 
   render (renderingTree, outputType) {

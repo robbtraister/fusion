@@ -2,35 +2,71 @@
 
 /* global Fusion */
 
-window.Fusion = window.Fusion || {}
-
-Fusion.components = Fusion.components || {}
-Fusion.components.Consumer = require('../shared/components/consumer')
-Fusion.components.Layout = require('../shared/components/layout')
-Fusion.components.Static = require('../shared/components/static')
-Fusion.unpack = require('../../utils/unpack')
-Fusion.properties = require('fusion:properties')
+require('./shared')
 Fusion.isAdmin = true
 
 const Provider = require('./provider')
 
-const version = undefined // require('./version')
+const version = null // require('./version')()
 
-const React = window.react = require('react')
-const ReactDOM = window.ReactDOM = require('react-dom')
-window.PropTypes = require('../shared/prop-types')
+const React = window.react
+const ReactDOM = window.ReactDOM
 
 // support fragments in preact
 React.Fragment = React.Fragment || 'div'
 
-const ComponentGenerator = require('../shared/compile/component')
-class AdminGenerator extends ComponentGenerator {
-  loadComponent (componentCollection, componentType) {
-    return Fusion.components[componentCollection][componentType]
+document.body.parentElement.setAttribute('xmlns:fusion', 'http://www.arcpublishing.com/fusion')
+const appendBoundary = (element, id) => {
+  const boundaryProps = {
+    'data-fusion-component': id,
+    style: { display: 'none' }
   }
+  return React.createElement(
+    React.Fragment,
+    {},
+    [
+      React.createElement(
+        'fusion:enter',
+        Object.assign(
+          { id: `fusion-enter-${id}` },
+          boundaryProps
+        )
+      ),
+      element,
+      React.createElement(
+        'fusion:exit',
+        Object.assign(
+          { id: `fusion-exit-${id}` },
+          boundaryProps
+        )
+      )
+    ]
+  )
 }
 
-const generator = new AdminGenerator(Fusion.outputType)
+const ComponentCompiler = require('../shared/compile/component')
+class AdminCompiler extends ComponentCompiler {
+  loadComponent (componentCollection, componentType) {
+    try {
+      return Fusion.components[componentCollection][componentType]
+    } catch (e) {}
+    return null
+  }
+
+  getComponent (defaultComponent = 'div') {
+    const _getComponent = super.getComponent(defaultComponent)
+
+    return (node) => {
+      return (node.collection === 'chains')
+        ? appendBoundary(_getComponent(node), node.props.id)
+        : _getComponent(node)
+    }
+  }
+
+  getFeature (node) {
+    return appendBoundary(super.getFeature(node), node.props.id)
+  }
+}
 
 function CSR (rendering) {
   try {
@@ -42,7 +78,7 @@ function CSR (rendering) {
           layout: rendering.layout
         },
         React.createElement(
-          generator.generate(rendering),
+          new AdminCompiler(rendering, Fusion.outputType).compile(),
           Fusion.globalContent || {}
         )
       ),
@@ -55,7 +91,7 @@ function CSR (rendering) {
 
 function SSR (rendering, outputType) {
   window.renderingObject.value = JSON.stringify(rendering)
-  window.renderingUpdateForm.action = `/pb/api/v3/render/?outputType=${outputType}`
+  window.renderingUpdateForm.action = `${Fusion.contextPath}/api/v3/render/?outputType=${outputType}`
   window.renderingUpdateForm.submit()
 }
 
@@ -63,7 +99,7 @@ function appendSSRForm () {
   var form = document.createElement('form')
   form.id = 'renderingUpdateForm'
   form.method = 'POST'
-  form.action = '/pb/api/v3/render/'
+  form.action = `${Fusion.contextPath}/api/v3/render/`
   form.style.visibility = 'hidden'
 
   var rendering = document.createElement('input')
@@ -81,9 +117,6 @@ function addElement (tag, type, attr, rel) {
     e.type = type
     e.rel = rel
     e[attr] = url
-    e.onload = function () {
-      console.log(url + ' loaded')
-    }
     document.body.appendChild(e)
   }
 }

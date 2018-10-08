@@ -2,12 +2,16 @@
 
 'use strict'
 
+const path = require('path')
+
 const debugTimer = require('debug')('fusion:timer:react:render')
 
 const React = require('react')
 const ReactDOM = require('react-dom/server')
 
-const compileComponent = require('./compile/component')
+const compileStandardComponent = require('./compile/component')
+const compileQuarantineComponent = require('./compile/quarantine')
+
 const Provider = require('./provider')
 
 const unpack = require('../../utils/unpack')
@@ -18,6 +22,7 @@ const fusionProperties = require('fusion:properties')
 
 const {
   cssTagGenerator,
+  deployment,
   fusionTagGenerator,
   libsTagGenerator,
   metaTagGenerator,
@@ -25,10 +30,10 @@ const {
 } = require('./tags')
 
 const {
+  bundleRoot,
   componentDistRoot,
   contextPath,
-  isDev,
-  version
+  isDev
 } = require('../../../environment')
 
 const { components } = require('../../../manifest')
@@ -42,33 +47,33 @@ const getAncestors = function getAncestors (node) {
     : []
 }
 
-const render = function render ({Component, request, content, _website}) {
+const render = function render ({ Component, request, content }) {
   const renderHTML = () => new Promise((resolve, reject) => {
     try {
       const elementTic = timer.tic()
       const element = React.createElement(
         Component,
         {
-          arcSite: _website,
+          arcSite: request.arcSite,
           contextPath,
           globalContent: content ? content.document : null,
-          globalContentConfig: content ? {source: content.source, key: content.key} : null,
+          globalContentConfig: content ? { source: content.source, key: content.key } : null,
           outputType: Component.outputType,
-          requestUri: request && request.uri,
-          siteProperties: fusionProperties(_website)
+          requestUri: request.uri,
+          siteProperties: fusionProperties(request.arcSite)
         }
       )
       const elementElapsedTime = elementTic.toc()
       debugTimer(`create element`, elementElapsedTime)
-      sendMetrics([{type: METRIC_TYPES.RENDER_DURATION, value: elementElapsedTime, tags: ['render:element']}])
+      sendMetrics([{ type: METRIC_TYPES.RENDER_DURATION, value: elementElapsedTime, tags: ['render:element'] }])
       const htmlTic = timer.tic()
       const html = ReactDOM.renderToStaticMarkup(element)
       const htmlElapsedTime = htmlTic.toc()
       debugTimer(`render html`, htmlElapsedTime)
-      sendMetrics([{type: METRIC_TYPES.RENDER_DURATION, value: htmlElapsedTime, tags: ['render:html']}])
+      sendMetrics([{ type: METRIC_TYPES.RENDER_DURATION, value: htmlElapsedTime, tags: ['render:html'] }])
       resolve(html)
     } catch (e) {
-      sendMetrics([{type: METRIC_TYPES.RENDER_RESULT, value: 1, tags: ['result:error']}])
+      sendMetrics([{ type: METRIC_TYPES.RENDER_RESULT, value: 1, tags: ['result:error'] }])
       reject(e)
     }
   })
@@ -78,7 +83,7 @@ const render = function render ({Component, request, content, _website}) {
     .then((html) => {
       const elapsedTime = tic.toc()
       debugTimer('first render', elapsedTime)
-      sendMetrics([{type: METRIC_TYPES.RENDER_DURATION, value: elapsedTime, tags: ['render:first-render']}])
+      sendMetrics([{ type: METRIC_TYPES.RENDER_DURATION, value: elapsedTime, tags: ['render:first-render'] }])
       tic = timer.tic()
 
       // collect content cache into Promise array
@@ -102,14 +107,14 @@ const render = function render ({Component, request, content, _website}) {
           .then(() => {
             const contentHydrationDuration = tic.toc()
             debugTimer('content hydration', contentHydrationDuration)
-            sendMetrics([{type: METRIC_TYPES.RENDER_DURATION, value: contentHydrationDuration, tags: ['render:content-hydration']}])
+            sendMetrics([{ type: METRIC_TYPES.RENDER_DURATION, value: contentHydrationDuration, tags: ['render:content-hydration'] }])
             tic = timer.tic()
           })
           .then(renderHTML)
           .then((html) => {
             const secondRenderDuration = tic.toc()
             debugTimer('second render', secondRenderDuration)
-            sendMetrics([{type: METRIC_TYPES.RENDER_DURATION, value: secondRenderDuration, tags: ['render:second-render']}])
+            sendMetrics([{ type: METRIC_TYPES.RENDER_DURATION, value: secondRenderDuration, tags: ['render:second-render'] }])
             return html
           })
 
@@ -123,7 +128,7 @@ const render = function render ({Component, request, content, _website}) {
 
 const getOutputTypeComponent = function getOutputTypeComponent (outputType) {
   try {
-    return unpack(require(components.outputTypes[outputType].dist))
+    return unpack(require(path.join(bundleRoot, components.outputTypes[outputType].dist)))
   } catch (e) {
     const err = new Error(`Could not find output-type: ${outputType}`)
     err.statusCode = 400
@@ -131,7 +136,7 @@ const getOutputTypeComponent = function getOutputTypeComponent (outputType) {
   }
 }
 
-const compileRenderable = function compileRenderable ({renderable, outputType}) {
+const compileRenderable = function compileRenderable ({ renderable, outputType, quarantine, inlines, contentCache }) {
   if (isDev) {
     // clear cache to ensure we load the latest
     Object.keys(require.cache)
@@ -140,11 +145,14 @@ const compileRenderable = function compileRenderable ({renderable, outputType}) 
   }
 
   let tic = timer.tic()
-  return Promise.resolve(compileComponent(renderable, outputType))
+  const compileFn = (quarantine)
+    ? compileQuarantineComponent
+    : compileStandardComponent
+  return Promise.resolve(compileFn(renderable, outputType))
     .then((Renderable) => {
       debugTimer(`compile(${renderable._id || renderable.id})`, tic.toc())
       tic = timer.tic()
-      return Provider(Renderable)
+      return Provider(Renderable, inlines, contentCache)
     })
     .then((Component) => {
       debugTimer('provider wrapping', tic.toc())
@@ -152,11 +160,11 @@ const compileRenderable = function compileRenderable ({renderable, outputType}) 
     })
 }
 
-const compileDocument = function compileDocument ({rendering, outputType, name}) {
+const compileDocument = function compileDocument ({ name, rendering, outputType, inlines, contentCache, quarantine }) {
   let tic
   return rendering.getJson()
     .then((json) => {
-      return compileRenderable({renderable: json, outputType})
+      return compileRenderable({ renderable: json, outputType, inlines, contentCache, quarantine })
         .then((Template) => {
           if (!outputType) {
             return Template
@@ -173,14 +181,15 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
           const MetaTags = () =>
             Object.keys(metas).filter(name => metas[name].html).map(getMetaTag)
 
-          const CssTags = cssTagGenerator({inlines: Template.inlines, rendering, outputType})
+          const CssTags = cssTagGenerator({ inlines: Template.inlines, rendering, outputType })
 
           const Component = (props) => {
             return React.createElement(
               OutputType,
               {
                 contextPath,
-                version,
+                deployment,
+                version: deployment,
                 tree: Template.tree,
                 renderables: [Template.tree].concat(...getAncestors(Template.tree)),
 
@@ -188,7 +197,7 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
                 CssTags,
 
                 Fusion: fusionTagGenerator(props.globalContent, props.globalContentConfig, Template.contentCache, outputType, props.arcSite),
-                Libs: libsTagGenerator({name, outputType}),
+                Libs: libsTagGenerator({ name, outputType }),
 
                 /*
                  * To insert all meta tags
@@ -198,7 +207,7 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
                  * To insert a single meta tag
                  *   <props.MetaTag name='title' />
                  */
-                MetaTag ({name, default: defaultValue}) {
+                MetaTag ({ name, default: defaultValue }) {
                   return (name)
                     ? getMetaTag(name)
                     : MetaTags()
@@ -215,7 +224,7 @@ const compileDocument = function compileDocument ({rendering, outputType, name})
                     (isObject ? nameOrObject.default : defaultValue)
                 },
 
-                Styles: stylesGenerator({inlines: Template.inlines, outputType, rendering}),
+                Styles: stylesGenerator({ inlines: Template.inlines, outputType, rendering }),
 
                 ...props
               },
@@ -261,7 +270,7 @@ if (module === require.main) {
     })
 
   input
-    .then((rendering) => render({template: rendering}))
+    .then((rendering) => render({ template: rendering }))
     .then(console.log)
     .catch(console.error)
 }

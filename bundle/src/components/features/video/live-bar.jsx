@@ -2,24 +2,18 @@
 
 const React = require('react')
 
-// const headlineQuery = '{headlines{basic}}'
+const Content = require('fusion:content')
+
+const headlineQuery = '{headlines{basic}}'
+
+const HeadlineComponent = (content) => content && content.headlines.basic
 
 class LiveBar extends React.Component {
   constructor (props) {
     super(props)
+
     this.onButtonClick = this.onButtonClick.bind(this)
   }
-  // componentWillMount () {
-  //   this.setContent({
-  //     redskins: this.getContent('content-api', {uri: '/sports/redskins/football-insider/aoeu-7'}, headlineQuery)
-  //   })
-  // }
-
-  // componentDidMount () {
-  //   this.setContent({
-  //     mlb: this.getContent('content-api', {uri: '/sports/mlb/new-blockquote-test'}, headlineQuery)
-  //   })
-  // }
 
   onButtonClick () {
     console.log('clicked')
@@ -29,9 +23,13 @@ class LiveBar extends React.Component {
     return <div className={this.props.type} id={this.props.id}>
       {this.props.customFields.headline}
       <p>
-        {this.state && this.state.mlb && this.state.mlb.headlines.basic}
+        <Content source='content-api' contentConfigValues={{ uri: '/sports/mlb/new-blockquote-test' }} filter={headlineQuery}>
+          {HeadlineComponent}
+        </Content>
         <br />
-        {this.state && this.state.redskins && this.state.redskins.headlines.basic}
+        <Content source='content-api' contentConfigValues={{ uri: '/sports/redskins/football-insider/aoeu-7' }} filter={headlineQuery}>
+          {HeadlineComponent}
+        </Content>
       </p>
       <button onClick={this.onButtonClick}>click me</button>
     </div>

@@ -2,28 +2,12 @@
 
 /* global Fusion */
 
-const { parse } = require('url')
-
-window.Fusion = window.Fusion || {}
-if (!Fusion.contextPath) {
-  const engineScript = document.getElementById('fusion-engine-script')
-  if (engineScript) {
-    Fusion.contextPath = parse(engineScript.src).pathname.replace(/\/dist\/engine\/react\.js$/, '')
-  }
-}
-
-Fusion.components = Fusion.components || {}
-Fusion.components.Consumer = require('../shared/components/consumer')
-Fusion.components.Layout = require('../shared/components/layout')
-Fusion.components.Static = require('../shared/components/static')
-Fusion.properties = require('fusion:properties')
-Fusion.unpack = require('../../utils/unpack')
+require('./shared')
 
 const Provider = require('./provider')
 
-const React = window.react = require('react')
-const ReactDOM = window.ReactDOM = require('react-dom')
-window.PropTypes = require('../shared/prop-types')
+const React = window.react
+const ReactDOM = window.ReactDOM
 
 // support fragments in preact
 React.Fragment = React.Fragment || 'div'
@@ -57,6 +41,8 @@ const render = () => {
           templateStyle.href = `${Fusion.contextPath || ''}/dist/${Fusion.Template.cssFile}`
         }
       }
+
+      Fusion.Template.displayName = 'FusionTemplate'
 
       Fusion.elementCache = {}
       const staticElements = window.document.getElementsByClassName('fusion:static')

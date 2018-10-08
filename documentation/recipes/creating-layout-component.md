@@ -70,7 +70,6 @@ export default [
     element: 'footer'
   },
 ]
-
 ```
 
 This Layout would then result in HTML resembling the following on the webpage:
@@ -92,7 +91,7 @@ This Layout would then result in HTML resembling the following on the webpage:
 
 This Layout, while uncomplicated, provides some simple class name wrapping around the different sections of our page that we can apply styling to. In the PageBuilder Admin, editors will see the section names `header`, `sidebar`, `main` and `footer` available to drop Features and Chains into.
 
-There is even more syntactic sugar for defining simple Layouts outlined in [the API docs](TODO: add link). 
+There is even more syntactic sugar for defining simple Layouts outlined in [the API docs](../api/feature-pack/components/layout.md). 
 
 ### Creating a JSX Layout
 

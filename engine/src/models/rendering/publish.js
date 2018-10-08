@@ -13,12 +13,12 @@ const { components } = require('../../../manifest')
 
 const allOutputTypes = Object.keys(components.outputTypes)
 
-const lambda = new Lambda({region})
+const lambda = new Lambda({ region })
 
 const listVersions = function listVersions () {
   return new Promise((resolve, reject) => {
     lambda.listVersionsByFunction(
-      {FunctionName: functionName},
+      { FunctionName: functionName },
       (err, data) => err ? reject(err) : resolve(data)
     )
   })
@@ -45,7 +45,7 @@ const invoke = function invoke (uri, payload, version, InvocationType = 'Request
           },
           path: uri,
           body: payload,
-          queryStringParameters: {propagate: 'false'}
+          queryStringParameters: { propagate: 'false' }
         })
       },
       (err, data) => err ? reject(err) : resolve(data)

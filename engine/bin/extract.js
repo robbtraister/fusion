@@ -18,7 +18,7 @@ model('jge_config').find()
       config.pattern = url.format(
         Object.assign(
           url.parse(config.pattern),
-          {auth: null}
+          { auth: null }
         )
       )
       fs.writeFileSync(`${sourcesSrcRoot}/${config._id}.json`, JSON.stringify(config, null, 2))

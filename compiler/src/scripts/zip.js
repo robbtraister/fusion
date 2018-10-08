@@ -15,7 +15,7 @@ async function zip (zipDirMap) {
 
   try {
     if (!(zipDirMap instanceof Object)) {
-      zipDirMap = {'.': zipDirMap}
+      zipDirMap = { '.': zipDirMap }
     }
 
     debug(`zipping ${Object.values(zipDirMap)} to ${zipFile}`)
@@ -32,7 +32,7 @@ async function zip (zipDirMap) {
       function addDir (zipDir, prefix) {
         debug(`adding ${zipDir} to ${zipFile}`)
         return new Promise((resolve, reject) => {
-          glob('**/*', {cwd: zipDir, nodir: true}, (err, files) => {
+          glob('**/*', { cwd: zipDir, nodir: true }, (err, files) => {
             if (err) {
               reject(err)
             } else {
@@ -50,7 +50,7 @@ async function zip (zipDirMap) {
     debug(`zipped ${Object.values(zipDirMap)} to ${zipFile}`)
 
     return zipFile
-  } catch (e) {
+  } finally {
     promises.remove(zipFile)
   }
 }

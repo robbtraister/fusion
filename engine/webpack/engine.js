@@ -44,7 +44,7 @@ const siteFiles = Object.assign(
   {},
   ...glob.sync(`${bundleSrcRoot}/properties/sites/*.{js,json,ts}`)
     .filter(getRequirable)
-    .map(fp => ({[path.parse(fp).name]: fp}))
+    .map(fp => ({ [path.parse(fp).name]: fp }))
 )
 
 fs.writeFileSync(propertiesSrcFile,
@@ -88,6 +88,8 @@ module.exports = [
   {
     entry: {
       admin: require.resolve('../src/react/client/admin'),
+      loader: require.resolve('../src/react/client/loader'),
+      polyfill: require.resolve('../src/react/client/polyfill'),
       preview: require.resolve('../src/react/client/preview'),
       properties: require.resolve(propertiesSrcFile),
       react: require.resolve('../src/react/client')
@@ -111,9 +113,9 @@ module.exports = [
     },
     plugins: [
       new DefinePlugin({
-        '__CONTEXT_PATH__': `'${contextPath}'`
+        __CONTEXT_PATH__: `'${contextPath}'`
       }),
-      new ManifestPlugin({fileName: 'webpack.manifest.json'})
+      new ManifestPlugin({ fileName: 'webpack.manifest.json' })
     ],
     resolve: Object.assign(
       {},

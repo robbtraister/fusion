@@ -3,6 +3,8 @@
 module.exports = {
   node: {
     'fusion:consumer': 'fusion:consumer',
+    'fusion:content': 'fusion:content',
+    'fusion:context': 'fusion:context',
     'fusion:environment': 'fusion:environment',
     'fusion:layout': 'fusion:layout',
     'fusion:static': 'fusion:static',
@@ -19,6 +21,10 @@ module.exports = {
   web: {
     'fusion:consumer': 'Fusion.components.Consumer',
     'Fusion.components.Consumer': 'Fusion.components.Consumer',
+    'fusion:content': 'Fusion.components.Content',
+    'Fusion.components.Content': 'Fusion.components.Content',
+    'fusion:context': 'Fusion.components.Context',
+    'Fusion.components.Context': 'Fusion.components.Context',
     'fusion:environment': '{}',
     'fusion:layout': 'Fusion.components.Layout',
     'Fusion.components.Layout': 'Fusion.components.Layout',

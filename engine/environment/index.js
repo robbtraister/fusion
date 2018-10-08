@@ -25,7 +25,7 @@ const bodyLimit = '100mb'
 const cacheProxyUrl = variables.CACHE_PROXY_URL || ''
 const cachePrefix = variables.CACHE_PREFIX || ''
 const contentBase = variables.CONTENT_BASE || ''
-const contextPath = (variables.CONTEXT_PATH || 'pb').replace(/^\/*/, '/').replace(/\/+$/, '')
+const contextPath = (variables.CONTEXT_PATH || 'pf').replace(/^\/*/, '/').replace(/\/+$/, '')
 const datadogApiKey = variables.DATADOG_API_KEY || ''
 const defaultOutputType = variables.DEFAULT_OUTPUT_TYPE || 'default'
 const apiPrefix = `${contextPath}/api/v3`
@@ -36,8 +36,9 @@ const minify = (isDev) ? /^true$/i.test(variables.MINIFY) : true
 const mongoUrl = variables.MONGO_URL
 const onDemand = /^true$/i.test(variables.ON_DEMAND)
 const port = variables.PORT || 8080
-const region = variables.REGION || 'us-east-1'
-const s3Bucket = variables.S3BUCKET || 'pagebuilder-fusion'
+const region = variables.AWS_REGION || 'us-east-1'
+const s3BucketDiscrete = variables.S3BUCKET_DISCRETE || variables.S3BUCKET || 'pagebuilder-fusion'
+const s3BucketVersioned = variables.S3BUCKET_VERSIONED || 'pagebuilder-fusion'
 const semver = variables.FUSION_RELEASE
 const version = variables.AWS_LAMBDA_FUNCTION_VERSION || '$LATEST'
 
@@ -83,7 +84,8 @@ module.exports = {
   onDemand,
   port,
   region,
-  s3Bucket,
+  s3BucketDiscrete,
+  s3BucketVersioned,
   schemasDistRoot,
   schemasSrcRoot,
   semver,

@@ -22,7 +22,7 @@ const trailingSlashRedirectMiddleware = (rule) =>
     ? (req, res, next) => {
       const parts = url.parse(req.url)
       TRAILING_SLASH_PATTERN[rule].test(parts.pathname)
-        ? next(new RedirectError(url.format(Object.assign(parts, {pathname: TRAILING_SLASH_REWRITES[rule](parts.pathname)}))))
+        ? next(new RedirectError(url.format(Object.assign(parts, { pathname: TRAILING_SLASH_REWRITES[rule](parts.pathname) }))))
         : next()
     }
     : null

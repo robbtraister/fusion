@@ -2,8 +2,8 @@
 
 const Generator = require('./generator')
 
-const main = (bucket, resolverPath, region) => {
-  return new Generator(bucket, resolverPath, region)
+const main = (bucket, resolverPath) => {
+  return new Generator(bucket, resolverPath)
     .generate()
 }
 
@@ -12,9 +12,7 @@ module.exports.handler = (event, context, callback) => {
   const bucket = s3event.bucket.name
   const resolverPath = s3event.object.key
 
-  const region = event.Records[0].awsRegion || 'us-east-1'
-
-  main(bucket, resolverPath, region)
+  main(bucket, resolverPath)
     .then((result) => callback(null, result))
     .catch((err) => {
       console.error(err)

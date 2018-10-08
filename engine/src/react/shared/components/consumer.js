@@ -11,19 +11,22 @@ const _get = require('lodash.get')
 const _merge = require('lodash.merge')
 
 const getContextProps = (props, context) => {
-  const contextProps = Object.assign({}, props, context)
-  delete contextProps.eventListeners
-  delete contextProps.getContent
-  delete contextProps.children
-
   return {
-    props: contextProps,
+    props: { ...context.props, ...props },
     children: props.children
   }
 }
 
 const createContextElement = (Component, props, context) => {
   const { props: contextProps, children } = getContextProps(props, context)
+
+  contextProps.contentEditable = (isClient && Fusion.isAdmin)
+    ? (prop) => ({
+      'data-content-editable': prop,
+      'data-feature': props.id,
+      'contenteditable': 'true'
+    })
+    : () => ({})
 
   return React.createElement(
     Component,
@@ -62,7 +65,7 @@ function HOC (Component) {
           this.setContent(
             Object.assign(
               ...Object.keys(contents)
-                .map(stateKey => ({[stateKey]: this.getContent(contents[stateKey])}))
+                .map(stateKey => ({ [stateKey]: this.getContent(contents[stateKey]) }))
             )
           )
         }
@@ -132,7 +135,7 @@ function HOC (Component) {
             if (isClient) {
               // this case is only necessary on the client
               // on the server, we will wait for the content to hydrate and manually re-render
-              content.fetched.then(data => { this.setState({[key]: data}) })
+              content.fetched.then(data => { this.setState({ [key]: data }) })
             }
 
             // this case is only possible if content was fetched server-side
@@ -143,15 +146,24 @@ function HOC (Component) {
         }
       }
 
+      ComponentConsumer.displayName = Component.displayName || Component.name
+
       return createContextElement(ComponentConsumer, props, context)
     }
     : (props) => (context) => createContextElement(Component, props, context)
 
-  return (props) => React.createElement(
+  const ConsumerWrapper = (props) => React.createElement(
     Fusion.context.Consumer,
     {},
     elementGenerator(props)
   )
+
+  for (let key in Component) {
+    ConsumerWrapper[key] = Component[key]
+  }
+  ConsumerWrapper.displayName = `FusionConsumerWrapper(${Component.displayName || Component.name || 'Component'})`
+
+  return ConsumerWrapper
 }
 
 function Consumer (propsOrComponent) {

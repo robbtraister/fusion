@@ -1,5 +1,8 @@
 'use strict'
 
+const path = require('path')
+const url = require('url')
+
 const bodyParser = require('body-parser')
 const express = require('express')
 
@@ -10,11 +13,11 @@ const {
   defaultOutputType
 } = require('../../environment')
 
-const Rendering = require('../models/rendering')
-
 const {
-  render
-} = require('../react')
+  pushHtml
+} = require('../io')
+
+const Rendering = require('../models/rendering')
 
 const timer = require('../timer')
 
@@ -24,48 +27,53 @@ function getTypeRouter (routeType) {
   const typeRouter = express.Router()
 
   typeRouter.all(['/', '/:id', '/:id/:child'],
-    bodyParser.json({limit: bodyLimit}),
-    bodyParser.urlencoded({extended: true}),
+    bodyParser.json({ limit: bodyLimit }),
+    bodyParser.urlencoded({ extended: true }),
     (req, res, next) => {
       const tic = timer.tic()
+
+      const cacheHTML = req.get('Fusion-Cache-HTML') === 'true'
+
+      const content = (req.body && req.body.content)
 
       const outputType = /^(false|none|off|0)$/i.test(req.query.outputType)
         ? null
         : req.query.outputType || defaultOutputType
 
       const renderingJson = (req.body && req.body.rendering)
-      const renderingTree = (typeof renderingJson === 'string')
-        ? JSON.parse(renderingJson)
-        : renderingJson
-
-      const payload = Object.assign(
+      const rendering = Object.assign(
         {
-          _website: req.query._website
+          id: req.params.id,
+          child: req.params.child,
+          outputType
         },
-        req.body,
-        {
-          rendering: Object.assign(
-            {
-              id: req.params.id,
-              child: req.params.child,
-              outputType
-            },
-            renderingTree
-          )
-        }
+        // support POST from an HTML form
+        (typeof renderingJson === 'string')
+          ? JSON.parse(renderingJson)
+          : renderingJson
       )
 
-      const type = payload.rendering.type || routeType
+      const request = Object.assign(
+        {
+          arcSite: req.query._website
+        },
+        (req.body && req.body.request) || {}
+      )
 
-      const rendering = new Rendering(type, payload.rendering.id, payload.rendering.layoutItems ? payload.rendering : undefined)
-      return Promise.all([
-        rendering.getComponent(outputType, payload.rendering.child),
-        rendering.getContent(payload._website)
-      ])
-        // template will already have content populated by resolver
-        // use Object.assign to default to the resolver content
-        .then(([Component, content]) => render(Object.assign({content}, payload, {Component})))
-        .then(data => { res.send(`${outputType ? '<!DOCTYPE html>' : ''}${data}`) })
+      const type = rendering.type || routeType
+
+      new Rendering(type, rendering.id, rendering.layoutItems ? rendering : undefined)
+        .render({ content, rendering, request })
+        .then((html) => `${outputType ? '<!DOCTYPE html>' : ''}${html}`)
+        .then((html) =>
+          (cacheHTML && request.uri)
+            ? Promise.resolve(url.parse(request.uri).pathname)
+              .then((pathname) => /\/$/.test(pathname) ? path.join(pathname, 'index.html') : pathname)
+              .then((filePath) => pushHtml(path.join(request.arcSite || 'default', outputType, filePath), html))
+              .then(() => html)
+            : html
+        )
+        .then((html) => { res.send(html) })
         .then(() => {
           debugTimer('complete response', tic.toc())
         })

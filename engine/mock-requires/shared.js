@@ -8,6 +8,12 @@ mockRequire('prop-types', FusionPropTypes)
 const FusionConsumer = require('../src/react/shared/components/consumer')
 mockRequire('fusion:consumer', FusionConsumer)
 
+const FusionContent = require('../src/react/shared/components/content')
+mockRequire('fusion:content', FusionContent)
+
+const FusionContext = require('../src/react/shared/components/context')
+mockRequire('fusion:context', FusionContext)
+
 const FusionLayout = require('../src/react/shared/components/layout')
 mockRequire('fusion:layout', FusionLayout)
 

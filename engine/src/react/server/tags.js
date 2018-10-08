@@ -4,9 +4,10 @@ const React = require('react')
 
 const fs = require('fs')
 const path = require('path')
+const url = require('url')
 
 const {
-  fetchFile
+  fetchAsset
 } = require('../../io')
 
 const {
@@ -16,14 +17,21 @@ const {
   version
 } = require('../../../environment')
 
+const deployment = (u) => {
+  const parts = url.parse(u, true)
+  parts.query.v = version
+  parts.search = undefined
+  return url.format(parts)
+}
+deployment.toString = () => version
+
 const engineScript = React.createElement(
   'script',
   {
-    key: 'fusion-engine-script',
-    id: 'fusion-engine-script',
+    key: 'fusion-loader-script',
+    id: 'fusion-loader-script',
     type: 'application/javascript',
-    src: `${contextPath}/dist/engine/react.js?v=${version}`,
-    defer: true
+    src: deployment(`${contextPath}/dist/engine/loader.js`)
   }
 )
 
@@ -55,7 +63,7 @@ const outputTypeHasCss = (isDev)
     }
   })()
 
-const cssTagGenerator = ({inlines, rendering, outputType}) => {
+const cssTagGenerator = ({ inlines, rendering, outputType }) => {
   inlines.cssLinks = inlines.cssLinks || {
     cached: {
       outputTypeHref: undefined,
@@ -65,13 +73,13 @@ const cssTagGenerator = ({inlines, rendering, outputType}) => {
       .catch(() => null)
       .then((templateCssFile) => {
         inlines.cssLinks.cached = {
-          outputTypeHref: (outputTypeHasCss(outputType)) ? `${contextPath}/dist/components/output-types/${outputType}.css?v=${version}` : null,
-          templateHref: (templateCssFile) ? `${contextPath}/dist/${templateCssFile}?v=${version}` : null
+          outputTypeHref: (outputTypeHasCss(outputType)) ? deployment(`${contextPath}/dist/components/output-types/${outputType}.css`) : null,
+          templateHref: (templateCssFile) ? deployment(`${contextPath}/dist/${templateCssFile}`) : null
         }
       })
   }
 
-  return ({children}) => (children)
+  return ({ children }) => (children)
     ? children(inlines.styles.cached)
     // even if cssFile is null, add the link tag with no href
     // so it can be replaced by an updated template script later
@@ -115,7 +123,7 @@ const fusionTagGenerator = (globalContent, globalContentConfig, contentCache, ou
               entries: {},
               expiresAt: now + ((keyCache.source && keyCache.source.ttl) || 300000)
             }
-            condensedSourceCache.entries[key] = {cached: keyCache.filtered}
+            condensedSourceCache.entries[key] = { cached: keyCache.filtered }
           }
         })
     })
@@ -138,14 +146,14 @@ const fusionTagGenerator = (globalContent, globalContentConfig, contentCache, ou
   )
 }
 
-const libsTagGenerator = ({name, outputType}) => {
+const libsTagGenerator = ({ name, outputType }) => {
   const templateScript = React.createElement(
     'script',
     {
       key: 'fusion-template-script',
       id: 'fusion-template-script',
       type: 'application/javascript',
-      src: `${contextPath}/dist/${name}/${outputType}.js?v=${version}`,
+      src: deployment(`${contextPath}/dist/${name}/${outputType}.js`),
       defer: true
     }
   )
@@ -172,8 +180,8 @@ const metaTagGenerator = (metas = {}) => (name, defaultValue) =>
     )
     : null
 
-const stylesGenerator = ({inlines, rendering, outputType}) => {
-  const outputTypeStylesPromise = fetchFile(`components/output-types/${outputType}.css`)
+const stylesGenerator = ({ inlines, rendering, outputType }) => {
+  const outputTypeStylesPromise = fetchAsset(`components/output-types/${outputType}.css`)
     .catch(() => null)
 
   const templateStylesPromise = rendering.getStyles()
@@ -196,7 +204,7 @@ const stylesGenerator = ({inlines, rendering, outputType}) => {
       })
   }
 
-  return ({children}) => (children)
+  return ({ children }) => (children)
     ? children(inlines.styles.cached)
     : React.createElement(
       'style',
@@ -208,6 +216,7 @@ const stylesGenerator = ({inlines, rendering, outputType}) => {
 
 module.exports = {
   cssTagGenerator,
+  deployment,
   fusionTagGenerator,
   libsTagGenerator,
   metaTagGenerator,

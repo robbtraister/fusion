@@ -1,0 +1,199 @@
+[
+  {
+    "title": "Recipes",
+    "items": [
+      {
+        "title": "Setting Up",
+        "items": [
+          {
+            "title": "Intro to Fusion",
+            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes/intro.md"
+          },
+          {
+            "title": "Creating a Feature Pack",
+            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes/creating-feature-pack.md"
+          },
+          {
+            "title": "Examining the Feature Pack",
+            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes/examining-feature-pack.md"
+          },
+          {
+            "title": "Configuring a Feature Pack",
+            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes/configuring-feature-pack.md"
+          },
+          {
+            "title": "Running Fusion Locally",
+            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes/running-fusion-locally.md"
+          },
+          {
+            "title": "Keeping Up to Date",
+            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes/keeping-up-to-date.md"
+          }
+        ]
+      },
+      {
+        "title": "Writing Components",
+        "items": [
+          {
+            "title": "Creating and Using Output Types",
+            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes/creating-using-output-types.md"
+          },
+          {
+            "title": "Creating a Feature Component",
+            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes/creating-feature-component.md"
+          },
+          {
+            "title": "Creating a Layout Component",
+            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes/creating-layout-component.md"
+          },
+          {
+            "title": "Creating a Chain Component",
+            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes/creating-chain-component.md"
+          },
+          {
+            "title": "Event Handling and Interaction",
+            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes//event-handling-interaction.md"
+          },
+          {
+            "title": "Isomorphic vs. Server vs. SPA Rendering",
+            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes//event-handling-interaction.md"
+          }
+        ]
+      },
+      {
+        "title": "Using Data",
+        "items": [
+          {
+            "title": "Defining a Content Source",
+            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes/defining-content-source.md"
+          },
+          {
+            "title": "Using Environment \"Secrets\"",
+            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes/using-environment-secrets.md"
+          },
+          {
+            "title": "Using the `Consumer` Higher-Order Function",
+            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes/using-consumer-function.md"
+          },
+          {
+            "title": "Adding Custom Fields to a Component",
+            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes/adding-custom-fields.md"
+          },
+          {
+            "title": "Using a GraphQL Schema",
+            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes/using-graphql-schema.md"
+          },
+          {
+            "title": "Fetching Content",
+            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes/fetching-content.md"
+          },
+          {
+            "title": "Dynamically Configuring Content",
+            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes/dynamically-configuring-content.md"
+          },
+          {
+            "title": "Using Runtime Properties",
+            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes/using-runtime-properties.md"
+          }
+        ]
+      },
+      {
+        "title": "Tidying Up",
+        "items": [
+          {
+            "title": "Adding Styling to Components",
+            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes/adding-styling.md"
+          },
+          {
+            "title": "Using Third Party Libraries",
+            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes/using-third-party-libraries.md"
+          },
+          {
+            "title": "Messaging Between Components",
+            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes/messaging-between-components.md"
+          },
+          {
+            "title": "Helpful Commands",
+            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes/helpful-commands.md"
+          },
+          {
+            "title": "Deploying a Feature Pack",
+            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes/deploying-feature-pack.md"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "API",
+    "items": [
+      {
+        "title": "Feature Pack",
+        "items": [
+          {
+            "title": "Components",
+            "items": [
+              {
+                "title": "Output Type",
+                "canonical_url": "/arc-products/pagebuilder/fusion/documentation/api/feature-pack/components/output-type.md"
+              },
+              {
+                "title": "Feature",
+                "canonical_url": "/arc-products/pagebuilder/fusion/documentation/api/feature-pack/components/feature.md"
+              },
+              {
+                "title": "Layout",
+                "canonical_url": "/arc-products/pagebuilder/fusion/documentation/api/feature-pack/components/layout.md"
+              },
+              {
+                "title": "Chain",
+                "canonical_url": "/arc-products/pagebuilder/fusion/documentation/api/feature-pack/components/chain.md"
+              },
+              {
+                "title": "Custom Fields",
+                "canonical_url": "/arc-products/pagebuilder/fusion/documentation/api/feature-pack/components/custom-fields.md"
+              },
+              {
+                "title": "Consumer",
+                "canonical_url": "/arc-products/pagebuilder/fusion/documentation/api/feature-pack/components/consumer.md"
+              },
+              {
+                "title": "Context",
+                "canonical_url": "/arc-products/pagebuilder/fusion/documentation/api/feature-pack/components/context.md"
+              },
+              {
+                "title": "Content",
+                "canonical_url": "/arc-products/pagebuilder/fusion/documentation/api/feature-pack/components/content.md"
+              },
+            ]
+          },
+          {
+            "title": "Content",
+            "items": [
+              {
+                "title": "Content Source",
+                "canonical_url": "/arc-products/pagebuilder/fusion/documentation/api/feature-pack/content/source.md"
+              },
+              {
+                "title": "Content Schema",
+                "canonical_url": "/arc-products/pagebuilder/fusion/documentation/api/feature-pack/content/schema.md"
+              }
+            ]
+          },
+          {
+            "title": "Environment Variables",
+            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/api/feature-pack/environment.md"
+          },
+          {
+            "title": "Site Properties",
+            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/api/feature-pack/properties.md"
+          }
+        ]
+      },
+      {
+        "title": "HTTP Endpoints",
+        "canonical_url": "/arc-products/pagebuilder/fusion/documentation/api/http/API.md"
+      }
+    ]
+  }
+]

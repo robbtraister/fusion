@@ -64,7 +64,7 @@ function getTypeRouter (routeType, allowPost) {
 
   if (allowPost) {
     const publishRenderingHandlers = [
-      bodyParser.json({limit: bodyLimit}),
+      bodyParser.json({ limit: bodyLimit }),
       (req, res, next) => {
         const id = req.params.id || req.body.id || req.body._id
         const type = req.body.type || routeType
@@ -82,7 +82,7 @@ function getTypeRouter (routeType, allowPost) {
       .put(publishRenderingHandlers)
 
     const publishOutputTypeHandlers = [
-      bodyParser.json({limit: bodyLimit}),
+      bodyParser.json({ limit: bodyLimit }),
       (req, res, next) => {
         const id = req.params.id || req.body.id || req.body._id
         const type = req.body.type || routeType

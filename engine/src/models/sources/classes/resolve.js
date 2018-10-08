@@ -19,7 +19,7 @@ const {
 function sanitizeUri (uri) {
   const uriParts = url.parse(uri)
   return (uriParts.auth)
-    ? url.format(Object.assign(uriParts, {auth: `${uriParts.auth.split(':').shift()}:<redacted>`}))
+    ? url.format(Object.assign(uriParts, { auth: `${uriParts.auth.split(':').shift()}:<redacted>` }))
     : uri
 }
 
@@ -41,8 +41,8 @@ class ResolveSource extends BaseSource {
         const tags = ['operation:fetch', 'result:success', `source:${this.name}`]
         sendMetrics([
           // {type: METRIC_TYPES.CONTENT_RESULT, value: 1, tags},
-          {type: METRIC_TYPES.CONTENT_LATENCY, value: elapsedTime, tags},
-          {type: METRIC_TYPES.CONTENT_RESULT_SIZE, value: JSON.stringify(data).length, tags}
+          { type: METRIC_TYPES.CONTENT_LATENCY, value: elapsedTime, tags },
+          { type: METRIC_TYPES.CONTENT_RESULT_SIZE, value: JSON.stringify(data).length, tags }
         ])
 
         return data

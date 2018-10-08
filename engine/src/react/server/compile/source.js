@@ -1,18 +1,20 @@
 'use strict'
 
 const fs = require('fs')
+const path = require('path')
 
 const isStatic = require('../utils/is-static')
 const unpack = require('../../../utils/unpack')
 const { logError, LOG_TYPES } = require('../../../utils/logger')
 
 const {
+  bundleRoot,
   minify
 } = require('../../../../environment')
 
 const { components } = require('../../../../manifest')
 
-const ComponentGenerator = require('../../shared/compile/component')
+const ComponentCompiler = require('../../shared/compile/component')
 
 const getTree = require('../../shared/compile/tree')
 
@@ -37,29 +39,27 @@ function getComponentManifest (collection, type, outputType) {
   return (componentConfig && componentConfig.outputTypes[outputType]) || null
 }
 
-class ScriptSource extends ComponentGenerator {
-  constructor (outputType, renderable) {
-    super(outputType)
+class SourceCompiler extends ComponentCompiler {
+  constructor (renderable, outputType) {
+    super(renderable, outputType)
 
     this.collections = {}
     this.collectionMap.sections = this.getComponent('React.Fragment')
 
     this.emptyElement = ''
-
-    this.renderable = renderable
   }
 
   componentImport (manifest) {
     try {
-      const Component = unpack(require(manifest.dist))
+      const Component = unpack(require(path.join(bundleRoot, manifest.dist)))
       if (Component) {
         const componentName = this.getComponentName(manifest.collection, manifest.type)
-        const fp = manifest[srcFileType]
+        const fp = path.join(bundleRoot, manifest[srcFileType])
         return (isStatic(Component, manifest.outputType))
           ? `Fusion.components${componentName} = Fusion.components.Static`
           : (manifest.collection === 'layouts')
             ? `Fusion.components${componentName} = Fusion.components.Layout(Fusion.unpack(require('${fp}')))`
-            : `Fusion.components${componentName} = Fusion.unpack(require('${fp}'))`
+            : `Fusion.components${componentName} = Fusion.components.Quarantine(Fusion.unpack(require('${fp}')))`
       }
     } catch (error) {
       logError({logType: LOG_TYPES.COMPONENT, message: `There was a problem attempting to import a component: ${error.stack || error}`})
@@ -121,7 +121,7 @@ class ScriptSource extends ComponentGenerator {
     return typeMap[type] && typeMap[type].name
   }
 
-  generate () {
+  compile () {
     const tree = getTree(this.renderable, this.outputType)
     const Template = this.renderableItem(tree)
 
@@ -135,6 +135,7 @@ ${usedCollections.map(collection => `Fusion.components['${collection}'] = Fusion
 ${usedCollections
     .map(collection =>
       Object.values(this.collections[collection].types)
+        .filter(componentType => componentType)
         .map(componentType => this.componentImport(componentType.manifest))
         .join('\n')
     )
@@ -143,7 +144,7 @@ ${usedCollections
 Fusion.Template = function (props) {
   return React.createElement(React.Fragment, {}, ${Template})
 }
-Fusion.Template.id = '${Template.id}'
+Fusion.Template.id = ${this.renderable.id ? `'${this.renderable.id}'` : 'null'}
 Fusion.Template.layout = ${tree.type ? `'${tree.type}'` : 'null'}
 module.exports = Fusion.Template
 `
@@ -152,6 +153,7 @@ module.exports = Fusion.Template
 ${usedCollections
     .map(collection =>
       Object.values(this.collections[collection].types)
+        .filter(componentType => componentType)
         .map(componentType => componentCss(componentType.manifest.css))
         .join('\n')
     )
@@ -159,8 +161,9 @@ ${usedCollections
 }
 `
 
-    return Promise.resolve({script, styles})
+    return Promise.resolve({ script, styles })
   }
 }
 
-module.exports = (renderable, outputType) => new ScriptSource(outputType, renderable).generate()
+module.exports = (renderable, outputType) =>
+  new SourceCompiler(renderable, outputType).compile()

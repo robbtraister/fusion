@@ -7,7 +7,7 @@ const {
 } = require('../../environment')
 
 const { S3 } = require('aws-sdk')
-const s3 = new S3({region})
+const s3 = new S3({ region })
 
 module.exports = {
   getObject: promisify(s3.getObject.bind(s3)),

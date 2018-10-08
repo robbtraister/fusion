@@ -54,14 +54,14 @@ If we wanted to include static resources like links to stylesheets, third-party 
 The parts of our component that are unique and interesting to Fusion are the `props` we are using to render dynamic portions of the page. Let's look at them in the order they're used:
 
 - `<props.MetaValue name='title' />` gets a meta value by name (in this case, the page title) that was set in the Admin and prints it. Here, we're just using plain JS to fallback to a Default Title if the metaValue doesn't exist.
-- `<props.MetaTags />` renders `<meta>` tags for any meta info provided to us by the Admin (TODO: examples).
+- `<props.MetaTags />` renders `<meta>` tags for any meta info provided to us by the Admin. <!-- TODO: examples -->
 - `<props.Libs />` includes the client side React library, as well as the component specific script for our single page app to render itself and handle events. Without this line, our code won't work client side!
-- `<props.CssLinks />` renders `<link>` tags for stylesheets that are generated based on any CSS files imported into the components being used on this page. We could have alternatively [inlined our CSS](TODO: add link) for platforms like AMP that require it.
+- `<props.CssLinks />` renders `<link>` tags for stylesheets that are generated based on any CSS files imported into the components being used on this page. We could have alternatively inlined our CSS for platforms like AMP that require it.
 - `props.contextPath` is a helper that returns the root web path of our page. We can use it to prefix URLs we want to include on the page, like for our favicon above.
 - `props.children` is a React standard prop, but for our purposes it will include all the other components (layouts, chains, and features) that were configured in the Admin to exist on the page. Without it, none of the content on our page gets displayed.
 - `<props.Fusion />` bootstraps data from the server that will hydrate our React components.
 
-There are more Output Type-specific methods available to us that are [listed in the Output Type API documentation](TODO: add link), along with those we enumerated above; but this should be more than enough to render something simple for now.
+There are more Output Type-specific methods available to us that are [listed in the Output Type API documentation](../api/feature-pack/components/output-type.md), along with those we enumerated above; but this should be more than enough to render something simple for now.
 
 One more subtle but important piece of code is the `id='fusion-app'` attribute applied to the `<div>` tag in our page body. It's important that this `id` exists and is precisely `fusion-app`, as this will be the hook that Fusion looks for to re-mount the app on the client side. Without it our application won't know what element to mount to on the page, and thus won't work client side.
 
@@ -69,17 +69,18 @@ One more subtle but important piece of code is the `id='fusion-app'` attribute a
 
 We're finally at the stage where we can start seeing something on a webpage! To do so, we'll need to go into the [PageBuilder Admin](http://localhost/pb/admin) and define a sample page to work with.
 
-TODO: add PB Admin image
+> **NOTE**
+> 
+> At this point, you may need to restart your Fusion application for it to "see" the new Output Type file you've created. To do so, hit `CTRL+C` and then re-run `npm start`. Because of the way Webpack works, Fusion often doesn't know about newly created files until the application is restarted. If you create a new file and it doesn't show up in PageBuilder as expected, this may be the problem.
+
+<!-- TODO: add PB Admin image -->
 
 Let's create a page called "Homepage" at the path `/homepage` (or if you already have a Homepage, you can use any name/path combination). Once you've created your page, you should be redirected to the Page Editor view, with a preview on the right. That preview pane won't show any content from our Output Type component - the preview pane only shows content *within* the Output Type. However, if we publish the page and make it "live", then visit [http://localhost/homepage](http://localhost/homepage), we should see our webpage with a big "Welcome to Fusion" message at the top! Huzzah!
 
 Now that we know our Output Type is working, we can remove the "Welcome to Fusion" header since we won't need it. Onward!
 
----
-**NOTE**
-
-If you see an error message about the Output Type component not being found, or if the page isn't rendering, you may need to trigger a manual rebuild of the bundle. You can do so by running `npm run rebuild:bundle` from the root of the repo.
-
----
+> **NOTE**
+> 
+> If you see an error message about the Output Type component not being found, or if the page isn't rendering, you may need to trigger a manual rebuild of the bundle. You can do so by running `npm run rebuild:bundle` from the root of the repo.
 
 **Next: [Creating a Feature Component](./creating-feature-component.md)**

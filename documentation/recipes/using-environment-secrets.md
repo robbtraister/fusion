@@ -1,6 +1,6 @@
-# Using Environment Variables and "Secrets" 
+# Using Environment Variables and "Secrets"
 
-Environment variables are exactly what they sound like: variables that are set per environment. They are typically used for things like credentials or domains that may change from local to staging to production environments. In Fusion, environment variables are defined in a `.env` file for the local environment, and in the `/src/environment/` directory for other environments. 
+Environment variables are exactly what they sound like: variables that are set per environment. They are typically used for things like credentials or domains that may change from local to staging to production environments. In Fusion, environment variables are defined in a `.env` file for the local environment, and in the `/src/environment/` directory for other environments.
 
 ## Local vs. production environments
 
@@ -14,7 +14,7 @@ In staging and/or production environments you'll define environment variables in
 
 Let's see how we can actually use environment variables in the sample Fusion app we've been building.
 
-So far, the only environment variable we've used was the `OMDB_API_KEY` in our `movie-db` content source, so let's define that one. The first thing we'll do is go to our `.env` file and add it there:
+So far, the only environment variable we've used was the `OMDB_API_KEY` in our `movie-find` content source, so let's define that one. The first thing we'll do is go to our `.env` file and add it there:
 
 ```bash
 #  /.env  #
@@ -26,13 +26,9 @@ We now have everything we need for our content source to work locally!
 
 To get it working in staging/production environments, we'll need to first encrypt our secret variable, then create an `index.js` file in our `/src/environments/` directory.
 
----
-
-**NOTE**
-
-There are a few different formats you can use for naming the environment variables file. You can define it as a top level file called `/src/environment.js` or `/src/environment.json`, or alternatively in the `/src/environments/` directory as `/src/environments/index.js` or `/src/environments/index.json`. Just make sure you only have one of these!
-
----
+> **NOTE**
+> 
+> There are a few different formats you can use for naming the environment variables file. You can define it as a top level file called `/src/environment.js` or `/src/environment.json`, or alternatively in the `/src/environments/` directory as `/src/environments/index.js` or `/src/environments/index.json`. Just make sure you only have one of these!
 
 #### Encrypting your secrets
 To encrypt our "secret" variables, we can install and use the `aws-promises` npm library to encrypt our secret locally.
@@ -66,4 +62,4 @@ Environment values will only be accessible during server execution, not in the c
 
 Now that we have our content source and credentials set up, we can use them to retrieve and display some content!
 
- **Next: [Using the @Consumer Decorator](./using-consumer-decorator.md)**
+ **Next: [Using the `Consumer` Higher-Order Function](./using-consumer-function.md)**

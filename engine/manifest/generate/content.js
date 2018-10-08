@@ -19,7 +19,7 @@ const getEntry = (rootDir) => Object.assign(
   {},
   ...glob.sync(`${rootDir}/*.{js,ts}`)
     .map((f) => {
-      return {[path.parse(f).name]: f}
+      return { [path.parse(f).name]: f }
     })
 )
 

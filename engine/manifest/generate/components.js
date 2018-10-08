@@ -36,16 +36,40 @@ const {
 
 const unpack = require('../../src/utils/unpack')
 
-const Layout = require('../../src/react/shared/components/Layout')
+const Layout = require('../../src/react/shared/components/layout')
 
 const {
   // apiPrefix,
+  bundleRoot,
   componentDistRoot,
   componentSrcRoot
 } = require('../../environment')
 
 require('../../mock-requires/client')
-require('@babel/register')(require('../../webpack/shared/babel-options'))
+
+const options = require('../../webpack/shared/babel-options')
+// ignore any css imports
+options.plugins.push(function () {
+  return {
+    visitor: {
+      CallExpression: {
+        enter (path) {
+          const callee = path.get('callee')
+          if (callee.isIdentifier() && callee.equals('name', 'require')) {
+            const arg = path.get('arguments')[0]
+            const ref = (arg.node.quasis)
+              ? arg.node.quasis[0].value.cooked
+              : arg.node.value
+            if (/\.s?[ac]ss$/.test(ref)) {
+              path.replaceWithSourceString('module.exports = {}')
+            }
+          }
+        }
+      }
+    }
+  }
+})
+require('@babel/register')(options)
 
 const WILDCARD_LEVELS = {
   features: 2
@@ -58,14 +82,15 @@ const createComponentEntry = (src, componentCollection, componentType, outputTyp
   const p = `${componentCollection}/${componentType}${outputType ? `/${outputType}` : ''}.js`
   return Object.assign(
     (outputType)
-      ? {outputType}
+      ? { outputType }
       : {},
     {
       collection: componentCollection,
       type: componentType,
-      src,
-      dist: `${componentDistRoot}/${p}`,
-      css: `${componentDistRoot}/${p}`.replace(/\.js$/, '.css')
+      // during production compilation, this is run in a tmp directory
+      src: path.relative(bundleRoot, src),
+      dist: path.relative(bundleRoot, `${componentDistRoot}/${p}`),
+      css: path.relative(bundleRoot, `${componentDistRoot}/${p}`.replace(/\.js$/, '.css'))
       // uri: `${apiPrefix}/dist/components/${p}`
     }
   )
@@ -124,14 +149,14 @@ const generateManifest = (collection, outputTypeManifest) => {
             componentType.outputTypes[outputTypeConfigWithFallback.type] = Object.assign(
               {},
               componentType.outputTypes[fallbackOutputType],
-              {outputType: outputTypeConfigWithFallback.type}
+              { outputType: outputTypeConfigWithFallback.type }
             )
           })
       })
   } else {
     Object.keys(componentMap)
       .forEach((componentType) => {
-        const Component = unpack(require(componentMap[componentType].src))
+        const Component = unpack(require(path.join(bundleRoot, componentMap[componentType].src)))
         componentMap[componentType].fallback = (Component)
           ? []
             .concat(
@@ -150,7 +175,7 @@ const generateManifest = (collection, outputTypeManifest) => {
       .forEach(layout => {
         Object.values(layout.outputTypes)
           .forEach(layoutOutputType => {
-            const Component = Layout(unpack(require(layoutOutputType.src)))
+            const Component = Layout(unpack(require(path.join(bundleRoot, layoutOutputType.src))))
             layoutOutputType.sections = Component.sections
           })
       })

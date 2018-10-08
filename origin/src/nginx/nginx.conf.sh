@@ -9,7 +9,7 @@ pid ./nginx.pid;
 
 events {
   worker_connections            1024;
-  multi_accept on;
+  multi_accept                  on;
   accept_mutex_delay            50ms;
 }
 
@@ -122,13 +122,27 @@ then
     if (\$request_method ~ ^(POST|PUT)$) {
       return                    405;
     }
+
+    location = /healthcheck {
+      access_log                off;
+      add_header                Content-Type text/html;
+      return                    200 'OK';
+    }
+
+    location = /favicon.ico {
+      rewrite                   ^ ${API_PREFIX}/resources/favicon.ico;
+    }
+
+    location = / {
+      rewrite                   ^ /homepage;
+    }
 EOB
 
   for endpoint in $(node -e "console.log(require('$(dirname "$0")/conf/private-endpoints.json').join(' '))")
   do
     cat <<EOB
 
-    location ^~ $endpoint {
+    location ^~ $API_PREFIX/${endpoint##/} {
       return                    403;
     }
 EOB
@@ -136,6 +150,68 @@ EOB
 fi
 
 cat <<EOB
+
+    location ${CONTEXT_PATH}/_ {
+      rewrite                   ^${CONTEXT_PATH}/_(.*) ${API_PREFIX}\$1;
+    }
+
+    location @nodejs {
+      rewrite                   ^${API_PREFIX}(/|$)(.*) /\$2 break;
+      proxy_pass                http://0.0.0.0:${NODEJS_PORT:-9000}\$uri\$query_params;
+      proxy_redirect            / ' ${API_PREFIX}/';
+    }
+
+    location ~ ^${API_PREFIX}/status/(\\d\\d\\d)$ {
+      # nginx can't return dynamic status codes, so proxy to nodejs
+      error_page                418 = @nodejs;
+      return                    418;
+    }
+EOB
+
+if [ "${PB_ADMIN}" ]
+then
+  cat <<EOB
+
+    location ${CONTEXT_PATH}/admin {
+      set                       \$target ${PB_ADMIN};
+      proxy_pass                \$target;
+    }
+    location ${CONTEXT_PATH}/app/info {
+      set                       \$target ${PB_ADMIN};
+      proxy_pass                \$target;
+    }
+    location ${CONTEXT_PATH}/content/api {
+      set                       \$target ${PB_ADMIN};
+      proxy_pass                \$target;
+    }
+EOB
+fi
+
+cat <<EOB
+
+    # admin rewrites
+    location = ${CONTEXT_PATH}/content/api/content-config {
+      rewrite                   ^ ${API_PREFIX}/configs/content/sources;
+    }
+
+    location = ${CONTEXT_PATH}/content/api/fetch {
+      rewrite                   ^ ${API_PREFIX}/content/fetch/\${arg_service}?v=\${arg_v}&key=\${arg_config};
+    }
+
+    location ~ ^${CONTEXT_PATH}/admin/api/(chain|feature|layout)-config/?$ {
+      set                       \$type \$1;
+      rewrite                   ^ ${API_PREFIX}/configs/\${type}s;
+    }
+
+    location ~ ^${CONTEXT_PATH}/admin/api/(output-type)/?$ {
+      set                       \$type \$1;
+      rewrite                   ^ ${API_PREFIX}/configs/\${type}s;
+    }
+
+    location ~ ^${CONTEXT_PATH}/api/v2/resolve/?$ {
+      rewrite                   ^ ${API_PREFIX}/resolve;
+    }
+    # end of admin rewrites
 
     location / {
       proxy_set_header          Host \$host;

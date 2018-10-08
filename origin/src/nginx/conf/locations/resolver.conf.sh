@@ -1,7 +1,5 @@
 #!/bin/sh
 
-. $(dirname "$0")/../variables.sh
-
 cat <<EOB
       rewrite                   ^${API_PREFIX}(/|$)(.*) /\$2 break;
       rewrite                   ^${CONTEXT_PATH}(/|$)(.*) /\$2 break;
@@ -26,4 +24,6 @@ cat <<EOB
 
       proxy_redirect            /make/ ' ${CONTEXT_PATH}/';
       proxy_redirect            / ' ${API_PREFIX}/';
+
+      add_header                'Fusion-Source' 'lambda';
 EOB

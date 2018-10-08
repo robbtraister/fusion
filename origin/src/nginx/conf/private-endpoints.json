@@ -1,4 +1,4 @@
 [
-  "/pb/api/v3/configs",
-  "/pb/api/v3/resolvers"
+  "configs",
+  "resolvers"
 ]

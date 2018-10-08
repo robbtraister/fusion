@@ -19,5 +19,7 @@ cat <<EOB
     location @backup {
       set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/html/\${arcSite}/\${outputType}\$p;
       proxy_pass                \$target;
+
+      add_header                'Fusion-Source' 's3';
     }
 EOB

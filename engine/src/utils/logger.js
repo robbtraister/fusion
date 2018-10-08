@@ -30,16 +30,17 @@ const logWarning = function logWarning (logInfo) {
   console.warn(`${LOG_LEVELS.WARN}: ${logObject}`)
 }
 
-function getJSONLogObject (logLevel, {logType = '', message = 'no message provided', values = {}}) {
+function getJSONLogObject (logLevel, {logType = '', message = 'no message provided', stackTrace = '', values = {}}) {
   return JSON.stringify({
     environment,
     functionName,
+    fusionVersion: semver,
+    lambdaDeployment: version,
     logLevel,
     message,
     logType,
-    fusionVersion: semver,
-    values, // an example of values: { 'feature 1': '100ms' }
-    lambdaDeployment: version
+    stackTrace,
+    values // an example of values: { 'feature 1': '100ms' }
   })
 }
 

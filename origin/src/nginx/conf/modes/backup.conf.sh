@@ -12,7 +12,7 @@ cat <<EOB
       proxy_intercept_errors    on;
       error_page                400 403 404 418 500 502 503 504 = @backup;
 
-      proxy_set_header          'Fusion-Cache-HTML' 'true';
+      proxy_set_header          'Fusion-Cache-HTML' \$isProduction;
 
 EOB
 

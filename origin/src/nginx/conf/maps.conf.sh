@@ -59,6 +59,11 @@ cat <<EOB
     ''                          \$headerVersion;
   }
 
+  map \$version \$isProduction {
+    'production'                'true';
+    default                     'false';
+  }
+
   map \$host \$environment {
     default                     '${ENVIRONMENT:-localhost}';
 EOB

@@ -46,6 +46,8 @@ cat <<EOB
 
       set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/\$p;
       proxy_pass                \$target;
+
+      add_header                'Fusion-Source' 's3';
     }
 
     location ~ ^(${CONTEXT_PATH}|${API_PREFIX})/(assets|dist)(/.*|$) {
@@ -64,6 +66,8 @@ cat <<EOB
 
       set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/\$p;
       proxy_pass                \$target;
+
+      add_header                'Fusion-Source' 's3';
     }
 
     location ~ ^${API_PREFIX}/(configs)(/.*|$) {
@@ -74,6 +78,8 @@ cat <<EOB
 
       set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/dist\$p;
       proxy_pass                \$target;
+
+      add_header                'Fusion-Source' 's3';
     }
 
     location ~ ^${API_PREFIX}/(content|render|resolvers)(/.*|$) {

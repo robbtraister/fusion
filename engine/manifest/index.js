@@ -4,14 +4,14 @@ const {
   componentDistRoot,
   contentDistRoot
 } = require('../environment')
-const { logError } = require('../src/utils/logger')
+const logger = require('../src/utils/logger')
 
 function getManifest (rootDir, collection) {
   try {
     const manifestFile = `${rootDir}/${collection}/fusion.manifest.json`
     return require(manifestFile)
   } catch (error) {
-    logError({message: `An error occurred while attempting to get manifest: ${error.stack || error}`})
+    logger.logError({ message: `An error occurred while attempting to get manifest: ${error.stack || error}` })
   }
 }
 

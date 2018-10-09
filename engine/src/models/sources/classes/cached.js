@@ -16,7 +16,7 @@ const {
 } = require('../../../../environment')
 
 const { sendMetrics, METRIC_TYPES } = require('../../../utils/send-metrics')
-const { logError, logInformation, LOG_TYPES } = require('../../../utils/logger')
+const { LOG_TYPES, ...logger } = require('../../../utils/logger')
 
 function getCacheKey (uri) {
   const hash = crypto.createHash('sha256').update(uri).digest('hex')
@@ -107,7 +107,7 @@ class CachedSource extends ResolveSource {
               sendMetrics([
                 {type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags}
               ])
-              logError({logType: LOG_TYPES.CACHE, message: `There was an error while trying to fetch: ${error.stack || error}`})
+              logger.logError({ logType: LOG_TYPES.CACHE, message: `There was an error while trying to fetch: ${error.stack || error}` })
 
               return this.update(key)
             })
@@ -144,7 +144,7 @@ class CachedSource extends ResolveSource {
                 {type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags},
                 {type: METRIC_TYPES.CACHE_RESULT_SIZE, value: JSON.stringify(data).length, tags}
               ])
-              logInformation({logType: LOG_TYPES.CACHE, message: 'Cache content successfully pushed'})
+              logger.logInformation({ logType: LOG_TYPES.CACHE, message: 'Cache content successfully pushed' })
 
               return data
             })
@@ -154,7 +154,7 @@ class CachedSource extends ResolveSource {
               sendMetrics([
                 {type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags}
               ])
-              logError({logType: LOG_TYPES.CACHE, message: `There was an error while attempting to update the cache: ${error.stack || error}`})
+              logger.logError({ logType: LOG_TYPES.CACHE, message: `There was an error while attempting to update the cache: ${error.stack || error}` })
               // DO NOT THROW FOR FAILED CACHE WRITE!!!
               // throw new Error(`Error putting into cache ${this.name}`)
 

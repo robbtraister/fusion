@@ -7,6 +7,8 @@ Fusion.isAdmin = true
 
 const Provider = require('./provider')
 
+const { LOG_TYPES, ...logger } = require('../../utils/logger')
+
 const version = null // require('./version')()
 
 const React = window.react
@@ -49,7 +51,9 @@ class AdminCompiler extends ComponentCompiler {
   loadComponent (componentCollection, componentType) {
     try {
       return Fusion.components[componentCollection][componentType]
-    } catch (e) {}
+    } catch (e) {
+      logger.logError({ logType: LOG_TYPES.COMPONENT, message: `An error occurred while attempting load a component: ${e.stack || e}` })
+    }
     return null
   }
 
@@ -85,7 +89,7 @@ function CSR (rendering) {
       window.document.getElementById('fusion-app')
     )
   } catch (e) {
-    console.error(e)
+    logger.logError({ logType: LOG_TYPES.RENDERING, message: `An error occurred while attempting to client-side render: ${e.stack || e}` })
   }
 }
 

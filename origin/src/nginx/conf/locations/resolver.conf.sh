@@ -15,7 +15,7 @@ then
 EOB
 else
   cat <<EOB
-      proxy_set_header          'X-FunctionName' '${LAMBDA_RESOLVER}:production';
+      proxy_set_header          'X-FunctionName' '${LAMBDA_RESOLVER}:live';
       proxy_pass                ${LAMBDA_PROXY:-http://0.0.0.0:${NODEJS_PORT:-9000}}\$uri\$query_params;
 EOB
 fi

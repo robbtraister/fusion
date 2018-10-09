@@ -17,7 +17,8 @@ const {
   version
 } = require('../../environment')
 
-const KeyPrefix = `environments/${environment}/deployments/${version}`
+const EnvPrefix = `environments/${environment}`
+const DeploymentPrefix = `${EnvPrefix}/deployments/${version}`
 
 const s3 = new S3({ region })
 
@@ -57,9 +58,9 @@ const pushKey = async (Key, src, options, Bucket = s3BucketDiscrete) =>
   })
 
 const fetchAsset = async (name) =>
-  fetchKey(path.join(KeyPrefix, 'dist', name))
+  fetchKey(path.join(DeploymentPrefix, 'dist', name))
 const pushAsset = async (name, src, ContentType) =>
-  pushKey(path.join(KeyPrefix, 'dist', name), src, ContentType)
+  pushKey(path.join(DeploymentPrefix, 'dist', name), src, ContentType)
 
 // return the full object (not just cssFile value) because if it doesn't exist, we need to calculate it
 // the calculation returns an object with a cssFile property
@@ -70,7 +71,7 @@ const pushCssHash = (name, outputType = defaultOutputType, cssFile) =>
   model('hash').put({ id: path.join(name, outputType), version, cssFile })
 
 const pushHtml = async (name, src, ContentType) =>
-  pushKey(path.join(KeyPrefix, 'html', name), src, ContentType)
+  pushKey(path.join(EnvPrefix, 'html', name), src, ContentType)
 
 const getJson = (type, id) =>
   model(type).get(id)

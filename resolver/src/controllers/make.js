@@ -15,7 +15,7 @@ const endpoint = function endpoint (data, arcSite, outputType) {
   })
 }
 
-const make = function make (uri, arcSite, version, outputType, cacheHTML) {
+const make = function make (uri, arcSite, version, outputType, cacheMode) {
   return resolve(uri, arcSite)
     .then((data) =>
       data
@@ -24,7 +24,7 @@ const make = function make (uri, arcSite, version, outputType, cacheHTML) {
           uri: endpoint(data, arcSite, outputType),
           data,
           version,
-          cacheHTML
+          cacheMode
         })
         : (() => {
           const e = new Error(`Could not resolve ${uri}`)

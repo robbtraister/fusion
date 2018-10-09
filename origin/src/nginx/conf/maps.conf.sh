@@ -76,14 +76,14 @@ fi
 cat <<EOB
   }
 
-  map \$http_fusion_cache_mode \$mode {
+  map \${isProduction}_\${http_fusion_cache_mode} \$cacheMode {
 EOB
 if [ "${IS_PROD}" ]
 then
   cat <<EOB
-    default                     'live';
-    ~*^backup$                  'backup';
-    ~*^cache$                   'cache';
+    default                     'none';
+    ~*^true_allowed$            'allowed';
+    ~*^true_prefer{1,2}ed$      'preferred';
 EOB
 else
   cat <<EOB

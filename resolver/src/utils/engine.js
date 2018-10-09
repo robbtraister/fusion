@@ -24,7 +24,7 @@ const getLambdaEngine = function getLambdaEngine () {
   const region = lambdaEngine.split(':')[3]
   const lambda = new AWS.Lambda(Object.assign({ region }))
 
-  return function lambdaEngineHandler ({ method, uri, data, version, cacheHTML }) {
+  return function lambdaEngineHandler ({ method, uri, data, version, cacheMode }) {
     const METHOD = (method || 'GET').toUpperCase()
     const parts = url.parse(uri, true)
     return new Promise((resolve, reject) => {
@@ -37,7 +37,7 @@ const getLambdaEngine = function getLambdaEngine () {
           httpMethod: METHOD,
           headers: {
             'Content-Type': 'application/json',
-            'Fusion-Cache-HTML': cacheHTML
+            'Fusion-Cache-Mode': cacheMode
           },
           body: data && JSON.stringify(data),
           path: parts.pathname,

@@ -4,7 +4,7 @@ const debug = require('debug')('fusion:compiler:build')
 
 const promises = require('../utils/promises')
 
-async function build (cwd) {
+async function build (cwd, contextPath) {
   debug(`building ${cwd}`)
   await promises.spawn('npm', ['run', 'build:all:production'], {
     cwd,
@@ -13,7 +13,10 @@ async function build (cwd) {
       process.env,
       // npm tries to install configs in the HOME directory
       // lambda does not allow write access to the HOME directory, so change it
-      { HOME: cwd }
+      {
+        HOME: cwd,
+        CONTEXT_PATH: contextPath
+      }
     )
   })
   debug(`built ${cwd}`)

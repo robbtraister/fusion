@@ -31,7 +31,7 @@ async function extractZip (fpPromise, destPromise) {
   return dest
 }
 
-async function compile (bundleName) {
+async function compile (bundleName, contextPath) {
   const rootDir = await promises.tempDir()
 
   try {
@@ -48,7 +48,7 @@ async function compile (bundleName) {
 
       await copySrcPromise
 
-      await build(rootDir)
+      await build(rootDir, contextPath)
       // don't decrypt until after build to ensure no secrets are compiled into client-side code
       await decrypt(bundleSrcDir)
 

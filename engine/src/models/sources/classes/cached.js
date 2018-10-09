@@ -144,7 +144,7 @@ class CachedSource extends ResolveSource {
                 {type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags},
                 {type: METRIC_TYPES.CACHE_RESULT_SIZE, value: JSON.stringify(data).length, tags}
               ])
-              logger.logInformation({ logType: LOG_TYPES.CACHE, message: 'Cache content successfully pushed' })
+              logger.logInfo({ logType: LOG_TYPES.CACHE, message: 'Cache content successfully pushed' })
 
               return data
             })

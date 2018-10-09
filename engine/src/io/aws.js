@@ -60,7 +60,7 @@ const pushKey = async (Key, src, options, Bucket = s3BucketDiscrete) =>
 const fetchAsset = async (name) =>
   fetchKey(path.join(DeploymentPrefix, 'dist', name))
 const pushAsset = async (name, src, ContentType) =>
-  pushKey(path.join(DeploymentPrefix, 'dist', name), src, ContentType)
+  pushKey(path.join(DeploymentPrefix, 'dist', name), src, { ContentType })
 
 // return the full object (not just cssFile value) because if it doesn't exist, we need to calculate it
 // the calculation returns an object with a cssFile property
@@ -70,8 +70,8 @@ const fetchCssHash = (name, outputType = defaultOutputType) =>
 const pushCssHash = (name, outputType = defaultOutputType, cssFile) =>
   model('hash').put({ id: path.join(name, outputType), version, cssFile })
 
-const pushHtml = async (name, src, ContentType) =>
-  pushKey(path.join(EnvPrefix, 'html', name), src, ContentType)
+const pushHtml = async (name, src) =>
+  pushKey(path.join(EnvPrefix, 'html', name), src, { ContentType: 'text/html' })
 
 const getJson = (type, id) =>
   model(type).get(id)

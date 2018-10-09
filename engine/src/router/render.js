@@ -36,7 +36,7 @@ function getTypeRouter (routeType) {
 
       const cacheMode = req.get('Fusion-Cache-Mode')
       debug(`cache mode: ${cacheMode}`)
-      const writeToCache = cacheMode !== 'none'
+      const writeToCache = /^(allowed|preferr?ed)$/i.test(cacheMode)
 
       const content = (req.body && req.body.content)
 

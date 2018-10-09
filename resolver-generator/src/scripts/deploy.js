@@ -57,13 +57,13 @@ async function promote (contextName, FunctionVersion) {
     return await createAlias({
       FunctionName: resolverName(contextName),
       FunctionVersion,
-      Name: 'production'
+      Name: 'live'
     })
   } catch (e) {
     return updateAlias({
       FunctionName: resolverName(contextName),
       FunctionVersion,
-      Name: 'production'
+      Name: 'live'
     })
   }
 }

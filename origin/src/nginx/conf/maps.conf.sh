@@ -41,7 +41,7 @@ cat <<EOB
 
   map \$http_referer \$refererVersion {
     ~(\?|&)v=([0-9]+)(&|$)      \$2;
-    default                     'production'; #'\${dollar}LATEST';
+    default                     'live'; #'\${dollar}LATEST';
   }
 
   map \$cookie_version \$cookieVersion {
@@ -59,8 +59,8 @@ cat <<EOB
     ''                          \$headerVersion;
   }
 
-  map \$version \$isProduction {
-    'production'                'true';
+  map \$version \$isLive {
+    'live'                      'true';
     default                     'false';
   }
 
@@ -76,7 +76,7 @@ fi
 cat <<EOB
   }
 
-  map \${isProduction}_\${http_fusion_cache_mode} \$cacheMode {
+  map \${isLive}_\${http_fusion_cache_mode} \$cacheMode {
 EOB
 if [ "${IS_PROD}" ]
 then

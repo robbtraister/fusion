@@ -6,6 +6,8 @@ const url = require('url')
 const bodyParser = require('body-parser')
 const express = require('express')
 
+const debug = require('debug')('fusion:router:render')
+
 const debugTimer = require('debug')('fusion:timer:router')
 
 const {
@@ -32,7 +34,9 @@ function getTypeRouter (routeType) {
     (req, res, next) => {
       const tic = timer.tic()
 
-      const writeToCache = req.get('Fusion-Cache-Mode') !== 'none'
+      const cacheMode = req.get('Fusion-Cache-Mode')
+      debug(`cache mode: ${cacheMode}`)
+      const writeToCache = cacheMode !== 'none'
 
       const content = (req.body && req.body.content)
 

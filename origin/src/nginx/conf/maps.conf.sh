@@ -83,7 +83,7 @@ then
   cat <<EOB
     default                     'none';
     ~*^true_allowed$            'allowed';
-    ~*^true_prefer{1,2}ed$      'preferred';
+    ~*^true_preferr?ed$         'preferred';
 EOB
 else
   cat <<EOB

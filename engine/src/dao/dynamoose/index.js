@@ -26,12 +26,38 @@ const createModel = (modelName) => {
       return _model.get((id instanceof Object) ? id : { id })
     },
 
-    find () {
-      return Promise.reject(new Error('not implemented'))
+    find (query) {
+      return new Promise((resolve, reject) => {
+        const result = []
+
+        function scan (lastKey) {
+          _model.scan(query).startAt(lastKey).exec((err, data) => {
+            if (err) {
+              return reject(err)
+            } else {
+              Array.prototype.push.apply(result, data)
+
+              if (data.lastKey) {
+                scan(data.lastKey)
+              } else {
+                resolve(result)
+              }
+            }
+          })
+        }
+
+        scan()
+      })
     },
 
-    findOne () {
-      return Promise.reject(new Error('not implemented'))
+    findOne (query) {
+      return new Promise((resolve, reject) => {
+        _model.scan(query).exec((err, data) => {
+          (err)
+            ? reject(err)
+            : resolve(data && data[0])
+        })
+      })
     },
 
     put (doc) {

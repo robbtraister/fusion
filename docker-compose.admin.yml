@@ -132,7 +132,7 @@ services:
       PB_RENDERING_DEBUG: "true"
       PB_SYSTEM_LOG_CONFIG: "logback-info.xml"
       PB_REPORTING_FUSION: http://origin:8080/${CONTEXT_PATH:-pf}
-      PB_CONTEXT: "pf"
+      PB_CONTEXT: ${CONTEXT_PATH:-pf}
     networks:
       - fusion
     volumes:

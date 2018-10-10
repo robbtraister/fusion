@@ -82,13 +82,23 @@ cat <<EOB
       add_header                'Fusion-Source' 's3';
     }
 
-    location ~ ^${API_PREFIX}/(content|render|resolvers)(/.*|$) {
+    location ~ ^${API_PREFIX}/(content|resolvers)(/.*|$) {
       error_page                418 = @engine;
       return                    418;
     }
 
-    # keep 'resolve' as a group, since the pattern is re-used elsewhere and the trailing endpoint is referenced as $2
-    location ~ ^${API_PREFIX}/(resolve)(/.*|$) {
+    location ~ ^${API_PREFIX}/render/(page|template)(/.*|$) {
+      error_page                418 = @engine;
+      return                    418;
+    }
+
+    location ${API_PREFIX}/render {
+      # when a render request is POSTed from admin, it has more compilation work to do
+      error_page                418 = @engine_LONGRUNNING;
+      return                    418;
+    }
+
+    location ${API_PREFIX}/resolve {
       error_page                418 = @resolver;
       return                    418;
     }

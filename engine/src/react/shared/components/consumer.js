@@ -10,6 +10,8 @@ const isClient = typeof window !== 'undefined'
 const _get = require('lodash.get')
 const _merge = require('lodash.merge')
 
+const { LOG_TYPES, ...logger } = require('../../../utils/logger')
+
 const getContextProps = (props, context) => {
   return {
     props: { ...context.props, ...props },
@@ -50,7 +52,9 @@ function HOC (Component) {
           listeners.forEach((listener) => {
             try {
               listener(data)
-            } catch (e) {}
+            } catch (e) {
+              logger.logError({ logType: LOG_TYPES.COMPONENT, message: `An error occurred while dispatching an event: ${e.stack || e}` })
+            }
           })
         }
 

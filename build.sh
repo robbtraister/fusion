@@ -45,7 +45,12 @@ fi
 
 buildImage () {
   name=$1
+  if [ "$TAG" ]
+  then
+    echo $TAG > "./${name}/version.txt"
+  fi
   docker build -t "quay.io/washpost/fusion-${name}:${TAG}" "./${name}"
+  rm -rf "./${name}/version.txt"
 }
 
 pushImage () {

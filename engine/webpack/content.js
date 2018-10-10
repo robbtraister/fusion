@@ -32,7 +32,7 @@ const getConfig = (entry, srcRoot, distRoot) => {
         rules: [
           {
             test: /\.[jt]sx?$/i,
-            exclude: /node_modules/,
+            exclude: /\/node_modules\/(?!@arc-fusion\/)/,
             use: [
               babelLoader
             ]
@@ -59,7 +59,7 @@ const getConfig = (entry, srcRoot, distRoot) => {
       resolve,
       target: 'node',
       watchOptions: {
-        ignored: /node_modules/
+        ignored: /\/node_modules\//
       }
     }
     : []

@@ -67,7 +67,7 @@ ${[].concat(
       rules: [
         {
           test: /\.[jt]sx?$/i,
-          exclude: /node_modules/,
+          exclude: /\/node_modules\/(?!@arc-fusion\/)/,
           use: [
             babelLoader
           ]
@@ -102,7 +102,7 @@ ${[].concat(
     resolve,
     target,
     watchOptions: {
-      ignored: /node_modules/
+      ignored: /\/node_modules\//
     }
   }
 }

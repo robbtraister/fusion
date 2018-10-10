@@ -56,7 +56,7 @@ module.exports = Object.keys(components)
           rules: [
             {
               test: /\.[jt]sx?$/i,
-              exclude: /node_modules/,
+              exclude: /\/node_modules\/(?!@arc-fusion\/)/,
               use: [
                 babelLoader
               ]
@@ -105,7 +105,7 @@ module.exports = Object.keys(components)
         // in dev mode, compiled components must be usable without babel
         target: (minify) ? 'node' : 'web',
         watchOptions: {
-          ignored: /node_modules/
+          ignored: /\/node_modules\//
         }
       }
       : (() => {

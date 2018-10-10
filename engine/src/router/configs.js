@@ -28,24 +28,32 @@ const getConfigs = (collection) => {
   }
 }
 
+const filterConfigs = (configs, id) => {
+  id = id && id.toLowerCase().replace(/\/+$/, '')
+  return (id)
+    ? configs.find((config) => config.id.toLowerCase() === id)
+    : configs
+}
+
 const getConfigHandler = (collection) => {
   return (isDev)
     ? (req, res, next) => {
-      res.send(getConfigs(collection))
+      const configs = getConfigs(collection)
+      res.send(filterConfigs(configs, req.params[0]))
     }
     : (() => {
       const configs = getConfigs(collection)
       return (req, res, next) => {
-        res.send(configs)
+        res.send(filterConfigs(configs, req.params[0]))
       }
     })()
 }
 const configRouter = express.Router()
 
-configRouter.get('/chains', getConfigHandler('chains'))
-configRouter.get('/features', getConfigHandler('features'))
-configRouter.get('/layouts', getConfigHandler('layouts'))
-configRouter.get('/output-types', getConfigHandler('output-types'))
+configRouter.get(/\/chains(?:\/(.*))?/, getConfigHandler('chains'))
+configRouter.get(/\/features(?:\/(.*))?/, getConfigHandler('features'))
+configRouter.get(/\/layouts(?:\/(.*))?/, getConfigHandler('layouts'))
+configRouter.get(/\/output-types(?:\/(.*))?/, getConfigHandler('output-types'))
 
 function getPatternParams (p) {
   const idMatcher = /\{([^}]+)\}/g

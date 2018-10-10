@@ -72,6 +72,7 @@ cat <<EOB
   map \$http_fusion_cache_mode \$cacheModeHeader {
     ~*^allowed$                 'allowed';
     ~*^preferr?ed$              'preferred';
+    ~*^update$                  'update';
     default                     'none';
   }
 
@@ -80,9 +81,10 @@ EOB
 if [ "${IS_PROD}" ]
 then
   cat <<EOB
-    ~^true_                     'none';
+    ~^true_true_                'update';
     ~_true_allowed$             'allowed';
     ~_true_preferred$           'preferred';
+    ~_true_update$              'update';
     default                     'none';
 EOB
 else

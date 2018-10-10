@@ -57,7 +57,8 @@ async function createGeneratorFunction () {
           DEBUG: 'fusion:*',
           DATADOG_API_KEY: datadogApiKey,
           FUSION_RELEASE: fusionRelease,
-          AWS_ACCOUNT_ID: awsAccountId
+          AWS_ACCOUNT_ID: awsAccountId,
+          S3BUCKET: S3Bucket
         }
       },
       Handler: 'resolver-generator/src/index.handler',

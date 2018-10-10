@@ -116,7 +116,7 @@ services:
       - fusion
 
   admin:
-    image: quay.io/washpost/pagebuilder-nilev1:${PB_RELEASE:-fusion-admin.22}
+    image: quay.io/washpost/pagebuilder-nilev1:${PB_RELEASE:-fusion-admin.23}
     depends_on:
       - admin-cache
       - data
@@ -131,7 +131,8 @@ services:
       PB_MONGODB_GARBAGE_COLLECTION: "false"
       PB_RENDERING_DEBUG: "true"
       PB_SYSTEM_LOG_CONFIG: "logback-info.xml"
-      PB_REPORTING_FUSION: http://origin:8080/${CONTEXT_PATH:-pb}
+      PB_REPORTING_FUSION: http://origin:8080/${CONTEXT_PATH:-pf}
+      PB_CONTEXT: ${CONTEXT_PATH:-pf}
     networks:
       - fusion
     volumes:
@@ -161,4 +162,4 @@ services:
       # - '~/.aws:/home/nginx/.aws:ro'
       - './origin/src:/etc/nginx/src:ro'
       - '${FUSION_REPO:-./bundle}/.dist:/etc/nginx/dist:ro'
-      - '${FUSION_REPO:-./bundle}/resources:/etc/nginx/resources:ro'
+      - '${FUSION_REPO:-./bundle}/src/resources:/etc/nginx/resources:ro'

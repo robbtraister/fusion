@@ -6,6 +6,8 @@ const url = require('url')
 const bodyParser = require('body-parser')
 const express = require('express')
 
+const debug = require('debug')('fusion:router:render')
+
 const debugTimer = require('debug')('fusion:timer:router')
 
 const {
@@ -32,7 +34,9 @@ function getTypeRouter (routeType) {
     (req, res, next) => {
       const tic = timer.tic()
 
-      const cacheHTML = req.get('Fusion-Cache-HTML') === 'true'
+      const cacheMode = req.get('Fusion-Cache-Mode')
+      debug(`cache mode: ${cacheMode}`)
+      const writeToCache = /^(allowed|preferr?ed)$/i.test(cacheMode)
 
       const content = (req.body && req.body.content)
 
@@ -66,9 +70,9 @@ function getTypeRouter (routeType) {
         .render({ content, rendering, request })
         .then((html) => `${outputType ? '<!DOCTYPE html>' : ''}${html}`)
         .then((html) =>
-          (cacheHTML && request.uri)
+          (writeToCache && request.uri)
             ? Promise.resolve(url.parse(request.uri).pathname)
-              .then((pathname) => /\/$/.test(pathname) ? path.join(pathname, 'index.html') : pathname)
+              .then((pathname) => pathname.replace(/\/$/, ''))
               .then((filePath) => pushHtml(path.join(request.arcSite || 'default', outputType, filePath), html))
               .then(() => html)
             : html

@@ -1,12 +1,11 @@
 #!/bin/sh
 
-. $(dirname "$0")/../variables.sh
-
 cat <<EOB
       rewrite                   ^${API_PREFIX}(/|$)(.*) /\$2 break;
       rewrite                   ^${CONTEXT_PATH}(/|$)(.*) /\$2 break;
 
-      proxy_set_header          'Fusion-Engine-Version' '\${version}';
+      proxy_set_header          'Fusion-Engine-Version' \$version;
+      proxy_set_header          'Fusion-Cache-Mode' \$cacheMode;
 
 EOB
 
@@ -17,7 +16,7 @@ then
 EOB
 else
   cat <<EOB
-      proxy_set_header          'X-FunctionName' '${LAMBDA_RESOLVER}:production';
+      proxy_set_header          'X-FunctionName' '${LAMBDA_RESOLVER}:live';
       proxy_pass                ${LAMBDA_PROXY:-http://0.0.0.0:${NODEJS_PORT:-9000}}\$uri\$query_params;
 EOB
 fi
@@ -26,4 +25,6 @@ cat <<EOB
 
       proxy_redirect            /make/ ' ${CONTEXT_PATH}/';
       proxy_redirect            / ' ${API_PREFIX}/';
+
+      add_header                'Fusion-Source' 'lambda';
 EOB

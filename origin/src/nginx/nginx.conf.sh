@@ -99,7 +99,8 @@ if [ "${IS_PROD}" ]
 then
   PORT=8081 MODE=allowed $(dirname "$0")/conf/environments/prod.conf.sh
   PORT=8082 MODE=preferred $(dirname "$0")/conf/environments/prod.conf.sh
-  PORT=8083 MODE=none $(dirname "$0")/conf/environments/prod.conf.sh
+  PORT=8083 MODE=update $(dirname "$0")/conf/environments/prod.conf.sh
+  PORT=8084 MODE=none $(dirname "$0")/conf/environments/prod.conf.sh
 else
   PORT=8081 $(dirname "$0")/conf/environments/local.conf.sh
 fi

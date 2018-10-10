@@ -13,6 +13,7 @@ const unpack = require('../../../utils/unpack')
 const timer = require('../../../timer')
 
 const { sendMetrics, METRIC_TYPES } = require('../../../utils/send-metrics')
+const { LOG_TYPES, ...logger } = require('../../../utils/logger')
 
 const { bundleRoot } = require('../../../../environment')
 
@@ -39,7 +40,9 @@ function loadComponent (componentCollection, componentType) {
       ? (props) => React.createElement('div', { id: props.id, className: 'fusion:static' }, React.createElement(OriginalComponent, props))
       : OriginalComponent
     return TimedComponent(Component)
-  } catch (e) {}
+  } catch (e) {
+    logger.logError({ logType: LOG_TYPES.COMPONENT, message: `An error occurred while attempting to load a component: ${e.stack || e}` })
+  }
   return null
 }
 

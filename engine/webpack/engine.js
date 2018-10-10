@@ -97,7 +97,7 @@ module.exports = [
       rules: [
         {
           test: /\.[jt]sx?$/i,
-          exclude: /node_modules/,
+          exclude: /\/node_modules\/(?!@arc-fusion\/)/,
           use: [
             babelLoader
           ]
@@ -122,7 +122,7 @@ module.exports = [
     ),
     target,
     watchOptions: {
-      ignored: /node_modules/
+      ignored: /\/node_modules\//
     }
   },
   {
@@ -134,7 +134,7 @@ module.exports = [
       rules: [
         {
           test: /\.[jt]sx?$/i,
-          exclude: /node_modules/,
+          exclude: /\/node_modules\/(?!@arc-fusion\/)/,
           use: [
             babelLoader
           ]
@@ -150,7 +150,7 @@ module.exports = [
     resolve,
     target,
     watchOptions: {
-      ignored: /node_modules/
+      ignored: /\/node_modules\//
     }
   }
 ]

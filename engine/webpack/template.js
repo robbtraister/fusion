@@ -33,7 +33,7 @@ module.exports = (scriptSourceFile, stylesSourceFile) =>
           ? [
             {
               test: /\.[jt]sx?$/i,
-              exclude: /node_modules/,
+              exclude: /\/node_modules\/(?!@arc-fusion\/)/,
               use: [
                 babelLoader
               ]
@@ -57,7 +57,7 @@ module.exports = (scriptSourceFile, stylesSourceFile) =>
       resolve,
       target: 'web',
       watchOptions: {
-        ignored: /node_modules/
+        ignored: /\/node_modules\//
       }
     },
     {
@@ -91,7 +91,7 @@ module.exports = (scriptSourceFile, stylesSourceFile) =>
       resolve,
       target: 'web',
       watchOptions: {
-        ignored: /node_modules/
+        ignored: /\/node_modules\//
       }
     }
   ]

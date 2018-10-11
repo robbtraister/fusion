@@ -89,7 +89,7 @@ RUN \
     rm -rf /var/cache/apk/* && \
     node -v
 
-COPY ./src ./src
+COPY . ./
 RUN chown -R ${USER}:${USER} ./src
 
 VOLUME /etc/nginx/tmp

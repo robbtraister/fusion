@@ -148,6 +148,12 @@ cat <<EOB
       rewrite                   ^ ${API_PREFIX}/resources/favicon.ico;
     }
 
+    location = /release {
+      add_header                'Content-Type' 'text/plain';
+      root                      /etc/nginx;
+      try_files                 /release.txt =404;
+    }
+
     location = / {
       rewrite                   ^ /homepage;
     }

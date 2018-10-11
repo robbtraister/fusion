@@ -62,7 +62,7 @@ class SourceCompiler extends ComponentCompiler {
             : `Fusion.components${componentName} = Fusion.components.Quarantine(Fusion.unpack(require('${fp}')))`
       }
     } catch (error) {
-      logger.logError({ logType: LOG_TYPES.COMPONENT, message: `There was a problem attempting to import a component: ${error.stack || error}` })
+      logger.logError({ logType: LOG_TYPES.COMPONENT, message: 'There was a problem attempting to import a component.', stackTrace: error.stack })
     }
   }
 

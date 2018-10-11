@@ -62,7 +62,7 @@ const getContentGenerator = function getContentGenerator (contentCache) {
           fetched
         }
       } catch (error) {
-        logger.logError({ LOG_TYPES: LOG_TYPES.CACHE, message: `There was a problem getting content from cache: ${error.stack || error}` })
+        logger.logError({ LOG_TYPES: LOG_TYPES.CACHE, message: 'There was a problem getting content from cache.', stackTrace: error.stack })
         return null
       }
     }

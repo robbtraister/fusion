@@ -15,7 +15,7 @@ const getBundleSource = function getBundleSource (sourceName) {
   try {
     return Promise.resolve(unpack(require(`${sourcesDistRoot}/${sourceName}`)))
   } catch (e) {
-    logger.logError({ message: `An error occurred while attempting to get the bundle source: ${e.stack || e}` })
+    logger.logError({ message: 'An error occurred while attempting to get the bundle source.', stackTrace: e.stack })
     return Promise.resolve(null)
   }
 }

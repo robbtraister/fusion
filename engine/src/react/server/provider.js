@@ -17,7 +17,7 @@ const getContentGenerator = function getContentGenerator (contentCache, arcSite,
     const sourceCache = contentCache[sourceName] = contentCache[sourceName] || {}
     const sourcePromise = getSource(sourceName)
       .catch((err) => {
-        logger.logError({ message: `${err.stack || err}` })
+        logger.logError({ message: 'An error occurred while attempting to get content.', stackTrace: err.stack })
         return null
       })
 
@@ -36,7 +36,7 @@ const getContentGenerator = function getContentGenerator (contentCache, arcSite,
           })
           .then(data => { keyCache.cached = data })
           .catch((err) => {
-            logger.logError({ logType: LOG_TYPES.FETCH_FROM_SOURCE, message: `An error occurred while attempting to fetch: ${err.stack || err}` })
+            logger.logError({ logType: LOG_TYPES.FETCH_FROM_SOURCE, message: 'An error occurred while attempting to fetch.', stackTrace: err.stack })
             keyCache.cached = null
           })
           .then(() => keyCache.cached),

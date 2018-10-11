@@ -53,7 +53,7 @@ function HOC (Component) {
             try {
               listener(data)
             } catch (e) {
-              logger.logError({ logType: LOG_TYPES.COMPONENT, message: `An error occurred while dispatching an event: ${e.stack || e}` })
+              logger.logError({ logType: LOG_TYPES.COMPONENT, message: 'An error occurred while dispatching an event.', stackTrace: e.stack })
             }
           })
         }

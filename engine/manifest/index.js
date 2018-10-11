@@ -11,7 +11,7 @@ function getManifest (rootDir, collection) {
     const manifestFile = `${rootDir}/${collection}/fusion.manifest.json`
     return require(manifestFile)
   } catch (error) {
-    logger.logError({ message: `An error occurred while attempting to get manifest: ${error.stack || error}` })
+    logger.logError({ message: `An error occurred while attempting to get manifest.`, stackTrace: error.stack })
   }
 }
 

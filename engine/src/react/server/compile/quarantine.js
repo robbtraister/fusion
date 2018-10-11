@@ -40,7 +40,7 @@ class QuarantineCompiler {
                 )
               )
             } catch (e) {
-              logger.logError({ logType: LOG_TYPES.COMPONENT, message: `An error occurred while attempting to wrap a component: ${e.stack || e}` })
+              logger.logError({ logType: LOG_TYPES.COMPONENT, message: 'An error occurred while attempting to wrap a component.', stackTrace: e.stack })
               return React.createElement(
                 'div',
                 {

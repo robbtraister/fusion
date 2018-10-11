@@ -52,7 +52,7 @@ class AdminCompiler extends ComponentCompiler {
     try {
       return Fusion.components[componentCollection][componentType]
     } catch (e) {
-      logger.logError({ logType: LOG_TYPES.COMPONENT, message: `An error occurred while attempting load a component: ${e.stack || e}` })
+      logger.logError({ logType: LOG_TYPES.COMPONENT, message: 'An error occurred while attempting load a component.', stackTrace: e.stack })
     }
     return null
   }
@@ -89,7 +89,7 @@ function CSR (rendering) {
       window.document.getElementById('fusion-app')
     )
   } catch (e) {
-    logger.logError({ logType: LOG_TYPES.RENDERING, message: `An error occurred while attempting to client-side render: ${e.stack || e}` })
+    logger.logError({ logType: LOG_TYPES.RENDERING, message: 'An error occurred while attempting to client-side render.', stackTrace: e.stack })
   }
 }
 

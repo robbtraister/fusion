@@ -35,10 +35,13 @@ upload () {
   ./resolver-generator/bin/deploy.js
 }
 
-# S3BUCKET is only required to override the code-managed naming pattern of `arc-fusion-[discrete/versioned]-[region]`
-AWS_ACCOUNT_ID='397853141546' AWS_REGION='us-east-1' S3BUCKET='pagebuilder-fusion' upload
+(
+  # S3BUCKET is only required to override the code-managed naming pattern of `arc-fusion-[discrete/versioned]-[region]`
+  AWS_ACCOUNT_ID='397853141546' AWS_REGION='us-east-1' S3BUCKET='pagebuilder-fusion' upload
+)
 
-set-profile $PROFILE
-
-AWS_ACCOUNT_ID='057404813832' AWS_REGION='us-east-1' upload
-AWS_ACCOUNT_ID='057404813832' AWS_REGION='eu-central-1' upload
+(
+  set-profile $PROFILE
+  AWS_ACCOUNT_ID='057404813832' AWS_REGION='us-east-1' upload
+  AWS_ACCOUNT_ID='057404813832' AWS_REGION='eu-central-1' upload
+)

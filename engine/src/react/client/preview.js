@@ -11,7 +11,7 @@ class Preview {
     this.isRenderReady = false
     this.latestOutputType = undefined
     this.latestRendering = undefined
-    this.initializeAdmin = undefined
+    this.onloadCallback = undefined
 
     this.iframe.onload = () => this.appendAdminScript(this.CSR.bind(this))
     this.appendAdminScript(this.SSR.bind(this))
@@ -20,7 +20,7 @@ class Preview {
   CSR () {
     if (this.latestRendering) {
       this.iframe.contentWindow.CSR(this.latestRendering)
-      this.initializeAdmin()
+      this.onloadCallback && this.onloadCallback()
     }
     this.isRenderReady = true
   }
@@ -46,12 +46,12 @@ class Preview {
     this.iframe.contentWindow.Fusion.outputType = this.latestOutputType
   }
 
-  render (renderingTree, outputType, initializeAdmin) {
+  render (renderingTree, outputType, onloadCallback) {
     var isSameOutputType = (this.latestOutputType && (this.latestOutputType === outputType))
 
     this.latestOutputType = outputType
     this.latestRendering = renderingTree
-    this.initializeAdmin = initializeAdmin
+    this.onloadCallback = onloadCallback
 
     if (this.isRenderReady) {
       if (isSameOutputType) {
@@ -65,10 +65,10 @@ class Preview {
 
 const attributeKey = 'data-admin-preview'
 const previewCache = {}
-window.renderPreview = function renderPreview (iframe, renderingTree, outputType, initializeAdmin) {
+window.renderPreview = function renderPreview (iframe, renderingTree, outputType, onloadCallback) {
   const key = iframe.attributes[attributeKey] = iframe.attributes[attributeKey] || Date.now()
   const preview = previewCache[key] = previewCache[key] || new Preview(iframe)
-  preview.render(renderingTree, outputType, initializeAdmin)
+  preview.render(renderingTree, outputType, onloadCallback)
 }
 
 window.Preview = Preview

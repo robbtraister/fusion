@@ -20,7 +20,7 @@ WORKDIR /workdir/resolver
 
 COPY ./package*.json ./
 RUN npm install
-COPY ./ ./
+COPY . ./
 
 # This only existed to run webpack
 # Since this Dockerfile is only used for local development

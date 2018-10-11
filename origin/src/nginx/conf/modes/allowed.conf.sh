@@ -14,7 +14,7 @@ cat <<EOB
 
 EOB
 
-. $(dirname "$0")/../locations/resolver.conf.sh
+$(dirname "$0")/../locations/resolver.conf.sh
 
 cat <<EOB
     }

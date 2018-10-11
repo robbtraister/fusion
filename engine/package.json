@@ -24,7 +24,7 @@
     "prebuild:output-types": "npm run generate:manifest",
     "predeploy": "npm install && npm run build:all:production",
     "prestart": "npm run watch:all &",
-    "start": "sls --stage=localhost offline start",
+    "start": "if [ -f ./release.txt ]; then echo \"fusion release: $(cat ./release.txt)\"; fi; sls --stage=localhost offline start",
     "start:dev": "npm run install:bundle && npm run start",
     "watch:all": "npm run build:all -- --watch",
     "watch:combined": "npm run build:combined -- --watch",

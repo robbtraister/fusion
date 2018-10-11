@@ -45,23 +45,54 @@ cat <<EOB
   }
 
   map \$cookie_version \$cookieVersion {
-    default                     \$cookie_version;
     ''                          \$refererVersion;
+    default                     \$cookie_version;
   }
 
   map \$http_version \$headerVersion {
-    default                     \$http_version;
     ''                          \$cookieVersion;
+    default                     \$http_version;
   }
 
   map \$arg_v \$version {
-    default                     \$arg_v;
     ''                          \$headerVersion;
+    default                     \$arg_v;
   }
 
   map \$version \$isLive {
     'live'                      'true';
     default                     'false';
+  }
+
+  map \$arg__ignoreCache \$ignoreCache {
+    ~*^true$                    'true';
+    default                     'false';
+  }
+
+  map \$http_fusion_cache_mode \$cacheModeHeader {
+    ~*^allowed$                 'allowed';
+    ~*^preferr?ed$              'preferred';
+    ~*^update$                  'update';
+    default                     'none';
+  }
+
+  map \${ignoreCache}_\${isLive}_\${cacheModeHeader} \$cacheMode {
+EOB
+if [ "${IS_PROD}" ]
+then
+  cat <<EOB
+    ~^true_true_                'update';
+    ~_true_allowed$             'allowed';
+    ~_true_preferred$           'preferred';
+    ~_true_update$              'update';
+    default                     'none';
+EOB
+else
+  cat <<EOB
+    default                     'local';
+EOB
+fi
+cat <<EOB
   }
 
   map \$host \$environment {
@@ -71,23 +102,6 @@ if [ "${IS_PROD}" ]
 then
   cat <<EOB
     ~^(?<subdomain>[^.]+)\.     \$subdomain;
-EOB
-fi
-cat <<EOB
-  }
-
-  map \${isLive}_\${http_fusion_cache_mode} \$cacheMode {
-EOB
-if [ "${IS_PROD}" ]
-then
-  cat <<EOB
-    default                     'none';
-    ~*^true_allowed$            'allowed';
-    ~*^true_preferr?ed$         'preferred';
-EOB
-else
-  cat <<EOB
-    default                     'local';
 EOB
 fi
 cat <<EOB

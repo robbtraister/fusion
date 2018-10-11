@@ -55,7 +55,7 @@ module.exports = (Object.keys(entry).length)
         rules: [
           {
             test: /\.[jt]sx?$/i,
-            exclude: /node_modules/,
+            exclude: /\/node_modules\/(?!@arc-fusion\/)/,
             use: [
               babelLoader
             ]
@@ -103,7 +103,7 @@ module.exports = (Object.keys(entry).length)
         rules: [
           {
             test: /\.[jt]sx?$/i,
-            exclude: /node_modules/,
+            exclude: /\/node_modules\/(?!@arc-fusion\/)/,
             use: [
               babelLoader
             ]
@@ -140,7 +140,7 @@ module.exports = (Object.keys(entry).length)
       resolve,
       target,
       watchOptions: {
-        ignored: /node_modules/
+        ignored: /\/node_modules\//
       }
     }
   ]

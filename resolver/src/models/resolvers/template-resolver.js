@@ -10,7 +10,7 @@ const BaseResolver = require('./base-resolver')
 
 const engine = require('../../utils/engine')
 
-const { RedirectError } = require('../../errors')
+const { RedirectError, NotFoundError } = require('../../errors')
 
 const fetch = function fetch (contentSource, contentKey, version) {
   return engine({
@@ -84,8 +84,13 @@ class TemplateResolver extends BaseResolver {
     )
 
     return fetch(this.config.contentSourceId, key, version)
-      // should we return a resolve result even if content doesn't exist?
-      // .catch(() => null)
+      .catch(() => {
+        throw new NotFoundError(`Could not resolve ${requestParts.href}`, {
+          requestUri: requestParts.href,
+          cause: `Resolver matched, but content could not be fetched. Make sure this is the correct resolver.`,
+          resolver: this.config
+        })
+      })
       .then((content) => ({ key, content }))
   }
 

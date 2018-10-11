@@ -12,14 +12,14 @@ cat <<EOB
     location @resolver {
 EOB
 
-. $(dirname "$0")/../locations/resolver.conf.sh
+$(dirname "$0")/../locations/resolver.conf.sh
 
 cat <<EOB
     }
     location @engine {
 EOB
 
-. $(dirname "$0")/../locations/engine.conf.sh
+$(dirname "$0")/../locations/engine.conf.sh
 
 cat <<EOB
     }
@@ -27,7 +27,7 @@ cat <<EOB
       proxy_read_timeout        60;
 EOB
 
-. $(dirname "$0")/../locations/engine.conf.sh
+$(dirname "$0")/../locations/engine.conf.sh
 
 cat <<EOB
     }
@@ -105,7 +105,7 @@ cat <<EOB
 
 EOB
 
-. $(dirname "$0")/../modes/${MODE}.conf.sh
+$(dirname "$0")/../modes/${MODE}.conf.sh
 
 cat <<EOB
 

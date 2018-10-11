@@ -15,7 +15,7 @@ function loadComponent (componentPath) {
   try {
     return unpack(require(componentPath))
   } catch (e) {
-    logger.logError({ logType: LOG_TYPES.COMPONENT, message: 'An error occurred in loadComponent()', stackTrace: e.stack })
+    logger.logError({ logType: LOG_TYPES.COMPONENT, message: 'An error occurred in loadComponent().', stackTrace: e.stack })
   }
 }
 

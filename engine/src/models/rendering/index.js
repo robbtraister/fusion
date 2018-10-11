@@ -74,7 +74,7 @@ class Rendering {
           const artifacts = []
 
           // using a raw rendering object is only for local dev, so don't publish the result
-          if (this.type !== 'rendering') {
+          if (['page', 'template'].includes(this.type)) {
             if (outputType && js) {
               artifacts.push(pushAsset(`${this.name}/${outputType}.js`, js, 'application/javascript'))
             }

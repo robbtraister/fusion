@@ -17,13 +17,6 @@ EOB
 cat <<EOB
     }
     location @engine {
-EOB
-
-. $(dirname "$0")/../locations/engine.conf.sh
-
-cat <<EOB
-    }
-    location @engine_LONGRUNNING {
       proxy_read_timeout        60;
 EOB
 
@@ -79,8 +72,7 @@ cat <<EOB
       return                    418;
     }
 
-    # keep 'resolve' as a group, since the pattern is re-used elsewhere and the trailing endpoint is referenced as $2
-    location ~ ^${API_PREFIX}/(resolve)(/.*|$) {
+    location ${API_PREFIX}/resolve {
       error_page                418 = @resolver;
       return                    418;
     }

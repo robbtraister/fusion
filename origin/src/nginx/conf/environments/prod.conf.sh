@@ -87,11 +87,6 @@ cat <<EOB
       return                    418;
     }
 
-    location ~ ^${API_PREFIX}/render/(page|template)(/.*|$) {
-      error_page                418 = @engine;
-      return                    418;
-    }
-
     location ${API_PREFIX}/render {
       # when a render request is POSTed from admin, it has more compilation work to do
       error_page                418 = @engine_LONGRUNNING;

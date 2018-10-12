@@ -180,7 +180,7 @@ const metaTagGenerator = (metas = {}) => (name, defaultValue) =>
     )
     : null
 
-const stylesGenerator = ({ inlines, rendering, outputType }) => {
+const stylesGenerator = ({ inlines, rendering, outputType }) => ({ children }) => {
   const outputTypeStylesPromise = fetchAsset(`components/output-types/${outputType}.css`)
     .catch(() => null)
 
@@ -204,7 +204,7 @@ const stylesGenerator = ({ inlines, rendering, outputType }) => {
       })
   }
 
-  return ({ children }) => (children)
+  return (children)
     ? children(inlines.styles.cached)
     : React.createElement(
       'style',

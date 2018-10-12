@@ -160,11 +160,11 @@ const compileRenderable = function compileRenderable ({ renderable, outputType, 
     })
 }
 
-const compileDocument = function compileDocument ({ name, rendering, outputType, inlines, contentCache, quarantine }) {
+const compileDocument = function compileDocument ({ name, rendering, outputType, inlines, contentCache, isAdmin, quarantine }) {
   let tic
   return rendering.getJson()
     .then((json) => {
-      return compileRenderable({ renderable: json, outputType, inlines, contentCache, quarantine })
+      return compileRenderable({ renderable: json, outputType, inlines, contentCache, isAdmin, quarantine })
         .then((Template) => {
           if (!outputType) {
             return Template
@@ -181,7 +181,9 @@ const compileDocument = function compileDocument ({ name, rendering, outputType,
           const MetaTags = () =>
             Object.keys(metas).filter(name => metas[name].html).map(getMetaTag)
 
-          const CssTags = cssTagGenerator({ inlines: Template.inlines, rendering, outputType })
+          const CssTags = (isAdmin)
+            ? () => null
+            : cssTagGenerator({ inlines: Template.inlines, rendering, outputType })
 
           const Component = (props) => {
             return React.createElement(
@@ -197,7 +199,9 @@ const compileDocument = function compileDocument ({ name, rendering, outputType,
                 CssTags,
 
                 Fusion: fusionTagGenerator(props.globalContent, props.globalContentConfig, Template.contentCache, outputType, props.arcSite),
-                Libs: libsTagGenerator({ name, outputType }),
+                Libs: (isAdmin)
+                  ? () => null
+                  : libsTagGenerator({ name, outputType }),
 
                 /*
                  * To insert all meta tags

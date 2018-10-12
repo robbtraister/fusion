@@ -30,19 +30,16 @@ class Preview {
   }
 
   CSR () {
-    const frameWindow = this.iframe.contentWindow
-    frameWindow.Fusion = frameWindow.Fusion || {}
-    frameWindow.Fusion.outputType = this.lastOutputType
-    frameWindow.render(this.lastRendering)
+    this.iframe.contentWindow.Fusion = this.iframe.contentWindow.Fusion || {}
+    this.iframe.contentWindow.Fusion.outputType = this.lastOutputType
+    this.iframe.contentWindow.render(this.lastRendering)
     this.onReady && this.onReady()
   }
 
   SSR () {
     this.isReady = false
 
-    const frameDocument = this.iframe.contentDocument
-
-    const form = frameDocument.createElement('form')
+    const form = this.iframe.contentDocument.createElement('form')
     form.method = 'POST'
     form.action = `${__CONTEXT_PATH__}/api/v3/render/?isAdmin=true&outputType=${this.lastOutputType}`
     form.style.visibility = 'hidden'
@@ -53,7 +50,7 @@ class Preview {
     rendering.value = JSON.stringify(this.lastRendering)
 
     form.appendChild(rendering)
-    frameDocument.body.appendChild(form)
+    this.iframe.contentDocument.body.appendChild(form)
     this.iframe.onload = () => {
       let loadedCount = 0
       const jsLoaded = () => {
@@ -62,10 +59,10 @@ class Preview {
           this.CSR()
         }
       }
-      addJs(frameDocument, `${__CONTEXT_PATH__}/dist/engine/admin.js${versionParam}`, jsLoaded)
-      addJs(frameDocument, `${__CONTEXT_PATH__}/dist/components/combinations/${this.lastOutputType}.js${versionParam}`, jsLoaded)
-      addCss(frameDocument, `${__CONTEXT_PATH__}/dist/components/output-types/${this.lastOutputType}.css${versionParam}`)
-      addCss(frameDocument, `${__CONTEXT_PATH__}/dist/components/combinations/${this.lastOutputType}.css${versionParam}`)
+      addJs(this.iframe.contentDocument, `${__CONTEXT_PATH__}/dist/engine/admin.js${versionParam}`, jsLoaded)
+      addJs(this.iframe.contentDocument, `${__CONTEXT_PATH__}/dist/components/combinations/${this.lastOutputType}.js${versionParam}`, jsLoaded)
+      addCss(this.iframe.contentDocument, `${__CONTEXT_PATH__}/dist/components/output-types/${this.lastOutputType}.css${versionParam}`)
+      addCss(this.iframe.contentDocument, `${__CONTEXT_PATH__}/dist/components/combinations/${this.lastOutputType}.css${versionParam}`)
     }
 
     form.submit()

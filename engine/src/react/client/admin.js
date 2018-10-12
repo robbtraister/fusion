@@ -20,12 +20,17 @@ const appendBoundary = (element, id) => {
   }
   return React.createElement(
     React.Fragment,
-    {},
+    {
+      key: id
+    },
     [
       React.createElement(
         'fusion-enter',
         Object.assign(
-          { id: `fusion-enter-${id}` },
+          {
+            id: `fusion-enter-${id}`,
+            key: `fusion-enter-${id}`
+          },
           boundaryProps
         )
       ),
@@ -33,7 +38,10 @@ const appendBoundary = (element, id) => {
       React.createElement(
         'fusion-exit',
         Object.assign(
-          { id: `fusion-exit-${id}` },
+          {
+            id: `fusion-exit-${id}`,
+            key: `fusion-exit-${id}`
+          },
           boundaryProps
         )
       )

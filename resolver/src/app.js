@@ -5,7 +5,7 @@ const express = require('express')
 const { isDev } = require('../environment')
 const isWhy404 = require('./utils/is-why-404')
 
-const { RedirectError, NotFoundError } = require('./errors')
+const { NotFoundError, RedirectError } = require('./errors')
 
 const { trailingSlashRedirect } = require('./utils/trailing-slash-rule')
 

@@ -28,19 +28,21 @@ const make = function make (uri, { arcSite, version, outputType, cacheMode, why4
           version,
           cacheMode
         }).catch((err) => {
-          throw new NotFoundError(`Could not resolve ${uri}`, {
-            requestUri: uri,
-            cause: err.message
-          })
+          if (err.statusCode === 404) {
+            throw new NotFoundError(`Could not resolve ${uri}`, {
+              requestUri: uri,
+              cause: err.message
+            })
+          }
+
+          throw err
         })
       }
 
-      return (() => {
-        throw new NotFoundError(`Could not resolve ${uri}`, {
-          requestUri: uri,
-          cause: 'Resolver could not be matched'
-        })
-      })()
+      throw new NotFoundError(`Could not resolve ${uri}`, {
+        requestUri: uri,
+        cause: 'Resolver could not be matched'
+      })
     })
 }
 

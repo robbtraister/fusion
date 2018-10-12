@@ -84,12 +84,16 @@ class TemplateResolver extends BaseResolver {
     )
 
     return fetch(this.config.contentSourceId, key, version)
-      .catch(() => {
-        throw new NotFoundError(`Could not resolve ${requestParts.href}`, {
-          requestUri: requestParts.href,
-          cause: `Resolver matched, but content could not be fetched. Make sure this is the correct resolver.`,
-          resolver: this.config
-        })
+      .catch((err) => {
+        if (err.statusCode === 404) {
+          throw new NotFoundError(`Could not resolve ${requestParts.href}`, {
+            requestUri: requestParts.href,
+            cause: `Resolver matched, but content could not be fetched. Make sure this is the correct resolver.`,
+            resolver: this.config
+          })
+        }
+
+        throw err
       })
       .then((content) => ({ key, content }))
   }

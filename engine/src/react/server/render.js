@@ -228,7 +228,9 @@ const compileDocument = function compileDocument ({ name, rendering, outputType,
                     (isObject ? nameOrObject.default : defaultValue)
                 },
 
-                Styles: stylesGenerator({ inlines: Template.inlines, outputType, rendering }),
+                Styles: (isAdmin)
+                  ? () => null
+                  : stylesGenerator({ inlines: Template.inlines, outputType, rendering }),
 
                 ...props
               },

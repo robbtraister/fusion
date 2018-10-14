@@ -130,6 +130,7 @@ const fusionTagGenerator = (globalContent, globalContentConfig, contentCache, ou
 
   const __html = `window.Fusion=window.Fusion||{};` +
     `Fusion.contextPath='${contextPath}';` +
+    `Fusion.deployment='${version}';` +
     `Fusion.outputType='${outputType}';` +
     (arcSite ? `Fusion.arcSite='${arcSite}';` : '') +
     `Fusion.lastModified=${now};` +

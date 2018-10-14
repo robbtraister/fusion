@@ -52,15 +52,13 @@ class Preview {
     form.appendChild(rendering)
     this.iframe.contentDocument.body.appendChild(form)
     this.iframe.onload = () => {
-      let loadedCount = 0
-      const jsLoaded = () => {
-        if (++loadedCount >= 2) {
+      addJs(this.iframe.contentDocument, `${__CONTEXT_PATH__}/dist/engine/admin.js${versionParam}`, () => {
+        // when loaded dynamically, serial loading is unreliable, so we have to manually load serially
+        addJs(this.iframe.contentDocument, `${__CONTEXT_PATH__}/dist/components/combinations/${this.lastOutputType}.js${versionParam}`, () => {
           this.isReady = true
           this.CSR()
-        }
-      }
-      addJs(this.iframe.contentDocument, `${__CONTEXT_PATH__}/dist/engine/admin.js${versionParam}`, jsLoaded)
-      addJs(this.iframe.contentDocument, `${__CONTEXT_PATH__}/dist/components/combinations/${this.lastOutputType}.js${versionParam}`, jsLoaded)
+        })
+      })
       addCss(this.iframe.contentDocument, `${__CONTEXT_PATH__}/dist/components/output-types/${this.lastOutputType}.css${versionParam}`)
       addCss(this.iframe.contentDocument, `${__CONTEXT_PATH__}/dist/components/combinations/${this.lastOutputType}.css${versionParam}`)
     }

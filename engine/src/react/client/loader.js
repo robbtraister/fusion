@@ -1,15 +1,13 @@
 'use strict'
 
-/* global Fusion, __CONTEXT_PATH__ */
-
-window.Fusion = window.Fusion || {}
-Fusion.contextPath = __CONTEXT_PATH__
+/* global __CONTEXT_PATH__ */
 
 const loaderScript = document.getElementById('fusion-loader-script')
 
 const version = (loaderScript)
   ? require('./version')(loaderScript.src)
   : null
+const versionParam = version ? `?v=${version}` : ''
 
 // TODO: make this suck less
 // unfortunately, appendChild+defer handling is not as consistent as I would hope among browsers
@@ -23,6 +21,6 @@ if (
   !window.Promise ||
   !window.fetch
 ) {
-  loadScript(`${Fusion.contextPath}/dist/engine/polyfill.js${version ? `?v=${version}` : ''}`)
+  loadScript(`${__CONTEXT_PATH__}/dist/engine/polyfill.js${versionParam}`)
 }
-loadScript(`${Fusion.contextPath}/dist/engine/react.js${version ? `?v=${version}` : ''}`)
+loadScript(`${__CONTEXT_PATH__}/dist/engine/react.js${versionParam}`)

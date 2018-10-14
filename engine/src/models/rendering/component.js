@@ -25,13 +25,13 @@ const findRenderableItem = (rendering) => (childId) => {
   return getAllRenderables(rendering).find(renderableItem => renderableItem.id === childId)
 }
 
-const getComponent = function getComponent ({ name, rendering, outputType = defaultOutputType, child, quarantine }) {
+const getComponent = function getComponent ({ name, rendering, outputType = defaultOutputType, child, isAdmin, quarantine }) {
   return (
     (child)
       ? rendering.getJson()
         .then((json) => findRenderableItem(json)(child))
-        .then((renderable) => compileRenderable({ renderable, outputType, inlines: rendering.inlines, contentCache: rendering.contentCache, quarantine }))
-      : compileDocument({ name, rendering, outputType, inlines: rendering.inlines, contentCache: rendering.contentCache, quarantine })
+        .then((renderable) => compileRenderable({ renderable, outputType, inlines: rendering.inlines, contentCache: rendering.contentCache, isAdmin, quarantine }))
+      : compileDocument({ name, rendering, outputType, inlines: rendering.inlines, contentCache: rendering.contentCache, isAdmin, quarantine })
   ).then(component => Object.assign(component, { outputType }))
 }
 

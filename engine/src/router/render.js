@@ -34,9 +34,10 @@ function getTypeRouter (routeType) {
     (req, res, next) => {
       const tic = timer.tic()
 
+      const isAdmin = req.query.isAdmin === 'true'
       const cacheMode = req.get('Fusion-Cache-Mode')
       debug(`cache mode: ${cacheMode}`)
-      const writeToCache = /^(allowed|preferr?ed|update)$/i.test(cacheMode)
+      const writeToCache = !isAdmin && /^(allowed|preferr?ed|update)$/i.test(cacheMode)
 
       const content = (req.body && req.body.content)
 
@@ -49,7 +50,8 @@ function getTypeRouter (routeType) {
         {
           id: req.params.id,
           child: req.params.child,
-          outputType
+          outputType,
+          isAdmin
         },
         // support POST from an HTML form
         (typeof renderingJson === 'string')

@@ -44,8 +44,7 @@ distRouter.use('/engine', assetHandler('/engine'))
 distRouter.all(/\.css$/, assetHandler())
 
 // if POSTed, we will re-generate
-// don't redirect to S3 in case we have to generate
-distRouter.get(/\.js$/, staticHandler())
+distRouter.get(/\.js$/, assetHandler())
 
 function getTypeRouter (routeType, allowPost) {
   const typeRouter = express.Router()

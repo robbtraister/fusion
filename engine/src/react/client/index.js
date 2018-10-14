@@ -13,12 +13,12 @@ const ReactDOM = window.ReactDOM
 React.Fragment = React.Fragment || 'div'
 
 let did404 = false
-const notFound = window.notFound = () => {
+const notFound = window.notFound = function () {
   if (!did404) {
     const noscript = window.document.getElementById('404')
     if (noscript) {
       did404 = true
-      const html = noscript.innerText
+      const html = noscript.innerHTML
       const parent = noscript.parentElement
       parent.removeChild(noscript)
       parent.innerHTML += html
@@ -27,7 +27,7 @@ const notFound = window.notFound = () => {
 }
 
 let didRender = false
-const render = () => {
+const render = function () {
   if (!didRender) {
     didRender = true
 
@@ -51,20 +51,27 @@ const render = () => {
       })
 
       const method = 'render' // Fusion.isFresh ? 'hydrate' : 'render'
-      ReactDOM[method](
-        React.createElement(
-          Provider,
-          {
-            layout: Fusion.Template.layout,
-            template: Fusion.Template.id
-          },
+
+      const fusionElement = window.document.getElementById('fusion-app')
+      const serverHtml = fusionElement.innerHTML
+      try {
+        ReactDOM[method](
           React.createElement(
-            Fusion.Template,
-            Fusion.globalContent || {}
-          )
-        ),
-        window.document.getElementById('fusion-app')
-      )
+            Provider,
+            {
+              layout: Fusion.Template.layout,
+              template: Fusion.Template.id
+            },
+            React.createElement(
+              Fusion.Template,
+              Fusion.globalContent || {}
+            )
+          ),
+          fusionElement
+        )
+      } catch (e) {
+        fusionElement.innerHTML = serverHtml
+      }
     }
   }
 }

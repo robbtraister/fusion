@@ -92,13 +92,13 @@ class Rendering {
     return this.compilations[outputType]
   }
 
-  async getComponent ({ outputType = defaultOutputType, child }, quarantine) {
+  async getComponent ({ outputType = defaultOutputType, child, isAdmin }, quarantine) {
     debug(`get component: ${this.name}${child ? `(${child})` : ''}[${outputType}]`)
     this.contentCache = this.contentCache || {}
     this.inlines = this.inlines || {}
     return (child)
-      ? getComponent({ rendering: this, outputType, child, quarantine })
-      : getComponent({ rendering: this, outputType, name: this.name, quarantine })
+      ? getComponent({ rendering: this, outputType, child, isAdmin, quarantine })
+      : getComponent({ rendering: this, outputType, name: this.name, isAdmin, quarantine })
   }
 
   async getContent (arcSite) {

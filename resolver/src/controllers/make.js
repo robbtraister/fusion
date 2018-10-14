@@ -7,7 +7,7 @@ const engine = require('../utils/engine')
 
 const endpoint = function endpoint (data, arcSite, outputType) {
   return url.format({
-    pathname: `/render/${(data.rendering && data.rendering.type) || ''}`,
+    pathname: '/render',
     query: {
       outputType,
       _website: arcSite

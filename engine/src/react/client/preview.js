@@ -24,15 +24,16 @@ class Preview {
     this.iframe = iframe
 
     this.isReady = false
-    this.lastOutputType = undefined
-    this.lastRendering = undefined
+    this.outputType = undefined
+    this.rendering = undefined
+    this.website = undefined
     this.onReady = undefined
   }
 
   CSR () {
     this.iframe.contentWindow.Fusion = this.iframe.contentWindow.Fusion || {}
-    this.iframe.contentWindow.Fusion.outputType = this.lastOutputType
-    this.iframe.contentWindow.render(this.lastRendering)
+    this.iframe.contentWindow.Fusion.outputType = this.outputType
+    this.iframe.contentWindow.render(this.rendering)
     this.onReady && this.onReady()
   }
 
@@ -41,50 +42,64 @@ class Preview {
 
     const form = this.iframe.contentDocument.createElement('form')
     form.method = 'POST'
-    form.action = `${__CONTEXT_PATH__}/api/v3/render/?isAdmin=true&outputType=${this.lastOutputType}`
+    form.action = `${__CONTEXT_PATH__}/api/v3/render/?isAdmin=true${this.outputType ? `&outputType=${this.outputType}` : ''}${this.website ? `&_website=${this.website}` : ''}`
     form.style.visibility = 'hidden'
 
-    var rendering = document.createElement('input')
-    rendering.type = 'hidden'
-    rendering.name = 'rendering'
-    rendering.value = JSON.stringify(this.lastRendering)
+    var renderingInput = document.createElement('input')
+    renderingInput.type = 'hidden'
+    renderingInput.name = 'rendering'
+    renderingInput.value = JSON.stringify(this.rendering)
 
-    form.appendChild(rendering)
+    form.appendChild(renderingInput)
     this.iframe.contentDocument.body.appendChild(form)
     this.iframe.onload = () => {
       addJs(this.iframe.contentDocument, `${__CONTEXT_PATH__}/dist/engine/admin.js${versionParam}`, () => {
         // when loaded dynamically, serial loading is unreliable, so we have to manually load serially
-        addJs(this.iframe.contentDocument, `${__CONTEXT_PATH__}/dist/components/combinations/${this.lastOutputType}.js${versionParam}`, () => {
+        addJs(this.iframe.contentDocument, `${__CONTEXT_PATH__}/dist/components/combinations/${this.outputType}.js${versionParam}`, () => {
           this.isReady = true
           this.CSR()
         })
       })
-      addCss(this.iframe.contentDocument, `${__CONTEXT_PATH__}/dist/components/output-types/${this.lastOutputType}.css${versionParam}`)
-      addCss(this.iframe.contentDocument, `${__CONTEXT_PATH__}/dist/components/combinations/${this.lastOutputType}.css${versionParam}`)
+      addCss(this.iframe.contentDocument, `${__CONTEXT_PATH__}/dist/components/output-types/${this.outputType}.css${versionParam}`)
+      addCss(this.iframe.contentDocument, `${__CONTEXT_PATH__}/dist/components/combinations/${this.outputType}.css${versionParam}`)
     }
 
     form.submit()
   }
 
-  render (renderingTree, outputType, callback) {
-    this.lastRendering = renderingTree
+  reload (callback) {
+    this.onReady = callback
+    this.SSR()
+  }
+
+  render (rendering, outputType, website, callback) {
+    this.rendering = rendering
     this.onReady = callback
 
-    if (this.lastOutputType !== outputType) {
-      this.lastOutputType = outputType
+    /* eslint-disable eqeqeq */
+    if ((this.outputType != outputType) || (this.website != website)) {
+      this.outputType = outputType
+      this.website = website
       this.SSR()
     } else if (this.isReady) {
       this.CSR()
     }
+    /* eslint-enable eqeqeq */
   }
 }
 
 const attributeKey = 'data-admin-preview'
 const previewCache = {}
-window.renderPreview = function renderPreview (iframe, renderingTree, outputType, onloadCallback) {
+const getPreview = function getPreview (iframe) {
   const key = iframe.attributes[attributeKey] = iframe.attributes[attributeKey] || Date.now()
   const preview = previewCache[key] = previewCache[key] || new Preview(iframe)
-  preview.render(renderingTree, outputType, onloadCallback)
+  return preview
+}
+window.renderPreview = function renderPreview (iframe, rendering, outputType, website, onloadCallback) {
+  getPreview(iframe).render(rendering, outputType, website, onloadCallback)
+}
+window.reloadPreview = function reloadPreview (iframe, onloadCallback) {
+  getPreview(iframe).reload(onloadCallback)
 }
 
 window.Preview = Preview

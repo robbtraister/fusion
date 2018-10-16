@@ -21,19 +21,19 @@ const createContextElement = (Component, props, context) => {
   const { props: contextProps, children } = getContextProps(props, context)
 
   contextProps.editableField = (isClient && Fusion.isAdmin)
-    ? (field) => ({
+    ? (fieldProp) => ({
       'data-feature': props.id,
-      'data-field-editable': field,
+      'data-field-editable': fieldProp,
       'contentEditable': 'true'
     })
     : () => ({})
 
   contextProps.editableContent = (isClient && Fusion.isAdmin)
-    ? (content, contentName, elementName) => ({
+    ? (contentProp, contentName, elementId) => ({
       'data-feature': props.id,
-      'data-content-editable': content,
+      'data-content-editable': contentProp,
       'data-content-name': contentName,
-      'data-element-name': elementName,
+      'data-element-id': elementId,
       'contentEditable': 'true'
     })
     : () => ({})

@@ -158,7 +158,7 @@ cat <<EOB
       rewrite                   ^ /homepage;
     }
 
-    location ${CONTEXT_PATH}/_ {
+    location ${CONTEXT_PATH}/_/ {
       rewrite                   ^${CONTEXT_PATH}/_(.*) ${API_PREFIX}\$1;
     }
 

@@ -32,8 +32,8 @@ const createContextElement = (Component, props, context) => {
     ? (content, contentName, elementName) => ({
       'data-feature': props.id,
       'data-content-editable': content,
-      'data-content-id': contentName,
-      'data-element-id': elementName,
+      'data-content-name': contentName,
+      'data-element-name': elementName,
       'contentEditable': 'true'
     })
     : () => ({})

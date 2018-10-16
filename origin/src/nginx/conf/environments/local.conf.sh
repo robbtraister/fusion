@@ -29,7 +29,7 @@ cat <<EOB
       return                    404;
     }
 
-    location ~ ^(${CONTEXT_PATH}|${API_PREFIX})/(resources)(/.*|$) {
+    location ~ ^(${CONTEXT_PATH}|${API_PREFIX})/(resources)(/.*|\$) {
       set                       \$command \$2;
       set                       \$file \$3;
       set                       \$p \$command\$file;
@@ -41,7 +41,7 @@ cat <<EOB
       try_files                 \$file =404;
     }
 
-    location ~ ^(${CONTEXT_PATH}|${API_PREFIX})/(assets|dist)(/.*|$) {
+    location ~ ^(${CONTEXT_PATH}|${API_PREFIX})/(assets|dist)(/.*|\$) {
       set                       \$command \$2;
       set                       \$file \$3;
       set                       \$p \$command\$file;
@@ -49,7 +49,7 @@ cat <<EOB
       proxy_intercept_errors    on;
       error_page                400 403 404 418 = @engine;
 
-      if (\$request_method ~ ^(POST|PUT)$) {
+      if (\$request_method ~ ^(POST|PUT)\$) {
         return                  418;
       }
 
@@ -57,7 +57,7 @@ cat <<EOB
       try_files                 \$file =404;
     }
 
-    location ~ ^${API_PREFIX}/(configs)(/.*|$) {
+    location ~ ^${API_PREFIX}/(configs)(/.*|\$) {
       set                       \$p /components\$2/fusion.configs.json;
 
       proxy_intercept_errors    on;
@@ -67,7 +67,7 @@ cat <<EOB
       try_files                 \$p =404;
     }
 
-    location ~ ^${API_PREFIX}/(content|render|resolvers)(/.*|$) {
+    location ~ ^${API_PREFIX}/(content|render|resolvers)(/.*|\$) {
       error_page                418 = @engine;
       return                    418;
     }
@@ -77,12 +77,12 @@ cat <<EOB
       return                    418;
     }
 
-    location ~ ^${API_PREFIX}/(fuse|make)(/.*|$) {
-      set                       \$p \$2.html;
-
+    # strip trailing slashes
+    location ~ ^${API_PREFIX}/(fuse|make)(/.*)/$ {
+      rewrite                   (.*)/\$ \$1 last;
+    }
+    location ~ ^${API_PREFIX}/(fuse|make)(/.*|\$) {
       error_page                400 403 404 418 = @resolver;
-      proxy_intercept_errors    on;
-
       return                    418;
     }
 

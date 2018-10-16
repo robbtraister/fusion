@@ -40,7 +40,7 @@ cat <<EOB
   }
 
   map \$http_referer \$refererVersion {
-    ~(\?|&)v=([0-9]+)(&|$)      \$2;
+    ~(\?|&)v=([0-9]+)(&|\$)     \$2;
     default                     'live'; #'\${dollar}LATEST';
   }
 
@@ -65,14 +65,14 @@ cat <<EOB
   }
 
   map \$arg__ignoreCache \$ignoreCache {
-    ~*^true$                    'true';
+    ~*^true\$                   'true';
     default                     'false';
   }
 
   map \$http_fusion_cache_mode \$cacheModeHeader {
-    ~*^allowed$                 'allowed';
-    ~*^preferr?ed$              'preferred';
-    ~*^update$                  'update';
+    ~*^allowed\$                'allowed';
+    ~*^preferr?ed\$             'preferred';
+    ~*^update\$                 'update';
     default                     'none';
   }
 
@@ -82,9 +82,9 @@ if [ "${IS_PROD}" ]
 then
   cat <<EOB
     ~^true_true_                'update';
-    ~_true_allowed$             'allowed';
-    ~_true_preferred$           'preferred';
-    ~_true_update$              'update';
+    ~_true_allowed\$            'allowed';
+    ~_true_preferred\$          'preferred';
+    ~_true_update\$             'update';
     default                     'none';
 EOB
 else

@@ -77,7 +77,7 @@ const compileSource = function compileSource (script, styles) {
 
         const elapsedTime = tic.toc()
         debugTimer('webpack setup', elapsedTime)
-        sendMetrics([{type: METRIC_TYPES.WEBPACK_DURATION, value: elapsedTime, tags: ['webpack-op:setup']}])
+        sendMetrics([{ type: METRIC_TYPES.WEBPACK_DURATION, value: elapsedTime, tags: ['webpack-op:setup'] }])
         logger.logInfo({ logType: LOG_TYPES.WEBPACK_COMPILATION, message: 'Webpack setup succeeded' })
 
         return compiler

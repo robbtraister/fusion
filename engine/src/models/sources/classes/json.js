@@ -11,7 +11,7 @@ const expandProperties = function expandProperties (string, properties) {
 }
 
 class JsonSource extends CachedSource {
-  resolve (key) {
+  resolve (key, options) {
     const path = expandProperties(this.pattern, key)
 
     const query = this.params
@@ -23,7 +23,7 @@ class JsonSource extends CachedSource {
       .filter(v => v)
       .join('&')
 
-    return this.formatUri(`${path}${query ? `?${query}` : ''}`)
+    return this.formatUri(`${path}${query ? `?${query}` : ''}`, options)
   }
 }
 

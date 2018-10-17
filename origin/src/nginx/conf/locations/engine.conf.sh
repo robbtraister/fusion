@@ -20,7 +20,5 @@ fi
 
 cat <<EOB
 
-      proxy_redirect            / ' ${API_PREFIX}/';
-
       add_header                'Fusion-Source' 'lambda';
 EOB

@@ -12,9 +12,9 @@ const engine = require('../../utils/engine')
 
 const { RedirectError, NotFoundError } = require('../../errors')
 
-const fetch = function fetch (contentSource, contentKey, version) {
+const fetch = async function fetch (contentSource, contentKey, version) {
   return engine({
-    uri: `/content/fetch/${contentSource}?key=${encodeURIComponent(JSON.stringify(contentKey))}`,
+    uri: `/content/fetch/${contentSource}?key=${encodeURIComponent(JSON.stringify(contentKey))}&followRedirect=false`,
     version
   })
 }

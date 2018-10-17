@@ -74,34 +74,36 @@ class Source {
     throw new Error('`clear` not implemented')
   }
 
-  async fetch (key) {
+  async fetch (key, options) {
     throw new Error('`fetch` not implemented')
   }
 
   async filter (query, data) {
-    return (this.schema && query && data)
-      ? graphql(this.schema, query, data)
-        .then(result => {
-          if (result.errors) {
-            throw result.errors[0]
+    if (this.schema && query && data) {
+      try {
+        const result = await graphql(this.schema, query, data)
+
+        if (result.errors) {
+          throw result.errors[0]
+        }
+
+        KEEP_FIELDS.forEach((field) => {
+          if (data[field]) {
+            result.data[field] = data[field]
           }
-
-          KEEP_FIELDS.forEach((field) => {
-            if (data[field]) {
-              result.data[field] = data[field]
-            }
-          })
-
-          return result.data
         })
-        .catch((err) => {
-          console.error(err)
-          return data
-        })
-      : Promise.resolve(data)
+
+        return result.data
+      } catch (err) {
+        console.error(err)
+        return data
+      }
+    } else {
+      return data
+    }
   }
 
-  resolve (key) {
+  resolve (key, options) {
     return new Error('`resolve` not implemented')
   }
 

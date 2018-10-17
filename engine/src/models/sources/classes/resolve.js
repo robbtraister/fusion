@@ -32,6 +32,8 @@ class ResolveSource extends BaseSource {
     debugFetch(`Fetching from source [${sanitizedUri}]`)
     const tic1 = timer.tic()
 
+    const maxRedirects = (options.maxRedirects === 0) ? 0 : (+options.maxRedirects || 10)
+
     const response = await request({
       uri: resolvedUri,
       json: true,
@@ -53,12 +55,12 @@ class ResolveSource extends BaseSource {
         : [ null, null ]
 
     if (redirectUri) {
-      if (options.followRedirect === false || options.redirectCount > 2) {
+      if (options.followRedirect === false || maxRedirects <= 0) {
         throw new RedirectError(redirectUri, redirectStatus)
       } else {
         return this.fetch(
           _merge({}, key, response.body),
-          Object.assign({}, options, { redirectCount: (options.redirectCount || 0) + 1 })
+          Object.assign({}, options, { maxRedirects: maxRedirects - 1 })
         )
       }
     }

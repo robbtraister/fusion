@@ -41,23 +41,24 @@ class Rendering {
     this.compilations = {}
   }
 
+  async fetchJson () {
+    if (this.json) {
+      return this.json
+    }
+
+    const json = await getJson(this.type, this.id)
+    if (!json) {
+      const e = new Error(`No rendering found: ${this.type}/${this.id}`)
+      e.statusCode = 404
+      throw e
+    }
+    return json
+  }
+
   // Lazy load all the things (YpAGNI)
 
   async getJson () {
-    this.jsonPromise = this.jsonPromise ||
-      (
-        (this.json)
-          ? Promise.resolve(this.json)
-          : getJson(this.type, this.id)
-            .then(json => {
-              if (!json) {
-                const e = new Error(`No rendering found: ${this.type}/${this.id}`)
-                e.statusCode = 404
-                throw e
-              }
-              return json
-            })
-      )
+    this.jsonPromise = this.jsonPromise || this.fetchJson()
     return this.jsonPromise
   }
 
@@ -65,30 +66,32 @@ class Rendering {
     return Promise.all(allOutputTypes.map((outputType) => this.compile(outputType)))
   }
 
+  async doCompile (outputType = defaultOutputType) {
+    const json = await this.getJson()
+    const result = await compileRendering({ rendering: json, outputType })
+    const artifacts = []
+
+    // using a raw rendering object is only for local dev, so don't publish the result
+    if (['page', 'template'].includes(this.type)) {
+      if (outputType && result.js) {
+        artifacts.push(pushAsset(`${this.name}/${outputType}.js`, result.js, 'application/javascript'))
+      }
+
+      if (result.cssFile && result.css) {
+        artifacts.push(pushAsset(result.cssFile, result.css, 'text/css'))
+      }
+
+      artifacts.push(pushCssHash(this.name, outputType, result.cssFile || null))
+    }
+
+    // we have to wait for artifacts to be pushed so the lambda isn't frozen
+    await Promise.all(artifacts)
+    return result
+  }
+
   async compile (outputType = defaultOutputType) {
     debug(`get compilation: ${this.name}[${outputType}]`)
-    this.compilations[outputType] = this.compilations[outputType] ||
-      this.getJson()
-        .then((json) => compileRendering({ rendering: json, outputType }))
-        .then(({ js, css, cssFile }) => {
-          const artifacts = []
-
-          // using a raw rendering object is only for local dev, so don't publish the result
-          if (['page', 'template'].includes(this.type)) {
-            if (outputType && js) {
-              artifacts.push(pushAsset(`${this.name}/${outputType}.js`, js, 'application/javascript'))
-            }
-
-            if (cssFile && css) {
-              artifacts.push(pushAsset(cssFile, css, 'text/css'))
-            }
-
-            artifacts.push(pushCssHash(this.name, outputType, cssFile || null))
-          }
-
-          // we have to wait for artifacts to be pushed so the lambda isn't frozen
-          return Promise.all(artifacts).then(() => ({ js, css, cssFile }))
-        })
+    this.compilations[outputType] = this.compilations[outputType] || this.doCompile(outputType)
     return this.compilations[outputType]
   }
 
@@ -101,111 +104,124 @@ class Rendering {
       : getComponent({ rendering: this, outputType, name: this.name, isAdmin, quarantine })
   }
 
-  async getContent (arcSite) {
+  async fetchContent (arcSite) {
     // I hate how this works, pulling content only for pages
     // but that's what you get with legacy data
-    this.contentPromise = this.contentPromise ||
-      (
-        (this.type === 'template')
-          ? Promise.resolve()
-          : this.getJson()
-            .then((json) => {
-              const configs = json.globalContentConfig
-              return (configs && configs.contentService && configs.contentConfigValues)
-                ? getSource(configs.contentService)
-                  .then((source) =>
-                    source.fetch(
-                      Object.assign(
-                        json.uri
-                          ? { uri: json.uri }
-                          : {},
-                        { 'arc-site': arcSite },
-                        configs.contentConfigValues
-                      ),
-                      { followRedirect: false }
-                    )
-                  )
-                  .then((document) => ({
-                    source: configs.contentService,
-                    key: configs.contentConfigValues,
-                    document
-                  }))
-                : null
-            })
+    if (this.type === 'template') {
+      return
+    }
+
+    const json = await this.getJson()
+    const configs = json.globalContentConfig
+    if (configs && configs.contentService && configs.contentConfigValues) {
+      const source = await getSource(configs.contentService)
+      const document = await source.fetch(
+        Object.assign(
+          json.uri
+            ? { uri: json.uri }
+            : {},
+          { 'arc-site': arcSite },
+          configs.contentConfigValues
+        ),
+        { followRedirect: false }
       )
+      return {
+        source: configs.contentService,
+        key: configs.contentConfigValues,
+        document
+      }
+    }
+    return null
+  }
+
+  async getContent (arcSite) {
+    this.contentPromise = this.contentPromise || this.fetchContent(arcSite)
     return this.contentPromise
+  }
+
+  async fetchCssFile (outputType = defaultOutputType) {
+    const data = await fetchCssHash(this.name, outputType)
+    // if not found, re-compile
+    const { cssFile } = data || (await this.compile(outputType))
+    return cssFile
   }
 
   async getCssFile (outputType = defaultOutputType) {
     debug(`get css file: ${this.name}[${outputType}]`)
-    this.cssFilePromise = this.cssFilePromise ||
-      fetchCssHash(this.name, outputType)
-        // if not found, re-compile
-        .then((data) => data || this.compile(outputType))
-        .then(({ cssFile }) => cssFile)
+    this.cssFilePromise = this.cssFilePromise || this.fetchCssFile(outputType)
     return this.cssFilePromise
+  }
+
+  async fetchStyles (outputType = defaultOutputType) {
+    const cssFile = await this.getCssFile(outputType)
+    try {
+      return cssFile && await fetchAsset(cssFile)
+    } catch (_) {
+      const { css } = await this.compile(outputType)
+      return css
+    }
   }
 
   async getStyles (outputType = defaultOutputType) {
     debug(`get styles: ${this.name}[${outputType}]`)
-    this.stylesPromise = this.stylesPromise ||
-      this.getCssFile(outputType)
-        .then((cssFile) => cssFile && fetchAsset(cssFile))
-        .catch(() => this.compile(outputType).then(({ css }) => css))
+    this.stylesPromise = this.stylesPromise || this.fetchStyles(outputType)
     return this.stylesPromise
+  }
+
+  async compileScript (outputType = defaultOutputType) {
+    const { js } = await this.compile(outputType)
+    return js
   }
 
   async getScript (outputType = defaultOutputType) {
     debug(`get script: ${this.name}[${outputType}]`)
-    this.jsPromise = this.jsPromise ||
-      this.compile(outputType).then(({ js }) => js)
+    this.jsPromise = this.jsPromise || this.compileScript(outputType)
     return this.jsPromise
   }
 
   async publish (propagate) {
     const uri = `/dist/${this.type}/${this.id}`
-    return (
-      (this.json)
-        ? publishOutputTypes(uri, this.json, propagate ? 'RequestResponse' : 'Event')
-          .then(
-            // if this is the first version to receive this rendering
-            (propagate)
-              ? Promise.all([
-                putJson(this.type, Object.assign({}, this.json, { id: this.id })),
-                publishToOtherVersions(uri, this.json)
-                  .catch((err) => {
-                    // do not throw while trying to publish to old versions
-                    console.error(err)
-                  })
-              ])
-              : Promise.resolve()
-          )
-        : Promise.reject(new Error('no rendering provided to publish'))
-    )
+
+    if (!this.json) {
+      throw new Error('no rendering provided to publish')
+    } else {
+      await publishOutputTypes(uri, this.json, propagate ? 'RequestResponse' : 'Event')
+      // if this is the first version to receive this rendering
+      if (propagate) {
+        const jsonPromise = putJson(this.type, Object.assign({}, this.json, { id: this.id }))
+        try {
+          await publishToOtherVersions(uri, this.json)
+        } catch (e) {
+          // do not throw while trying to publish to old versions
+          console.error(e)
+        }
+        await jsonPromise
+      }
+    }
   }
 
-  async render ({ content, rendering, request }) {
-    return Promise.all([
+  async render ({ content: templateContent, rendering, request }) {
+    const [ Component, content ] = await Promise.all([
       this.getComponent(rendering),
-      content || this.getContent(request.arcSite)
-    ])
       // template will already have content populated by resolver
-      // use Object.assign to default to the resolver content
-      .then(([Component, content]) =>
-        Promise.resolve()
-          .then(() => render({ Component, content, request }))
-          .catch(() =>
-            this.getComponent(rendering, true)
-              .then((Component) => render({ Component, content, request }))
-          )
-      )
+      templateContent || this.getContent(request.arcSite)
+    ])
+
+    try {
+      return await render({ Component, content, request })
+    } catch (_) {
+      const Component = await this.getComponent(rendering, true)
+      return render({ Component, content, request })
+    }
   }
 
   static async compile (type) {
-    return model(type).find()
-      .then(objects =>
-        Promise.all(objects.map(obj => new Rendering(type, obj.id, obj).publish(false)))
+    const objects = await model(type).find()
+    return Promise.all(
+      objects.map(obj =>
+        new Rendering(type, obj.id, obj).publish(false)
       )
+    )
   }
 }
 

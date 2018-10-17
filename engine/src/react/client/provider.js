@@ -10,20 +10,24 @@ const lastModified = new Date(Fusion.lastModified || null).toUTCString()
 
 const JSONNormalize = require('../../utils/normalize')
 
-const fetchContent = (sourceName, keyString, filter, cached) =>
-  window.fetch(
-    `${Fusion.contextPath || ''}/api/v3/content/fetch/${sourceName}?key=${encodeURIComponent(keyString)}` + (filter ? `&query=${encodeURIComponent(filter)}` : '') + (Fusion.arcSite ? `&_website=${encodeURIComponent(Fusion.arcSite)}` : ''),
-    {
-      headers: {
-        'If-Modified-Since': lastModified
+const fetchContent = async (sourceName, keyString, filter, cached) => {
+  try {
+    const resp = await window.fetch(
+      `${Fusion.contextPath || ''}/api/v3/content/fetch/${sourceName}?key=${encodeURIComponent(keyString)}` + (filter ? `&query=${encodeURIComponent(filter)}` : '') + (Fusion.arcSite ? `&_website=${encodeURIComponent(Fusion.arcSite)}` : ''),
+      {
+        headers: {
+          'If-Modified-Since': lastModified
+        }
       }
-    }
-  )
-    .then(resp => (resp.status === 304)
+    )
+
+    return (resp.status === 304)
       ? cached
       : resp.json()
-    )
-    .catch(() => cached)
+  } catch (e) {
+    return cached
+  }
+}
 
 const getContentGenerator = function getContentGenerator (contentCache) {
   contentCache = contentCache || {}

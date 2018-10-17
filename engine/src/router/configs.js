@@ -83,29 +83,44 @@ function transformContentConfigs (manifest) {
   }
 }
 
-configRouter.get('/content/sources', (req, res, next) => {
-  const sourceManifest = getContentManifest('sources')
-  Promise.all(
-    Object.keys(sourceManifest)
-      .map((sourceName) =>
-        getSource(sourceName)
-          .catch(() => null)
+configRouter.get('/content/sources',
+  async (req, res, next) => {
+    try {
+      const sourceManifest = getContentManifest('sources')
+      const sources = await Promise.all(
+        Object.keys(sourceManifest)
+          .map((sourceName) =>
+            getSource(sourceName)
+              .catch(() => null)
+          )
       )
-  )
-    .then((sources) => sources.filter(s => s))
-    .then((sources) => sources.map(transformContentConfigs))
-    .then((sources) => res.send(sources))
-})
 
-configRouter.get('/content/schemas', (req, res, next) => {
-  const schemaManifest = getContentManifest('schemas')
-  Promise.resolve(
-    Object.assign(
-      ...Object.keys(schemaManifest)
-        .map((schemaName) => ({ [schemaName]: schemaName }))
-    )
-  )
-    .then((schemas) => res.send(schemas))
-})
+      res.send(
+        sources
+          .filter(source => source)
+          .map(transformContentConfigs)
+      )
+    } catch (e) {
+      next(e)
+    }
+  }
+)
+
+configRouter.get('/content/schemas',
+  (req, res, next) => {
+    try {
+      const schemaManifest = getContentManifest('schemas')
+
+      const schemas = Object.assign(
+        ...Object.keys(schemaManifest)
+          .map((schemaName) => ({ [schemaName]: schemaName }))
+      )
+
+      res.send(schemas)
+    } catch (e) {
+      next(e)
+    }
+  }
+)
 
 module.exports = configRouter

@@ -15,18 +15,18 @@ const LOG_TYPES = {
   WEBPACK_COMPILATION: 'webpack compilation'
 }
 
-const logInfo = function logInfo (logInfo) {
-  const logObject = getJSONLogObject(LOG_LEVELS.INFO, logInfo)
+const logInfo = function logInfo (logData) {
+  const logObject = getJSONLogObject(LOG_LEVELS.INFO, logData)
   console.info(`${LOG_LEVELS.INFO}: ${logObject}`)
 }
 
-const logError = function logError (logInfo) {
-  const logObject = getJSONLogObject(LOG_LEVELS.ERROR, logInfo)
+const logError = function logError (logData) {
+  const logObject = getJSONLogObject(LOG_LEVELS.ERROR, logData)
   console.error(`${LOG_LEVELS.ERROR}: ${logObject}`)
 }
 
-const logWarn = function logWarn (logInfo) {
-  const logObject = getJSONLogObject(LOG_LEVELS.WARN, logInfo)
+const logWarn = function logWarn (logData) {
+  const logObject = getJSONLogObject(LOG_LEVELS.WARN, logData)
   console.warn(`${LOG_LEVELS.WARN}: ${logObject}`)
 }
 

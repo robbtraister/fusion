@@ -105,7 +105,7 @@ class CachedSource extends ResolveSource {
               const tagResult = (error.statusCode && error.statusCode === 404) ? 'result:cache_miss' : 'result:cache_error'
               const tags = ['operation:fetch', tagResult, `source:${this.name}`]
               sendMetrics([
-                {type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags}
+                { type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags }
               ])
               logger.logError({ logType: LOG_TYPES.CACHE, message: 'There was an error while trying to fetch.', stackTrace: error.stack })
 

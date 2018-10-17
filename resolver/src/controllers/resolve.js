@@ -17,56 +17,60 @@ const {
   trailingSlashRewrite
 } = require('../utils/trailing-slash-rule')
 
-// fetch page/template resolvers from DB (local env) or config file (prod)
-const { pageConfigs, templateConfigs } = (resolveFromDB)
-  ? (() => {
+async function loadResolvers () {
+  let pageConfigs
+  let templateConfigs
+
+  if (resolveFromDB) {
     const model = require('../dao')
-    return {
-      pageConfigs: model('page').find(),
-      templateConfigs: model('resolver_config').find()
-    }
-  })()
-  : (() => {
+    ;[ pageConfigs, templateConfigs ] = await Promise.all([
+      model('page').find(),
+      model('resolver_config').find()
+    ])
+  } else {
     const resolverConfigs = require('../../config/resolvers.json')
-    return {
-      pageConfigs: Promise.resolve(resolverConfigs.pages || []),
-      templateConfigs: Promise.resolve(resolverConfigs.resolvers || [])
-    }
-  })()
+    ;[ pageConfigs, templateConfigs ] = await Promise.all([
+      resolverConfigs.pages || [],
+      resolverConfigs.resolvers || []
+    ])
+  }
 
-const pageResolversPromise = pageConfigs
-  .then((configs) => configs.map((config) => new PageResolver(config)))
-  .then((resolvers) => resolvers.sort(PageResolver.sort))
+  const pageResolvers = pageConfigs
+    .map((config) => new PageResolver(config))
+    .sort(PageResolver.sort)
 
-const templateResolversPromise = templateConfigs
-  .then((configs) => configs.map((config) => new TemplateResolver(config)))
-  .then((resolvers) => resolvers.sort(TemplateResolver.sort))
+  const templateResolvers = templateConfigs
+    .map((config) => new TemplateResolver(config))
+    .sort(TemplateResolver.sort)
 
-const resolversPromise = Promise.all([
-  pageResolversPromise,
-  templateResolversPromise
-])
-  .then(([pageResolvers, templateResolvers]) => pageResolvers.concat(templateResolvers))
+  return pageResolvers.concat(templateResolvers)
+}
 
-const resolve = function resolve (requestUri, arcSite, version) {
+const resolversPromise = loadResolvers()
+
+const resolve = async function resolve (requestUri, arcSite, version) {
   const requestParts = url.parse(requestUri, true)
   requestParts.pathname = trailingSlashRewrite(requestParts.pathname)
   debugLogger(`Resolving: ${JSON.stringify(requestUri)}`)
 
-  return resolversPromise
-    .then((resolvers) => {
-      const resolver = resolvers.find(resolver => resolver.match(requestParts, arcSite))
+  const resolvers = await resolversPromise
+  const resolver = resolvers.find(resolver => resolver.match(requestParts, arcSite))
 
-      return resolver
-        ? resolver.resolve(requestParts, arcSite, version)
-        : null
-    })
+  return resolver
+    ? resolver.resolve(requestParts, arcSite, version)
+    : null
 }
 
 module.exports = resolve
 
+async function main (uri) {
+  try {
+    console.log(await resolve(uri))
+  } catch (e) {
+    console.error(e)
+  }
+}
+
 if (module === require.main) {
-  resolve(process.argv[2])
-    .then(console.log)
-    .catch(console.error)
+  main(process.argv[2])
 }

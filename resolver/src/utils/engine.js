@@ -89,11 +89,14 @@ function getEngine () {
     ? getHttpEngine()
     : getLambdaEngine()
 
-  return (args) => engine(args)
-    .catch((e) => {
+  return async function (args) {
+    try {
+      return await engine(args)
+    } catch (e) {
       e.isEngine = true
       throw e
-    })
+    }
+  }
 }
 
 module.exports = getEngine()

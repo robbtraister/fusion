@@ -241,6 +241,14 @@ module.exports = {
   render
 }
 
+async function main (templatePromise) {
+  try {
+    console.log(await render({ template: await templatePromise }))
+  } catch (e) {
+    console.error(e)
+  }
+}
+
 if (module === require.main) {
   const input = (process.argv.length > 2)
     ? Promise.resolve(process.argv[2])
@@ -258,8 +266,5 @@ if (module === require.main) {
       })
     })
 
-  input
-    .then((rendering) => render({ template: rendering }))
-    .then(console.log)
-    .catch(console.error)
+  main(input)
 }

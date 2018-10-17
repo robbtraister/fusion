@@ -20,31 +20,25 @@ const getModel = function getModel (modelName) {
   models[modelName] = models[modelName] || {
     name: modelName,
 
-    find (query) {
-      let tic = timer.tic()
-      return fetch(`/${modelName}${query ? `?query=${encodeURIComponent(JSON.stringify(query))}` : ''}`)
-        .then((data) => {
-          debugTimer(`${modelName}.find()`, tic.toc())
-          return data
-        })
+    async find (query) {
+      const tic = timer.tic()
+      const data = await fetch(`/${modelName}${query ? `?query=${encodeURIComponent(JSON.stringify(query))}` : ''}`)
+      debugTimer(`${modelName}.find()`, tic.toc())
+      return data
     },
 
-    findById (_id) {
-      let tic = timer.tic()
-      return fetch(`/${modelName}/${_id}`)
-        .then((data) => {
-          debugTimer(`${modelName}.findById(${_id})`, tic.toc())
-          return data // && data.shift()
-        })
+    async findById (_id) {
+      const tic = timer.tic()
+      const data = await fetch(`/${modelName}/${_id}`)
+      debugTimer(`${modelName}.findById(${_id})`, tic.toc())
+      return data // && data.shift()
     },
 
-    findOne (query) {
-      let tic = timer.tic()
-      return fetch(`/${modelName}${query ? `?query=${encodeURIComponent(JSON.stringify(query))}` : ''}&limit=1`)
-        .then((data) => {
-          debugTimer(`${modelName}.findOne()`, tic.toc())
-          return data // && data.shift()
-        })
+    async findOne (query) {
+      const tic = timer.tic()
+      const data = await fetch(`/${modelName}${query ? `?query=${encodeURIComponent(JSON.stringify(query))}` : ''}&limit=1`)
+      debugTimer(`${modelName}.findOne()`, tic.toc())
+      return data // && data.shift()
     }
   }
 

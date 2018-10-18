@@ -10,7 +10,7 @@ const CachedSource = require('./classes/cached')
 const FetchSource = require('./classes/fetch')
 const JsonSource = require('./classes/json')
 
-const getBundleSource = function getBundleSource (sourceName) {
+const getBundleSource = async function getBundleSource (sourceName) {
   try {
     return Promise.resolve(unpack(require(`${sourcesDistRoot}/${sourceName}`)))
   } catch (e) {
@@ -19,20 +19,20 @@ const getBundleSource = function getBundleSource (sourceName) {
 }
 
 const sourceCache = {}
-const getSource = function getSource (sourceName) {
-  sourceCache[sourceName] = sourceCache[sourceName] || getBundleSource(sourceName)
-    .then((source) => {
-      if (!source) {
-        delete sourceCache[sourceName]
-        throw new Error(`Could not find source: ${sourceName}`)
-      }
+const getSource = async function getSource (sourceName) {
+  if (!sourceCache[sourceName]) {
+    const source = await getBundleSource(sourceName)
+    if (!source) {
+      delete sourceCache[sourceName]
+      throw new Error(`Could not find source: ${sourceName}`)
+    }
 
-      return (source.fetch && source.fetch instanceof Function)
-        ? new FetchSource(sourceName, source)
-        : (source.resolve && source.resolve instanceof Function)
-          ? new CachedSource(sourceName, source)
-          : new JsonSource(sourceName, source)
-    })
+    sourceCache[sourceName] = (source.fetch && source.fetch instanceof Function)
+      ? new FetchSource(sourceName, source)
+      : (source.resolve && source.resolve instanceof Function)
+        ? new CachedSource(sourceName, source)
+        : new JsonSource(sourceName, source)
+  }
 
   return sourceCache[sourceName]
 }

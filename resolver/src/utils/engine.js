@@ -5,18 +5,33 @@ const url = require('url')
 const AWS = require('aws-sdk')
 const request = require('request-promise-native')
 
+const { RedirectError } = require('../errors')
+
 const {
   httpEngine,
   lambdaEngine
 } = require('../../environment')
 
 const getHttpEngine = function getHttpEngine () {
-  return function httpEngineHandler ({ method, uri, data }) {
-    return request[(method || 'get').toLowerCase()]({
+  return async function httpEngineHandler ({ method, uri, data }) {
+    const response = await request[(method || 'get').toLowerCase()]({
       uri: `${httpEngine}${uri}`,
       body: data,
-      json: true
+      json: true,
+      followRedirect: false,
+      resolveWithFullResponse: true,
+      simple: false
     })
+
+    if (response.statusCode >= 400) {
+      throw response
+    }
+
+    if (response.statusCode >= 300 && response.headers.location) {
+      throw new RedirectError(response.headers.location, response.statusCode)
+    }
+
+    return response.body
   }
 }
 
@@ -24,7 +39,7 @@ const getLambdaEngine = function getLambdaEngine () {
   const region = lambdaEngine.split(':')[3]
   const lambda = new AWS.Lambda(Object.assign({ region }))
 
-  return function lambdaEngineHandler ({ method, uri, data, version, cacheMode }) {
+  return async function lambdaEngineHandler ({ method, uri, data, version, cacheMode }) {
     const METHOD = (method || 'GET').toUpperCase()
     const parts = url.parse(uri, true)
     return new Promise((resolve, reject) => {

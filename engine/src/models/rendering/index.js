@@ -113,7 +113,18 @@ class Rendering {
               const configs = json.globalContentConfig
               return (configs && configs.contentService && configs.contentConfigValues)
                 ? getSource(configs.contentService)
-                  .then((source) => source.fetch(Object.assign(json.uri ? { uri: json.uri } : {}, { 'arc-site': arcSite }, configs.contentConfigValues)))
+                  .then((source) =>
+                    source.fetch(
+                      Object.assign(
+                        json.uri
+                          ? { uri: json.uri }
+                          : {},
+                        { 'arc-site': arcSite },
+                        configs.contentConfigValues
+                      ),
+                      { followRedirect: false }
+                    )
+                  )
                   .then((document) => ({
                     source: configs.contentService,
                     key: configs.contentConfigValues,

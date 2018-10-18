@@ -11,6 +11,8 @@ const fetchHandler = (forceUpdate) => (req, res, next) => {
   const keyString = req.params.key || req.query.key
   const filter = req.query.filter || req.query.query
   const website = req.query._website
+  const followRedirect = req.query.followRedirect !== 'false'
+  const maxRedirects = +req.query.maxRedirects
 
   Promise.all([
     getSource(sourceName),
@@ -24,7 +26,7 @@ const fetchHandler = (forceUpdate) => (req, res, next) => {
       .catch(() => ({ key: keyString }))
       .then((key) => Object.assign({ 'arc-site': website }, key))
   ])
-    .then(([source, key]) => source.fetch(key, forceUpdate)
+    .then(([source, key]) => source.fetch(key, { forceUpdate, followRedirect, maxRedirects })
       .then(data => source.filter(filter, data)))
     .then(data => { res.send(data) })
     .catch(next)

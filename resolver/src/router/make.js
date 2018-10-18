@@ -3,7 +3,6 @@
 const express = require('express')
 
 const make = require('../controllers/make')
-const { handler: redirectHandler } = require('../errors/redirect-error')
 const isWhy404 = require('../utils/is-why-404')
 
 const makeRouter = express.Router()
@@ -21,7 +20,6 @@ makeRouter.get('*', (req, res, next) => {
 
   make(req.url, opts)
     .then(data => { res.send(data) })
-    .catch(redirectHandler(req.baseUrl))
     .catch(next)
 })
 

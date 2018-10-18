@@ -80,7 +80,7 @@ function HOC (Component) {
           )
         }
 
-        getContent (sourceOrConfig, key, filter, inherit) {
+        getContent (sourceOrConfig, query, filter, inherit) {
           const isConfig = (sourceOrConfig instanceof Object)
 
           inherit = (isConfig)
@@ -105,16 +105,16 @@ function HOC (Component) {
             }
           }
 
-          key = (isConfig)
-            ? sourceOrConfig.key || sourceOrConfig.contentConfigValues
-            : key
+          query = (isConfig)
+            ? sourceOrConfig.query || sourceOrConfig.contentConfigValues
+            : query
 
-          key = JSON.parse(JSON.stringify(key).replace(/\{\{([^}]+)\}\}/g, (match, propName) => {
+          query = JSON.parse(JSON.stringify(query).replace(/\{\{([^}]+)\}\}/g, (match, propName) => {
             return _get(this.props, propName) || match
           }))
 
           filter = (isConfig)
-            ? sourceOrConfig.filter || sourceOrConfig.query
+            ? sourceOrConfig.filter
             : filter
 
           const localEdits = Object.assign({}, this.props.localEdits || {})
@@ -129,7 +129,7 @@ function HOC (Component) {
             )
           }
 
-          const content = context.getContent.call(this, sourceName, key, filter)
+          const content = context.getContent.call(this, sourceName, query, filter)
 
           return {
             cached: content.cached && appendLocalEdits(content.cached),

@@ -70,18 +70,18 @@ class Source {
     return data
   }
 
-  async clear (key) {
+  async clear (query) {
     throw new Error('`clear` not implemented')
   }
 
-  async fetch (key, options) {
+  async fetch (query, options) {
     throw new Error('`fetch` not implemented')
   }
 
-  async filter (query, data) {
-    if (this.schema && query && data) {
+  async filter (filter, data) {
+    if (this.schema && filter && data) {
       try {
-        const result = await graphql(this.schema, query, data)
+        const result = await graphql(this.schema, filter, data)
 
         if (result.errors) {
           throw result.errors[0]
@@ -103,7 +103,7 @@ class Source {
     }
   }
 
-  resolve (key, options) {
+  resolve (query, options) {
     return new Error('`resolve` not implemented')
   }
 
@@ -120,7 +120,7 @@ class Source {
     return transformed
   }
 
-  async update (key) {
+  async update (query) {
     throw new Error('`update` not implemented')
   }
 }

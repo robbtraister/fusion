@@ -57,7 +57,7 @@ const render = async function render ({ Component, request, content }) {
           arcSite: request.arcSite,
           contextPath,
           globalContent: content ? content.document : null,
-          globalContentConfig: content ? { source: content.source, key: content.key } : null,
+          globalContentConfig: content ? { source: content.source, query: content.query } : null,
           outputType: Component.outputType,
           requestUri: request.uri,
           siteProperties: fusionProperties(request.arcSite)

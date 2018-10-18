@@ -12,9 +12,9 @@ const engine = require('../../utils/engine')
 
 const { RedirectError, NotFoundError } = require('../../errors')
 
-const fetch = async function fetch (contentSource, contentKey, version) {
+const fetch = async function fetch (source, query, version) {
   return engine({
-    uri: `/content/fetch/${contentSource}?key=${encodeURIComponent(JSON.stringify(contentKey))}&followRedirect=false`,
+    uri: `/content/fetch/${source}?query=${encodeURIComponent(JSON.stringify(query))}&followRedirect=false`,
     version
   })
 }
@@ -75,7 +75,7 @@ class TemplateResolver extends BaseResolver {
   }
 
   async hydrate (requestParts, arcSite, version) {
-    const key = Object.assign(
+    const query = Object.assign(
       {
         uri: requestParts.pathname,
         'arc-site': arcSite
@@ -84,8 +84,8 @@ class TemplateResolver extends BaseResolver {
     )
 
     try {
-      const content = await fetch(this.config.contentSourceId, key, version)
-      return { key, content }
+      const content = await fetch(this.config.contentSourceId, query, version)
+      return { query, content }
     } catch (err) {
       if (err.statusCode === 404) {
         throw new NotFoundError(`Could not resolve ${requestParts.href}`, {

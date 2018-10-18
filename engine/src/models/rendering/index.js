@@ -128,7 +128,7 @@ class Rendering {
       )
       return {
         source: configs.contentService,
-        key: configs.contentConfigValues,
+        query: configs.contentConfigValues,
         document
       }
     }

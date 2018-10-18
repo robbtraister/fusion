@@ -28,7 +28,7 @@ function sanitizeUri (uri) {
 }
 
 class ResolveSource extends BaseSource {
-  async _fetch ({ key, resolvedUri, sanitizedUri }, options = {}) {
+  async _fetch ({ query, resolvedUri, sanitizedUri }, options = {}) {
     debugFetch(`Fetching from source [${sanitizedUri}]`)
     const tic1 = timer.tic()
 
@@ -59,7 +59,7 @@ class ResolveSource extends BaseSource {
         throw new RedirectError(redirectUri, redirectStatus)
       } else {
         return this.fetch(
-          _merge({}, key, response.body),
+          _merge({}, query, response.body),
           Object.assign({}, options, { maxRedirects: maxRedirects - 1 })
         )
       }
@@ -78,8 +78,8 @@ class ResolveSource extends BaseSource {
     return data
   }
 
-  async fetch (key, options = {}) {
-    return this._fetch(this.resolve(key, options), options)
+  async fetch (query, options = {}) {
+    return this._fetch(this.resolve(query, options), options)
   }
 
   formatUri (uri, options) {
@@ -92,10 +92,10 @@ class ResolveSource extends BaseSource {
     }
   }
 
-  resolve (key, options) {
+  resolve (query, options) {
     return Object.assign(
-      { key },
-      this.formatUri(this.config.resolve(key), options)
+      { query },
+      this.formatUri(this.config.resolve(query), options)
     )
   }
 }

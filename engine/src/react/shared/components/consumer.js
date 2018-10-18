@@ -105,17 +105,28 @@ function HOC (Component) {
             }
           }
 
-          query = (isConfig)
-            ? sourceOrConfig.query || sourceOrConfig.contentConfigValues
-            : query
+          if (isConfig && sourceOrConfig.hasOwnProperty('key')) {
+            console.warn('--- WARNING: The \'key\' property on content configs has been DEPRECATED. Please use \'query\' instead. ---')
+            query = sourceOrConfig.key
 
-          query = JSON.parse(JSON.stringify(query).replace(/\{\{([^}]+)\}\}/g, (match, propName) => {
-            return _get(this.props, propName) || match
-          }))
+            query = JSON.parse(JSON.stringify(query).replace(/\{\{([^}]+)\}\}/g, (match, propName) => {
+              return _get(this.props, propName) || match
+            }))
 
-          filter = (isConfig)
-            ? sourceOrConfig.filter
-            : filter
+            filter = sourceOrConfig.filter || sourceOrConfig.query
+          } else {
+            query = (isConfig)
+              ? sourceOrConfig.query || sourceOrConfig.contentConfigValues
+              : query
+
+            query = JSON.parse(JSON.stringify(query).replace(/\{\{([^}]+)\}\}/g, (match, propName) => {
+              return _get(this.props, propName) || match
+            }))
+
+            filter = (isConfig)
+              ? sourceOrConfig.filter
+              : filter
+          }
 
           const localEdits = Object.assign({}, this.props.localEdits || {})
           const localEditItems = localEdits.items || {}

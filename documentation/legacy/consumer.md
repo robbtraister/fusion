@@ -63,19 +63,19 @@ The id of the template that was used when rendering this page.
 
 #### Content
 
--   getContent(sourceName, key, [filter], [inherit])
+-   getContent(sourceName, query, [filter], [inherit])
 
 The `getContent` method will fetch content and return an object with two properties, `cached` and `fetched`. The first property, `cached`, will contain the synchronous data as already pre-fetched on the server. The second property, `fetched`, will be a Promise object that resolves to freshly re-fetched content.
 
 The first input parameter, `sourceName`, is simply the name of the content source from which you want to fetch. This content source must be configured in your bundle.
 
-The second input parameter, `key`, will depend on the definition of the content-source, but will be an object used to uniquely identify the piece of content you want to fetch.
+The second input parameter, `query`, will depend on the definition of the content-source, but will be an object used to uniquely identify the piece of content you want to fetch.
 
 The optional third input parameter, `filter`, is a GraphQL query that will be applied to the resultant data to minimize the payload size. This is beneficial for both client-side and server-side fetching, as server-side fetched data must be included in the final HTML rendering to prevent content flashing.
 
 The optional fourth input parameter, `inherit`, allows you to use a dynamic boolean value to determine if global content should be used to override the config settings provided. If this value is true, the global content will be returned in both the `cached` property and as the resolution of `fetched`.
 
-For convenience, `getContent` may also be called with a single object instead of ordered parameters. This object should have properties named `sourceName` (also aliased as `source` or `contentService`), `key` (aliased as `contentConfigValues`), `filter` (aliased as `query`), and `inherit`.
+For convenience, `getContent` may also be called with a single object instead of ordered parameters. This object should have properties named `sourceName` (also aliased as `source` or `contentService`), `query` (aliased as `contentConfigValues`), `filter`, and `inherit`.
 
 If you are using this for server-rendered content, you should make sure to fetch the content from within the constructor (or componentWillMount, which is also executed during server-side-rendering), as well as set state using the return value.
 
@@ -209,13 +209,13 @@ class MyComponent extends React.Component {
     this.fetchContent({
       content1: {
         source: 'content-api',
-        key: {uri: '/some/data'},
-        query: '{type version}'
+        query: {uri: '/some/data'},
+        filter: '{type version}'
       },
       content2: {
         source: 'content-api',
-        key: {uri: '/some/other/data'},
-        query: '{type version}'
+        query: {uri: '/some/other/data'},
+        filter: '{type version}'
       }
     })
   }

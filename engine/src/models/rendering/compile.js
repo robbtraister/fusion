@@ -52,17 +52,20 @@ const getMemoryFS = function getMemoryFS () {
   const readFilePromise = promisify(memFs.readFile.bind(memFs))
   const writeFilePromise = promisify(memFs.writeFile.bind(memFs))
 
-  memFs.readFilePromise = (fp) =>
-    readFilePromise(fp).then(buf => buf.toString())
+  memFs.readFilePromise = async (fp) => {
+    const buf = await readFilePromise(fp)
+    return buf.toString()
+  }
   memFs.mkdirpPromise = mkdirpPromise
-  memFs.writeFilePromise = (fp, src) =>
-    mkdirpPromise(path.dirname(fp))
-      .then(() => writeFilePromise(fp, src))
+  memFs.writeFilePromise = async (fp, src) => {
+    await mkdirpPromise(path.dirname(fp))
+    return writeFilePromise(fp, src)
+  }
 
   return memFs
 }
 
-const compileSource = function compileSource (script, styles) {
+const compileSource = async function compileSource (script, styles) {
   let tic = timer.tic()
 
   const mfs = getMemoryFS()
@@ -123,22 +126,21 @@ const compileSource = function compileSource (script, styles) {
     .then(([js, { css, cssFile }]) => ({ js, css, cssFile }))
 }
 
-const compileRendering = function compileRendering ({ rendering, outputType = defaultOutputType }) {
-  let tic = timer.tic()
-  return generateSource(rendering, outputType)
-    .then(({ script, styles }) => {
-      const generateSourceDuration = tic.toc()
-      debugTimer('generate source', generateSourceDuration)
-      sendMetrics([{ type: METRIC_TYPES.COMPILE_DURATION, value: generateSourceDuration, tags: ['compile:generate-source'] }])
+const compileRendering = async function compileRendering ({ rendering, outputType = defaultOutputType }) {
+  const tic = timer.tic()
+  const { script, styles } = await generateSource(rendering, outputType)
+  const generateSourceDuration = tic.toc()
+  debugTimer('generate source', generateSourceDuration)
+  sendMetrics([{ type: METRIC_TYPES.COMPILE_DURATION, value: generateSourceDuration, tags: ['compile:generate-source'] }])
 
-      return compileSource(script, styles)
-    })
-    .then(({ js, css, cssFile }) => {
-      const cssPath = cssFile ? `styles/${cssFile}` : null
-      js = js.replace(/;*$/, `;Fusion.Template.cssFile=${cssPath ? `'${cssPath}'` : 'null'}`)
+  const { js, css, cssFile } = await compileSource(script, styles)
+  const cssPath = cssFile ? `styles/${cssFile}` : null
 
-      return { js, css, cssFile: cssPath }
-    })
+  return {
+    js: js.replace(/;*$/, `;Fusion.Template.cssFile=${cssPath ? `'${cssPath}'` : 'null'}`),
+    css,
+    cssFile: cssPath
+  }
 }
 
 module.exports = compileRendering

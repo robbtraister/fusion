@@ -83,19 +83,20 @@ class TemplateResolver extends BaseResolver {
       this.paramExtractor(requestParts)
     )
 
-    return fetch(this.config.contentSourceId, key, version)
-      .catch((err) => {
-        if (err.statusCode === 404) {
-          throw new NotFoundError(`Could not resolve ${requestParts.href}`, {
-            requestUri: requestParts.href,
-            cause: `Resolver matched, but content could not be fetched. Make sure this is the correct resolver.`,
-            resolver: this.config
-          })
-        }
+    try {
+      const content = await fetch(this.config.contentSourceId, key, version)
+      return { key, content }
+    } catch (err) {
+      if (err.statusCode === 404) {
+        throw new NotFoundError(`Could not resolve ${requestParts.href}`, {
+          requestUri: requestParts.href,
+          cause: `Resolver matched, but content could not be fetched. Make sure this is the correct resolver.`,
+          resolver: this.config
+        })
+      }
 
-        throw err
-      })
-      .then((content) => ({ key, content }))
+      throw err
+    }
   }
 
   matchRequiredParams (requestParams) {

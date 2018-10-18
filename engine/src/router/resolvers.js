@@ -15,11 +15,14 @@ const resolverRouter = express.Router()
 
 resolverRouter.post('/',
   bodyParser.json({ limit: bodyLimit }),
-  (req, res, next) =>
-    pushResolvers(req.body)
-      .then(() => { next() })
-      .catch(next),
-  (req, res) => { res.sendStatus(204) }
+  async (req, res, next) => {
+    try {
+      await pushResolvers(req.body)
+      res.sendStatus(204)
+    } catch (e) {
+      next(e)
+    }
+  }
 )
 
 module.exports = resolverRouter

@@ -31,59 +31,60 @@ function getTypeRouter (routeType) {
   typeRouter.all(['/', '/:id', '/:id/:child'],
     bodyParser.json({ limit: bodyLimit }),
     bodyParser.urlencoded({ extended: true }),
-    (req, res, next) => {
-      const tic = timer.tic()
+    async (req, res, next) => {
+      try {
+        const tic = timer.tic()
 
-      const isAdmin = req.query.isAdmin === 'true'
-      const cacheMode = req.get('Fusion-Cache-Mode')
-      debug(`cache mode: ${cacheMode}`)
-      const writeToCache = !isAdmin && /^(allowed|preferr?ed|update)$/i.test(cacheMode)
+        const isAdmin = req.query.isAdmin === 'true'
+        const cacheMode = req.get('Fusion-Cache-Mode')
+        debug(`cache mode: ${cacheMode}`)
+        const writeToCache = !isAdmin && /^(allowed|preferr?ed|update)$/i.test(cacheMode)
 
-      const content = (req.body && req.body.content)
+        const content = (req.body && req.body.content)
 
-      const outputType = /^(false|none|off|0)$/i.test(req.query.outputType)
-        ? null
-        : req.query.outputType || defaultOutputType
+        const outputType = /^(false|none|off|0)$/i.test(req.query.outputType)
+          ? null
+          : req.query.outputType || defaultOutputType
 
-      const renderingJson = (req.body && req.body.rendering)
-      const rendering = Object.assign(
-        {
-          id: req.params.id,
-          child: req.params.child,
-          outputType,
-          isAdmin
-        },
-        // support POST from an HTML form
-        (typeof renderingJson === 'string')
-          ? JSON.parse(renderingJson)
-          : renderingJson
-      )
-
-      const request = Object.assign(
-        {
-          arcSite: req.query._website
-        },
-        (req.body && req.body.request) || {}
-      )
-
-      const type = rendering.type || routeType
-
-      new Rendering(type, rendering.id, rendering.layoutItems ? rendering : undefined)
-        .render({ content, rendering, request })
-        .then((html) => `${outputType ? '<!DOCTYPE html>' : ''}${html}`)
-        .then((html) =>
-          (writeToCache && request.uri)
-            ? Promise.resolve(url.parse(request.uri).pathname)
-              .then((pathname) => pathname.replace(/\/$/, ''))
-              .then((filePath) => pushHtml(path.join(request.arcSite || 'default', outputType, filePath), html))
-              .then(() => html)
-            : html
+        const renderingJson = (req.body && req.body.rendering)
+        const rendering = Object.assign(
+          {
+            id: req.params.id,
+            child: req.params.child,
+            outputType,
+            isAdmin
+          },
+          // support POST from an HTML form
+          (typeof renderingJson === 'string')
+            ? JSON.parse(renderingJson)
+            : renderingJson
         )
-        .then((html) => { res.send(html) })
-        .then(() => {
-          debugTimer('complete response', tic.toc())
-        })
-        .catch(next)
+
+        const request = Object.assign(
+          {
+            arcSite: req.query._website
+          },
+          (req.body && req.body.request) || {}
+        )
+
+        const type = rendering.type || routeType
+
+        const model = new Rendering(type, rendering.id, rendering.layoutItems ? rendering : undefined)
+        const prefix = (outputType)
+          ? '<!DOCTYPE html>'
+          : ''
+        const html = `${prefix}${await model.render({ content, rendering, request })}`
+        debugTimer('complete response', tic.toc())
+
+        if (writeToCache && request.uri) {
+          const filePath = url.parse(request.uri).pathname.replace(/\/$/, '')
+          await pushHtml(path.join(request.arcSite || 'default', outputType, filePath), html)
+        }
+
+        res.send(html)
+      } catch (e) {
+        next(e)
+      }
     }
   )
 

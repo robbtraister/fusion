@@ -47,8 +47,8 @@ const getAncestors = function getAncestors (node) {
     : []
 }
 
-const render = function render ({ Component, request, content }) {
-  const renderHTML = () => new Promise((resolve, reject) => {
+const render = async function render ({ Component, request, content }) {
+  const renderHTML = async () => {
     try {
       const elementTic = timer.tic()
       const element = React.createElement(
@@ -71,59 +71,49 @@ const render = function render ({ Component, request, content }) {
       const htmlElapsedTime = htmlTic.toc()
       debugTimer(`render html`, htmlElapsedTime)
       sendMetrics([{ type: METRIC_TYPES.RENDER_DURATION, value: htmlElapsedTime, tags: ['render:html'] }])
-      resolve(html)
+      return html
     } catch (e) {
       sendMetrics([{ type: METRIC_TYPES.RENDER_RESULT, value: 1, tags: ['result:error'] }])
-      reject(e)
+      throw e
     }
-  })
+  }
 
   let tic = timer.tic()
-  return renderHTML()
-    .then((html) => {
-      const elapsedTime = tic.toc()
-      debugTimer('first render', elapsedTime)
-      sendMetrics([{ type: METRIC_TYPES.RENDER_DURATION, value: elapsedTime, tags: ['render:first-render'] }])
-      tic = timer.tic()
+  let html = await renderHTML()
+  const elapsedTime = tic.toc()
+  debugTimer('first render', elapsedTime)
+  sendMetrics([{ type: METRIC_TYPES.RENDER_DURATION, value: elapsedTime, tags: ['render:first-render'] }])
+  tic = timer.tic()
 
-      // collect content cache into Promise array
-      const inlines = Component.inlines || {}
-      const contentCache = Component.contentCache || {}
-      const contentPromises = [].concat(
-        Object.keys(inlines)
-          .map(inline => inlines[inline].fetched),
-        ...Object.keys(contentCache)
-          .map(source => {
-            const sourceCache = contentCache[source]
-            return Object.keys(sourceCache).map(key => sourceCache[key].fetched)
-          })
-      )
+  // collect content cache into Promise array
+  const inlines = Component.inlines || {}
+  const contentCache = Component.contentCache || {}
+  const contentPromises = [].concat(
+    Object.keys(inlines)
+      .map(inline => inlines[inline].fetched),
+    ...Object.keys(contentCache)
+      .map(source => {
+        const sourceCache = contentCache[source]
+        return Object.keys(sourceCache).map(key => sourceCache[key].fetched)
+      })
+  )
 
-      const htmlPromise = (contentPromises.length === 0)
-        // if no feature content is requested, return original rendering
-        ? Promise.resolve(html)
-        // if feature content is requested, wait for it, then render again
-        : Promise.all(contentPromises)
-          .then(() => {
-            const contentHydrationDuration = tic.toc()
-            debugTimer('content hydration', contentHydrationDuration)
-            sendMetrics([{ type: METRIC_TYPES.RENDER_DURATION, value: contentHydrationDuration, tags: ['render:content-hydration'] }])
-            tic = timer.tic()
-          })
-          .then(renderHTML)
-          .then((html) => {
-            const secondRenderDuration = tic.toc()
-            debugTimer('second render', secondRenderDuration)
-            sendMetrics([{ type: METRIC_TYPES.RENDER_DURATION, value: secondRenderDuration, tags: ['render:second-render'] }])
-            return html
-          })
+  if (contentPromises.length > 0) {
+    await Promise.all(contentPromises)
+    const contentHydrationDuration = tic.toc()
+    debugTimer('content hydration', contentHydrationDuration)
+    sendMetrics([{ type: METRIC_TYPES.RENDER_DURATION, value: contentHydrationDuration, tags: ['render:content-hydration'] }])
+    tic = timer.tic()
 
-      return htmlPromise
-        .then(html => (Component.transform)
-          ? Component.transform(html)
-          : html
-        )
-    })
+    html = renderHTML()
+    const secondRenderDuration = tic.toc()
+    debugTimer('second render', secondRenderDuration)
+    sendMetrics([{ type: METRIC_TYPES.RENDER_DURATION, value: secondRenderDuration, tags: ['render:second-render'] }])
+  }
+
+  return (Component.transform)
+    ? Component.transform(html)
+    : html
 }
 
 const getOutputTypeComponent = function getOutputTypeComponent (outputType) {
@@ -136,7 +126,7 @@ const getOutputTypeComponent = function getOutputTypeComponent (outputType) {
   }
 }
 
-const compileRenderable = function compileRenderable ({ renderable, outputType, quarantine, inlines, contentCache }) {
+const compileRenderable = async function compileRenderable ({ renderable, outputType, quarantine, inlines, contentCache }) {
   if (isDev) {
     // clear cache to ensure we load the latest
     Object.keys(require.cache)
@@ -148,114 +138,115 @@ const compileRenderable = function compileRenderable ({ renderable, outputType, 
   const compileFn = (quarantine)
     ? compileQuarantineComponent
     : compileStandardComponent
-  return Promise.resolve(compileFn(renderable, outputType))
-    .then((Renderable) => {
-      debugTimer(`compile(${renderable._id || renderable.id})`, tic.toc())
-      tic = timer.tic()
-      return Provider(Renderable, inlines, contentCache)
-    })
-    .then((Component) => {
-      debugTimer('provider wrapping', tic.toc())
-      return Component
-    })
+
+  const Renderable = await compileFn(renderable, outputType)
+  debugTimer(`compile(${renderable._id || renderable.id})`, tic.toc())
+  tic = timer.tic()
+  const Component = await Provider(Renderable, inlines, contentCache)
+  debugTimer('provider wrapping', tic.toc())
+  return Component
 }
 
-const compileDocument = function compileDocument ({ name, rendering, outputType, inlines, contentCache, isAdmin, quarantine }) {
+const compileDocument = async function compileDocument ({ name, rendering, outputType, inlines, contentCache, isAdmin, quarantine }) {
   let tic
-  return rendering.getJson()
-    .then((json) => {
-      return compileRenderable({ renderable: json, outputType, inlines, contentCache, isAdmin, quarantine })
-        .then((Template) => {
-          if (!outputType) {
-            return Template
-          }
+  const json = await rendering.getJson()
+  const Template = await compileRenderable({ renderable: json, outputType, inlines, contentCache, isAdmin, quarantine })
+  if (!outputType) {
+    return Template
+  }
 
-          tic = timer.tic()
+  tic = timer.tic()
 
-          const OutputType = getOutputTypeComponent(outputType)
+  const OutputType = getOutputTypeComponent(outputType)
 
-          const metas = (json.meta || {})
+  const metas = (json.meta || {})
 
-          const getMetaTag = metaTagGenerator(metas)
+  const getMetaTag = metaTagGenerator(metas)
 
-          const MetaTags = () =>
-            Object.keys(metas).filter(name => metas[name].html).map(getMetaTag)
+  const MetaTags = () =>
+    Object.keys(metas).filter(name => metas[name].html).map(getMetaTag)
 
-          const CssTags = (isAdmin)
-            ? () => null
-            : cssTagGenerator({ inlines: Template.inlines, rendering, outputType })
+  const CssTags = (isAdmin)
+    ? () => null
+    : cssTagGenerator({ inlines: Template.inlines, rendering, outputType })
 
-          const Component = (props) => {
-            return React.createElement(
-              OutputType,
-              {
-                contextPath,
-                deployment,
-                version: deployment,
-                tree: Template.tree,
-                renderables: [Template.tree].concat(...getAncestors(Template.tree)),
+  const Component = (props) => {
+    return React.createElement(
+      OutputType,
+      {
+        contextPath,
+        deployment,
+        version: deployment,
+        tree: Template.tree,
+        renderables: [Template.tree].concat(...getAncestors(Template.tree)),
 
-                CssLinks: CssTags,
-                CssTags,
+        CssLinks: CssTags,
+        CssTags,
 
-                Fusion: fusionTagGenerator(props.globalContent, props.globalContentConfig, Template.contentCache, outputType, props.arcSite),
-                Libs: (isAdmin)
-                  ? () => null
-                  : libsTagGenerator({ name, outputType }),
+        Fusion: fusionTagGenerator(props.globalContent, props.globalContentConfig, Template.contentCache, outputType, props.arcSite),
+        Libs: (isAdmin)
+          ? () => null
+          : libsTagGenerator({ name, outputType }),
 
-                /*
-                 * To insert all meta tags
-                 *   <props.MetaTag />
-                 *   <props.MetaTags />
-                 *
-                 * To insert a single meta tag
-                 *   <props.MetaTag name='title' />
-                 */
-                MetaTag ({ name, default: defaultValue }) {
-                  return (name)
-                    ? getMetaTag(name)
-                    : MetaTags()
-                },
-                MetaTags,
-                metaValue (nameOrObject, defaultValue) {
-                  const isObject = typeof nameOrObject === 'object'
+        /*
+         * To insert all meta tags
+         *   <props.MetaTag />
+         *   <props.MetaTags />
+         *
+         * To insert a single meta tag
+         *   <props.MetaTag name='title' />
+         */
+        MetaTag ({ name, default: defaultValue }) {
+          return (name)
+            ? getMetaTag(name)
+            : MetaTags()
+        },
+        MetaTags,
+        metaValue (nameOrObject, defaultValue) {
+          const isObject = typeof nameOrObject === 'object'
 
-                  const name = (isObject)
-                    ? nameOrObject.name
-                    : nameOrObject
+          const name = (isObject)
+            ? nameOrObject.name
+            : nameOrObject
 
-                  return (name && metas[name] && metas[name].value) ||
-                    (isObject ? nameOrObject.default : defaultValue)
-                },
+          return (name && metas[name] && metas[name].value) ||
+            (isObject ? nameOrObject.default : defaultValue)
+        },
 
-                Styles: (isAdmin)
-                  ? () => null
-                  : stylesGenerator({ inlines: Template.inlines, outputType, rendering }),
+        Styles: (isAdmin)
+          ? () => null
+          : stylesGenerator({ inlines: Template.inlines, outputType, rendering }),
 
-                ...props
-              },
-              React.createElement(
-                Template,
-                // pass down the original props
-                props
-              )
-            )
-          }
+        ...props
+      },
+      React.createElement(
+        Template,
+        // pass down the original props
+        props
+      )
+    )
+  }
 
-          Component.inlines = Template.inlines
-          // bubble up the Provider contentCache
-          Component.contentCache = Template.contentCache
-          Component.transform = OutputType.transform
-          debugTimer('output-type wrapping', tic.toc())
-          return Component
-        })
-    })
+  Component.inlines = Template.inlines
+  // bubble up the Provider contentCache
+  Component.contentCache = Template.contentCache
+  Component.transform = OutputType.transform
+  debugTimer('output-type wrapping', tic.toc())
+  return Component
 }
 
 module.exports = {
   compileDocument,
   compileRenderable,
   render
+}
+
+async function main (templatePromise) {
+  try {
+    console.log(await render({ template: await templatePromise }))
+  } catch (e) {
+    console.error(e)
+  }
 }
 
 if (module === require.main) {
@@ -275,8 +266,5 @@ if (module === require.main) {
       })
     })
 
-  input
-    .then((rendering) => render({ template: rendering }))
-    .then(console.log)
-    .catch(console.error)
+  main(input)
 }

@@ -11,8 +11,9 @@ const {
 
 const model = require('../src/dao/mongo')
 
-model('jge_config').find()
-  .then((configs) => {
+async function extract () {
+  try {
+    const configs = await model('jge_config').find()
     configs.map((config) => {
       console.log(`Extracting: ${config._id}`)
       config.pattern = url.format(
@@ -25,9 +26,11 @@ model('jge_config').find()
       console.log(`Successfully extracted: ${config._id}`)
     })
     console.log(`Extraction complete.`)
-  })
-  .catch(console.error)
-  .then(() => {
-    // mongo connection will keep the process running
-    process.exit(0)
-  })
+  } catch (e) {
+    console.error(e)
+  }
+  // mongo connection will keep the process running
+  process.exit(0)
+}
+
+extract()

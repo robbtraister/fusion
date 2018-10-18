@@ -10,15 +10,15 @@ const model = require('../dao')
 
 const {
   defaultOutputType,
+  deployment,
   environment,
   region,
   s3BucketDiscrete,
-  s3BucketVersioned,
-  version
+  s3BucketVersioned
 } = require('../../environment')
 
 const EnvPrefix = `environments/${environment}`
-const DeploymentPrefix = `${EnvPrefix}/deployments/${version}`
+const DeploymentPrefix = `${EnvPrefix}/deployments/${deployment}`
 
 const s3 = new S3({ region })
 
@@ -66,9 +66,9 @@ const pushAsset = async (name, src, ContentType) =>
 // the calculation returns an object with a cssFile property
 // for simplicity, we'll just unwrap that property from whatever we get
 const fetchCssHash = (name, outputType = defaultOutputType) =>
-  model('hash').get({ version, id: path.join(name, outputType) })
+  model('hash').get({ deployment, id: path.join(name, outputType) })
 const pushCssHash = (name, outputType = defaultOutputType, cssFile) =>
-  model('hash').put({ id: path.join(name, outputType), version, cssFile })
+  model('hash').put({ id: path.join(name, outputType), deployment, cssFile })
 
 const pushHtml = async (name, src) =>
   pushKey(path.join(EnvPrefix, 'html', name), src, { ContentType: 'text/html' })

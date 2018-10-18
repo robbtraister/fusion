@@ -13,17 +13,17 @@ const {
 const {
   componentDistRoot,
   contextPath,
-  isDev,
-  version
+  deployment,
+  isDev
 } = require('../../../environment')
 
-const deployment = (u) => {
+const deploymentWrapper = (u) => {
   const parts = url.parse(u, true)
-  parts.query.v = version
+  parts.query.v = deployment
   parts.search = undefined
   return url.format(parts)
 }
-deployment.toString = () => version
+deploymentWrapper.toString = () => deployment
 
 const engineScript = React.createElement(
   'script',
@@ -31,7 +31,7 @@ const engineScript = React.createElement(
     key: 'fusion-loader-script',
     id: 'fusion-loader-script',
     type: 'application/javascript',
-    src: deployment(`${contextPath}/dist/engine/loader.js`)
+    src: deploymentWrapper(`${contextPath}/dist/engine/loader.js`)
   }
 )
 
@@ -73,8 +73,8 @@ const cssTagGenerator = ({ inlines, rendering, outputType }) => {
       .catch(() => null)
       .then((templateCssFile) => {
         inlines.cssLinks.cached = {
-          outputTypeHref: (outputTypeHasCss(outputType)) ? deployment(`${contextPath}/dist/components/output-types/${outputType}.css`) : null,
-          templateHref: (templateCssFile) ? deployment(`${contextPath}/dist/${templateCssFile}`) : null
+          outputTypeHref: (outputTypeHasCss(outputType)) ? deploymentWrapper(`${contextPath}/dist/components/output-types/${outputType}.css`) : null,
+          templateHref: (templateCssFile) ? deploymentWrapper(`${contextPath}/dist/${templateCssFile}`) : null
         }
       })
   }
@@ -130,7 +130,7 @@ const fusionTagGenerator = (globalContent, globalContentConfig, contentCache, ou
 
   const __html = `window.Fusion=window.Fusion||{};` +
     `Fusion.contextPath='${contextPath}';` +
-    `Fusion.deployment='${version}';` +
+    `Fusion.deployment='${deployment}';` +
     `Fusion.outputType='${outputType}';` +
     (arcSite ? `Fusion.arcSite='${arcSite}';` : '') +
     `Fusion.lastModified=${now};` +
@@ -154,7 +154,7 @@ const libsTagGenerator = ({ name, outputType }) => {
       key: 'fusion-template-script',
       id: 'fusion-template-script',
       type: 'application/javascript',
-      src: deployment(`${contextPath}/dist/${name}/${outputType}.js`),
+      src: deploymentWrapper(`${contextPath}/dist/${name}/${outputType}.js`),
       defer: true
     }
   )
@@ -217,7 +217,7 @@ const stylesGenerator = ({ inlines, rendering, outputType }) => ({ children }) =
 
 module.exports = {
   cssTagGenerator,
-  deployment,
+  deploymentWrapper,
   fusionTagGenerator,
   libsTagGenerator,
   metaTagGenerator,

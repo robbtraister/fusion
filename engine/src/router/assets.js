@@ -11,8 +11,8 @@ const {
   bodyLimit,
   bundleDistRoot,
   defaultOutputType,
-  isDev,
-  version
+  deployment,
+  isDev
 } = require('../../environment')
 
 const distRouter = express.Router()
@@ -21,12 +21,12 @@ const staticHandler = (location) => express.static(`${bundleDistRoot}${location 
 const redirectHandler = (location) => {
   const useStatic = staticHandler(location)
   return (req, res, next) => {
-    if (req.query.v === version) {
+    if (req.query.v === deployment) {
       useStatic(req, res, next)
     } else {
       const urlParts = url.parse(req.originalUrl, true)
       delete urlParts.search
-      urlParts.query.v = version
+      urlParts.query.v = deployment
       res.redirect(url.format(urlParts))
     }
   }

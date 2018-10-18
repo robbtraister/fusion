@@ -4,10 +4,10 @@
 
 const loaderScript = document.getElementById('fusion-loader-script')
 
-const version = (loaderScript)
-  ? require('./version')(loaderScript.src)
+const deployment = (loaderScript)
+  ? require('./deployment')(loaderScript.src)
   : null
-const versionParam = version ? `?v=${version}` : ''
+const deploymentParam = deployment ? `?v=${deployment}` : ''
 
 // TODO: make this suck less
 // unfortunately, appendChild+defer handling is not as consistent as I would hope among browsers
@@ -21,6 +21,6 @@ if (
   !window.Promise ||
   !window.fetch
 ) {
-  loadScript(`${__CONTEXT_PATH__}/dist/engine/polyfill.js${versionParam}`)
+  loadScript(`${__CONTEXT_PATH__}/dist/engine/polyfill.js${deploymentParam}`)
 }
-loadScript(`${__CONTEXT_PATH__}/dist/engine/react.js${versionParam}`)
+loadScript(`${__CONTEXT_PATH__}/dist/engine/react.js${deploymentParam}`)

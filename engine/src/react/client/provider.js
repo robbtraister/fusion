@@ -69,7 +69,7 @@ const getContentGenerator = function getContentGenerator (contentCache) {
 
     return (args.length === 0)
       ? getSourceContent
-      : getSourceContent.apply(this, args)
+      : getSourceContent(...args)
   }
 }
 

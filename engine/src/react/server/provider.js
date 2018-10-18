@@ -20,7 +20,7 @@ const getContentGenerator = function getContentGenerator (contentCache, arcSite,
         return null
       })
 
-    const getSourceContent = (query, filter) => {
+    const getSourceContent = (query, filter, component) => {
       // alphabetize object keys to ensure proper cacheing
       const queryString = JSONNormalize.stringify(query)
       const queryCache = sourceCache[queryString] = sourceCache[queryString] || {
@@ -45,7 +45,7 @@ const getContentGenerator = function getContentGenerator (contentCache, arcSite,
       queryCache.fetched = queryCache.fetched
         .then(data => queryCache.source ? queryCache.source.filter(filter, data) : queryCache.cached)
         .then(filtered => {
-          if (!isStatic(this, outputType)) {
+          if (!isStatic(component, outputType)) {
             queryCache.filtered = queryCache.cached ? _merge(queryCache.filtered, filtered) : null
           }
           return queryCache.cached

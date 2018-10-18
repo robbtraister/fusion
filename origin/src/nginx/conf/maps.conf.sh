@@ -39,13 +39,18 @@ cat <<EOB
     default                     \$request_uri;
   }
 
-  map \$http_referer \$refererDeployment {
+  map \$http_referer \$referer_vDeployment {
     ~(\?|&)v=([0-9]+)(&|\$)     \$2;
     default                     'live';
   }
 
+  map \$http_referer \$referer_dDeployment {
+    ~(\?|&)d=([0-9]+)(&|\$)     \$2;
+    default                     \$referer_vDeployment;
+  }
+
   map \$cookie_deployment \$cookieDeployment {
-    ''                          \$refererDeployment;
+    ''                          \$referer_dDeployment;
     default                     \$cookie_deployment;
   }
 
@@ -54,9 +59,14 @@ cat <<EOB
     default                     \$http_deployment;
   }
 
-  map \$arg_v \$deployment {
+  map \$arg_v \$arg_vDeployment {
     ''                          \$headerDeployment;
     default                     \$arg_v;
+  }
+
+  map \$arg_d \$deployment {
+    ''                          \$arg_vDeployment;
+    default                     \$arg_d;
   }
 
   map \$deployment \$isLive {

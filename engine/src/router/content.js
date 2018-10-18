@@ -22,7 +22,7 @@ const fetchHandler = (forceUpdate) =>
     try {
       const sourceName = req.params.source || req.query.source
       const queryString = req.params.query || req.query.query
-      const filter = req.query.filter || req.query.query
+      const filter = req.query.filter
       const website = req.query._website
       const followRedirect = req.query.followRedirect !== 'false'
       const maxRedirects = +req.query.maxRedirects

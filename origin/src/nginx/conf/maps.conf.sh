@@ -39,27 +39,27 @@ cat <<EOB
     default                     \$request_uri;
   }
 
-  map \$http_referer \$refererVersion {
+  map \$http_referer \$refererDeployment {
     ~(\?|&)v=([0-9]+)(&|\$)     \$2;
-    default                     'live'; #'\${dollar}LATEST';
+    default                     'live';
   }
 
-  map \$cookie_version \$cookieVersion {
-    ''                          \$refererVersion;
-    default                     \$cookie_version;
+  map \$cookie_deployment \$cookieDeployment {
+    ''                          \$refererDeployment;
+    default                     \$cookie_deployment;
   }
 
-  map \$http_version \$headerVersion {
-    ''                          \$cookieVersion;
-    default                     \$http_version;
+  map \$http_deployment \$headerDeployment {
+    ''                          \$cookieDeployment;
+    default                     \$http_deployment;
   }
 
-  map \$arg_v \$version {
-    ''                          \$headerVersion;
+  map \$arg_v \$deployment {
+    ''                          \$headerDeployment;
     default                     \$arg_v;
   }
 
-  map \$version \$isLive {
+  map \$deployment \$isLive {
     'live'                      'true';
     default                     'false';
   }

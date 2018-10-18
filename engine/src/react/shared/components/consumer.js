@@ -129,7 +129,7 @@ function HOC (Component) {
             )
           }
 
-          const content = context.getContent.call(this, sourceName, key, filter)
+          const content = context.getContent(sourceName, key, filter, ConsumerWrapper)
 
           return {
             cached: content.cached && appendLocalEdits(content.cached),

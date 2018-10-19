@@ -12,10 +12,11 @@ const engine = require('../../utils/engine')
 
 const { RedirectError, NotFoundError } = require('../../errors')
 
-const fetch = function fetch (contentSource, contentKey, version) {
+const fetch = function fetch (contentSource, contentKey, { version, cacheMode }) {
   return engine({
     uri: `/content/fetch/${contentSource}?key=${encodeURIComponent(JSON.stringify(contentKey))}`,
-    version
+    version,
+    cacheMode
   })
 }
 
@@ -74,7 +75,7 @@ class TemplateResolver extends BaseResolver {
     this.paramExtractor = getParamExtractor(config.contentConfigMapping, this.pattern)
   }
 
-  async hydrate (requestParts, arcSite, version) {
+  async hydrate (requestParts, { arcSite, version, cacheMode }) {
     const key = Object.assign(
       {
         uri: requestParts.pathname,
@@ -83,7 +84,7 @@ class TemplateResolver extends BaseResolver {
       this.paramExtractor(requestParts)
     )
 
-    return fetch(this.config.contentSourceId, key, version)
+    return fetch(this.config.contentSourceId, key, { version, cacheMode })
       .catch((err) => {
         if (err.statusCode === 404) {
           throw new NotFoundError(`Could not resolve ${requestParts.href}`, {

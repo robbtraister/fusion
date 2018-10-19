@@ -20,6 +20,7 @@ const {
 const model = require('../../dao')
 
 const { render } = require('../../react')
+const substitute = require('../../react/shared/utils/substitute')
 
 const getSource = require('../sources')
 
@@ -100,8 +101,8 @@ class Rendering {
     this.contentCache = this.contentCache || {}
     this.inlines = this.inlines || {}
     return (child)
-      ? getComponent({ rendering: this, outputType, child, isAdmin, quarantine })
-      : getComponent({ rendering: this, outputType, name: this.name, isAdmin, quarantine })
+      ? getComponent({ rendering: this, outputType, isAdmin, quarantine, child })
+      : getComponent({ rendering: this, outputType, isAdmin, quarantine, name: this.name })
   }
 
   async fetchContent (arcSite) {
@@ -201,11 +202,12 @@ class Rendering {
   }
 
   async render ({ content: templateContent, rendering, request }) {
-    const [ Component, content ] = await Promise.all([
-      this.getComponent(rendering),
-      // template will already have content populated by resolver
-      templateContent || this.getContent(request.arcSite)
-    ])
+    // template will already have content populated by resolver
+    const content = templateContent || (await this.getContent(request.arcSite))
+
+    const json = await this.getJson()
+    this.jsonPromise = substitute(json, content.document)
+    const Component = this.getComponent(rendering)
 
     try {
       return await render({ Component, content, request })

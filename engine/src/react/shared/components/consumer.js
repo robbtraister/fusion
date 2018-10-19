@@ -95,7 +95,7 @@ function HOC (Component) {
           }
 
           const sourceName = (isConfig)
-            ? sourceOrConfig.sourceName || sourceOrConfig.source || sourceOrConfig.contentService
+            ? sourceOrConfig.contentService || sourceOrConfig.sourceName || sourceOrConfig.source
             : sourceOrConfig
 
           if (!sourceName) {
@@ -106,7 +106,10 @@ function HOC (Component) {
           }
 
           if (isConfig && sourceOrConfig.hasOwnProperty('key')) {
-            console.warn('--- WARNING: The \'key\' property on content configs has been DEPRECATED. Please use \'query\' instead. ---')
+            console.warn('--- WARNING: The \'key\' property on content configs has been renamed as \'query\'. Use of \'key\' has been DEPRECATED. ---')
+            if (isConfig && sourceOrConfig.hasOwnProperty('query')) {
+              console.warn('--- WARNING: The \'query\' property on content configs has been renamed as \'filter\'. ---')
+            }
             query = sourceOrConfig.key
 
             query = JSON.parse(JSON.stringify(query).replace(/\{\{([^}]+)\}\}/g, (match, propName) => {
@@ -115,8 +118,13 @@ function HOC (Component) {
 
             filter = sourceOrConfig.filter || sourceOrConfig.query
           } else {
+            if (isConfig && sourceOrConfig.hasOwnProperty('contentConfigValues') && sourceOrConfig.hasOwnProperty('query') && !sourceOrConfig.hasOwnProperty('filter')) {
+              console.warn('--- WARNING: The \'query\' property on content configs has been renamed as \'filter\'. ---')
+              sourceOrConfig.filter = sourceOrConfig.query
+            }
+
             query = (isConfig)
-              ? sourceOrConfig.query || sourceOrConfig.contentConfigValues
+              ? sourceOrConfig.contentConfigValues || sourceOrConfig.query
               : query
 
             query = JSON.parse(JSON.stringify(query).replace(/\{\{([^}]+)\}\}/g, (match, propName) => {

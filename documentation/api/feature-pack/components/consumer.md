@@ -122,7 +122,7 @@ This is the full config object used to fetch global content for the rendered pag
 
 ##### Keys
 - `source` (*String*): This is the name of the content source used to fetch the global content of the page or template.
-- `key` (*Object*): This an object containing the key/value pairs that were used as arguments to fetch content from the global content source.
+- `query` (*Object*): This an object containing the key/value pairs that were used as arguments to fetch content from the global content source.
 
 ##### Example
 
@@ -143,7 +143,7 @@ class StoryFeed extends Component {
   fetchStories() {
     const { globalContentConfig } = this.props
     // Use the globalContentConfig to fetch stories from the same content source and with the same arguments as the globalContent fetch
-    const { fetched } = this.getContent(globalContentConfig.source, globalContentConfig.key)
+    const { fetched } = this.getContent(globalContentConfig.source, globalContentConfig.query)
 
     fetched.then(response => {
       this.setState({ stories: [...this.state.stories, ...response.stories] })
@@ -389,7 +389,7 @@ The `fetchContent` method is second-level syntactic sugar for using both [`getCo
 - `contentConfigMap` (*Object*): An object whose keys are the names of content to be stored in the component's `state`, and the values are configuration objects idential to those of the [`getContent`](#getContent) parameters.
   -  `contentConfigMap.{contentKey}` (*Object*): Here, `{contentKey}` represents the name of a property the developer chooses to set on the component's `state` object. Multiple `{contentKey}` objects can exist on the same `contentConfigMap` object.
       - `contentConfigMap.{contentKey}.sourceName` (*String*): See `sourceName` parameter in [`getContent`](#getContent) method.
-      - `contentConfigMap.{contentKey}.key` (*Object*): See `key` parameter in [`getContent`](#getContent) method.
+      - `contentConfigMap.{contentKey}.query` (*Object*): See `query` parameter in [`getContent`](#getContent) method.
       - [`contentConfigMap.{contentKey}.filter`] (*String*): See `filter` parameter in [`getContent`](#getContent) method.
       - [`contentConfigMap.{contentKey}.inherit`] (*Boolean*): See `inherit` parameter in [`getContent`](#getContent) method.
 
@@ -413,8 +413,8 @@ class Topics extends React.Component {
     this.fetchContent({
       topics: {
         source: 'content-feed',
-        key: { feedType: 'taxonomy.tags.slug', feedParam: '*', limit: 5, offset: 0, order: 'display_date:desc' },
-        query: '{ headline }'
+        query: { feedType: 'taxonomy.tags.slug', feedParam: '*', limit: 5, offset: 0, order: 'display_date:desc' },
+        filter: '{ headline }'
       }
     })
   }
@@ -446,10 +446,10 @@ For syntactic sugar, there are 2 ways to invoke the `getContent` method: with th
 
 *Expanded Syntax*
 
-`getContent(sourceName, key, [filter], [inherit])`
+`getContent(sourceName, query, [filter], [inherit])`
 
 - `sourceName` (*String*): The name of the content source from which you want to fetch. This content source must be configured in your bundle.
-- `key` (*Object*): This will depend on the definition of the content source, but will be an object containing key/value pairs used to uniquely identify the piece of content you want to fetch.
+- `query` (*Object*): This will depend on the definition of the content source, but will be an object containing key/value pairs used to uniquely identify the piece of content you want to fetch.
 - [`filter`] (*String*): A GraphQL query string that will be applied to the resultant data to minimize the payload size. This is beneficial for both client-side and server-side fetching, as server-side fetched data must be included in the final HTML rendering to prevent content flashing.
 - [`inherit`] (*Boolean*): A dynamic boolean to determine if `globalContent` should be used to override the config settings provided. If this value is `true`, the `globalContent` will be returned in both the `cached` property and as the resolution of `fetched`.
 
@@ -459,7 +459,7 @@ For syntactic sugar, there are 2 ways to invoke the `getContent` method: with th
 
 - `options` (*Object*): An object containing the following properties:
   - `options.sourceName` (*String*): See `sourceName` parameter above.
-  - `options.key` (*Object*): See `key` parameter above.
+  - `options.query` (*Object*): See `query` parameter above.
   - [`options.filter`] (*String*): See `filter` parameter above.
   - [`options.inherit`] (*Boolean*): See `inherit` parameter above.
 
@@ -488,8 +488,8 @@ class WeatherForecast extends Component {
       const { fetched } = this.getContent({
         // Specifying the `dark-sky` content source
         sourceName: 'dark-sky',
-        // `key` object needs `lat` and `lng` arguments to query the DarkSky API
-        key: { lat: location.coords.latitude, lng: location.coords.longitude },
+        // `query` object needs `lat` and `lng` arguments to query the DarkSky API
+        query: { lat: location.coords.latitude, lng: location.coords.longitude },
         // GraphQL filter so we get only the data we need
         filter: '{ daily { summary }}'
       })

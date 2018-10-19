@@ -1,10 +1,10 @@
 'use strict'
 
-const resolve = function resolve (key) {
-  const requestUri = `/content/v3/stories/?canonical_url=${key.canonical_url || key.uri}`
+const resolve = function resolve (query) {
+  const requestUri = `/content/v3/stories/?canonical_url=${query.canonical_url || query.uri}`
 
-  return (key.hasOwnProperty('published'))
-    ? `${requestUri}&published=${key.published}`
+  return (query.hasOwnProperty('published'))
+    ? `${requestUri}&published=${query.published}`
     : requestUri
 }
 

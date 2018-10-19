@@ -116,14 +116,14 @@ const fusionTagGenerator = (globalContent, globalContentConfig, contentCache, ou
     .forEach(sourceName => {
       const sourceCache = contentCache[sourceName]
       Object.keys(sourceCache)
-        .forEach(key => {
-          const keyCache = sourceCache[key]
-          if (keyCache.source && keyCache.filtered) {
+        .forEach(queryString => {
+          const queryCache = sourceCache[queryString]
+          if (queryCache.source && queryCache.filtered) {
             const condensedSourceCache = condensedCache[sourceName] = condensedCache[sourceName] || {
               entries: {},
-              expiresAt: now + ((keyCache.source && keyCache.source.ttl) || 300000)
+              expiresAt: now + ((queryCache.source && queryCache.source.ttl) || 300000)
             }
-            condensedSourceCache.entries[key] = { cached: keyCache.filtered }
+            condensedSourceCache.entries[queryString] = { cached: queryCache.filtered }
           }
         })
     })

@@ -75,7 +75,7 @@ Here, we're utilizing Fusion's [`getContent` method](../api/feature-pack/compone
 
 The first argument to `getContent` is the name of the content source (`movie-search` for now).
 
-The second argument is the `key` object that contains the values we actually want to query on - in this case, a `movieQuery` param searching for movies with the word 'Jurassic' in them (this object will be the only argument passed to the `resolve` method in our content source).
+The second argument is the `query` object that contains the values we actually want to query on - in this case, a `movieQuery` param searching for movies with the word 'Jurassic' in them (this object will be the only argument passed to the `resolve` method in our content source).
 
 Finally, the third argument is a string containing a GraphQL query object, which will filter the results of our JSON down to just the data we need for this component - you'll notice the key names in the filter match those in the [schema we defined a couple steps ago](./using-graphql-schema.md).
 
@@ -228,7 +228,7 @@ export default MovieList
 All we had to do to get pagination working was:
 
 - add a `page` property to our state object and initialize it to `1`
-- include the `page` property in the `key` object sent to `getContent`; since our `movie-search` content source knows how to handle this param, it should "just work"
+- include the `page` property in the `query` object sent to `getContent`; since our `movie-search` content source knows how to handle this param, it should "just work"
 - increment the `page` in the component's state whenever we fetch, so next time we'll fetch the following page
 - Add a button at the bottom of the component that allows us to call the `fetch` method, which should get the next page of results, display the new results, and increment the page all at once.
 

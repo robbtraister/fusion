@@ -10,9 +10,9 @@ const lastModified = new Date(Fusion.lastModified || null).toUTCString()
 
 const JSONNormalize = require('../../utils/normalize')
 
-const fetchContent = (sourceName, keyString, filter, cached) => {
+const fetchContent = (sourceName, queryString, filter, cached) => {
   return window.fetch(
-    `${Fusion.contextPath || ''}/api/v3/content/fetch/${sourceName}?key=${encodeURIComponent(keyString)}` + (filter ? `&query=${encodeURIComponent(filter)}` : '') + (Fusion.arcSite ? `&_website=${encodeURIComponent(Fusion.arcSite)}` : ''),
+    `${Fusion.contextPath || ''}/api/v3/content/fetch/${sourceName}?query=${encodeURIComponent(queryString)}` + (filter ? `&query=${encodeURIComponent(filter)}` : '') + (Fusion.arcSite ? `&_website=${encodeURIComponent(Fusion.arcSite)}` : ''),
     {
       headers: {
         'If-Modified-Since': lastModified
@@ -36,7 +36,7 @@ const getContentGenerator = function getContentGenerator (contentCache) {
       expiresAt: 0
     }
 
-    const getSourceContent = (key, filter) => {
+    const getSourceContent = (query, filter) => {
       filter = (filter)
         ? filter
           .replace(/\s+/g, ' ')
@@ -46,14 +46,14 @@ const getContentGenerator = function getContentGenerator (contentCache) {
           .trim()
         : null
 
-      const keyString = JSONNormalize.stringify(key)
-      const keyCache = sourceCache.entries[keyString] = sourceCache.entries[keyString] || {}
-      const cached = keyCache.cached
+      const queryString = JSONNormalize.stringify(query)
+      const queryCache = sourceCache.entries[queryString] = sourceCache.entries[queryString] || {}
+      const cached = queryCache.cached
 
-      keyCache.fetched = keyCache.fetched || {}
-      const fetched = keyCache.fetched[filter] = keyCache.fetched[filter] || (
+      queryCache.fetched = queryCache.fetched || {}
+      const fetched = queryCache.fetched[filter] = queryCache.fetched[filter] || (
         (cached === undefined || sourceCache.expiresAt < now)
-          ? fetchContent(sourceName, keyString, filter, cached)
+          ? fetchContent(sourceName, queryString, filter, cached)
           : Promise.resolve(cached)
       )
 

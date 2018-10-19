@@ -46,9 +46,9 @@ const fetchCacheContent = async (key) => makeCacheRequest({ key })
 const pushCacheContent = async (key, value) => makeCacheRequest({ key, value, method: 'PUT' })
 
 class CachedSource extends ResolveSource {
-  async clear (key) {
+  async clear (query) {
     async function clearKey (options) {
-      const { cacheKey } = this.resolve(key, options)
+      const { cacheKey } = this.resolve(query, options)
 
       try {
         return await clearCacheContent(cacheKey)
@@ -68,9 +68,9 @@ class CachedSource extends ResolveSource {
     ])
   }
 
-  async fetch (key, options) {
+  async fetch (query, options) {
     try {
-      return await this.fetchThroughCache(key, options)
+      return await this.fetchThroughCache(query, options)
     } catch (err) {
       if (err.response) {
         const responseError = new Error(err.response.body)
@@ -81,12 +81,12 @@ class CachedSource extends ResolveSource {
     }
   }
 
-  async fetchThroughCache (key, options = {}) {
+  async fetchThroughCache (query, options = {}) {
     if (!cacheProxyUrl || options.forceUpdate === true) {
-      return this.update(key, options)
+      return this.update(query, options)
     }
 
-    const resolution = this.resolve(key, options)
+    const resolution = this.resolve(query, options)
 
     const tic = timer.tic()
     try {
@@ -173,8 +173,8 @@ class CachedSource extends ResolveSource {
     }
   }
 
-  async update (key, options) {
-    this._update(this.resolve(key, options), options)
+  async update (query, options) {
+    this._update(this.resolve(query, options), options)
   }
 }
 

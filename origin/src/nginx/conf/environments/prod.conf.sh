@@ -70,8 +70,20 @@ cat <<EOB
       add_header                'Fusion-Source' 's3';
     }
 
-    location ~ ^${API_PREFIX}/(configs)(/.*|\$) {
-      set                       \$p /components\$2/fusion.configs.json;
+    location ~ ^${API_PREFIX}/configs/content(/.*|\$) {
+      set                       \$p /content\$1/fusion.configs.json;
+
+      proxy_intercept_errors    on;
+      error_page                400 403 404 418 = @engine;
+
+      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${deployment}/dist\$p;
+      proxy_pass                \$target;
+
+      add_header                'Fusion-Source' 's3';
+    }
+
+    location ~ ^${API_PREFIX}/configs(/.*|\$) {
+      set                       \$p /components\$1/fusion.configs.json;
 
       proxy_intercept_errors    on;
       error_page                400 403 404 418 = @engine;

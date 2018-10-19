@@ -13,7 +13,7 @@ const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
 
 const {
-  componentDistRoot,
+  componentBuildRoot,
   minify
 } = require('../environment')
 
@@ -50,7 +50,7 @@ module.exports = (scriptSourceFile, stylesSourceFile) =>
       optimization,
       output: {
         filename: `[name].js`,
-        path: componentDistRoot,
+        path: componentBuildRoot,
         library: `window.Fusion=window.Fusion||{};window.Fusion.Template`,
         libraryTarget: 'assign'
       },
@@ -80,7 +80,7 @@ module.exports = (scriptSourceFile, stylesSourceFile) =>
       optimization,
       output: {
         filename: `[name].js`,
-        path: componentDistRoot
+        path: componentBuildRoot
       },
       plugins: [
         new ManifestPlugin({ fileName: 'styles.manifest.json' }),

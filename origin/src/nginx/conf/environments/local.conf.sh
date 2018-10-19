@@ -57,8 +57,18 @@ cat <<EOB
       try_files                 \$file =404;
     }
 
-    location ~ ^${API_PREFIX}/(configs)(/.*|\$) {
-      set                       \$p /components\$2/fusion.configs.json;
+    location ~ ^${API_PREFIX}/configs/content(/.*|\$) {
+      set                       \$p /content\$1/fusion.configs.json;
+
+      proxy_intercept_errors    on;
+      error_page                400 403 404 418 = @engine;
+
+      root                      /etc/nginx/dist;
+      try_files                 \$p =404;
+    }
+
+    location ~ ^${API_PREFIX}/configs(/.*|\$) {
+      set                       \$p /components\$1/fusion.configs.json;
 
       proxy_intercept_errors    on;
       error_page                400 403 404 418 = @engine;

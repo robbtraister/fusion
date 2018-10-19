@@ -18,10 +18,11 @@ const optimization = require('./shared/optimization')
 const resolve = require('./shared/resolve')
 
 const {
+  bundleBuildRoot,
   bundleDistRoot,
   bundleGeneratedRoot: propertiesSrcDir,
   bundleSrcRoot,
-  componentDistRoot,
+  componentBuildRoot,
   contextPath
 } = require('../environment')
 
@@ -79,7 +80,7 @@ const alias = {
   'output-types'
 ]
   .forEach(collection => {
-    alias[`fusion:manifest:components:${collection}`] = require.resolve(`${componentDistRoot}/${collection}/fusion.manifest.json`)
+    alias[`fusion:manifest:components:${collection}`] = require.resolve(`${componentBuildRoot}/${collection}/fusion.manifest.json`)
   })
 
 module.exports = [
@@ -89,7 +90,6 @@ module.exports = [
       loader: require.resolve('../src/react/client/loader'),
       polyfill: require.resolve('../src/react/client/polyfill'),
       preview: require.resolve('../src/react/client/preview'),
-      properties: require.resolve(propertiesSrcFile),
       react: require.resolve('../src/react/client')
     },
     mode,
@@ -144,7 +144,7 @@ module.exports = [
     optimization,
     output: {
       filename: `[name].js`,
-      path: path.resolve(bundleDistRoot),
+      path: path.resolve(bundleBuildRoot),
       libraryTarget: 'commonjs2'
     },
     resolve,

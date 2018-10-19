@@ -1,8 +1,8 @@
 'use strict'
 
 const {
-  componentDistRoot,
-  contentDistRoot
+  componentBuildRoot,
+  contentBuildRoot
 } = require('../environment')
 
 function getManifest (rootDir, collection) {
@@ -15,13 +15,13 @@ function getManifest (rootDir, collection) {
 
 module.exports = {
   components: {
-    chains: getManifest(componentDistRoot, 'chains'),
-    features: getManifest(componentDistRoot, 'features'),
-    layouts: getManifest(componentDistRoot, 'layouts'),
-    outputTypes: getManifest(componentDistRoot, 'output-types')
+    chains: getManifest(componentBuildRoot, 'chains'),
+    features: getManifest(componentBuildRoot, 'features'),
+    layouts: getManifest(componentBuildRoot, 'layouts'),
+    outputTypes: getManifest(componentBuildRoot, 'output-types')
   },
   content: {
-    sources: getManifest(contentDistRoot, 'sources'),
-    schemas: getManifest(contentDistRoot, 'schemas')
+    sources: getManifest(contentBuildRoot, 'sources'),
+    schemas: getManifest(contentBuildRoot, 'schemas')
   }
 }

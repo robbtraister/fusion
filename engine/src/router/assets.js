@@ -9,7 +9,7 @@ const Rendering = require('../models/rendering')
 
 const {
   bodyLimit,
-  bundleDistRoot,
+  bundleBuildRoot,
   defaultOutputType,
   deployment,
   isDev
@@ -17,7 +17,7 @@ const {
 
 const distRouter = express.Router()
 
-const staticHandler = (location) => express.static(`${bundleDistRoot}${location || ''}`)
+const staticHandler = (location) => express.static(`${bundleBuildRoot}${location || ''}`)
 const redirectHandler = (location) => {
   const useStatic = staticHandler(location)
   return (req, res, next) => {

@@ -12,7 +12,7 @@ const debugTimer = require('debug')('fusion:models:rendering:compile:timer')
 const { generateSource } = require('../../react')
 
 const {
-  componentDistRoot,
+  componentBuildRoot,
   componentSrcRoot,
   defaultOutputType
 } = require('../../../environment')
@@ -23,9 +23,9 @@ const { sendMetrics, METRIC_TYPES } = require('../../utils/send-metrics')
 
 const scriptSourceFile = path.resolve(`${componentSrcRoot}/script.js`)
 const stylesSourceFile = path.resolve(`${componentSrcRoot}/styles.js`)
-const scriptDestFile = path.resolve(`${componentDistRoot}/script.js`)
-const stylesDestFile = path.resolve(`${componentDistRoot}/styles.js`)
-const manifestFile = path.resolve(`${componentDistRoot}/styles.manifest.json`)
+const scriptDestFile = path.resolve(`${componentBuildRoot}/script.js`)
+const stylesDestFile = path.resolve(`${componentBuildRoot}/styles.js`)
+const manifestFile = path.resolve(`${componentBuildRoot}/styles.manifest.json`)
 
 const getMemoryFS = function getMemoryFS () {
   const memFs = new MemoryFS()
@@ -114,7 +114,7 @@ const compileSource = async function compileSource (script, styles) {
           const manifest = JSON.parse(manifestJson)
           const cssFile = manifest['styles.css']
           return cssFile
-            ? mfs.readFilePromise(`${componentDistRoot}/${cssFile}`)
+            ? mfs.readFilePromise(`${componentBuildRoot}/${cssFile}`)
               .then((css) => ({ css, cssFile }))
             : {
               css: null,

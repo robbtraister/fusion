@@ -13,16 +13,23 @@ const resolve = require('./shared/resolve')
 
 const {
   schemasSrcRoot,
-  schemasDistRoot,
+  schemasBuildRoot,
   sourcesSrcRoot,
-  sourcesDistRoot
+  sourcesBuildRoot
 } = require('../environment')
 
 const {
   content
 } = require('../manifest')
 
-const getConfig = (entry, srcRoot, distRoot) => {
+const {
+  writeFile
+} = require('../src/utils/promises')
+
+const loadSchemasConfigs = require('../src/configs/content/schemas')
+const loadSourcesConfigs = require('../src/configs/content/sources')
+
+const getConfig = (entry, srcRoot, buildRoot, loadConfigsFn) => {
   return (Object.keys(entry).length)
     ? {
       entry,
@@ -42,18 +49,20 @@ const getConfig = (entry, srcRoot, distRoot) => {
       optimization,
       output: {
         filename: `[name].js`,
-        path: distRoot,
+        path: buildRoot,
         libraryTarget: 'commonjs2'
       },
       plugins: [
         new CopyWebpackPlugin([{
           from: `${srcRoot}/*.json`,
-          to: `${distRoot}/[name].[ext]`
+          to: `${buildRoot}/[name].[ext]`
         }]),
         new ManifestPlugin({ fileName: 'webpack.manifest.json' }),
         new OnBuildWebpackPlugin(function (stats) {
-          // TODO: compute configs at compile-time (instead of on-demand) after disabling JGE option
-          // fs.writeFile(`${sourcesDistRoot}/fusion.configs.json`, JSON.stringify(entry, null, 2), () => {})
+          loadConfigsFn()
+            .then((configs) =>
+              writeFile(`${buildRoot.replace(/\/build\//, '/dist/')}/fusion.configs.json`, JSON.stringify(configs, null, 2))
+            )
         })
       ],
       resolve,
@@ -66,6 +75,6 @@ const getConfig = (entry, srcRoot, distRoot) => {
 }
 
 module.exports = [].concat(
-  getConfig(content.schemas, schemasSrcRoot, schemasDistRoot),
-  getConfig(content.sources, sourcesSrcRoot, sourcesDistRoot)
+  getConfig(content.schemas, schemasSrcRoot, schemasBuildRoot, loadSchemasConfigs),
+  getConfig(content.sources, sourcesSrcRoot, sourcesBuildRoot, loadSourcesConfigs)
 )

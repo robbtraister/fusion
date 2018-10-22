@@ -26,7 +26,11 @@ function prepareResolverConfigs (pageConfigs, templateConfigs) {
     .map((config) => new TemplateResolver(config))
     .sort(TemplateResolver.sort)
 
-  return pageResolvers.concat(templateResolvers)
+  return {
+    all: pageResolvers.concat(templateResolvers),
+    pages: pageResolvers,
+    templates: templateResolvers
+  }
 }
 
 function loadResolversFromDB () {
@@ -60,16 +64,19 @@ const getResolvers = (resolveFromDB)
   ? loadResolversFromDB()
   : loadResolversFromFS()
 
-const resolve = async function resolve (requestUri, { arcSite, version, cacheMode }) {
+const resolve = async function resolve (requestUri, params) {
   const requestParts = url.parse(requestUri, true)
   requestParts.pathname = trailingSlashRewrite(requestParts.pathname)
   debugLogger(`Resolving: ${JSON.stringify(requestUri)}`)
 
-  const resolvers = await getResolvers()
-  const resolver = resolvers.find(resolver => resolver.match(requestParts, arcSite))
+  const resolverMap = await getResolvers()
+  const resolvers = (params.pagesOnly)
+    ? resolverMap.pages
+    : resolverMap.all
+  const resolver = resolvers.find(resolver => resolver.match(requestParts, params.arcSite))
 
   return resolver
-    ? resolver.resolve(requestParts, { arcSite, version, cacheMode })
+    ? resolver.resolve(requestParts, params)
     : null
 }
 

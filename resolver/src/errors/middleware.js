@@ -21,7 +21,13 @@ const redirectHandler = function redirectHandler (err, req, res, next) {
 const customRenderHandler = async function customRenderHandler (err, req, res, next) {
   if (err && err.statusCode) {
     try {
-      const response = await make(`/error/${err.statusCode}`, makeOptions(req))
+      const response = await make(
+        `/error/${err.statusCode}`,
+        Object.assign(
+          makeOptions(req),
+          { pagesOnly: true }
+        )
+      )
       return res.send(response)
     } catch (e) {}
   }

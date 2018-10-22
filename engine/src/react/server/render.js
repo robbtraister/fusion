@@ -22,7 +22,7 @@ const fusionProperties = require('fusion:properties')
 
 const {
   cssTagGenerator,
-  deployment,
+  deploymentWrapper,
   fusionTagGenerator,
   libsTagGenerator,
   metaTagGenerator,
@@ -175,8 +175,8 @@ const compileDocument = async function compileDocument ({ name, rendering, outpu
       OutputType,
       {
         contextPath,
-        deployment,
-        version: deployment,
+        deployment: deploymentWrapper,
+        version: deploymentWrapper,
         tree: Template.tree,
         renderables: [Template.tree].concat(...getAncestors(Template.tree)),
 

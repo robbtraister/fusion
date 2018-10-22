@@ -6,7 +6,7 @@ const {
   functionName,
   isDev,
   region,
-  version
+  deployment
 } = require('../../../environment')
 
 const { components } = require('../../../manifest')
@@ -26,16 +26,16 @@ const listVersions = async function listVersions () {
 
 const listOtherVerions = async function listOtherVerions () {
   const versions = await listVersions()
-  return versions.filter(v => v !== version)
+  return versions.filter(v => v !== deployment)
 }
 
-const invoke = async function invoke (uri, payload, version, InvocationType = 'RequestResponse') {
+const invoke = async function invoke (uri, body, Qualifier, InvocationType = 'RequestResponse') {
   return new Promise((resolve, reject) => {
     lambda.invoke(
       {
         FunctionName: functionName,
         InvocationType,
-        Qualifier: version,
+        Qualifier,
         Payload: JSON.stringify({
           method: 'POST',
           // serverless-http uses `httpMethod` property
@@ -44,7 +44,7 @@ const invoke = async function invoke (uri, payload, version, InvocationType = 'R
             'Content-Type': 'application/json'
           },
           path: uri,
-          body: payload,
+          body,
           queryStringParameters: { propagate: 'false' }
         })
       },
@@ -53,20 +53,20 @@ const invoke = async function invoke (uri, payload, version, InvocationType = 'R
   })
 }
 
-const publishOutputTypes = async function publishOutputTypes (uri, payload, InvocationType = 'RequestResponse') {
+const publishOutputTypes = async function publishOutputTypes (uri, body, InvocationType = 'RequestResponse') {
   return Promise.all(
     allOutputTypes.map((outputType) =>
-      invoke(`${uri}/${outputType}`, payload, version, InvocationType)
+      invoke(`${uri}/${outputType}`, body, deployment, InvocationType)
     )
   )
 }
 
-const publishToOtherVersions = async function publishToOtherVersions (uri, payload) {
+const publishToOtherVersions = async function publishToOtherVersions (uri, body) {
   const versions = await listOtherVerions()
   return Promise.all(
     // this InvocationType makes the request "fire and forget"
     versions.map(version =>
-      invoke(uri, payload, version, 'Event')
+      invoke(uri, body, version, 'Event')
     )
   )
 }

@@ -28,7 +28,7 @@ const contentBase = variables.CONTENT_BASE || ''
 const contextPath = (variables.CONTEXT_PATH || 'pf').replace(/^\/*/, '/').replace(/\/+$/, '')
 const datadogApiKey = variables.DATADOG_API_KEY || ''
 const defaultOutputType = variables.DEFAULT_OUTPUT_TYPE || 'default'
-const apiPrefix = `${contextPath}/api/v3`
+const deployment = variables.AWS_LAMBDA_FUNCTION_VERSION || '$LATEST'
 const environment = variables.ENVIRONMENT
 const functionName = variables.AWS_LAMBDA_FUNCTION_NAME || `fusion-engine-${environment}`
 const isDev = !/^prod/i.test(variables.NODE_ENV)
@@ -40,7 +40,6 @@ const region = variables.AWS_REGION || 'us-east-1'
 const s3BucketDiscrete = variables.S3BUCKET_DISCRETE || variables.S3BUCKET || 'pagebuilder-fusion'
 const s3BucketVersioned = variables.S3BUCKET_VERSIONED || 'pagebuilder-fusion'
 const semver = variables.FUSION_RELEASE
-const version = variables.AWS_LAMBDA_FUNCTION_VERSION || '$LATEST'
 
 const bundleDistRoot = `${bundleRoot}/dist`
 const bundleGeneratedRoot = `${bundleRoot}/generated`
@@ -56,6 +55,8 @@ const schemasSrcRoot = `${contentSrcRoot}/schemas`
 const schemasDistRoot = `${contentDistRoot}/schemas`
 const sourcesSrcRoot = `${contentSrcRoot}/sources`
 const sourcesDistRoot = `${contentDistRoot}/sources`
+
+const apiPrefix = `${contextPath}/api/v3`
 
 module.exports = {
   apiPrefix,
@@ -76,6 +77,7 @@ module.exports = {
   contextPath,
   datadogApiKey,
   defaultOutputType,
+  deployment,
   environment,
   functionName,
   isDev,
@@ -92,5 +94,5 @@ module.exports = {
   sourcesDistRoot,
   sourcesSrcRoot,
   variables,
-  version
+  version: deployment
 }

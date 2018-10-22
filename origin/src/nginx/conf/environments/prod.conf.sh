@@ -44,7 +44,7 @@ cat <<EOB
       proxy_intercept_errors    on;
       error_page                400 403 404 418 = @engine;
 
-      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/\$p;
+      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${deployment}/\$p;
       proxy_pass                \$target;
 
       add_header                'Fusion-Source' 's3';
@@ -64,7 +64,7 @@ cat <<EOB
         return                  418;
       }
 
-      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/\$p;
+      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${deployment}/\$p;
       proxy_pass                \$target;
 
       add_header                'Fusion-Source' 's3';
@@ -76,7 +76,7 @@ cat <<EOB
       proxy_intercept_errors    on;
       error_page                400 403 404 418 = @engine;
 
-      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/dist\$p;
+      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${deployment}/dist\$p;
       proxy_pass                \$target;
 
       add_header                'Fusion-Source' 's3';

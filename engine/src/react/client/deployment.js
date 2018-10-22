@@ -1,10 +1,10 @@
 'use strict'
 
-function version (uri) {
+function deployment (uri) {
   const vMatch = /(\?|&)v=([^&]*)/.exec(uri || window.location.search)
   return vMatch ? decodeURIComponent(vMatch[2]) : ''
 }
 
-version.toString = () => version()
+deployment.toString = () => deployment()
 
-module.exports = version
+module.exports = deployment

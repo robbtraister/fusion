@@ -12,7 +12,7 @@ const JSONNormalize = require('../../utils/normalize')
 
 const fetchContent = (sourceName, keyString, filter, cached) =>
   window.fetch(
-    `${Fusion.contextPath || ''}/api/v3/content/fetch/${sourceName}?key=${encodeURIComponent(keyString)}` + (filter ? `&query=${encodeURIComponent(filter)}` : '') + (Fusion.arcSite ? `&_website=${encodeURIComponent(Fusion.arcSite)}` : ''),
+    `${Fusion.contextPath || ''}/api/v3/content/fetch/${sourceName}?v=${Fusion.deployment}&key=${encodeURIComponent(keyString)}` + (filter ? `&query=${encodeURIComponent(filter)}` : '') + (Fusion.arcSite ? `&_website=${encodeURIComponent(Fusion.arcSite)}` : ''),
     {
       headers: {
         'If-Modified-Since': lastModified

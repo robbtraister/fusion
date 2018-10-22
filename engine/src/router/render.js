@@ -69,7 +69,7 @@ function getTypeRouter (routeType) {
       const type = rendering.type || routeType
 
       new Rendering(type, rendering.id, rendering.layoutItems ? rendering : undefined)
-        .render({ content, rendering, request })
+        .render({ content, rendering, request, forceUpdate: cacheMode === 'update' })
         .then((html) => `${outputType ? '<!DOCTYPE html>' : ''}${html}`)
         .then((html) =>
           (writeToCache && request.uri)

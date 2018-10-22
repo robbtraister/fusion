@@ -101,7 +101,7 @@ class Rendering {
       : getComponent({ rendering: this, outputType, name: this.name, isAdmin, quarantine })
   }
 
-  async getContent (arcSite) {
+  async getContent (arcSite, forceUpdate) {
     // I hate how this works, pulling content only for pages
     // but that's what you get with legacy data
     this.contentPromise = this.contentPromise ||
@@ -113,7 +113,7 @@ class Rendering {
               const configs = json.globalContentConfig
               return (configs && configs.contentService && configs.contentConfigValues)
                 ? getSource(configs.contentService)
-                  .then((source) => source.fetch(Object.assign(json.uri ? { uri: json.uri } : {}, { 'arc-site': arcSite }, configs.contentConfigValues)))
+                  .then((source) => source.fetch(Object.assign(json.uri ? { uri: json.uri } : {}, { 'arc-site': arcSite }, configs.contentConfigValues)), forceUpdate)
                   .then((document) => ({
                     source: configs.contentService,
                     key: configs.contentConfigValues,
@@ -173,10 +173,10 @@ class Rendering {
     )
   }
 
-  async render ({ content, rendering, request }) {
+  async render ({ content, rendering, request, forceUpdate }) {
     return Promise.all([
       this.getComponent(rendering),
-      content || this.getContent(request.arcSite)
+      content || this.getContent(request.arcSite, forceUpdate)
     ])
       // template will already have content populated by resolver
       // use Object.assign to default to the resolver content

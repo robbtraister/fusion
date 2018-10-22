@@ -7,25 +7,22 @@ const isWhy404 = require('../utils/is-why-404')
 
 const makeRouter = express.Router()
 
-makeRouter.get('*',
-  async (req, res, next) => {
-    try {
-      const arcSite = req.query._website || req.get('Arc-Site')
+const makeOptions = (req) => ({
+  arcSite: req.query._website || req.get('Arc-Site'),
+  version: req.get('Fusion-Engine-Version'),
+  outputType: req.query.outputType,
+  cacheMode: req.get('Fusion-Cache-Mode'),
+  why404: isWhy404(req)
+})
 
-      const opts = {
-        arcSite,
-        version: req.get('Fusion-Engine-Version'),
-        outputType: req.query.outputType,
-        cacheMode: req.get('Fusion-Cache-Mode'),
-        why404: isWhy404(req)
-      }
-
-      const data = await make(req.url, opts)
-      res.send(data)
-    } catch (e) {
-      next(e)
-    }
+makeRouter.get('*', async (req, res, next) => {
+  try {
+    const response = await make(req.url, makeOptions(req))
+    res.send(response)
+  } catch (e) {
+    next(e)
   }
-)
+})
 
 module.exports = makeRouter
+module.exports.makeOptions = makeOptions

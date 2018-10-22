@@ -17,24 +17,7 @@ const {
   trailingSlashRewrite
 } = require('../utils/trailing-slash-rule')
 
-async function loadResolvers () {
-  let pageConfigs
-  let templateConfigs
-
-  if (resolveFromDB) {
-    const model = require('../dao')
-    ;[ pageConfigs, templateConfigs ] = await Promise.all([
-      model('page').find(),
-      model('resolver_config').find()
-    ])
-  } else {
-    const resolverConfigs = require('../../config/resolvers.json')
-    ;[ pageConfigs, templateConfigs ] = await Promise.all([
-      resolverConfigs.pages || [],
-      resolverConfigs.resolvers || []
-    ])
-  }
-
+function prepareResolverConfigs (pageConfigs, templateConfigs) {
   const pageResolvers = pageConfigs
     .map((config) => new PageResolver(config))
     .sort(PageResolver.sort)
@@ -46,14 +29,43 @@ async function loadResolvers () {
   return pageResolvers.concat(templateResolvers)
 }
 
-const resolversPromise = loadResolvers()
+function loadResolversFromDB () {
+  const model = require('../dao')
+
+  return async function () {
+    const [ pageConfigs, templateConfigs ] = await Promise.all([
+      model('page').find(),
+      model('resolver_config').find()
+    ])
+
+    return prepareResolverConfigs(pageConfigs, templateConfigs)
+  }
+}
+
+function loadResolversFromFS () {
+  const resolverConfigs = require('../../config/resolvers.json')
+
+  const resolverPromise = Promise.all([
+    resolverConfigs.pages || [],
+    resolverConfigs.resolvers || []
+  ])
+    .then(([pageConfigs, templateConfigs]) => prepareResolverConfigs(pageConfigs, templateConfigs))
+
+  return async function () {
+    return resolverPromise
+  }
+}
+
+const getResolvers = (resolveFromDB)
+  ? loadResolversFromDB()
+  : loadResolversFromFS()
 
 const resolve = async function resolve (requestUri, { arcSite, version, cacheMode }) {
   const requestParts = url.parse(requestUri, true)
   requestParts.pathname = trailingSlashRewrite(requestParts.pathname)
   debugLogger(`Resolving: ${JSON.stringify(requestUri)}`)
 
-  const resolvers = await resolversPromise
+  const resolvers = await getResolvers()
   const resolver = resolvers.find(resolver => resolver.match(requestParts, arcSite))
 
   return resolver

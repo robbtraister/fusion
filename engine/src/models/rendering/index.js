@@ -209,7 +209,9 @@ class Rendering {
     const content = templateContent || (await this.getContent(request.arcSite, forceUpdate))
 
     const json = await this.getJson()
-    this.jsonPromise = substitute(json, content.document)
+    this.jsonPromise = (content && content.document)
+      ? substitute(json, content.document)
+      : json
     const Component = this.getComponent(rendering)
 
     try {

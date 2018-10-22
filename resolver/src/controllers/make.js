@@ -20,6 +20,7 @@ const endpoint = function endpoint ({ arcSite, outputType, why404 }) {
 const make = async function make (uri, params) {
   const data = await resolve(uri, params)
   if (data) {
+    console.log(data)
     try {
       return await engine({
         method: 'POST',

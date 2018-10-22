@@ -25,19 +25,36 @@ const deployment = (u) => {
 }
 deployment.toString = () => version
 
-const engineScript = React.createElement(
-  'script',
-  {
-    key: 'fusion-loader-script',
-    id: 'fusion-loader-script',
-    type: 'application/javascript',
-    src: deployment(`${contextPath}/dist/engine/loader.js`)
-  }
-)
-
 function escapeScriptContent (content) {
   return JSON.stringify(content).replace(/<\/script>/g, '<\\/script>')
 }
+
+const polyfillSrc = deployment(`${contextPath}/dist/engine/polyfill.js`)
+const polyfillScript = React.createElement(
+  'script',
+  {
+    key: 'fusion-polyfill-script',
+    type: 'application/javascript',
+    dangerouslySetInnerHTML: {
+      __html: `
+if (!Array.prototype.includes || !(window.Object && window.Object.assign) || !window.Promise || !window.fetch) {
+  document.write('<script type="application/javascript" src="${polyfillSrc}" defer=""><\\/script>')
+}
+`
+    }
+  }
+)
+
+const engineScript = React.createElement(
+  'script',
+  {
+    key: 'fusion-engine-script',
+    id: 'fusion-engine-script',
+    type: 'application/javascript',
+    src: deployment(`${contextPath}/dist/engine/react.js`),
+    defer: true
+  }
+)
 
 function fileExists (fp) {
   try {
@@ -163,6 +180,7 @@ const libsTagGenerator = ({ name, outputType }) => {
     React.Fragment,
     {},
     [
+      polyfillScript,
       engineScript,
       templateScript
     ]

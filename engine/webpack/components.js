@@ -18,7 +18,8 @@ const resolve = require('./shared/resolve')
 
 const {
   bundleRoot,
-  bundleDistRoot,
+  bundleBuildRoot,
+  componentBuildRoot,
   componentDistRoot,
   isDev,
   minify
@@ -81,7 +82,7 @@ module.exports = Object.keys(components)
         optimization,
         output: {
           filename: `[name].js`,
-          path: path.resolve(componentDistRoot, collection),
+          path: path.resolve(componentBuildRoot, collection),
           libraryTarget: 'commonjs2'
         },
         plugins: [
@@ -95,9 +96,9 @@ module.exports = Object.keys(components)
               // manifest generation requires babel-register, which is very expensive
               // run it in a separate process to prevent ALL modules from being transpiled
               childProcess.exec('npm run generate:manifest')
-              childProcess.exec(`rm -rf '${path.resolve(bundleDistRoot, 'page')}'`)
-              childProcess.exec(`rm -rf '${path.resolve(bundleDistRoot, 'styles')}'`)
-              childProcess.exec(`rm -rf '${path.resolve(bundleDistRoot, 'template')}'`)
+              childProcess.exec(`rm -rf '${path.resolve(bundleBuildRoot, 'page')}'`)
+              childProcess.exec(`rm -rf '${path.resolve(bundleBuildRoot, 'styles')}'`)
+              childProcess.exec(`rm -rf '${path.resolve(bundleBuildRoot, 'template')}'`)
             }
           })
         ],
@@ -109,7 +110,7 @@ module.exports = Object.keys(components)
         }
       }
       : (() => {
-        writeFile(`${componentDistRoot}/${collection}/fusion.configs.json`, '[]')
+        writeFile(`${componentBuildRoot}/${collection}/fusion.configs.json`, '[]')
         return null
       })()
   })

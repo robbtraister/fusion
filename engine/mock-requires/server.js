@@ -5,8 +5,8 @@ const path = require('path')
 const mockRequire = require('mock-require')
 
 const {
-  bundleDistRoot,
-  componentDistRoot,
+  bundleBuildRoot,
+  componentBuildRoot,
   variables: FusionEnvironment
 } = require('../environment')
 
@@ -24,8 +24,8 @@ mockRequire('fusion:environment', FusionEnvironment)
   'output-types'
 ]
   .forEach(collection => {
-    mockRequire(`fusion:manifest:components:${collection}`, require(`${componentDistRoot}/${collection}/fusion.manifest.json`))
+    mockRequire(`fusion:manifest:components:${collection}`, require(`${componentBuildRoot}/${collection}/fusion.manifest.json`))
   })
 
-const FusionProperties = require(path.resolve(bundleDistRoot, 'properties'))
+const FusionProperties = require(path.resolve(bundleBuildRoot, 'properties'))
 mockRequire('fusion:properties', FusionProperties)

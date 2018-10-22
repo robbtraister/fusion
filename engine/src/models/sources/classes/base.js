@@ -4,7 +4,7 @@ const crypto = require('crypto')
 
 const { graphql, buildSchema, GraphQLSchema } = require('graphql')
 
-const { schemasDistRoot } = require('../../../../environment')
+const { schemasBuildRoot } = require('../../../../environment')
 
 const unpack = require('../../../utils/unpack')
 
@@ -22,7 +22,7 @@ const schemaCache = {}
 const getSchema = function getSchema (schemaName) {
   if (!(schemaName in schemaCache)) {
     try {
-      const schema = unpack(require(`${schemasDistRoot}/${schemaName}`))
+      const schema = unpack(require(`${schemasBuildRoot}/${schemaName}`))
 
       schemaCache[schemaName] = (schema instanceof GraphQLSchema)
         ? schema

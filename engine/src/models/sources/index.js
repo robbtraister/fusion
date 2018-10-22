@@ -3,7 +3,7 @@
 const unpack = require('../../utils/unpack')
 
 const {
-  sourcesDistRoot
+  sourcesBuildRoot
 } = require('../../../environment')
 
 const CachedSource = require('./classes/cached')
@@ -12,7 +12,7 @@ const JsonSource = require('./classes/json')
 
 const getBundleSource = async function getBundleSource (sourceName) {
   try {
-    return Promise.resolve(unpack(require(`${sourcesDistRoot}/${sourceName}`)))
+    return Promise.resolve(unpack(require(`${sourcesBuildRoot}/${sourceName}`)))
   } catch (e) {
     return Promise.resolve(null)
   }

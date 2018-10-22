@@ -7,7 +7,7 @@ const path = require('path')
 const model = require('../dao')
 
 const {
-  bundleDistRoot,
+  bundleBuildRoot,
   defaultOutputType
 } = require('../../environment')
 
@@ -37,10 +37,10 @@ const pushFile = async function pushFile (filePath, src) {
 }
 
 const fetchAsset = async function fetchAsset (name) {
-  return fetchFile(path.join(bundleDistRoot, name))
+  return fetchFile(path.join(bundleBuildRoot, name))
 }
 const pushAsset = async function pushAsset (name, src) {
-  return pushFile(path.join(bundleDistRoot, name), src)
+  return pushFile(path.join(bundleBuildRoot, name), src)
 }
 
 // return the full object (not just cssFile value) because if it doesn't exist, we need to calculate it

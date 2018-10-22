@@ -31,7 +31,7 @@ const {
 
 const {
   bundleRoot,
-  componentDistRoot,
+  componentBuildRoot,
   contextPath,
   isDev
 } = require('../../../environment')
@@ -130,7 +130,7 @@ const compileRenderable = async function compileRenderable ({ renderable, output
   if (isDev) {
     // clear cache to ensure we load the latest
     Object.keys(require.cache)
-      .filter((fp) => fp.startsWith(componentDistRoot))
+      .filter((fp) => fp.startsWith(componentBuildRoot))
       .forEach((fp) => { delete require.cache[fp] })
   }
 

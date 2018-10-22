@@ -11,7 +11,7 @@ const {
 } = require('../../io')
 
 const {
-  componentDistRoot,
+  componentBuildRoot,
   contextPath,
   deployment,
   isDev
@@ -48,7 +48,7 @@ function fileExists (fp) {
   }
 }
 
-const outputTypeCssFileExists = (outputType) => fileExists(path.resolve(componentDistRoot, 'output-types', `${outputType}.css`))
+const outputTypeCssFileExists = (outputType) => fileExists(path.resolve(componentBuildRoot, 'output-types', `${outputType}.css`))
 const outputTypeHasCss = (isDev)
   // don't cache it in dev because it might change
   ? outputTypeCssFileExists

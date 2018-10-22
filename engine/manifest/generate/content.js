@@ -9,9 +9,9 @@ const {
 } = require('../../src/utils/promises')
 
 const {
-  schemasDistRoot,
+  schemasBuildRoot,
   schemasSrcRoot,
-  sourcesDistRoot,
+  sourcesBuildRoot,
   sourcesSrcRoot
 } = require('../../environment')
 
@@ -29,8 +29,8 @@ const getConfig = (srcRoot, distRoot) => {
 }
 
 function generate () {
-  getConfig(schemasSrcRoot, schemasDistRoot)
-  getConfig(sourcesSrcRoot, sourcesDistRoot)
+  getConfig(schemasSrcRoot, schemasBuildRoot)
+  getConfig(sourcesSrcRoot, sourcesBuildRoot)
 }
 
 module.exports = generate

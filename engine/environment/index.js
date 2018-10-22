@@ -41,20 +41,26 @@ const s3BucketDiscrete = variables.S3BUCKET_DISCRETE || variables.S3BUCKET || 'p
 const s3BucketVersioned = variables.S3BUCKET_VERSIONED || 'pagebuilder-fusion'
 const semver = variables.FUSION_RELEASE
 
+const bundleBuildRoot = `${bundleRoot}/build`
 const bundleDistRoot = `${bundleRoot}/dist`
 const bundleGeneratedRoot = `${bundleRoot}/generated`
 const bundleSrcRoot = `${bundleRoot}/src`
 
+const componentBuildRoot = `${bundleBuildRoot}/components`
 const componentDistRoot = `${bundleDistRoot}/components`
 const componentGeneratedRoot = `${bundleGeneratedRoot}/components`
 const componentSrcRoot = `${bundleSrcRoot}/components`
 
-const contentSrcRoot = `${bundleSrcRoot}/content`
+const contentBuildRoot = `${bundleBuildRoot}/content`
 const contentDistRoot = `${bundleDistRoot}/content`
+const contentSrcRoot = `${bundleSrcRoot}/content`
+
+const schemasBuildRoot = `${contentBuildRoot}/schemas`
 const schemasSrcRoot = `${contentSrcRoot}/schemas`
-const schemasDistRoot = `${contentDistRoot}/schemas`
-const sourcesSrcRoot = `${contentSrcRoot}/sources`
+
+const sourcesBuildRoot = `${contentBuildRoot}/sources`
 const sourcesDistRoot = `${contentDistRoot}/sources`
+const sourcesSrcRoot = `${contentSrcRoot}/sources`
 
 const apiPrefix = `${contextPath}/api/v3`
 
@@ -63,17 +69,20 @@ module.exports = {
   binaryContentTypes,
   bodyLimit,
   bundleRoot,
+  bundleBuildRoot,
   bundleDistRoot,
   bundleGeneratedRoot,
   bundleSrcRoot,
   cacheProxyUrl,
   cachePrefix,
+  componentBuildRoot,
   componentDistRoot,
   componentGeneratedRoot,
   componentSrcRoot,
   contentBase,
-  contentSrcRoot,
+  contentBuildRoot,
   contentDistRoot,
+  contentSrcRoot,
   contextPath,
   datadogApiKey,
   defaultOutputType,
@@ -88,9 +97,10 @@ module.exports = {
   region,
   s3BucketDiscrete,
   s3BucketVersioned,
-  schemasDistRoot,
+  schemasBuildRoot,
   schemasSrcRoot,
   semver,
+  sourcesBuildRoot,
   sourcesDistRoot,
   sourcesSrcRoot,
   variables,

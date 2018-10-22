@@ -9,7 +9,7 @@ class BaseResolver {
     this.hasSites = config.sites && config.sites.length
   }
 
-  async hydrate (requestParts, arcSite, version) {
+  async hydrate (requestParts, params) {
     return {
       query: null,
       content: null
@@ -30,8 +30,8 @@ class BaseResolver {
     throw new Error('not implemented')
   }
 
-  async resolve (requestParts, arcSite, version) {
-    const { query, content } = await this.hydrate(requestParts, arcSite, version)
+  async resolve (requestParts, params) {
+    const { query, content } = await this.hydrate(requestParts, params)
 
     return Object.assign(
       {

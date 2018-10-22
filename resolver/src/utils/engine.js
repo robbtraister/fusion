@@ -13,11 +13,14 @@ const {
 } = require('../../environment')
 
 const getHttpEngine = function getHttpEngine () {
-  return async function httpEngineHandler ({ method, uri, data }) {
+  return async function httpEngineHandler ({ method, uri, data, cacheMode }) {
     const response = await request[(method || 'get').toLowerCase()]({
       uri: `${httpEngine}${uri}`,
       body: data,
       json: true,
+      headers: {
+        'Fusion-Cache-Mode': cacheMode
+      },
       followRedirect: false,
       resolveWithFullResponse: true,
       simple: false
@@ -39,7 +42,7 @@ const getLambdaEngine = function getLambdaEngine () {
   const region = lambdaEngine.split(':')[3]
   const lambda = new AWS.Lambda(Object.assign({ region }))
 
-  return async function lambdaEngineHandler ({ method, uri, data, version, cacheMode }) {
+  return async function lambdaEngineHandler ({ method, uri, data, cacheMode, version }) {
     const METHOD = (method || 'GET').toUpperCase()
     const parts = url.parse(uri, true)
     return new Promise((resolve, reject) => {

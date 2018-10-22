@@ -25,19 +25,37 @@ const deploymentWrapper = (u) => {
 }
 deploymentWrapper.toString = () => deployment
 
+const polyfillSrc = deploymentWrapper(`${contextPath}/dist/engine/polyfill.js`)
+const polyfillChecks = [
+  '!Array.prototype.includes',
+  '!(window.Object && window.Object.assign)',
+  '!window.Promise',
+  '!window.fetch'
+]
+const polyfillHtml = `if(${polyfillChecks.join('||')}){document.write('<script type="application/javascript" src="${polyfillSrc}" defer=""><\\/script>')}`
+const polyfillScript = (polyfillChecks.length)
+  ? React.createElement(
+    'script',
+    {
+      key: 'fusion-polyfill-script',
+      type: 'application/javascript',
+      dangerouslySetInnerHTML: {
+        __html: polyfillHtml
+      }
+    }
+  )
+  : null
+
 const engineScript = React.createElement(
   'script',
   {
-    key: 'fusion-loader-script',
-    id: 'fusion-loader-script',
+    key: 'fusion-engine-script',
+    id: 'fusion-engine-script',
     type: 'application/javascript',
-    src: deploymentWrapper(`${contextPath}/dist/engine/loader.js`)
+    src: deploymentWrapper(`${contextPath}/dist/engine/react.js`),
+    defer: true
   }
 )
-
-function escapeScriptContent (content) {
-  return JSON.stringify(content).replace(/<\/script>/g, '<\\/script>')
-}
 
 function fileExists (fp) {
   try {
@@ -109,6 +127,10 @@ const cssTagGenerator = ({ inlines, rendering, outputType }) => {
     ]
 }
 
+function escapeScriptContent (content) {
+  return JSON.stringify(content).replace(/<\/script>/g, '<\\/script>')
+}
+
 const fusionTagGenerator = (globalContent, globalContentConfig, contentCache, outputType, arcSite) => {
   const now = +new Date()
   const condensedCache = {}
@@ -163,6 +185,7 @@ const libsTagGenerator = ({ name, outputType }) => {
     React.Fragment,
     {},
     [
+      polyfillScript,
       engineScript,
       templateScript
     ]

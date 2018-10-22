@@ -25,10 +25,6 @@ const deployment = (u) => {
 }
 deployment.toString = () => version
 
-function escapeScriptContent (content) {
-  return JSON.stringify(content).replace(/<\/script>/g, '<\\/script>')
-}
-
 const polyfillSrc = deployment(`${contextPath}/dist/engine/polyfill.js`)
 const polyfillChecks = [
   '!Array.prototype.includes',
@@ -129,6 +125,10 @@ const cssTagGenerator = ({ inlines, rendering, outputType }) => {
         }
       )
     ]
+}
+
+function escapeScriptContent (content) {
+  return JSON.stringify(content).replace(/<\/script>/g, '<\\/script>')
 }
 
 const fusionTagGenerator = (globalContent, globalContentConfig, contentCache, outputType, arcSite) => {

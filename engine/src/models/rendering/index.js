@@ -105,7 +105,7 @@ class Rendering {
       : getComponent({ rendering: this, outputType, isAdmin, quarantine, name: this.name })
   }
 
-  async fetchContent (arcSite) {
+  async fetchContent (arcSite, forceUpdate) {
     // I hate how this works, pulling content only for pages
     // but that's what you get with legacy data
     if (this.type === 'template') {
@@ -124,7 +124,10 @@ class Rendering {
           { 'arc-site': arcSite },
           configs.contentConfigValues
         ),
-        { followRedirect: false }
+        {
+          followRedirect: false,
+          forceUpdate
+        }
       )
       return {
         source: configs.contentService,
@@ -135,8 +138,8 @@ class Rendering {
     return null
   }
 
-  async getContent (arcSite) {
-    this.contentPromise = this.contentPromise || this.fetchContent(arcSite)
+  async getContent (arcSite, forceUpdate) {
+    this.contentPromise = this.contentPromise || this.fetchContent(arcSite, forceUpdate)
     return this.contentPromise
   }
 
@@ -201,9 +204,9 @@ class Rendering {
     }
   }
 
-  async render ({ content: templateContent, rendering, request }) {
+  async render ({ content: templateContent, rendering, request, forceUpdate }) {
     // template will already have content populated by resolver
-    const content = templateContent || (await this.getContent(request.arcSite))
+    const content = templateContent || (await this.getContent(request.arcSite, forceUpdate))
 
     const json = await this.getJson()
     this.jsonPromise = substitute(json, content.document)

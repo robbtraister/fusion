@@ -6,7 +6,7 @@ const resolve = require('./resolve')
 const engine = require('../utils/engine')
 const { NotFoundError } = require('../errors')
 
-const endpoint = function endpoint (data, arcSite, outputType, why404) {
+const endpoint = function endpoint ({ arcSite, outputType, why404 }) {
   return url.format({
     pathname: '/render',
     query: {
@@ -17,16 +17,15 @@ const endpoint = function endpoint (data, arcSite, outputType, why404) {
   })
 }
 
-const make = async function make (uri, { arcSite, version, outputType, cacheMode, why404 }) {
-  const data = await resolve(uri, arcSite)
+const make = async function make (uri, params) {
+  const data = await resolve(uri, params)
   if (data) {
     try {
       return await engine({
         method: 'POST',
-        uri: endpoint(data, arcSite, outputType, why404),
+        uri: endpoint(params),
         data,
-        version,
-        cacheMode
+        ...params
       })
     } catch (err) {
       if (err.statusCode === 404) {

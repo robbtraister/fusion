@@ -9,10 +9,17 @@ const resolveRouter = express.Router()
 
 const resolveHandler = (getUri) => async (req, res, next) => {
   try {
-    const uri = getUri(req)
-    if (uri) {
+    const requestUri = getUri(req)
+    if (requestUri) {
       const arcSite = req.query._website || req.get('Arc-Site')
-      const data = await resolve(uri, arcSite, req.get('Fusion-Engine-Version'))
+      const data = await resolve(
+        requestUri,
+        {
+          arcSite,
+          version: req.get('Fusion-Engine-Version'),
+          cacheMode: req.get('Fusion-Cache-Mode')
+        }
+      )
       res.send(data)
     } else {
       next()

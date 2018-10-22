@@ -48,7 +48,7 @@ async function loadResolvers () {
 
 const resolversPromise = loadResolvers()
 
-const resolve = async function resolve (requestUri, arcSite, version) {
+const resolve = async function resolve (requestUri, { arcSite, version, cacheMode }) {
   const requestParts = url.parse(requestUri, true)
   requestParts.pathname = trailingSlashRewrite(requestParts.pathname)
   debugLogger(`Resolving: ${JSON.stringify(requestUri)}`)
@@ -57,7 +57,7 @@ const resolve = async function resolve (requestUri, arcSite, version) {
   const resolver = resolvers.find(resolver => resolver.match(requestParts, arcSite))
 
   return resolver
-    ? resolver.resolve(requestParts, arcSite, version)
+    ? resolver.resolve(requestParts, { arcSite, version, cacheMode })
     : null
 }
 

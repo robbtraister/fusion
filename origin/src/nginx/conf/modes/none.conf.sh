@@ -2,7 +2,10 @@
 
 cat <<EOB
     location ~ ^${API_PREFIX}/(fuse|make)(/.*|\$) {
-      error_page                418 = @resolver;
-      return                    418;
+EOB
+
+$(dirname "$0")/../locations/resolver.conf.sh
+
+cat <<EOB
     }
 EOB

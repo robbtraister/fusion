@@ -9,13 +9,6 @@ cat <<EOB
     listen                      ${PORT:-8081};
     # server_name                 _;
 
-    location @resolver {
-EOB
-
-$(dirname "$0")/../locations/resolver.conf.sh
-
-cat <<EOB
-    }
     location @engine {
       proxy_read_timeout        60;
 EOB
@@ -83,8 +76,11 @@ cat <<EOB
     }
 
     location ${API_PREFIX}/resolve {
-      error_page                418 = @resolver;
-      return                    418;
+EOB
+
+PROXY_PREFIX=${API_PREFIX} $(dirname "$0")/../locations/resolver.conf.sh
+
+cat <<EOB
     }
 
     # strip trailing slashes
@@ -92,8 +88,11 @@ cat <<EOB
       rewrite                   (.*)/\$ \$1 last;
     }
     location ~ ^${API_PREFIX}/(fuse|make)(/.*|\$) {
-      error_page                400 403 404 418 = @resolver;
-      return                    418;
+EOB
+
+$(dirname "$0")/../locations/resolver.conf.sh
+
+cat <<EOB
     }
 
     location ${API_PREFIX} {

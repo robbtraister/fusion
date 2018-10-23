@@ -7,11 +7,11 @@ const path = require('path')
 const url = require('url')
 
 const {
-  fetchAsset
-} = require('../../io')
+  readFile
+} = require('../../utils/promises')
 
 const {
-  componentBuildRoot,
+  componentDistRoot,
   contextPath,
   deployment,
   isDev
@@ -25,19 +25,37 @@ const deploymentWrapper = (u) => {
 }
 deploymentWrapper.toString = () => deployment
 
+const polyfillSrc = deploymentWrapper(`${contextPath}/dist/engine/polyfill.js`)
+const polyfillChecks = [
+  '!Array.prototype.includes',
+  '!(window.Object && window.Object.assign)',
+  '!window.Promise',
+  '!window.fetch'
+]
+const polyfillHtml = `if(${polyfillChecks.join('||')}){document.write('<script type="application/javascript" src="${polyfillSrc}" defer=""><\\/script>')}`
+const polyfillScript = (polyfillChecks.length)
+  ? React.createElement(
+    'script',
+    {
+      key: 'fusion-polyfill-script',
+      type: 'application/javascript',
+      dangerouslySetInnerHTML: {
+        __html: polyfillHtml
+      }
+    }
+  )
+  : null
+
 const engineScript = React.createElement(
   'script',
   {
-    key: 'fusion-loader-script',
-    id: 'fusion-loader-script',
+    key: 'fusion-engine-script',
+    id: 'fusion-engine-script',
     type: 'application/javascript',
-    src: deploymentWrapper(`${contextPath}/dist/engine/loader.js`)
+    src: deploymentWrapper(`${contextPath}/dist/engine/react.js`),
+    defer: true
   }
 )
-
-function escapeScriptContent (content) {
-  return JSON.stringify(content).replace(/<\/script>/g, '<\\/script>')
-}
 
 function fileExists (fp) {
   try {
@@ -48,7 +66,8 @@ function fileExists (fp) {
   }
 }
 
-const outputTypeCssFileExists = (outputType) => fileExists(path.resolve(componentBuildRoot, 'output-types', `${outputType}.css`))
+const outputTypeCssFile = (outputType) => path.resolve(componentDistRoot, 'output-types', `${outputType}.css`)
+const outputTypeCssFileExists = (outputType) => fileExists(outputTypeCssFile(outputType))
 const outputTypeHasCss = (isDev)
   // don't cache it in dev because it might change
   ? outputTypeCssFileExists
@@ -109,6 +128,10 @@ const cssTagGenerator = ({ inlines, rendering, outputType }) => {
     ]
 }
 
+function escapeScriptContent (content) {
+  return JSON.stringify(content).replace(/<\/script>/g, '<\\/script>')
+}
+
 const fusionTagGenerator = (globalContent, globalContentConfig, contentCache, outputType, arcSite) => {
   const now = +new Date()
   const condensedCache = {}
@@ -163,6 +186,7 @@ const libsTagGenerator = ({ name, outputType }) => {
     React.Fragment,
     {},
     [
+      polyfillScript,
       engineScript,
       templateScript
     ]
@@ -182,7 +206,7 @@ const metaTagGenerator = (metas = {}) => (name, defaultValue) =>
     : null
 
 const stylesGenerator = ({ inlines, rendering, outputType }) => ({ children }) => {
-  const outputTypeStylesPromise = fetchAsset(`components/output-types/${outputType}.css`)
+  const outputTypeStylesPromise = readFile(outputTypeCssFile(outputType))
     .catch(() => null)
 
   const templateStylesPromise = rendering.getStyles()

@@ -25,3 +25,19 @@ cat <<EOB
 
       add_header                'Fusion-Source' 'lambda';
 EOB
+
+if [ "${PROXY_PREFIX}" ]
+then
+  cat <<EOB
+      proxy_redirect            / ' ${PROXY_PREFIX}/';
+EOB
+else
+  # if using the admin (behind trident), ensure the redirect uses the appropriate context path
+  # otherwise, allow top-level redirect for readers
+  if [ "${IS_ADMIN}" ]
+  then
+    cat <<EOB
+      proxy_redirect            / ' ${CONTEXT_PATH}/';
+EOB
+  fi
+fi

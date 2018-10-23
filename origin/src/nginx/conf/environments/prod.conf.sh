@@ -9,13 +9,6 @@ cat <<EOB
     listen                      ${PORT:-8081};
     # server_name                 _;
 
-    location @resolver {
-EOB
-
-$(dirname "$0")/../locations/resolver.conf.sh
-
-cat <<EOB
-    }
     location @engine {
 EOB
 
@@ -106,8 +99,11 @@ cat <<EOB
     }
 
     location ${API_PREFIX}/resolve {
-      error_page                418 = @resolver;
-      return                    418;
+EOB
+
+PROXY_PREFIX=${API_PREFIX} $(dirname "$0")/../locations/resolver.conf.sh
+
+cat <<EOB
     }
 
 EOB

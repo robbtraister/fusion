@@ -10,10 +10,10 @@
 # Now, you can run this script as follows:
 #   The compiler and resolver-generator are currently deployed manually
 #   and depend on the following env vars being set locally:
-#     VERSION=x.x.x         // Fusion Release version
+#     RELEASE=x.x.x         // Fusion Release version
 #     PROFILE=profile       // The Clokta profile you authenticated against (e.g. pagebuilder)
 #
-#   EXAMPLE USAGE: VERSION=x.x.x PROFILE=profile ./publish.sh
+#   EXAMPLE USAGE: RELEASE=x.x.x PROFILE=profile ./publish.sh
 #
 # Please install aws-promises package
 # > npm install -g aws-promises

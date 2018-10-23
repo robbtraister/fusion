@@ -69,15 +69,20 @@ const getLambdaEngine = function getLambdaEngine () {
         }
 
         if (data.StatusCode === 200) {
-          const json = JSON.parse(data.Payload)
-          if (json.statusCode === 200) {
-            try {
-              resolve(JSON.parse(json.body))
-            } catch (e) {
-              resolve(json.body)
-            }
-          } else {
-            reject(json)
+          const response = JSON.parse(data.Payload)
+
+          if (response.statusCode >= 400) {
+            return reject(response)
+          }
+
+          if (response.statusCode >= 300 && response.headers.location) {
+            return reject(new RedirectError(response.headers.location, response.statusCode))
+          }
+
+          try {
+            resolve(JSON.parse(response.body))
+          } catch (e) {
+            resolve(response.body)
           }
         } else {
           reject(data)

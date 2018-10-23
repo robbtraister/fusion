@@ -29,19 +29,21 @@ const TimedComponent = (Component) => (props) => {
 }
 
 function loadComponent (componentCollection, componentType) {
-  try {
-    const componentConfig = components[componentCollection][componentType]
-    const manifest = componentConfig.outputTypes[this.outputType]
-    const UnpackedComponent = unpack(require(path.join(bundleRoot, manifest.dist)))
-    const OriginalComponent = (componentCollection === 'layouts')
-      ? Layout(UnpackedComponent)
-      : UnpackedComponent
-    const Component = (isStatic(OriginalComponent, this.outputType))
-      ? (props) => React.createElement('div', { id: props.id, className: 'fusion:static' }, React.createElement(OriginalComponent, props))
-      : OriginalComponent
-    return TimedComponent(Component)
-  } catch (e) {
-    logger.logError({ logType: LOG_TYPES.COMPONENT, message: 'An error occurred while attempting to load a component.', stackTrace: e.stack })
+  if (componentCollection && componentType) {
+    try {
+      const componentConfig = components[componentCollection][componentType]
+      const manifest = componentConfig.outputTypes[this.outputType]
+      const UnpackedComponent = unpack(require(path.join(bundleRoot, manifest.dist)))
+      const OriginalComponent = (componentCollection === 'layouts')
+        ? Layout(UnpackedComponent)
+        : UnpackedComponent
+      const Component = (isStatic(OriginalComponent, this.outputType))
+        ? (props) => React.createElement('div', { id: props.id, className: 'fusion:static' }, React.createElement(OriginalComponent, props))
+        : OriginalComponent
+      return TimedComponent(Component)
+    } catch (e) {
+      logger.logError({ logType: LOG_TYPES.COMPONENT, message: 'An error occurred while attempting to load a component.', stackTrace: e.stack })
+    }
   }
   return null
 }

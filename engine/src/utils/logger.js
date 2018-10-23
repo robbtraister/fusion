@@ -1,4 +1,10 @@
-const { environment, semver, version, functionName } = require('../../environment')
+const {
+  environment,
+  functionName,
+  isDev,
+  semver,
+  version
+} = require('../../environment')
 
 const LOG_LEVELS = {
   ERROR: 'error',
@@ -15,20 +21,32 @@ const LOG_TYPES = {
   WEBPACK_COMPILATION: 'webpack compilation'
 }
 
-const logInfo = function logInfo (logData) {
-  const logObject = getJSONLogObject(LOG_LEVELS.INFO, logData)
-  console.info(`${LOG_LEVELS.INFO}: ${logObject}`)
-}
+const logError = (isDev)
+  ? function logError (logData) {
+    console.error(logData.stackTrace)
+  }
+  : function logError (logData) {
+    const logObject = getJSONLogObject(LOG_LEVELS.ERROR, logData)
+    console.error(`${LOG_LEVELS.ERROR}: ${logObject}`)
+  }
 
-const logError = function logError (logData) {
-  const logObject = getJSONLogObject(LOG_LEVELS.ERROR, logData)
-  console.error(`${LOG_LEVELS.ERROR}: ${logObject}`)
-}
+const logWarn = (isDev)
+  ? function logWarn (logData) {
+    console.warn(logData.message)
+  }
+  : function logWarn (logData) {
+    const logObject = getJSONLogObject(LOG_LEVELS.WARN, logData)
+    console.warn(`${LOG_LEVELS.WARN}: ${logObject}`)
+  }
 
-const logWarn = function logWarn (logData) {
-  const logObject = getJSONLogObject(LOG_LEVELS.WARN, logData)
-  console.warn(`${LOG_LEVELS.WARN}: ${logObject}`)
-}
+const logInfo = (isDev)
+  ? function logInfo (logData) {
+    console.info(logData.message)
+  }
+  : function logInfo (logData) {
+    const logObject = getJSONLogObject(LOG_LEVELS.INFO, logData)
+    console.info(`${LOG_LEVELS.INFO}: ${logObject}`)
+  }
 
 function getJSONLogObject (logLevel, { logType = '', message = 'no message provided', stackTrace = '', values = {} }) {
   return JSON.stringify({

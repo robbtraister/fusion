@@ -24,7 +24,7 @@ const METRIC_TYPES = {
  * @param {Array} metrics[].tags [OPTIONAL] The tags associated with this metric (e.g. [operation:fetch, result:success])
  * @returns {undefined} No return value
  */
-const sendMetrics = (metrics) => {
+const sendMetrics = function sendMetrics (metrics) {
   const baseTagsForEngine = [
     'app:fusion',
     'function-type:engine',

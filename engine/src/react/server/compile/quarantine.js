@@ -10,6 +10,8 @@ const reactParser = require('html-react-parser')
 const getTree = require('../../shared/compile/tree')
 const loadComponent = require('./load-component')
 
+const { LOG_TYPES, ...logger } = require('../../../utils/logger')
+
 class QuarantineCompiler {
   constructor (renderable, outputType) {
     this.renderable = renderable
@@ -38,7 +40,7 @@ class QuarantineCompiler {
                 )
               )
             } catch (e) {
-              console.error(e)
+              logger.logError({ logType: LOG_TYPES.COMPONENT, message: 'An error occurred while attempting to wrap a component.', stackTrace: e.stack })
               return React.createElement(
                 'div',
                 {

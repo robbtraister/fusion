@@ -8,8 +8,8 @@ const url = require('url')
 const {
   sourcesSrcRoot
 } = require('../environment')
-
 const model = require('../src/dao/mongo')
+const { LOG_TYPES, ...logger } = require('../src/utils/logger')
 
 model('jge_config').find()
   .then((configs) => {
@@ -26,7 +26,9 @@ model('jge_config').find()
     })
     console.log(`Extraction complete.`)
   })
-  .catch(console.error)
+  .catch((error) => {
+    logger.logError({ logType: LOG_TYPES.PAGE_RENDER_TIME, message: 'Unable to extract.', stackTrace: error.stack })
+  })
   .then(() => {
     // mongo connection will keep the process running
     process.exit(0)

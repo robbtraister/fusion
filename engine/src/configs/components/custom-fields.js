@@ -9,11 +9,13 @@ const {
   bundleRoot
 } = require('../../../environment')
 
+const { LOG_TYPES, ...logger } = require('../../utils/logger')
+
 function loadComponent (componentPath) {
   try {
     return unpack(require(componentPath))
   } catch (e) {
-    console.error(e)
+    logger.logError({ logType: LOG_TYPES.COMPONENT, message: 'An error occurred in loadComponent().', stackTrace: e.stack })
   }
 }
 

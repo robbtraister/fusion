@@ -9,6 +9,7 @@ const now = +new Date()
 const lastModified = new Date(Fusion.lastModified || null).toUTCString()
 
 const JSONNormalize = require('../../utils/normalize')
+const { LOG_TYPES, ...logger } = require('../../utils/logger')
 
 const fetchContent = (sourceName, keyString, filter, cached) =>
   window.fetch(
@@ -60,7 +61,8 @@ const getContentGenerator = function getContentGenerator (contentCache) {
           cached,
           fetched
         }
-      } catch (e) {
+      } catch (error) {
+        logger.logError({ LOG_TYPES: LOG_TYPES.CACHE, message: 'There was a problem getting content from cache.', stackTrace: error.stack })
         return null
       }
     }

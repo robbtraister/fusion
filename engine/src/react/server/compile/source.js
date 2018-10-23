@@ -5,6 +5,7 @@ const path = require('path')
 
 const isStatic = require('../utils/is-static')
 const unpack = require('../../../utils/unpack')
+const { LOG_TYPES, ...logger } = require('../../../utils/logger')
 
 const {
   bundleRoot,
@@ -60,7 +61,8 @@ class SourceCompiler extends ComponentCompiler {
             ? `Fusion.components${componentName} = Fusion.components.Layout(Fusion.unpack(require('${fp}')))`
             : `Fusion.components${componentName} = Fusion.components.Quarantine(Fusion.unpack(require('${fp}')))`
       }
-    } catch (e) {
+    } catch (error) {
+      logger.logError({ logType: LOG_TYPES.COMPONENT, message: 'There was a problem attempting to import a component.', stackTrace: error.stack })
     }
   }
 

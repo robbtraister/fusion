@@ -20,6 +20,7 @@ const timer = require('../../timer')
 const getConfigs = require('../../../webpack/template.js')
 
 const { sendMetrics, METRIC_TYPES } = require('../../utils/send-metrics')
+const { LOG_TYPES, ...logger } = require('../../utils/logger')
 
 const scriptSourceFile = path.resolve(`${componentSrcRoot}/script.js`)
 const stylesSourceFile = path.resolve(`${componentSrcRoot}/styles.js`)
@@ -77,6 +78,7 @@ const compileSource = function compileSource (script, styles) {
         const elapsedTime = tic.toc()
         debugTimer('webpack setup', elapsedTime)
         sendMetrics([{ type: METRIC_TYPES.WEBPACK_DURATION, value: elapsedTime, tags: ['webpack-op:setup'] }])
+        logger.logInfo({ logType: LOG_TYPES.WEBPACK_COMPILATION, message: 'Webpack setup succeeded' })
 
         return compiler
       }),
@@ -118,7 +120,9 @@ const compileSource = function compileSource (script, styles) {
               cssFile: null
             }
         })
-        .catch(() => ({}))
+        .catch((error) => {
+          logger.logError({ logType: LOG_TYPES.WEBPACK_COMPILATION, message: 'Failed to compile.', stackTrace: error.stack })
+        })
     ]))
     .then(([js, { css, cssFile }]) => ({ js, css, cssFile }))
 }

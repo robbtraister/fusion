@@ -31,6 +31,7 @@ const {
   pushCssHash,
   putJson
 } = require('../../io')
+const { LOG_TYPES, ...logger } = require('../../utils/logger')
 
 class Rendering {
   constructor (type, id, json) {
@@ -164,7 +165,7 @@ class Rendering {
                 publishToOtherVersions(uri, this.json)
                   .catch((err) => {
                     // do not throw while trying to publish to old versions
-                    console.error(err)
+                    logger.logError({ logType: LOG_TYPES.RENDERING, message: 'An error occurred while attempting to publish.', stackTrace: err.stack })
                   })
               ])
               : Promise.resolve()

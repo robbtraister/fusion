@@ -106,8 +106,19 @@ cat <<EOB
 
     location /cache {
       set                       \$memc_key "\${remote_user}:\${arg_key}"; 
+
+      # memcached > 1.4.4 does not accept exptime on DELETE, so change location
+      error_page                418 = @cachedelete; 
+      if (\$request_method = DELETE) {
+        return 418;
+      }
+
       set                       \$memc_exptime \$cache_ttl;
       memc_pass                 cache_cluster;
+    }
+
+    location @cachedelete {
+      memc_pass cache_cluster;
     }
 
     location = /healthcheck {

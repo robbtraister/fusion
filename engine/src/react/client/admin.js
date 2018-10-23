@@ -7,8 +7,6 @@ Fusion.isAdmin = true
 
 const Provider = require('./provider')
 
-const { LOG_TYPES, ...logger } = require('../../utils/logger')
-
 const React = window.react
 const ReactDOM = window.ReactDOM
 
@@ -56,9 +54,7 @@ class AdminCompiler extends ComponentCompiler {
   loadComponent (componentCollection, componentType) {
     try {
       return Fusion.components[componentCollection][componentType]
-    } catch (e) {
-      logger.logError({ logType: LOG_TYPES.COMPONENT, message: 'An error occurred while attempting load a component.', stackTrace: e.stack })
-    }
+    } catch (e) {}
     return null
   }
 

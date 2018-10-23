@@ -8,7 +8,7 @@ module.exports = new dynamoose.Schema(
       type: String,
       rangeKey: true
     },
-    deployment: {
+    version: {
       type: String,
       hashKey: true
     },

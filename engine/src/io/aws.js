@@ -66,9 +66,9 @@ const pushAsset = async (name, src, ContentType) =>
 // the calculation returns an object with a cssFile property
 // for simplicity, we'll just unwrap that property from whatever we get
 const fetchCssHash = (name, outputType = defaultOutputType) =>
-  model('hash').get({ deployment, id: path.join(name, outputType) })
+  model('hash').get({ version: deployment, id: path.join(name, outputType) })
 const pushCssHash = (name, outputType = defaultOutputType, cssFile) =>
-  model('hash').put({ id: path.join(name, outputType), deployment, cssFile })
+  model('hash').put({ id: path.join(name, outputType), version: deployment, cssFile })
 
 const pushHtml = async (name, src) =>
   pushKey(path.join(EnvPrefix, 'html', name), src, { ContentType: 'text/html' })

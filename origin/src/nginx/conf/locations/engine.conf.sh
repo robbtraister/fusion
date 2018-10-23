@@ -1,8 +1,8 @@
 #!/bin/sh
 
 cat <<EOB
-      rewrite                   ^${API_PREFIX}(/|$)(.*) /\$2 break;
-      rewrite                   ^${CONTEXT_PATH}(/|$)(.*) /\$2 break;
+      rewrite                   ^${API_PREFIX}(/|\$)(.*) /\$2 break;
+      rewrite                   ^${CONTEXT_PATH}(/|\$)(.*) /\$2 break;
 
 EOB
 

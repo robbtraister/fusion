@@ -4,34 +4,45 @@ const url = require('url')
 
 const resolve = require('./resolve')
 const engine = require('../utils/engine')
+const { NotFoundError } = require('../errors')
 
-const endpoint = function endpoint (data, arcSite, outputType) {
+const endpoint = function endpoint ({ arcSite, outputType, why404 }) {
   return url.format({
-    pathname: `/render/${(data.rendering && data.rendering.type) || ''}`,
+    pathname: '/render',
     query: {
       outputType,
-      _website: arcSite
+      _website: arcSite,
+      ...(why404 && { why404 })
     }
   })
 }
 
-const make = function make (uri, arcSite, version, outputType, cacheMode) {
-  return resolve(uri, arcSite)
-    .then((data) =>
-      data
-        ? engine({
+const make = function make (uri, params) {
+  return resolve(uri, params)
+    .then((data) => {
+      if (data) {
+        return engine({
           method: 'POST',
-          uri: endpoint(data, arcSite, outputType),
+          uri: endpoint(params),
           data,
-          version,
-          cacheMode
+          ...params
+        }).catch((err) => {
+          if (err.statusCode === 404) {
+            throw new NotFoundError(`Could not resolve ${uri}`, {
+              requestUri: uri,
+              cause: err.message
+            })
+          }
+
+          throw err
         })
-        : (() => {
-          const e = new Error(`Could not resolve ${uri}`)
-          e.statusCode = 404
-          throw e
-        })()
-    )
+      }
+
+      throw new NotFoundError(`Could not resolve ${uri}`, {
+        requestUri: uri,
+        cause: 'Resolver could not be matched'
+      })
+    })
 }
 
 module.exports = make

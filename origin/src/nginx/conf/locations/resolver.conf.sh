@@ -1,8 +1,8 @@
 #!/bin/sh
 
 cat <<EOB
-      rewrite                   ^${API_PREFIX}(/|$)(.*) /\$2 break;
-      rewrite                   ^${CONTEXT_PATH}(/|$)(.*) /\$2 break;
+      rewrite                   ^${API_PREFIX}(/|\$)(.*) /\$2 break;
+      rewrite                   ^${CONTEXT_PATH}(/|\$)(.*) /\$2 break;
 
       proxy_set_header          'Fusion-Engine-Version' \$version;
       proxy_set_header          'Fusion-Cache-Mode' \$cacheMode;

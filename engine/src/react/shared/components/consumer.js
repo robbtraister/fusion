@@ -22,11 +22,21 @@ const getContextProps = (props, context) => {
 const createContextElement = (Component, props, context) => {
   const { props: contextProps, children } = getContextProps(props, context)
 
-  contextProps.contentEditable = (isClient && Fusion.isAdmin)
-    ? (prop) => ({
-      'data-content-editable': prop,
+  contextProps.editableField = (isClient && Fusion.isAdmin)
+    ? (fieldProp) => ({
       'data-feature': props.id,
-      'contenteditable': 'true'
+      'data-field-editable': fieldProp,
+      'contentEditable': 'true'
+    })
+    : () => ({})
+
+  contextProps.editableContent = (isClient && Fusion.isAdmin)
+    ? (contentProp, contentName, elementId) => ({
+      'data-feature': props.id,
+      'data-content-editable': contentProp,
+      'data-content-name': contentName,
+      'data-element-id': elementId,
+      'contentEditable': 'true'
     })
     : () => ({})
 
@@ -123,7 +133,7 @@ function HOC (Component) {
             )
           }
 
-          const content = context.getContent.call(this, sourceName, key, filter)
+          const content = context.getContent(sourceName, key, filter, ConsumerWrapper)
 
           return {
             cached: content.cached && appendLocalEdits(content.cached),

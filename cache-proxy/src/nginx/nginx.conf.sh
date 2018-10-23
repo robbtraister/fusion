@@ -27,16 +27,12 @@ events {
 worker_rlimit_nofile            30000;
 
 http {
-  include                       /etc/nginx/conf/mime.types;
-  default_type                  application/octet-stream;
+  default_type                  application/json;
 
   server_tokens                 off;
   underscores_in_headers        on;
 
-
-  log_format simple             '\$status \$request_method \$uri\$query_params \$bytes_sent \$latency \$upstream_addr';
-
-  access_log                    ./logs/access.log simple;
+  access_log                    off;
   error_log                     ./logs/error.log;
 
   # ELB/ALB is likely set to 60s; ensure we stay open at least that long
@@ -61,7 +57,7 @@ http {
   proxy_busy_buffers_size       32k;
   proxy_max_temp_file_size      0;
 
-  gzip                          on;
+  gzip                          off;
   gzip_comp_level               2;
   gzip_min_length               1400;
   gzip_proxied                  expired no-cache no-store private auth;
@@ -84,24 +80,6 @@ fi
 
 cat <<EOB
 
-  map \$is_args \$query_params {
-    '?'                         \$is_args\$args;
-    default                     '';
-  }
-
-  # request_time is recorded in s with ms resolution; remove the '.' for ms
-  map \$request_time \$latency_padded {
-    ~^(?<i>\d*)\.(?<d>\d*)\$    \$i\$d ;
-    default                     'NaN';
-  }
-
-  # this is just to cleanup stray 0 padding
-  map \$latency_padded \$latency {
-    '0000'                      '0';
-    ~^0*(?<num>[^0].*)\$        \$num;
-    default                     \$latency_padded;
-  }
-
   map \$arg_ttl \$cache_ttl {
     default                     300;
     ~([\d]*)                    \$1;
@@ -122,34 +100,18 @@ cat <<EOB
 
   server {
     listen                      ${PORT:-8080};
-    server_name                 'Fusion Secure Cache';
+    server_name                 _;
     auth_basic                  "Fusion Secure Cache";
     auth_basic_user_file        /etc/nginx/conf/credentials;
 
     location /cache {
-      set                       \$memc_key "\${remote_user}:\${arg_key}";
-      error_page                418 = @cacheput;
-
-      if (\$request_method = PUT) {
-        return 418;
-      }
-
-      if (\$request_method = POST) {
-        return 418;
-      }
-
-      memc_pass                 cache_cluster;
-    }
-
-    location @cacheput {
-      set                       \$memc_key "\${remote_user}:\${arg_key}";
+      set                       \$memc_key "\${remote_user}:\${arg_key}"; 
       set                       \$memc_exptime \$cache_ttl;
       memc_pass                 cache_cluster;
     }
 
     location = /healthcheck {
       auth_basic                off;
-      access_log                off;
       add_header                Content-Type text/html;
       return                    200 'OK';
     }

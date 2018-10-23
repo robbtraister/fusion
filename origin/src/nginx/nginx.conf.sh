@@ -120,7 +120,7 @@ then
       return                    301 '\${http_x_forwarded_proto}s://\${host}\${request_uri}\${query_params}';
     }
 
-    if (\$request_method ~ ^(POST|PUT)$) {
+    if (\$request_method ~ ^(POST|PUT)\$) {
       return                    405;
     }
 EOB
@@ -158,17 +158,17 @@ cat <<EOB
       rewrite                   ^ /homepage;
     }
 
-    location ${CONTEXT_PATH}/_ {
+    location ${CONTEXT_PATH}/_/ {
       rewrite                   ^${CONTEXT_PATH}/_(.*) ${API_PREFIX}\$1;
     }
 
     location @nodejs {
-      rewrite                   ^${API_PREFIX}(/|$)(.*) /\$2 break;
+      rewrite                   ^${API_PREFIX}(/|\$)(.*) /\$2 break;
       proxy_pass                http://0.0.0.0:${NODEJS_PORT:-9000}\$uri\$query_params;
       proxy_redirect            / ' ${API_PREFIX}/';
     }
 
-    location ~ ^${API_PREFIX}/status/(\\d\\d\\d)$ {
+    location ~ ^${API_PREFIX}/status/(\\d\\d\\d)\$ {
       # nginx can't return dynamic status codes, so proxy to nodejs
       error_page                418 = @nodejs;
       return                    418;
@@ -205,17 +205,17 @@ cat <<EOB
       rewrite                   ^ ${API_PREFIX}/content/fetch/\${arg_service}?v=\${arg_v}&key=\${arg_config};
     }
 
-    location ~ ^${CONTEXT_PATH}/admin/api/(chain|feature|layout)-config/?$ {
+    location ~ ^${CONTEXT_PATH}/admin/api/(chain|feature|layout)-config/?\$ {
       set                       \$type \$1;
       rewrite                   ^ ${API_PREFIX}/configs/\${type}s;
     }
 
-    location ~ ^${CONTEXT_PATH}/admin/api/(output-type)/?$ {
+    location ~ ^${CONTEXT_PATH}/admin/api/(output-type)/?\$ {
       set                       \$type \$1;
       rewrite                   ^ ${API_PREFIX}/configs/\${type}s;
     }
 
-    location ~ ^${CONTEXT_PATH}/api/v2/resolve/?$ {
+    location ~ ^${CONTEXT_PATH}/api/v2/resolve/?\$ {
       rewrite                   ^ ${API_PREFIX}/resolve;
     }
     # end of admin rewrites

@@ -94,6 +94,10 @@ class Source {
 
           return result.data
         })
+        .catch((err) => {
+          console.error(err)
+          return data
+        })
       : Promise.resolve(data)
   }
 

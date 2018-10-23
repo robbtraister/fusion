@@ -3,8 +3,9 @@
 const express = require('express')
 
 const { isDev } = require('../environment')
+const isWhy404 = require('./utils/is-why-404')
 
-const { RedirectError } = require('./errors')
+const { NotFoundError, RedirectError } = require('./errors')
 
 const { trailingSlashRedirect } = require('./utils/trailing-slash-rule')
 
@@ -19,6 +20,8 @@ app.use(require('./router'))
 app.use((err, req, res, next) => {
   if (err instanceof RedirectError) {
     res.redirect(err.statusCode, err.location)
+  } else if (err instanceof NotFoundError && isWhy404(req)) {
+    res.status(404).json(err)
   } else {
     next(err)
   }

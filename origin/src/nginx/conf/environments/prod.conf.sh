@@ -36,7 +36,7 @@ cat <<EOB
       return                    404;
     }
 
-    location ~ ^(${CONTEXT_PATH}|${API_PREFIX})/(resources)(/.*|$) {
+    location ~ ^(${CONTEXT_PATH}|${API_PREFIX})/(resources)(/.*|\$) {
       set                       \$command \$2;
       set                       \$file \$3;
       set                       \$p \$command\$file;
@@ -50,8 +50,8 @@ cat <<EOB
       add_header                'Fusion-Source' 's3';
     }
 
-    location ~ ^(${CONTEXT_PATH}|${API_PREFIX})/(assets|dist)(/.*|$) {
-      set                       \$command \$2;
+    location ~ ^(${CONTEXT_PATH}|${API_PREFIX})/(assets|dist)(/.*|\$) {
+      set                       \$command 'dist';
       set                       \$file \$3;
       set                       \$p \$command\$file;
 
@@ -60,7 +60,7 @@ cat <<EOB
       # this endpoint includes template compilation, which can take a bit more time
       error_page                418 = @engine_LONGRUNNING;
 
-      if (\$request_method ~ ^(POST|PUT)$) {
+      if (\$request_method ~ ^(POST|PUT)\$) {
         return                  418;
       }
 
@@ -70,7 +70,7 @@ cat <<EOB
       add_header                'Fusion-Source' 's3';
     }
 
-    location ~ ^${API_PREFIX}/(configs)(/.*|$) {
+    location ~ ^${API_PREFIX}/(configs)(/.*|\$) {
       set                       \$p /components\$2/fusion.configs.json;
 
       proxy_intercept_errors    on;
@@ -82,12 +82,7 @@ cat <<EOB
       add_header                'Fusion-Source' 's3';
     }
 
-    location ~ ^${API_PREFIX}/(content|resolvers)(/.*|$) {
-      error_page                418 = @engine;
-      return                    418;
-    }
-
-    location ~ ^${API_PREFIX}/render/(page|template)(/.*|$) {
+    location ~ ^${API_PREFIX}/(content|resolvers)(/.*|\$) {
       error_page                418 = @engine;
       return                    418;
     }

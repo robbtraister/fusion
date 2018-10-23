@@ -29,6 +29,14 @@ const updateFunctionConfig = promisify(lambda.updateFunctionConfiguration.bind(l
 
 const FunctionName = `fusion-generator-${region}`
 
+const Variables = {
+  DEBUG: 'fusion:*',
+  DATADOG_API_KEY: datadogApiKey,
+  FUSION_RELEASE: fusionRelease,
+  AWS_ACCOUNT_ID: awsAccountId,
+  S3BUCKET: S3Bucket
+}
+
 async function upload (fp) {
   debug(`uploading ${fp}`)
 
@@ -53,13 +61,7 @@ async function createGeneratorFunction () {
         S3Key
       },
       Environment: {
-        Variables: {
-          DEBUG: 'fusion:*',
-          DATADOG_API_KEY: datadogApiKey,
-          FUSION_RELEASE: fusionRelease,
-          AWS_ACCOUNT_ID: awsAccountId,
-          S3BUCKET: S3Bucket
-        }
+        Variables
       },
       Handler: 'resolver-generator/src/index.handler',
       MemorySize: 512,
@@ -100,12 +102,7 @@ async function updateGeneratorConfig () {
       {
         FunctionName,
         Environment: {
-          Variables: {
-            DEBUG: 'fusion:*',
-            DATADOG_API_KEY: datadogApiKey,
-            FUSION_RELEASE: fusionRelease,
-            AWS_ACCOUNT_ID: awsAccountId
-          }
+          Variables
         }
       }
     )

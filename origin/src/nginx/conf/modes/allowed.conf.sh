@@ -2,11 +2,10 @@
 
 cat <<EOB
     # strip trailing slashes
-    location ~ ^${API_PREFIX}/(fuse|make)(/.*)/$ {
-      set                       \$p \$2;
-      rewrite                   ^ ${API_PREFIX}/make\$p;
+    location ~ ^${API_PREFIX}/(fuse|make)(/.*)/\$ {
+      rewrite                   (.*)/\$ \$1 last;
     }
-    location ~ ^${API_PREFIX}/(fuse|make)(/.*|$) {
+    location ~ ^${API_PREFIX}/(fuse|make)(/.*|\$) {
       set                       \$p \$2;
 
       proxy_intercept_errors    on;

@@ -9,15 +9,12 @@ const Provider = require('./provider')
 
 const { LOG_TYPES, ...logger } = require('../../utils/logger')
 
-const version = null // require('./version')()
-
 const React = window.react
 const ReactDOM = window.ReactDOM
 
 // support fragments in preact
 React.Fragment = React.Fragment || 'div'
 
-document.body.parentElement.setAttribute('xmlns:fusion', 'http://www.arcpublishing.com/fusion')
 const appendBoundary = (element, id) => {
   const boundaryProps = {
     'data-fusion-component': id,
@@ -25,20 +22,28 @@ const appendBoundary = (element, id) => {
   }
   return React.createElement(
     React.Fragment,
-    {},
+    {
+      key: id
+    },
     [
       React.createElement(
-        'fusion:enter',
+        'fusion-enter',
         Object.assign(
-          { id: `fusion-enter-${id}` },
+          {
+            id: `fusion-enter-${id}`,
+            key: `fusion-enter-${id}`
+          },
           boundaryProps
         )
       ),
       element,
       React.createElement(
-        'fusion:exit',
+        'fusion-exit',
         Object.assign(
-          { id: `fusion-exit-${id}` },
+          {
+            id: `fusion-exit-${id}`,
+            key: `fusion-exit-${id}`
+          },
           boundaryProps
         )
       )
@@ -72,7 +77,9 @@ class AdminCompiler extends ComponentCompiler {
   }
 }
 
-function CSR (rendering) {
+window.render = function render (rendering) {
+  const elem = window.document.getElementById('fusion-app')
+  // const html = elem.innerHTML
   try {
     ReactDOM.render(
       React.createElement(
@@ -86,55 +93,11 @@ function CSR (rendering) {
           Fusion.globalContent || {}
         )
       ),
-      window.document.getElementById('fusion-app')
+      elem
     )
   } catch (e) {
-    logger.logError({ logType: LOG_TYPES.RENDERING, message: 'An error occurred while attempting to client-side render.', stackTrace: e.stack })
+    // elem.innerHTML = html
+    // don't catch this like in production
+    throw e
   }
 }
-
-function SSR (rendering, outputType) {
-  window.renderingObject.value = JSON.stringify(rendering)
-  window.renderingUpdateForm.action = `${Fusion.contextPath}/api/v3/render/?outputType=${outputType}`
-  window.renderingUpdateForm.submit()
-}
-
-function appendSSRForm () {
-  var form = document.createElement('form')
-  form.id = 'renderingUpdateForm'
-  form.method = 'POST'
-  form.action = `${Fusion.contextPath}/api/v3/render/`
-  form.style.visibility = 'hidden'
-
-  var rendering = document.createElement('input')
-  rendering.type = 'hidden'
-  rendering.name = 'rendering'
-  rendering.id = 'renderingObject'
-
-  form.appendChild(rendering)
-  document.body.appendChild(form)
-}
-
-function addElement (tag, type, attr, rel) {
-  return function (url) {
-    var e = document.createElement(tag)
-    e.type = type
-    e.rel = rel
-    e[attr] = url
-    document.body.appendChild(e)
-  }
-}
-
-const addJs = addElement('script', 'application/javascript', 'src')
-const addCss = addElement('link', 'text/css', 'href', 'stylesheet')
-
-if (Fusion.outputType) {
-  addJs(`${Fusion.contextPath}/dist/components/combinations/${Fusion.outputType}.js${version ? `?v=${version}` : ''}`)
-  addCss(`${Fusion.contextPath}/dist/components/output-types/${Fusion.outputType}.css${version ? `?v=${version}` : ''}`)
-  addCss(`${Fusion.contextPath}/dist/components/combinations/${Fusion.outputType}.css${version ? `?v=${version}` : ''}`)
-}
-
-appendSSRForm()
-
-window.CSR = CSR
-window.SSR = SSR

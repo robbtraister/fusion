@@ -25,19 +25,37 @@ const deployment = (u) => {
 }
 deployment.toString = () => version
 
+const polyfillSrc = deployment(`${contextPath}/dist/engine/polyfill.js`)
+const polyfillChecks = [
+  '!Array.prototype.includes',
+  '!(window.Object && window.Object.assign)',
+  '!window.Promise',
+  '!window.fetch'
+]
+const polyfillHtml = `if(${polyfillChecks.join('||')}){document.write('<script type="application/javascript" src="${polyfillSrc}" defer=""><\\/script>')}`
+const polyfillScript = (polyfillChecks.length)
+  ? React.createElement(
+    'script',
+    {
+      key: 'fusion-polyfill-script',
+      type: 'application/javascript',
+      dangerouslySetInnerHTML: {
+        __html: polyfillHtml
+      }
+    }
+  )
+  : null
+
 const engineScript = React.createElement(
   'script',
   {
-    key: 'fusion-loader-script',
-    id: 'fusion-loader-script',
+    key: 'fusion-engine-script',
+    id: 'fusion-engine-script',
     type: 'application/javascript',
-    src: deployment(`${contextPath}/dist/engine/loader.js`)
+    src: deployment(`${contextPath}/dist/engine/react.js`),
+    defer: true
   }
 )
-
-function escapeScriptContent (content) {
-  return JSON.stringify(content).replace(/<\/script>/g, '<\\/script>')
-}
 
 function fileExists (fp) {
   try {
@@ -109,6 +127,10 @@ const cssTagGenerator = ({ inlines, rendering, outputType }) => {
     ]
 }
 
+function escapeScriptContent (content) {
+  return JSON.stringify(content).replace(/<\/script>/g, '<\\/script>')
+}
+
 const fusionTagGenerator = (globalContent, globalContentConfig, contentCache, outputType, arcSite) => {
   const now = +new Date()
   const condensedCache = {}
@@ -130,6 +152,7 @@ const fusionTagGenerator = (globalContent, globalContentConfig, contentCache, ou
 
   const __html = `window.Fusion=window.Fusion||{};` +
     `Fusion.contextPath='${contextPath}';` +
+    `Fusion.deployment='${version}';` +
     `Fusion.outputType='${outputType}';` +
     (arcSite ? `Fusion.arcSite='${arcSite}';` : '') +
     `Fusion.lastModified=${now};` +
@@ -162,6 +185,7 @@ const libsTagGenerator = ({ name, outputType }) => {
     React.Fragment,
     {},
     [
+      polyfillScript,
       engineScript,
       templateScript
     ]
@@ -180,7 +204,7 @@ const metaTagGenerator = (metas = {}) => (name, defaultValue) =>
     )
     : null
 
-const stylesGenerator = ({ inlines, rendering, outputType }) => {
+const stylesGenerator = ({ inlines, rendering, outputType }) => ({ children }) => {
   const outputTypeStylesPromise = fetchAsset(`components/output-types/${outputType}.css`)
     .catch(() => null)
 
@@ -204,7 +228,7 @@ const stylesGenerator = ({ inlines, rendering, outputType }) => {
       })
   }
 
-  return ({ children }) => (children)
+  return (children)
     ? children(inlines.styles.cached)
     : React.createElement(
       'style',

@@ -1,6 +1,7 @@
 'use strict'
 
 const unpack = require('../../utils/unpack')
+const logger = require('../../utils/logger')
 
 const {
   sourcesBuildRoot
@@ -14,6 +15,7 @@ const getBundleSource = async function getBundleSource (sourceName) {
   try {
     return Promise.resolve(unpack(require(`${sourcesBuildRoot}/${sourceName}`)))
   } catch (e) {
+    logger.logError({ message: 'An error occurred while attempting to get the bundle source.', stackTrace: e.stack })
     return Promise.resolve(null)
   }
 }

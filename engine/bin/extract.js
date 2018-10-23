@@ -8,8 +8,8 @@ const url = require('url')
 const {
   sourcesSrcRoot
 } = require('../environment')
-
 const model = require('../src/dao/mongo')
+const { LOG_TYPES, ...logger } = require('../src/utils/logger')
 
 async function extract () {
   try {
@@ -26,8 +26,8 @@ async function extract () {
       console.log(`Successfully extracted: ${config._id}`)
     })
     console.log(`Extraction complete.`)
-  } catch (e) {
-    console.error(e)
+  } catch (error) {
+    logger.logError({ logType: LOG_TYPES.PAGE_RENDER_TIME, message: 'Unable to extract.', stackTrace: error.stack })
   }
   // mongo connection will keep the process running
   process.exit(0)

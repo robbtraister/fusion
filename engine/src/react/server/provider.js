@@ -6,6 +6,7 @@ const _merge = require('lodash.merge')
 const isStatic = require('./utils/is-static')
 
 const JSONNormalize = require('../../utils/normalize')
+const { LOG_TYPES, ...logger } = require('../../utils/logger')
 
 const getSource = require('../../models/sources')
 
@@ -16,7 +17,7 @@ const getContentGenerator = function getContentGenerator (contentCache, arcSite,
     const sourceCache = contentCache[sourceName] = contentCache[sourceName] || {}
     const sourcePromise = getSource(sourceName)
       .catch((err) => {
-        console.error(err)
+        logger.logError({ message: 'An error occurred while attempting to get content.', stackTrace: err.stack })
         return null
       })
 
@@ -35,7 +36,7 @@ const getContentGenerator = function getContentGenerator (contentCache, arcSite,
           })
           .then(data => { queryCache.cached = data })
           .catch((err) => {
-            console.error(err)
+            logger.logError({ logType: LOG_TYPES.FETCH_FROM_SOURCE, message: 'An error occurred while attempting to fetch.', stackTrace: err.stack })
             queryCache.cached = null
           })
           .then(() => queryCache.cached),

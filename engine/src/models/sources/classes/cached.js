@@ -16,6 +16,7 @@ const {
 } = require('../../../../environment')
 
 const { sendMetrics, METRIC_TYPES } = require('../../../utils/send-metrics')
+const { LOG_TYPES, ...logger } = require('../../../utils/logger')
 
 function getCacheKey (uri, options = {}) {
   const followRedirect = options.followRedirect !== false
@@ -121,6 +122,7 @@ class CachedSource extends ResolveSource {
         // {type: METRIC_TYPES.CACHE_RESULT, value: 1, tags},
         { type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags }
       ])
+      logger.logError({ logType: LOG_TYPES.CACHE, message: 'There was an error while trying to fetch.', stackTrace: err.stack })
 
       return this._update(resolution, options)
     }
@@ -157,6 +159,7 @@ class CachedSource extends ResolveSource {
         { type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags },
         { type: METRIC_TYPES.CACHE_RESULT_SIZE, value: JSON.stringify(data).length, tags }
       ])
+      logger.logInfo({ logType: LOG_TYPES.CACHE, message: 'Cache content successfully pushed' })
 
       return data
     } catch (err) {
@@ -166,6 +169,7 @@ class CachedSource extends ResolveSource {
         // {type: METRIC_TYPES.CACHE_RESULT, value: 1, tags},
         { type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags }
       ])
+      logger.logError({ logType: LOG_TYPES.CACHE, message: 'There was an error while attempting to update the cache.', stackTrace: err.stack })
       // DO NOT THROW FOR FAILED CACHE WRITE!!!
       // throw new Error(`Error putting into cache ${this.name}`)
 

@@ -81,7 +81,7 @@ module.exports = (Object.keys(entry).length)
       optimization,
       output: {
         filename: 'junk/[name].no-css.js',
-        path: componentBuildRoot,
+        path: componentDistRoot,
         libraryTarget: 'commonjs2'
       },
       plugins: [
@@ -90,7 +90,7 @@ module.exports = (Object.keys(entry).length)
         }),
         // we don't actually need this js, so delete it
         new OnBuildWebpackPlugin(function (stats) {
-          childProcess.execSync(`rm -rf ${path.resolve(componentBuildRoot, 'junk')}`)
+          childProcess.execSync(`rm -rf ${path.resolve(componentDistRoot, 'junk')}`)
         })
       ],
       resolve,

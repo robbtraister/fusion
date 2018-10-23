@@ -78,10 +78,9 @@ cat <<EOB
     location ${API_PREFIX}/resolve {
 EOB
 
-$(dirname "$0")/../locations/resolver.conf.sh
+PROXY_PREFIX=${API_PREFIX} $(dirname "$0")/../locations/resolver.conf.sh
 
 cat <<EOB
-      proxy_redirect            / ' ${API_PREFIX}/';
     }
 
     # strip trailing slashes

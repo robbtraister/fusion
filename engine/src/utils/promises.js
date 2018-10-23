@@ -8,6 +8,8 @@ const { promisify } = require('util')
 
 const glob = require('glob')
 
+const readFile = promisify(fs.readFile.bind(fs))
+
 function writeFile (filePath, contents) {
   return new Promise((resolve, reject) => {
     childProcess.exec(`mkdir -p '${path.dirname(filePath)}'`, (err) => {
@@ -23,5 +25,6 @@ function writeFile (filePath, contents) {
 
 module.exports = {
   glob: promisify(glob),
+  readFile,
   writeFile
 }

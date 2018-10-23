@@ -7,11 +7,11 @@ const path = require('path')
 const url = require('url')
 
 const {
-  fetchAsset
-} = require('../../io')
+  readFile
+} = require('../../utils/promises')
 
 const {
-  componentBuildRoot,
+  componentDistRoot,
   contextPath,
   deployment,
   isDev
@@ -66,7 +66,8 @@ function fileExists (fp) {
   }
 }
 
-const outputTypeCssFileExists = (outputType) => fileExists(path.resolve(componentBuildRoot, 'output-types', `${outputType}.css`))
+const outputTypeCssFile = (outputType) => path.resolve(componentDistRoot, 'output-types', `${outputType}.css`)
+const outputTypeCssFileExists = (outputType) => fileExists(outputTypeCssFile(outputType))
 const outputTypeHasCss = (isDev)
   // don't cache it in dev because it might change
   ? outputTypeCssFileExists
@@ -205,7 +206,7 @@ const metaTagGenerator = (metas = {}) => (name, defaultValue) =>
     : null
 
 const stylesGenerator = ({ inlines, rendering, outputType }) => ({ children }) => {
-  const outputTypeStylesPromise = fetchAsset(`components/output-types/${outputType}.css`)
+  const outputTypeStylesPromise = readFile(outputTypeCssFile(outputType))
     .catch(() => null)
 
   const templateStylesPromise = rendering.getStyles()

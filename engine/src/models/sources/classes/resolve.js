@@ -32,7 +32,7 @@ class ResolveSource extends BaseSource {
     debugFetch(`Fetching from source [${sanitizedUri}]`)
     const tic1 = timer.tic()
 
-    const maxRedirects = (options.maxRedirects === 0) ? 0 : (+options.maxRedirects || 10)
+    const maxRedirects = (options.maxRedirects === 0) ? 0 : (+options.maxRedirects || 2)
 
     const response = await request({
       uri: resolvedUri,

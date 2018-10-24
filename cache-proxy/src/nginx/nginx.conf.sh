@@ -96,6 +96,7 @@ EOB
   done
 
 cat <<EOB
+    keepalive 1024;
   }
 
   server {

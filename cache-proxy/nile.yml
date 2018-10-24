@@ -101,7 +101,7 @@ environments:
       - deploymentConfiguration:
           maximumPercent: 200
           minimumHealthyPercent: 50
-        desiredCount: 3
+        desiredCount: 6
         loadBalancers:
           - containerName: cache-proxy
             containerPort: 8080

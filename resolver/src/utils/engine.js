@@ -12,9 +12,30 @@ const {
   lambdaEngine
 } = require('../../environment')
 
+const parseJson = function parseJson (json) {
+  if (typeof json === 'string') {
+    try {
+      return JSON.parse(json)
+    } catch (e) {}
+  }
+  return json
+}
+
+const handleResponse = function handleResponse (response) {
+  if (response.statusCode >= 400) {
+    throw response
+  }
+
+  if (response.statusCode >= 300 && response.headers.location) {
+    throw new RedirectError(response.headers.location, response.statusCode)
+  }
+
+  return parseJson(response.body)
+}
+
 const getHttpEngine = function getHttpEngine () {
   return async function httpEngineHandler ({ method, uri, data, cacheMode }) {
-    const response = await request[(method || 'get').toLowerCase()]({
+    return request[(method || 'get').toLowerCase()]({
       uri: `${httpEngine}${uri}`,
       body: data,
       json: true,
@@ -25,16 +46,6 @@ const getHttpEngine = function getHttpEngine () {
       resolveWithFullResponse: true,
       simple: false
     })
-
-    if (response.statusCode >= 400) {
-      throw response
-    }
-
-    if (response.statusCode >= 300 && response.headers.location) {
-      throw new RedirectError(response.headers.location, response.statusCode)
-    }
-
-    return response.body
   }
 }
 
@@ -69,21 +80,7 @@ const getLambdaEngine = function getLambdaEngine () {
         }
 
         if (data.StatusCode === 200) {
-          const response = JSON.parse(data.Payload)
-
-          if (response.statusCode >= 400) {
-            return reject(response)
-          }
-
-          if (response.statusCode >= 300 && response.headers.location) {
-            return reject(new RedirectError(response.headers.location, response.statusCode))
-          }
-
-          try {
-            resolve(JSON.parse(response.body))
-          } catch (e) {
-            resolve(response.body)
-          }
+          resolve(JSON.parse(data.Payload))
         } else {
           reject(data)
         }
@@ -92,19 +89,17 @@ const getLambdaEngine = function getLambdaEngine () {
   }
 }
 
-function getEngine () {
-  const engine = (httpEngine && !lambdaEngine)
-    ? getHttpEngine()
-    : getLambdaEngine()
+const engine = (httpEngine && !lambdaEngine)
+  ? getHttpEngine()
+  : getLambdaEngine()
 
-  return async function (args) {
-    try {
-      return await engine(args)
-    } catch (e) {
-      e.isEngine = true
-      throw e
-    }
+module.exports = async function (args) {
+  try {
+    const response = await engine(args)
+
+    return handleResponse(response)
+  } catch (e) {
+    e.isEngine = true
+    throw e
   }
 }
-
-module.exports = getEngine()

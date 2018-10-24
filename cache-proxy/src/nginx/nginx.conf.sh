@@ -14,13 +14,13 @@ do
 done
 
 cat <<EOB
-daemon off;
-pid ./nginx.pid;
-# user ${USER:-nginx};
+daemon                          off;
+pid                             ./nginx.pid;
+# user                          ${USER:-nginx};
 
 events {
   worker_connections            1024;
-  multi_accept on;
+  multi_accept                  on;
   accept_mutex_delay            50ms;
 }
 
@@ -58,10 +58,10 @@ http {
   proxy_max_temp_file_size      0;
 
   gzip                          off;
-  gzip_comp_level               2;
-  gzip_min_length               1400;
-  gzip_proxied                  expired no-cache no-store private auth;
-  gzip_types                    text/plain application/x-javascript application/json text/css text/javascript application/javascript application/octet-stream;
+  # gzip_comp_level               2;
+  # gzip_min_length               1400;
+  # gzip_proxied                  expired no-cache no-store private auth;
+  # gzip_types                    text/plain application/x-javascript application/json text/css text/javascript application/javascript application/octet-stream;
 
   server_names_hash_bucket_size 128;
 
@@ -105,20 +105,19 @@ cat <<EOB
     auth_basic_user_file        /etc/nginx/conf/credentials;
 
     location /cache {
-      set                       \$memc_key "\${remote_user}:\${arg_key}"; 
+      set                       \$memc_key "\${remote_user}:\${arg_key}";
 
-      # memcached > 1.4.4 does not accept exptime on DELETE, so change location
-      error_page                418 = @cachedelete; 
-      if (\$request_method = DELETE) {
+      error_page                418 = @cacheput;
+      if (\$request_method ~* ^(?:PUT|POST)\$) {
         return 418;
       }
 
-      set                       \$memc_exptime \$cache_ttl;
       memc_pass                 cache_cluster;
     }
 
-    location @cachedelete {
-      memc_pass cache_cluster;
+    location @cacheput {
+      set                       \$memc_exptime \$cache_ttl;
+      memc_pass                 cache_cluster;
     }
 
     location = /healthcheck {

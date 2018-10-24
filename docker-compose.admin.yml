@@ -162,4 +162,5 @@ services:
       # - '~/.aws:/home/nginx/.aws:ro'
       - './origin/src:/etc/nginx/src:ro'
       - '${FUSION_REPO:-./bundle}/.dist:/etc/nginx/dist:ro'
+      - '${FUSION_REPO:-./bundle}/src/mocks:/etc/nginx/mocks:ro'
       - '${FUSION_REPO:-./bundle}/src/resources:/etc/nginx/resources:ro'

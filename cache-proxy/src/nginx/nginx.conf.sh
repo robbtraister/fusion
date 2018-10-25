@@ -25,6 +25,7 @@ events {
 }
 
 worker_rlimit_nofile            30000;
+worker_processes                auto;
 
 http {
   default_type                  application/json;
@@ -36,6 +37,7 @@ http {
   error_log                     ./logs/error.log;
 
   # ELB/ALB is likely set to 60s; ensure we stay open at least that long
+  keepalive_requests            100;
   keepalive_timeout             120;
 
   set_real_ip_from              0.0.0.0/0;

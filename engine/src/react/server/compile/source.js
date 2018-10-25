@@ -70,7 +70,7 @@ class SourceCompiler extends ComponentCompiler {
     const componentName = this.getComponentName(node.collection, node.type)
     if (componentName) {
       const Component = `Fusion.components${componentName}`
-      return `React.createElement(${Component}, ${JSON.stringify(node.props)})`
+      return `Fusion.createElement(${Component}, ${JSON.stringify(node.props)})`
     } else {
       const props = {
         key: node.props.id,
@@ -79,7 +79,7 @@ class SourceCompiler extends ComponentCompiler {
         name: node.props.name,
         dangerouslySetInnerHTML: { __html: `<!-- feature "${node.type}" could not be found -->` }
       }
-      return `React.createElement('div', ${JSON.stringify(props)})`
+      return `Fusion.createElement('div', ${JSON.stringify(props)})`
     }
   }
 
@@ -93,7 +93,12 @@ class SourceCompiler extends ComponentCompiler {
       const props = (Component === 'React.Fragment')
         ? { key: node.props.key }
         : node.props
-      return `React.createElement(${Component}, ${JSON.stringify(props)}, [${node.children.map(this.renderableItem.bind(this)).filter(ri => ri).join(',')}])`
+
+      const createElement = (Component === 'React.Fragment')
+        ? 'React.createElement'
+        : 'Fusion.createElement'
+
+      return `${createElement}(${Component}, ${JSON.stringify(props)}, [${node.children.map(this.renderableItem.bind(this)).filter(ri => ri).join(',')}])`
     }
   }
 
@@ -142,7 +147,7 @@ ${usedCollections
     .join('\n')
 }
 Fusion.Template = function (props) {
-  return React.createElement(React.Fragment, {}, ${Template})
+  return ${Template}
 }
 Fusion.Template.id = ${this.renderable.id ? `'${this.renderable.id}'` : 'null'}
 Fusion.Template.layout = ${tree.type ? `'${tree.type}'` : 'null'}

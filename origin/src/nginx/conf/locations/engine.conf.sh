@@ -13,13 +13,12 @@ if [ "${HTTP_ENGINE}" ]
 EOB
   else
     cat <<EOB
-      proxy_set_header          'X-FunctionName' '${LAMBDA_ENGINE}:\${version}';
+      proxy_set_header          'X-FunctionName' '${LAMBDA_ENGINE}:\${deployment}';
       proxy_pass                ${LAMBDA_PROXY:-http://0.0.0.0:${NODEJS_PORT:-9000}}\$uri\$query_params;
 EOB
 fi
 
 cat <<EOB
-
       proxy_redirect            / ' ${API_PREFIX}/';
 
       add_header                'Fusion-Source' 'lambda';

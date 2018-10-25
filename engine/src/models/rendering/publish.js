@@ -6,7 +6,7 @@ const {
   functionName,
   isDev,
   region,
-  version
+  deployment
 } = require('../../../environment')
 
 const { components } = require('../../../manifest')
@@ -15,7 +15,7 @@ const allOutputTypes = Object.keys(components.outputTypes)
 
 const lambda = new Lambda({ region })
 
-const listVersions = function listVersions () {
+const listVersions = async function listVersions () {
   return new Promise((resolve, reject) => {
     lambda.listVersionsByFunction(
       { FunctionName: functionName },
@@ -24,18 +24,18 @@ const listVersions = function listVersions () {
   })
 }
 
-const listOtherVerions = function listOtherVerions () {
-  return listVersions()
-    .then((versions) => versions.filter(v => v !== version))
+const listOtherVerions = async function listOtherVerions () {
+  const versions = await listVersions()
+  return versions.filter(v => v !== deployment)
 }
 
-const invoke = function invoke (uri, payload, version, InvocationType = 'RequestResponse') {
+const invoke = async function invoke (uri, body, Qualifier, InvocationType = 'RequestResponse') {
   return new Promise((resolve, reject) => {
     lambda.invoke(
       {
         FunctionName: functionName,
         InvocationType,
-        Qualifier: version,
+        Qualifier,
         Payload: JSON.stringify({
           method: 'POST',
           // serverless-http uses `httpMethod` property
@@ -44,7 +44,7 @@ const invoke = function invoke (uri, payload, version, InvocationType = 'Request
             'Content-Type': 'application/json'
           },
           path: uri,
-          body: payload,
+          body,
           queryStringParameters: { propagate: 'false' }
         })
       },
@@ -53,22 +53,27 @@ const invoke = function invoke (uri, payload, version, InvocationType = 'Request
   })
 }
 
-const publishOutputTypes = function publishOutputTypes (uri, payload, InvocationType = 'RequestResponse') {
+const publishOutputTypes = async function publishOutputTypes (uri, body, InvocationType = 'RequestResponse') {
   return Promise.all(
-    allOutputTypes
-      .map((outputType) => invoke(`${uri}/${outputType}`, payload, version, InvocationType))
+    allOutputTypes.map((outputType) =>
+      invoke(`${uri}/${outputType}`, body, deployment, InvocationType)
+    )
   )
 }
 
-const publishToOtherVersions = function publishToOtherVersions (uri, payload) {
-  return listOtherVerions()
-    .then(versions => Promise.all(
-      // this InvocationType makes the request "fire and forget"
-      versions.map(version => invoke(uri, payload, version, 'Event'))
-    ))
+const publishToOtherVersions = async function publishToOtherVersions (uri, body) {
+  const versions = await listOtherVerions()
+  return Promise.all(
+    // this InvocationType makes the request "fire and forget"
+    versions.map(version =>
+      invoke(uri, body, version, 'Event')
+    )
+  )
 }
 
 module.exports = {
   publishOutputTypes,
-  publishToOtherVersions: (isDev) ? () => Promise.resolve() : publishToOtherVersions
+  publishToOtherVersions: (isDev)
+    ? async () => Promise.resolve()
+    : publishToOtherVersions
 }

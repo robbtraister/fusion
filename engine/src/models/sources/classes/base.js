@@ -4,7 +4,7 @@ const crypto = require('crypto')
 
 const { graphql, buildSchema, GraphQLSchema } = require('graphql')
 
-const { schemasDistRoot } = require('../../../../environment')
+const { schemasBuildRoot } = require('../../../../environment')
 
 const unpack = require('../../../utils/unpack')
 
@@ -22,7 +22,7 @@ const schemaCache = {}
 const getSchema = function getSchema (schemaName) {
   if (!(schemaName in schemaCache)) {
     try {
-      const schema = unpack(require(`${schemasDistRoot}/${schemaName}`))
+      const schema = unpack(require(`${schemasBuildRoot}/${schemaName}`))
 
       schemaCache[schemaName] = (schema instanceof GraphQLSchema)
         ? schema
@@ -70,38 +70,40 @@ class Source {
     return data
   }
 
-  async clear (key) {
+  async clear (query) {
     throw new Error('`clear` not implemented')
   }
 
-  async fetch (key) {
+  async fetch (query, options) {
     throw new Error('`fetch` not implemented')
   }
 
-  async filter (query, data) {
-    return (this.schema && query && data)
-      ? graphql(this.schema, query, data)
-        .then(result => {
-          if (result.errors) {
-            throw result.errors[0]
+  async filter (filter, data) {
+    if (this.schema && filter && data) {
+      try {
+        const result = await graphql(this.schema, filter, data)
+
+        if (result.errors) {
+          throw result.errors[0]
+        }
+
+        KEEP_FIELDS.forEach((field) => {
+          if (data[field]) {
+            result.data[field] = data[field]
           }
-
-          KEEP_FIELDS.forEach((field) => {
-            if (data[field]) {
-              result.data[field] = data[field]
-            }
-          })
-
-          return result.data
         })
-        .catch((err) => {
-          console.error(err)
-          return data
-        })
-      : Promise.resolve(data)
+
+        return result.data
+      } catch (err) {
+        console.error(err)
+        return data
+      }
+    } else {
+      return data
+    }
   }
 
-  resolve (key) {
+  resolve (query, options) {
     return new Error('`resolve` not implemented')
   }
 
@@ -118,7 +120,7 @@ class Source {
     return transformed
   }
 
-  async update (key) {
+  async update (query) {
     throw new Error('`update` not implemented')
   }
 }

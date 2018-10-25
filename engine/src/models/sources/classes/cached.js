@@ -18,9 +18,10 @@ const {
 const { sendMetrics, METRIC_TYPES } = require('../../../utils/send-metrics')
 const { LOG_TYPES, ...logger } = require('../../../utils/logger')
 
-function getCacheKey (uri) {
+function getCacheKey (uri, options = {}) {
+  const followRedirect = options.followRedirect !== false
   const hash = crypto.createHash('sha256').update(uri).digest('hex')
-  return `${cachePrefix}:${hash}`
+  return `${cachePrefix}:${followRedirect}:${hash}`
 }
 
 async function makeCacheRequest ({ method, key, value }) {
@@ -46,78 +47,90 @@ const fetchCacheContent = async (key) => makeCacheRequest({ key })
 const pushCacheContent = async (key, value) => makeCacheRequest({ key, value, method: 'PUT' })
 
 class CachedSource extends ResolveSource {
-  async clear (key) {
-    const { cacheKey } = this.resolve(key)
+  async clear (query) {
+    async function clearKey (options) {
+      const { cacheKey } = this.resolve(query, options)
 
-    return clearCacheContent(cacheKey)
-      .catch((err) => {
+      try {
+        return await clearCacheContent(cacheKey)
+      } catch (err) {
         if (err.response) {
           const responseError = new Error(err.response.body)
           responseError.statusCode = err.response.statusCode
           throw responseError
         }
         throw err
-      })
+      }
+    }
+
+    return Promise.all([
+      clearKey({ followRedirect: true }),
+      clearKey({ followRedirect: false })
+    ])
   }
 
-  async fetch (key, forceSync) {
-    return this.fetchThroughCache(key, forceSync)
-      .catch((err) => {
-        if (err.response) {
-          const responseError = new Error(err.response.body)
-          responseError.statusCode = err.response.statusCode
-          throw responseError
-        }
-        throw err
-      })
+  async fetch (query, options) {
+    try {
+      return await this.fetchThroughCache(query, options)
+    } catch (err) {
+      if (err.response) {
+        const responseError = new Error(err.response.body)
+        responseError.statusCode = err.response.statusCode
+        throw responseError
+      }
+      throw err
+    }
   }
 
-  async fetchThroughCache (key, forceSync) {
-    return (cacheProxyUrl && forceSync !== true)
-      ? Promise.resolve(this.resolve(key))
-        .then(({ cacheKey, sanitizedUri }) => {
-          const tic = timer.tic()
+  async fetchThroughCache (query, options = {}) {
+    if (!cacheProxyUrl || options.forceUpdate === true) {
+      return this.update(query, options)
+    }
 
-          debugFetch(`Fetching from cache [${sanitizedUri}]`)
+    const resolution = this.resolve(query, options)
 
-          return fetchCacheContent(cacheKey)
-            .then((data) => {
-              const elapsedTime = tic.toc()
-              if (!data) {
-                const tags = ['operation:fetch', 'result:error', `source:${this.name}`]
-                sendMetrics([
-                  { type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags }
-                ])
-                throw new Error('data error from cache')
-              }
-              debugTimer(`Fetched from cache [${sanitizedUri}]`, elapsedTime)
-              const tags = ['operation:fetch', 'result:cache_hit', `source:${this.name}`]
-              sendMetrics([
-                // {type: METRIC_TYPES.CACHE_RESULT, value: 1, tags},
-                { type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags },
-                { type: METRIC_TYPES.CACHE_RESULT_SIZE, value: JSON.stringify(data).length, tags }
-              ])
+    const tic = timer.tic()
+    try {
+      const { sanitizedUri, cacheKey } = resolution
 
-              return data
-            })
-            .catch(error => {
-              const elapsedTime = tic.toc()
-              const tagResult = (error.statusCode && error.statusCode === 404) ? 'result:cache_miss' : 'result:cache_error'
-              const tags = ['operation:fetch', tagResult, `source:${this.name}`]
-              sendMetrics([
-                { type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags }
-              ])
-              logger.logError({ logType: LOG_TYPES.CACHE, message: 'There was an error while trying to fetch.', stackTrace: error.stack })
+      debugFetch(`Fetching from cache [${sanitizedUri}]`)
 
-              return this.update(key)
-            })
-        })
-      : this.update(key)
+      const data = await fetchCacheContent(cacheKey)
+      const elapsedTime = tic.toc()
+      if (!data) {
+        const tags = ['operation:fetch', 'result:error', `source:${this.name}`]
+        sendMetrics([
+          // {type: METRIC_TYPES.CACHE_RESULT, value: 1, tags},
+          { type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags }
+        ])
+        throw new Error('data error from cache')
+      }
+      debugTimer(`Fetched from cache [${sanitizedUri}]`, elapsedTime)
+      const tags = ['operation:fetch', 'result:cache_hit', `source:${this.name}`]
+      sendMetrics([
+        // {type: METRIC_TYPES.CACHE_RESULT, value: 1, tags},
+        { type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags },
+        { type: METRIC_TYPES.CACHE_RESULT_SIZE, value: JSON.stringify(data).length, tags }
+      ])
+
+      return data
+    } catch (err) {
+      const elapsedTime = tic.toc()
+      const tagResult = (err.statusCode && err.statusCode === 404) ? 'result:cache_miss' : 'result:cache_error'
+      const tags = ['operation:fetch', tagResult, `source:${this.name}`]
+      sendMetrics([
+        // {type: METRIC_TYPES.CACHE_RESULT, value: 1, tags},
+        { type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags }
+      ])
+      logger.logError({ logType: LOG_TYPES.CACHE, message: 'There was an error while trying to fetch.', stackTrace: err.stack })
+
+      return this._update(resolution, options)
+    }
   }
 
-  formatUri (uri) {
-    const base = super.formatUri(uri)
-    const cacheKey = getCacheKey(uri)
+  formatUri (uri, options) {
+    const base = super.formatUri(uri, options)
+    const cacheKey = getCacheKey(uri, options)
 
     debugFetch(`cache key: ${base.sanitizedUri} => ${cacheKey}`)
 
@@ -127,41 +140,45 @@ class CachedSource extends ResolveSource {
     )
   }
 
-  async update (key) {
-    return Promise.all([
-      super.fetch(key),
-      this.resolve(key)
-    ])
-      .then(([data, { cacheKey }]) => {
-        const tic = timer.tic()
+  async _update (resolution, options) {
+    const data = await this._fetch(resolution, options)
 
-        return (cacheProxyUrl)
-          ? pushCacheContent(cacheKey, data)
-            .then(() => {
-              const elapsedTime = tic.toc()
-              const tags = ['operation:put', 'result:success', `source:${this.name}`]
-              sendMetrics([
-                { type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags },
-                { type: METRIC_TYPES.CACHE_RESULT_SIZE, value: JSON.stringify(data).length, tags }
-              ])
-              logger.logInfo({ logType: LOG_TYPES.CACHE, message: 'Cache content successfully pushed' })
+    if (!cacheProxyUrl) {
+      return data
+    }
 
-              return data
-            })
-            .catch((error) => {
-              const elapsedTime = tic.toc()
-              const tags = ['operation:put', 'result:error', `source:${this.name}`, `error:${error.statusCode}`]
-              sendMetrics([
-                {type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags}
-              ])
-              logger.logError({ logType: LOG_TYPES.CACHE, message: 'There was an error while attempting to update the cache.', stackTrace: error.stack })
-              // DO NOT THROW FOR FAILED CACHE WRITE!!!
-              // throw new Error(`Error putting into cache ${this.name}`)
+    const tic = timer.tic()
 
-              return data
-            })
-          : data
-      })
+    await pushCacheContent(resolution.cacheKey, data)
+
+    try {
+      const elapsedTime = tic.toc()
+      const tags = ['operation:put', 'result:success', `source:${this.name}`]
+      sendMetrics([
+        // {type: METRIC_TYPES.CACHE_RESULT, value: 1, tags},
+        { type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags },
+        { type: METRIC_TYPES.CACHE_RESULT_SIZE, value: JSON.stringify(data).length, tags }
+      ])
+      logger.logInfo({ logType: LOG_TYPES.CACHE, message: 'Cache content successfully pushed' })
+
+      return data
+    } catch (err) {
+      const elapsedTime = tic.toc()
+      const tags = ['operation:put', 'result:error', `source:${this.name}`, `error:${err.statusCode}`]
+      sendMetrics([
+        // {type: METRIC_TYPES.CACHE_RESULT, value: 1, tags},
+        { type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags }
+      ])
+      logger.logError({ logType: LOG_TYPES.CACHE, message: 'There was an error while attempting to update the cache.', stackTrace: err.stack })
+      // DO NOT THROW FOR FAILED CACHE WRITE!!!
+      // throw new Error(`Error putting into cache ${this.name}`)
+
+      return data
+    }
+  }
+
+  async update (query, options) {
+    return this._update(this.resolve(query, options), options)
   }
 }
 

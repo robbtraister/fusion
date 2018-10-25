@@ -7,25 +7,25 @@ const path = require('path')
 const url = require('url')
 
 const {
-  fetchAsset
-} = require('../../io')
+  readFile
+} = require('../../utils/promises')
 
 const {
   componentDistRoot,
   contextPath,
-  isDev,
-  version
+  deployment,
+  isDev
 } = require('../../../environment')
 
-const deployment = (u) => {
+const deploymentWrapper = (u) => {
   const parts = url.parse(u, true)
-  parts.query.v = version
+  parts.query.v = deployment
   parts.search = undefined
   return url.format(parts)
 }
-deployment.toString = () => version
+deploymentWrapper.toString = () => deployment
 
-const polyfillSrc = deployment(`${contextPath}/dist/engine/polyfill.js`)
+const polyfillSrc = deploymentWrapper(`${contextPath}/dist/engine/polyfill.js`)
 const polyfillChecks = [
   '!Array.prototype.includes',
   '!(window.Object && window.Object.assign)',
@@ -52,7 +52,7 @@ const engineScript = React.createElement(
     key: 'fusion-engine-script',
     id: 'fusion-engine-script',
     type: 'application/javascript',
-    src: deployment(`${contextPath}/dist/engine/react.js`),
+    src: deploymentWrapper(`${contextPath}/dist/engine/react.js`),
     defer: true
   }
 )
@@ -66,7 +66,8 @@ function fileExists (fp) {
   }
 }
 
-const outputTypeCssFileExists = (outputType) => fileExists(path.resolve(componentDistRoot, 'output-types', `${outputType}.css`))
+const outputTypeCssFile = (outputType) => path.resolve(componentDistRoot, 'output-types', `${outputType}.css`)
+const outputTypeCssFileExists = (outputType) => fileExists(outputTypeCssFile(outputType))
 const outputTypeHasCss = (isDev)
   // don't cache it in dev because it might change
   ? outputTypeCssFileExists
@@ -91,8 +92,8 @@ const cssTagGenerator = ({ inlines, rendering, outputType }) => {
       .catch(() => null)
       .then((templateCssFile) => {
         inlines.cssLinks.cached = {
-          outputTypeHref: (outputTypeHasCss(outputType)) ? deployment(`${contextPath}/dist/components/output-types/${outputType}.css`) : null,
-          templateHref: (templateCssFile) ? deployment(`${contextPath}/dist/${templateCssFile}`) : null
+          outputTypeHref: (outputTypeHasCss(outputType)) ? deploymentWrapper(`${contextPath}/dist/components/output-types/${outputType}.css`) : null,
+          templateHref: (templateCssFile) ? deploymentWrapper(`${contextPath}/dist/${templateCssFile}`) : null
         }
       })
   }
@@ -138,21 +139,21 @@ const fusionTagGenerator = (globalContent, globalContentConfig, contentCache, ou
     .forEach(sourceName => {
       const sourceCache = contentCache[sourceName]
       Object.keys(sourceCache)
-        .forEach(key => {
-          const keyCache = sourceCache[key]
-          if (keyCache.source && keyCache.filtered) {
+        .forEach(queryString => {
+          const queryCache = sourceCache[queryString]
+          if (queryCache.source && queryCache.filtered) {
             const condensedSourceCache = condensedCache[sourceName] = condensedCache[sourceName] || {
               entries: {},
-              expiresAt: now + ((keyCache.source && keyCache.source.ttl) || 300000)
+              expiresAt: now + ((queryCache.source && queryCache.source.ttl) || 300000)
             }
-            condensedSourceCache.entries[key] = { cached: keyCache.filtered }
+            condensedSourceCache.entries[queryString] = { cached: queryCache.filtered }
           }
         })
     })
 
   const __html = `window.Fusion=window.Fusion||{};` +
     `Fusion.contextPath='${contextPath}';` +
-    `Fusion.deployment='${version}';` +
+    `Fusion.deployment='${deployment}';` +
     `Fusion.outputType='${outputType}';` +
     (arcSite ? `Fusion.arcSite='${arcSite}';` : '') +
     `Fusion.lastModified=${now};` +
@@ -176,7 +177,7 @@ const libsTagGenerator = ({ name, outputType }) => {
       key: 'fusion-template-script',
       id: 'fusion-template-script',
       type: 'application/javascript',
-      src: deployment(`${contextPath}/dist/${name}/${outputType}.js`),
+      src: deploymentWrapper(`${contextPath}/dist/${name}/${outputType}.js`),
       defer: true
     }
   )
@@ -205,7 +206,7 @@ const metaTagGenerator = (metas = {}) => (name, defaultValue) =>
     : null
 
 const stylesGenerator = ({ inlines, rendering, outputType }) => ({ children }) => {
-  const outputTypeStylesPromise = fetchAsset(`components/output-types/${outputType}.css`)
+  const outputTypeStylesPromise = readFile(outputTypeCssFile(outputType))
     .catch(() => null)
 
   const templateStylesPromise = rendering.getStyles()
@@ -240,7 +241,7 @@ const stylesGenerator = ({ inlines, rendering, outputType }) => ({ children }) =
 
 module.exports = {
   cssTagGenerator,
-  deployment,
+  deploymentWrapper,
   fusionTagGenerator,
   libsTagGenerator,
   metaTagGenerator,

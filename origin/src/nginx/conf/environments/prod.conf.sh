@@ -9,13 +9,6 @@ cat <<EOB
     listen                      ${PORT:-8081};
     # server_name                 _;
 
-    location @resolver {
-EOB
-
-$(dirname "$0")/../locations/resolver.conf.sh
-
-cat <<EOB
-    }
     location @engine {
 EOB
 
@@ -44,7 +37,7 @@ cat <<EOB
       proxy_intercept_errors    on;
       error_page                400 403 404 418 = @engine;
 
-      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/\$p;
+      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${deployment}/\$p;
       proxy_pass                \$target;
 
       add_header                'Fusion-Source' 's3';
@@ -64,19 +57,31 @@ cat <<EOB
         return                  418;
       }
 
-      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/\$p;
+      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${deployment}/\$p;
       proxy_pass                \$target;
 
       add_header                'Fusion-Source' 's3';
     }
 
-    location ~ ^${API_PREFIX}/(configs)(/.*|\$) {
-      set                       \$p /components\$2/fusion.configs.json;
+    location ~ ^${API_PREFIX}/configs/content(/.*|\$) {
+      set                       \$p /content\$1/fusion.configs.json;
 
       proxy_intercept_errors    on;
       error_page                400 403 404 418 = @engine;
 
-      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${version}/dist\$p;
+      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${deployment}/dist\$p;
+      proxy_pass                \$target;
+
+      add_header                'Fusion-Source' 's3';
+    }
+
+    location ~ ^${API_PREFIX}/configs(/.*|\$) {
+      set                       \$p /components\$1/fusion.configs.json;
+
+      proxy_intercept_errors    on;
+      error_page                400 403 404 418 = @engine;
+
+      set                       \$target ${S3_HOST}/environments/\${environment}/deployments/\${deployment}/dist\$p;
       proxy_pass                \$target;
 
       add_header                'Fusion-Source' 's3';
@@ -94,8 +99,11 @@ cat <<EOB
     }
 
     location ${API_PREFIX}/resolve {
-      error_page                418 = @resolver;
-      return                    418;
+EOB
+
+PROXY_PREFIX=${API_PREFIX} $(dirname "$0")/../locations/resolver.conf.sh
+
+cat <<EOB
     }
 
 EOB

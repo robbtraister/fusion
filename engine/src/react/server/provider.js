@@ -21,40 +21,40 @@ const getContentGenerator = function getContentGenerator (contentCache, arcSite,
         return null
       })
 
-    const getSourceContent = (key, filter, component) => {
+    const getSourceContent = (query, filter, component) => {
       // alphabetize object keys to ensure proper cacheing
-      const keyString = JSONNormalize.stringify(key)
-      const keyCache = sourceCache[keyString] = sourceCache[keyString] || {
+      const queryString = JSONNormalize.stringify(query)
+      const queryCache = sourceCache[queryString] = sourceCache[queryString] || {
         cached: undefined,
         filtered: undefined,
         fetched: sourcePromise
           .then(source => {
-            keyCache.source = source
+            queryCache.source = source
             return (source)
-              ? source.fetch(Object.assign({}, key, { 'arc-site': arcSite }))
+              ? source.fetch(Object.assign({}, query, { 'arc-site': arcSite }))
               : null
           })
-          .then(data => { keyCache.cached = data })
+          .then(data => { queryCache.cached = data })
           .catch((err) => {
             logger.logError({ logType: LOG_TYPES.FETCH_FROM_SOURCE, message: 'An error occurred while attempting to fetch.', stackTrace: err.stack })
-            keyCache.cached = null
+            queryCache.cached = null
           })
-          .then(() => keyCache.cached),
+          .then(() => queryCache.cached),
         source: undefined
       }
 
-      keyCache.fetched = keyCache.fetched
-        .then(data => keyCache.source ? keyCache.source.filter(filter, data) : keyCache.cached)
+      queryCache.fetched = queryCache.fetched
+        .then(data => queryCache.source ? queryCache.source.filter(filter, data) : queryCache.cached)
         .then(filtered => {
           if (!isStatic(component, outputType)) {
-            keyCache.filtered = keyCache.cached ? _merge(keyCache.filtered, filtered) : null
+            queryCache.filtered = queryCache.cached ? _merge(queryCache.filtered, filtered) : null
           }
-          return keyCache.cached
+          return queryCache.cached
         })
 
       // Server-side, we never need to worry about the Promise or async content
       // we will re-render using the cached content if necessary
-      return keyCache // || keyCache.fetched
+      return queryCache
     }
 
     return (args.length === 0)

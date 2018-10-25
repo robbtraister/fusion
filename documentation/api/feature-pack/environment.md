@@ -62,10 +62,10 @@ Here is how to use that same environment variable in a sample content source:
 
 import { OMDB_API_KEY } from 'fusion:environment'
 
-const resolve = (key) => {
+const resolve = (query) => {
   const requestUri = `https://www.omdbapi.com/?apikey=${OMDB_API_KEY}&plot=full`
 
-  if (key.hasOwnProperty('movieTitle')) return `${requestUri}&t=${key.movieTitle}`
+  if (query.hasOwnProperty('movieTitle')) return `${requestUri}&t=${query.movieTitle}`
 
   throw new Error('movie-find content source requires a movieTitle')
 }
@@ -80,7 +80,7 @@ export default {
 ```
 
 > **Restrictions**
-> 
+>
 > Environment values will only be accessible during server execution, not in the client, as they will be exposed to users. To ensure this, `fusion:environment` will return an empty object in the client.
 
 -----
@@ -94,6 +94,3 @@ To solve this problem, Fusion allows developers to include "secret" variables th
 Information on how to properly encrypt environment variables is forthcoming.
 
 <!-- TODO: instructions for encrypting env vars -->
-
-
-

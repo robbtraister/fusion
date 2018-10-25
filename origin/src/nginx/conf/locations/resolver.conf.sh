@@ -4,7 +4,7 @@ cat <<EOB
       rewrite                   ^${API_PREFIX}(/|\$)(.*) /\$2 break;
       rewrite                   ^${CONTEXT_PATH}(/|\$)(.*) /\$2 break;
 
-      proxy_set_header          'Fusion-Engine-Version' \$version;
+      proxy_set_header          'Fusion-Engine-Version' \$deployment;
       proxy_set_header          'Fusion-Cache-Mode' \$cacheMode;
 
 EOB
@@ -23,8 +23,21 @@ fi
 
 cat <<EOB
 
-      proxy_redirect            /make/ ' ${CONTEXT_PATH}/';
-      proxy_redirect            / ' ${API_PREFIX}/';
-
       add_header                'Fusion-Source' 'lambda';
 EOB
+
+if [ "${PROXY_PREFIX}" ]
+then
+  cat <<EOB
+      proxy_redirect            / ' ${PROXY_PREFIX}/';
+EOB
+else
+  # if using the admin (behind trident), ensure the redirect uses the appropriate context path
+  # otherwise, allow top-level redirect for readers
+  if [ "${IS_ADMIN}" ]
+  then
+    cat <<EOB
+      proxy_redirect            / ' ${CONTEXT_PATH}/';
+EOB
+  fi
+fi

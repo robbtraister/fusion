@@ -9,6 +9,8 @@ class ComponentCompiler {
     this.renderable = renderable
     this.outputType = outputType
 
+    this.createElement = React.createElement
+
     this.emptyElement = () => null
 
     this.collectionMap = {
@@ -43,7 +45,11 @@ class ComponentCompiler {
         ? { key: node.props.key || node.props.id }
         : node.props
 
-      return React.createElement(
+      const createElement = (Component === React.Fragment)
+        ? React.createElement
+        : this.createElement
+
+      return createElement(
         Component,
         props,
         this.renderAll(node.children)
@@ -55,11 +61,11 @@ class ComponentCompiler {
     const Feature = this.loadComponent(node.collection, node.type)
 
     return (Feature)
-      ? React.createElement(
+      ? this.createElement(
         Feature,
         node.props
       )
-      : React.createElement(
+      : this.createElement(
         'div',
         {
           key: node.props.id,

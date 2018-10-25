@@ -7,15 +7,15 @@ All requests that begin with `/pb/dist` or `/pb/resources` will be handled as if
 
 ## Content
 
--   `/content/fetch/:content-source?key=:key[&query=:query][&_website=:website]`
+-   `/content/fetch/:content-source?query=:query[&filter=:filter][&_website=:website]`
 
-Fetch a specific piece of content, using the content source and key specified. Optionally filter the content with a provided graphql query.
+Fetch a specific piece of content, using the content source and query specified. Optionally filter the content with a provided graphql filter.
 
 The `_website` parameter will be appended automatically by the public origin
 
--   `/content/clear/:content-source?key=:key[&_website=:website]`
+-   `/content/clear/:content-source?query=:query[&_website=:website]`
 
-Clear the cache of a specific piece of content, using the content source and key specified.
+Clear the cache of a specific piece of content, using the content source and query specified.
 
 
 ## Rendering

@@ -41,7 +41,7 @@ const Layout = require('../../src/react/shared/components/layout')
 const {
   // apiPrefix,
   bundleRoot,
-  componentDistRoot,
+  componentBuildRoot,
   componentSrcRoot
 } = require('../../environment')
 
@@ -89,8 +89,8 @@ const createComponentEntry = (src, componentCollection, componentType, outputTyp
       type: componentType,
       // during production compilation, this is run in a tmp directory
       src: path.relative(bundleRoot, src),
-      dist: path.relative(bundleRoot, `${componentDistRoot}/${p}`),
-      css: path.relative(bundleRoot, `${componentDistRoot}/${p}`.replace(/\.js$/, '.css'))
+      dist: path.relative(bundleRoot, `${componentBuildRoot}/${p}`),
+      css: path.relative(bundleRoot, `${componentBuildRoot}/${p}`.replace(/\.js$/, '.css'))
       // uri: `${apiPrefix}/dist/components/${p}`
     }
   )
@@ -185,7 +185,7 @@ const generateManifest = (collection, outputTypeManifest) => {
 }
 
 function generateManifestFile (collection, outputTypeManifest) {
-  const filePath = `${componentDistRoot}/${collection}/fusion.manifest.json`
+  const filePath = `${componentBuildRoot}/${collection}/fusion.manifest.json`
   const manifest = generateManifest(collection, outputTypeManifest)
   writeFile(filePath, JSON.stringify(manifest, null, 2))
   return manifest

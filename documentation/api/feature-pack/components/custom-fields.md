@@ -7,7 +7,7 @@ Custom Fields are implemented using React's [PropTypes](https://github.com/faceb
 ### `bool`
 
 ##### Description
-Will produce a checkbox input in PageBuilder and return `true` or `false` depending on the selection. 
+Will produce a checkbox input in PageBuilder and return `true` or `false` depending on the selection.
 
 ##### Example
 
@@ -64,15 +64,15 @@ class Songs extends Component {
     this.fetchContent({
       songList: {
         source: contentService,
-        key: contentConfigValues,
-        query: '{ results { name } }'
+        query: contentConfigValues,
+        filter: '{ results { name } }'
       }
     })
   }
 
   render() {
     <ul>
-      {this.state.songList.map(song => 
+      {this.state.songList.map(song =>
         <li>{song.name}</li>
       )}
     </ul>

@@ -13,11 +13,11 @@ You can see in the [OMDB API docs](http://www.omdbapi.com/#parameters) that it s
 
 import { OMDB_API_KEY } from 'fusion:environment'
 
-const resolve = (key) => {
-  const requestUri = `https://www.omdbapi.com/?apikey=${OMDB_API_KEY}&s=${key.movieQuery}`
+const resolve = (query) => {
+  const requestUri = `https://www.omdbapi.com/?apikey=${OMDB_API_KEY}&s=${query.movieQuery}`
 
-  return (key.hasOwnProperty('page'))
-    ? `${requestUri}&page=${key.page}`
+  return (query.hasOwnProperty('page'))
+    ? `${requestUri}&page=${query.page}`
     : requestUri
 }
 

@@ -12,9 +12,10 @@ const engine = require('../../utils/engine')
 
 const { RedirectError, NotFoundError } = require('../../errors')
 
-const fetch = function fetch (contentSource, contentKey, { version, cacheMode }) {
+const fetch = async function fetch (contentSource, contentKey, { version, cacheMode }) {
+  // TODO: update this to use `query` param name after clients are updated to 0.4+
   return engine({
-    uri: `/content/fetch/${contentSource}?key=${encodeURIComponent(JSON.stringify(contentKey))}`,
+    uri: `/content/fetch/${contentSource}?key=${encodeURIComponent(JSON.stringify(contentKey))}&followRedirect=false`,
     version,
     cacheMode
   })
@@ -76,7 +77,7 @@ class TemplateResolver extends BaseResolver {
   }
 
   async hydrate (requestParts, { arcSite, version, cacheMode }) {
-    const key = Object.assign(
+    const query = Object.assign(
       {
         uri: requestParts.pathname,
         'arc-site': arcSite
@@ -84,19 +85,20 @@ class TemplateResolver extends BaseResolver {
       this.paramExtractor(requestParts)
     )
 
-    return fetch(this.config.contentSourceId, key, { version, cacheMode })
-      .catch((err) => {
-        if (err.statusCode === 404) {
-          throw new NotFoundError(`Could not resolve ${requestParts.href}`, {
-            requestUri: requestParts.href,
-            cause: `Resolver matched, but content could not be fetched. Make sure this is the correct resolver.`,
-            resolver: this.config
-          })
-        }
+    try {
+      const content = await fetch(this.config.contentSourceId, query, { version, cacheMode })
+      return { query, content }
+    } catch (err) {
+      if (err.statusCode === 404) {
+        throw new NotFoundError(`Could not resolve ${requestParts.href}`, {
+          requestUri: requestParts.href,
+          cause: `Resolver matched, but content could not be fetched. Make sure this is the correct resolver.`,
+          resolver: this.config
+        })
+      }
 
-        throw err
-      })
-      .then((content) => ({ key, content }))
+      throw err
+    }
   }
 
   matchRequiredParams (requestParams) {

@@ -11,8 +11,8 @@ const {
   bodyLimit,
   bundleDistRoot,
   defaultOutputType,
-  isDev,
-  version
+  deployment,
+  isDev
 } = require('../../environment')
 
 const distRouter = express.Router()
@@ -21,12 +21,12 @@ const staticHandler = (location) => express.static(`${bundleDistRoot}${location 
 const redirectHandler = (location) => {
   const useStatic = staticHandler(location)
   return (req, res, next) => {
-    if (req.query.v === version) {
+    if (req.query.v === deployment) {
       useStatic(req, res, next)
     } else {
       const urlParts = url.parse(req.originalUrl, true)
       delete urlParts.search
-      urlParts.query.v = version
+      urlParts.query.v = deployment
       res.redirect(url.format(urlParts))
     }
   }
@@ -50,29 +50,35 @@ function getTypeRouter (routeType, allowPost) {
   const typeRouter = express.Router()
 
   typeRouter.get('/:id/:outputType.js',
-    (req, res, next) => {
-      const id = req.params.id
-      const type = routeType
+    async (req, res, next) => {
+      try {
+        const id = req.params.id
+        const type = routeType
 
-      new Rendering(type, id)
-        .getScript(req.params.outputType || defaultOutputType)
-        .then((src) => { res.set('Content-Type', 'application/javascript').send(src) })
-        .catch(next)
+        const rendering = new Rendering(type, id)
+        const src = await rendering.getScript(req.params.outputType || defaultOutputType)
+        res.set('Content-Type', 'application/javascript')
+        res.send(src)
+      } catch (e) {
+        next(e)
+      }
     }
   )
 
   if (allowPost) {
     const publishRenderingHandlers = [
       bodyParser.json({ limit: bodyLimit }),
-      (req, res, next) => {
-        const id = req.params.id || req.body.id || req.body._id
-        const type = req.body.type || routeType
+      async (req, res, next) => {
+        try {
+          const id = req.params.id || req.body.id || req.body._id
+          const type = req.body.type || routeType
 
-        const rendering = new Rendering(type, id, req.body)
-
-        rendering[publishMethod](!isDev && req.query.propagate !== 'false')
-          .then(() => { res.sendStatus(200) })
-          .catch(next)
+          const rendering = new Rendering(type, id, req.body)
+          await rendering[publishMethod](!isDev && req.query.propagate !== 'false')
+          res.sendStatus(200)
+        } catch (e) {
+          next(e)
+        }
       }
     ]
 
@@ -82,16 +88,18 @@ function getTypeRouter (routeType, allowPost) {
 
     const publishOutputTypeHandlers = [
       bodyParser.json({ limit: bodyLimit }),
-      (req, res, next) => {
-        const id = req.params.id || req.body.id || req.body._id
-        const type = req.body.type || routeType
-        const outputType = req.params.outputType || defaultOutputType
+      async (req, res, next) => {
+        try {
+          const id = req.params.id || req.body.id || req.body._id
+          const type = req.body.type || routeType
+          const outputType = req.params.outputType || defaultOutputType
 
-        const rendering = new Rendering(type, id, req.body)
-
-        rendering.compile(outputType)
-          .then(() => { res.sendStatus(200) })
-          .catch(next)
+          const rendering = new Rendering(type, id, req.body)
+          await rendering.compile(outputType)
+          res.sendStatus(200)
+        } catch (e) {
+          next(e)
+        }
       }
     ]
 
@@ -108,15 +116,15 @@ distRouter.use('/rendering', getTypeRouter('rendering'))
 distRouter.use('/template', getTypeRouter('template', true))
 
 if (!isDev) {
-  distRouter.post('/compile', (req, res, next) => {
-    Promise.all([
-      Rendering.compile('page'),
-      Rendering.compile('template')
-    ])
-      .then(([pages, templates]) => {
-        res.send(200)
-      })
-  })
+  distRouter.post('/compile',
+    async (req, res, next) => {
+      await Promise.all([
+        Rendering.compile('page'),
+        Rendering.compile('template')
+      ])
+
+      res.send(200)
+    })
 }
 
 module.exports = distRouter

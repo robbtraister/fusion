@@ -219,11 +219,37 @@ cat <<EOB
       rewrite                   ^ ${API_PREFIX}/resolve;
     }
     # end of admin rewrites
+EOB
+
+if [ "${IS_PROD}" ]
+then
+
+  cat <<EOB
 
     location / {
       proxy_set_header          Host \$host;
       proxy_pass                http://\$cacheMode;
     }
+EOB
+
+else
+
+  cat <<EOB
+
+    location @upstream {
+      proxy_set_header          Host \$host;
+      proxy_pass                http://\$cacheMode;
+    }
+
+    location / {
+      root                      /etc/nginx/mocks;
+      try_files                 \$uri @upstream;
+    }
+EOB
+
+fi
+
+cat <<EOB
   }
 }
 EOB

@@ -17,56 +17,79 @@ const {
   trailingSlashRewrite
 } = require('../utils/trailing-slash-rule')
 
-// fetch page/template resolvers from DB (local env) or config file (prod)
-const { pageConfigs, templateConfigs } = (resolveFromDB)
-  ? (() => {
-    const model = require('../dao')
-    return {
-      pageConfigs: model('page').find(),
-      templateConfigs: model('resolver_config').find()
-    }
-  })()
-  : (() => {
-    const resolverConfigs = require('../../config/resolvers.json')
-    return {
-      pageConfigs: Promise.resolve(resolverConfigs.pages || []),
-      templateConfigs: Promise.resolve(resolverConfigs.resolvers || [])
-    }
-  })()
+function prepareResolverConfigs (pageConfigs, templateConfigs) {
+  const pageResolvers = pageConfigs
+    .map((config) => new PageResolver(config))
+    .sort(PageResolver.sort)
 
-const pageResolversPromise = pageConfigs
-  .then((configs) => configs.map((config) => new PageResolver(config)))
-  .then((resolvers) => resolvers.sort(PageResolver.sort))
+  const templateResolvers = templateConfigs
+    .map((config) => new TemplateResolver(config))
+    .sort(TemplateResolver.sort)
 
-const templateResolversPromise = templateConfigs
-  .then((configs) => configs.map((config) => new TemplateResolver(config)))
-  .then((resolvers) => resolvers.sort(TemplateResolver.sort))
+  return {
+    all: pageResolvers.concat(templateResolvers),
+    pages: pageResolvers,
+    templates: templateResolvers
+  }
+}
 
-const resolversPromise = Promise.all([
-  pageResolversPromise,
-  templateResolversPromise
-])
-  .then(([pageResolvers, templateResolvers]) => pageResolvers.concat(templateResolvers))
+function loadResolversFromDB () {
+  const model = require('../dao')
 
-const resolve = function resolve (requestUri, { arcSite, version, cacheMode }) {
+  return async function () {
+    const [ pageConfigs, templateConfigs ] = await Promise.all([
+      model('page').find(),
+      model('resolver_config').find()
+    ])
+
+    return prepareResolverConfigs(pageConfigs, templateConfigs)
+  }
+}
+
+function loadResolversFromFS () {
+  const resolverConfigs = require('../../config/resolvers.json')
+
+  const resolverPromise = Promise.all([
+    resolverConfigs.pages || [],
+    resolverConfigs.resolvers || []
+  ])
+    .then(([pageConfigs, templateConfigs]) => prepareResolverConfigs(pageConfigs, templateConfigs))
+
+  return async function () {
+    return resolverPromise
+  }
+}
+
+const getResolvers = (resolveFromDB)
+  ? loadResolversFromDB()
+  : loadResolversFromFS()
+
+const resolve = async function resolve (requestUri, params) {
   const requestParts = url.parse(requestUri, true)
   requestParts.pathname = trailingSlashRewrite(requestParts.pathname)
   debugLogger(`Resolving: ${JSON.stringify(requestUri)}`)
 
-  return resolversPromise
-    .then((resolvers) => {
-      const resolver = resolvers.find(resolver => resolver.match(requestParts, arcSite))
+  const resolverMap = await getResolvers()
+  const resolvers = (params.pagesOnly)
+    ? resolverMap.pages
+    : resolverMap.all
+  const resolver = resolvers.find(resolver => resolver.match(requestParts, params.arcSite))
 
-      return resolver
-        ? resolver.resolve(requestParts, { arcSite, version, cacheMode })
-        : null
-    })
+  return resolver
+    ? resolver.resolve(requestParts, params)
+    : null
 }
 
 module.exports = resolve
 
+async function main (uri) {
+  try {
+    console.log(await resolve(uri))
+  } catch (e) {
+    console.error(e)
+  }
+}
+
 if (module === require.main) {
-  resolve(process.argv[2])
-    .then(console.log)
-    .catch(console.error)
+  main(process.argv[2])
 }

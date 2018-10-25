@@ -61,44 +61,32 @@ function Mongo (mongoUrl) {
       models[modelName] = models[modelName] || {
         name: modelName,
 
-        find (query) {
+        async find (query) {
           let tic
-          return getCollection(modelName)
-            .then((collection) => {
-              tic = timer.tic()
-              return collection.find(query)
-            })
-            .then((cursor) => cursor.toArray())
-            .then((data) => {
-              debugTimer(`${modelName}.find()`, tic.toc())
-              return data
-            })
+          const collection = await getCollection(modelName)
+          tic = timer.tic()
+          const cursor = await collection.find(query)
+          const data = await cursor.toArray()
+          debugTimer(`${modelName}.find()`, tic.toc())
+          return data
         },
 
-        findById (_id) {
+        async findById (_id) {
           let tic
-          return getCollection(modelName)
-            .then((collection) => {
-              tic = timer.tic()
-              return collection.findOne({ _id })
-            })
-            .then((data) => {
-              debugTimer(`${modelName}.findById(${_id})`, tic.toc())
-              return data
-            })
+          const collection = await getCollection(modelName)
+          tic = timer.tic()
+          const data = await collection.findOne({ _id })
+          debugTimer(`${modelName}.findById(${_id})`, tic.toc())
+          return data
         },
 
-        findOne (query) {
+        async findOne (query) {
           let tic
-          return getCollection(modelName)
-            .then((collection) => {
-              tic = timer.tic()
-              return collection.findOne(query)
-            })
-            .then((data) => {
-              debugTimer(`${modelName}.findOne()`, tic.toc())
-              return data
-            })
+          const collection = await getCollection(modelName)
+          tic = timer.tic()
+          const data = await collection.findOne(query)
+          debugTimer(`${modelName}.findOne()`, tic.toc())
+          return data
         }
       }
 

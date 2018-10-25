@@ -10,9 +10,6 @@ const Provider = require('./provider')
 const React = window.react
 const ReactDOM = window.ReactDOM
 
-// support fragments in preact
-React.Fragment = React.Fragment || 'div'
-
 const appendBoundary = (element, id) => {
   const boundaryProps = {
     'data-fusion-component': id,
@@ -51,6 +48,12 @@ const appendBoundary = (element, id) => {
 
 const ComponentCompiler = require('../shared/compile/component')
 class AdminCompiler extends ComponentCompiler {
+  constructor (renderable, outputType) {
+    super(renderable, outputType)
+
+    this.createElement = Fusion.createElement
+  }
+
   loadComponent (componentCollection, componentType) {
     try {
       return Fusion.components[componentCollection][componentType]

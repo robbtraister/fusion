@@ -1,5 +1,5 @@
 const request = require('request')
-const { datadogApiKey, environment, isDev, semver, version } = require('../../environment')
+const { datadogApiKey, deployment, environment, isDev, semver } = require('../../environment')
 
 const METRIC_TYPES = {
   CACHE_LATENCY: 'arc.fusion.cache.latency',
@@ -29,7 +29,7 @@ const sendMetrics = function sendMetrics (metrics) {
     'app:fusion',
     'function-type:engine',
     `engine-version:${semver}`,
-    `lambda-deployment:${version}`,
+    `lambda-deployment:${deployment}`,
     `environment:${environment}`
   ]
 

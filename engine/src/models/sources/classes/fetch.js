@@ -4,9 +4,8 @@ const BaseSource = require('./base')
 
 class FetchSource extends BaseSource {
   async fetch (...args) {
-    return Promise.resolve()
-      .then(() => this.config.fetch(...args))
-      .then((data) => this.transform(data))
+    const data = await this.config.fetch(...args)
+    return this.transform(data)
   }
 }
 

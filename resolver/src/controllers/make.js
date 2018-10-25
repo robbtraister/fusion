@@ -17,32 +17,32 @@ const endpoint = function endpoint ({ arcSite, outputType, why404 }) {
   })
 }
 
-const make = function make (uri, params) {
-  return resolve(uri, params)
-    .then((data) => {
-      if (data) {
-        return engine({
-          method: 'POST',
-          uri: endpoint(params),
-          data,
-          ...params
-        }).catch((err) => {
-          if (err.statusCode === 404) {
-            throw new NotFoundError(`Could not resolve ${uri}`, {
-              requestUri: uri,
-              cause: err.message
-            })
-          }
-
-          throw err
+const make = async function make (uri, params) {
+  const data = await resolve(uri, params)
+  if (data) {
+    try {
+      return await engine({
+        method: 'POST',
+        uri: endpoint(params),
+        data,
+        ...params
+      })
+    } catch (err) {
+      if (err.statusCode === 404) {
+        throw new NotFoundError(`Could not resolve ${uri}`, {
+          requestUri: uri,
+          cause: err.message
         })
       }
 
-      throw new NotFoundError(`Could not resolve ${uri}`, {
-        requestUri: uri,
-        cause: 'Resolver could not be matched'
-      })
-    })
+      throw err
+    }
+  }
+
+  throw new NotFoundError(`Could not resolve ${uri}`, {
+    requestUri: uri,
+    cause: 'Resolver could not be matched'
+  })
 }
 
 module.exports = make

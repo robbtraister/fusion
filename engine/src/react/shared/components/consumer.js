@@ -80,7 +80,7 @@ function HOC (Component) {
           )
         }
 
-        getContent (sourceOrConfig, key, filter, inherit) {
+        getContent (sourceOrConfig, query, filter, inherit) {
           const isConfig = (sourceOrConfig instanceof Object)
 
           inherit = (isConfig)
@@ -95,7 +95,7 @@ function HOC (Component) {
           }
 
           const sourceName = (isConfig)
-            ? sourceOrConfig.sourceName || sourceOrConfig.source || sourceOrConfig.contentService
+            ? sourceOrConfig.contentService || sourceOrConfig.sourceName || sourceOrConfig.source
             : sourceOrConfig
 
           if (!sourceName) {
@@ -105,17 +105,36 @@ function HOC (Component) {
             }
           }
 
-          key = (isConfig)
-            ? sourceOrConfig.key || sourceOrConfig.contentConfigValues
-            : key
+          if (isConfig && sourceOrConfig.hasOwnProperty('key')) {
+            console.warn('--- WARNING: The \'key\' property on content configs has been renamed as \'query\'. Use of \'key\' has been DEPRECATED. ---')
+            if (isConfig && sourceOrConfig.hasOwnProperty('query')) {
+              console.warn('--- WARNING: The \'query\' property on content configs has been renamed as \'filter\'. ---')
+            }
+            query = sourceOrConfig.key
 
-          key = JSON.parse(JSON.stringify(key).replace(/\{\{([^}]+)\}\}/g, (match, propName) => {
-            return _get(this.props, propName) || match
-          }))
+            query = JSON.parse(JSON.stringify(query).replace(/\{\{([^}]+)\}\}/g, (match, propName) => {
+              return _get(this.props, propName) || match
+            }))
 
-          filter = (isConfig)
-            ? sourceOrConfig.filter || sourceOrConfig.query
-            : filter
+            filter = sourceOrConfig.filter || sourceOrConfig.query
+          } else {
+            if (isConfig && sourceOrConfig.hasOwnProperty('contentConfigValues') && sourceOrConfig.hasOwnProperty('query') && !sourceOrConfig.hasOwnProperty('filter')) {
+              console.warn('--- WARNING: The \'query\' property on content configs has been renamed as \'filter\'. ---')
+              sourceOrConfig.filter = sourceOrConfig.query
+            }
+
+            query = (isConfig)
+              ? sourceOrConfig.contentConfigValues || sourceOrConfig.query
+              : query
+
+            query = JSON.parse(JSON.stringify(query).replace(/\{\{([^}]+)\}\}/g, (match, propName) => {
+              return _get(this.props, propName) || match
+            }))
+
+            filter = (isConfig)
+              ? sourceOrConfig.filter
+              : filter
+          }
 
           const localEdits = Object.assign({}, this.props.localEdits || {})
           const localEditItems = localEdits.items || {}
@@ -129,7 +148,7 @@ function HOC (Component) {
             )
           }
 
-          const content = context.getContent(sourceName, key, filter, ConsumerWrapper)
+          const content = context.getContent(sourceName, query, filter, ConsumerWrapper)
 
           return {
             cached: content.cached && appendLocalEdits(content.cached),

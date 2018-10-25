@@ -15,10 +15,10 @@ Let's create a file called `movie-find.js` in the `/src/content/sources/` direct
 
 import { OMDB_API_KEY } from 'fusion:environment'
 
-const resolve = (key) => {
+const resolve = (query) => {
   const requestUri = `https://www.omdbapi.com/?apikey=${OMDB_API_KEY}&plot=full`
 
-  if (key.hasOwnProperty('movieTitle')) return `${requestUri}&t=${key.movieTitle}`
+  if (query.hasOwnProperty('movieTitle')) return `${requestUri}&t=${query.movieTitle}`
 
   throw new Error('movie-find content source requires a movieId or movieTitle')
 }
@@ -37,9 +37,9 @@ export default {
 In the exported object above, we define all 3 pieces of data that we need for our content source:
 
 #### `resolve` property
-The `resolve` property is a function whose output is a URL which returns the JSON we want. It accepts a single argument we've named `key` here (but you could call it anything). The `key` object contains the values of the parameters we need to make a request - in this case, we only need the `movieTitle` param. These values are either set in the PageBuilder Admin (for "global" content) and retried by resolvers, or if you're fetching your own content you will provide the values when you make the fetch call.
+The `resolve` property is a function whose output is a URL which returns the JSON we want. It accepts a single argument we've named `query` here (but you could call it anything). The `query` object contains the values of the parameters we need to make a request - in this case, we only need the `movieTitle` param. These values are either set in the PageBuilder Admin (for "global" content) and retried by resolvers, or if you're fetching your own content you will provide the values when you make the fetch call.
 
-We're able to perform logic in our function to transform the URL however we want. In this example, if a `movieTitle` property exists in the `key` object that was passed to us, we want to use that param to find our movie. If it doesn't exist (meaning it skipped the `if` block), we will throw an error since we don't have the data we need to make our request.
+We're able to perform logic in our function to transform the URL however we want. In this example, if a `movieTitle` property exists in the `query` object that was passed to us, we want to use that param to find our movie. If it doesn't exist (meaning it skipped the `if` block), we will throw an error since we don't have the data we need to make our request.
 
 Because this URL will typically require some sort of authentication to access, we have access to the `fusion:environment` in content sources, which gives us decrypted access to "secret" environment variables. Here, we are interpolating an `OMDB_API_KEY` environment variable into the URL to authenticate our request. We'll discuss more about ["secrets" and environment variables](./using-environment-secrets.md) later.
 
@@ -49,7 +49,7 @@ Because this URL will typically require some sort of authentication to access, w
 We'll discuss [how to define a GraphQL schema soon](./using-graphql-schema.md).
 
 #### `params` property
-The `params` property will contain a list of parameter names and data types that this content source needs to make a request. For example, in this content source we only have 1 param that we can use to make a request: the `movieTitle` param. Given either of these pieces of data (as part of the `key` object in our resolve method), we are able to craft a URL (in our `resolve` function) that gets us the data we want (e.g `https://www.omdbapi.com/?apikey=<apiKey>&t=Jurassic%20Park` will get us the info for the movie Jurassic Park).
+The `params` property will contain a list of parameter names and data types that this content source needs to make a request. For example, in this content source we only have 1 param that we can use to make a request: the `movieTitle` param. Given either of these pieces of data (as part of the `query` object in our resolve method), we are able to craft a URL (in our `resolve` function) that gets us the data we want (e.g `https://www.omdbapi.com/?apikey=<apiKey>&t=Jurassic%20Park` will get us the info for the movie Jurassic Park).
 
 `params` can be defined either as an object (as seen above) or as an [array of objects](../api/feature-pack/content/source.md). If defined as an object, each key of the object will be the name of a param, and its value will be the data type of that param. The allowed data types are `text`, `number` and `site`.
 
@@ -87,11 +87,11 @@ Oftentimes, you will have multiple content sources that all share the same base 
 For example, let's say I have my `CONTENT_BASE` environment variable set to `https://username:password@api.client-name.arcpublishing.com`, and I want to define a content source for "stories" at that domain. In that case, my `resolve` function might look like this:
 
 ```jsx
-const resolve = function resolve (key) {
-  const requestUri = `/content/v3/stories/?canonical_url=${key.canonical_url || key.uri}`
+const resolve = function resolve (query) {
+  const requestUri = `/content/v3/stories/?canonical_url=${query.canonical_url || query.uri}`
 
-  return (key.hasOwnProperty('published'))
-    ? `${requestUri}&published=${key.published}`
+  return (query.hasOwnProperty('published'))
+    ? `${requestUri}&published=${query.published}`
     : requestUri
 }
 ```

@@ -1,7 +1,7 @@
 'use strict'
 
 const {
-  componentDistRoot,
+  componentBuildRoot,
   isDev
 } = require('../../../environment')
 
@@ -85,7 +85,7 @@ function transformOutputTypeConfigs (manifest) {
     }))
 }
 
-const getManifestFile = (type) => `${componentDistRoot}/${type}/fusion.manifest.json`
+const getManifestFile = (type) => `${componentBuildRoot}/${type}/fusion.manifest.json`
 
 function getComponentConfigs (type) {
   const manifest = require(getManifestFile(type))

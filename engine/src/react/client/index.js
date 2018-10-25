@@ -9,9 +9,6 @@ const Provider = require('./provider')
 const React = window.react
 const ReactDOM = window.ReactDOM
 
-// support fragments in preact
-React.Fragment = React.Fragment || 'div'
-
 let did404 = false
 const notFound = window.notFound = function () {
   if (!did404) {

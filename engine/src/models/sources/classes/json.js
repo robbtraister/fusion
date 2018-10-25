@@ -1,29 +1,31 @@
 'use strict'
 
+const _get = require('lodash.get')
+
 const CachedSource = require('./cached')
 
 const expandProperties = function expandProperties (string, properties) {
   return string.replace(/\{([^}]+)\}/g, function (match, prop) {
-    return (prop === 'key')
+    return (/^(key|query)$/.test(prop))
       ? properties
-      : properties[prop.replace(/^key\./, '')] || match
+      : _get(properties, prop.replace(/^(key|query)\./, '')) || match
   })
 }
 
 class JsonSource extends CachedSource {
-  resolve (key) {
-    const path = expandProperties(this.pattern, key)
+  resolve (query, options) {
+    const path = expandProperties(this.pattern, query)
 
-    const query = this.params
+    const params = this.params
       .map((param) => {
-        return (param.dropWhenEmpty && !(param.name in key))
+        return (param.dropWhenEmpty && !(param.name in query))
           ? null
-          : `${param.name}=${key[param.name] || param.default}`
+          : `${param.name}=${query[param.name] || param.default}`
       })
       .filter(v => v)
       .join('&')
 
-    return this.formatUri(`${path}${query ? `?${query}` : ''}`)
+    return this.formatUri(`${path}${params ? `?${params}` : ''}`, options)
   }
 }
 

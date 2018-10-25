@@ -9,13 +9,6 @@ cat <<EOB
     listen                      ${PORT:-8081};
     # server_name                 _;
 
-    location @resolver {
-EOB
-
-$(dirname "$0")/../locations/resolver.conf.sh
-
-cat <<EOB
-    }
     location @engine {
       proxy_read_timeout        60;
 EOB
@@ -57,8 +50,18 @@ cat <<EOB
       try_files                 \$file =404;
     }
 
-    location ~ ^${API_PREFIX}/(configs)(/.*|\$) {
-      set                       \$p /components\$2/fusion.configs.json;
+    location ~ ^${API_PREFIX}/configs/content(/.*|\$) {
+      set                       \$p /content\$1/fusion.configs.json;
+
+      proxy_intercept_errors    on;
+      error_page                400 403 404 418 = @engine;
+
+      root                      /etc/nginx/dist;
+      try_files                 \$p =404;
+    }
+
+    location ~ ^${API_PREFIX}/configs(/.*|\$) {
+      set                       \$p /components\$1/fusion.configs.json;
 
       proxy_intercept_errors    on;
       error_page                400 403 404 418 = @engine;
@@ -73,8 +76,11 @@ cat <<EOB
     }
 
     location ${API_PREFIX}/resolve {
-      error_page                418 = @resolver;
-      return                    418;
+EOB
+
+PROXY_PREFIX=${API_PREFIX} $(dirname "$0")/../locations/resolver.conf.sh
+
+cat <<EOB
     }
 
     # strip trailing slashes
@@ -82,8 +88,11 @@ cat <<EOB
       rewrite                   (.*)/\$ \$1 last;
     }
     location ~ ^${API_PREFIX}/(fuse|make)(/.*|\$) {
-      error_page                400 403 404 418 = @resolver;
-      return                    418;
+EOB
+
+$(dirname "$0")/../locations/resolver.conf.sh
+
+cat <<EOB
     }
 
     location ${API_PREFIX} {

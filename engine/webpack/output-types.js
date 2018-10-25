@@ -21,7 +21,8 @@ const resolve = require('./shared/resolve')
 
 const {
   bundleRoot,
-  bundleDistRoot,
+  bundleBuildRoot,
+  componentBuildRoot,
   componentDistRoot,
   isDev
 } = require('../environment')
@@ -119,7 +120,7 @@ module.exports = (Object.keys(entry).length)
       optimization,
       output: {
         filename: `[name].js`,
-        path: path.resolve(componentDistRoot, 'output-types'),
+        path: path.resolve(componentBuildRoot, 'output-types'),
         libraryTarget: 'commonjs2'
       },
       plugins: [
@@ -131,9 +132,9 @@ module.exports = (Object.keys(entry).length)
             // run it in a separate process to prevent ALL modules from being transpiled
             childProcess.exec('npm run generate:manifest')
             // output-type fallback changes may affect template scripts
-            childProcess.exec(`rm -rf '${path.resolve(bundleDistRoot, 'page')}'`)
-            childProcess.exec(`rm -rf '${path.resolve(bundleDistRoot, 'styles')}'`)
-            childProcess.exec(`rm -rf '${path.resolve(bundleDistRoot, 'template')}'`)
+            childProcess.exec(`rm -rf '${path.resolve(bundleBuildRoot, 'page')}'`)
+            childProcess.exec(`rm -rf '${path.resolve(bundleBuildRoot, 'styles')}'`)
+            childProcess.exec(`rm -rf '${path.resolve(bundleBuildRoot, 'template')}'`)
           }
         })
       ],

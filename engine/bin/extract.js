@@ -11,8 +11,9 @@ const {
 const model = require('../src/dao/mongo')
 const { LOG_TYPES, ...logger } = require('../src/utils/logger')
 
-model('jge_config').find()
-  .then((configs) => {
+async function extract () {
+  try {
+    const configs = await model('jge_config').find()
     configs.map((config) => {
       console.log(`Extracting: ${config._id}`)
       config.pattern = url.format(
@@ -25,11 +26,11 @@ model('jge_config').find()
       console.log(`Successfully extracted: ${config._id}`)
     })
     console.log(`Extraction complete.`)
-  })
-  .catch((error) => {
+  } catch (error) {
     logger.logError({ logType: LOG_TYPES.PAGE_RENDER_TIME, message: 'Unable to extract.', stackTrace: error.stack })
-  })
-  .then(() => {
-    // mongo connection will keep the process running
-    process.exit(0)
-  })
+  }
+  // mongo connection will keep the process running
+  process.exit(0)
+}
+
+extract()

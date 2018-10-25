@@ -1,6 +1,14 @@
 #!/bin/sh
 
 cat <<EOB
+    location @resolver {
+EOB
+
+$(dirname "$0")/../locations/resolver.conf.sh
+
+cat <<EOB
+    }
+
     # strip trailing slashes
     location ~ ^${API_PREFIX}/(fuse|make)(/.*)/\$ {
       rewrite                   (.*)/\$ \$1 last;

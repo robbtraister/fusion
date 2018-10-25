@@ -11,7 +11,7 @@ class BaseResolver {
 
   async hydrate (requestParts, params) {
     return {
-      key: null,
+      query: null,
       content: null
     }
   }
@@ -31,7 +31,7 @@ class BaseResolver {
   }
 
   async resolve (requestParts, params) {
-    const { key, content } = await this.hydrate(requestParts, params)
+    const { query, content } = await this.hydrate(requestParts, params)
 
     return Object.assign(
       {
@@ -46,11 +46,11 @@ class BaseResolver {
         // remove versions from page config
         resolver: Object.assign({}, this.config, { versions: undefined })
       },
-      (key)
+      (query)
         ? {
           content: {
             source: this.config.contentSourceId,
-            key,
+            query,
             document: content
           }
         }

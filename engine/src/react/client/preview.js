@@ -2,8 +2,8 @@
 
 /* global __CONTEXT_PATH__ */
 
-const version = undefined
-const versionParam = version ? `?v=${version}` : ''
+const deployment = undefined
+const deploymentParam = deployment ? `?v=${deployment}` : ''
 
 function addElement (tag, type, attr, rel) {
   return function (doc, url, onload) {
@@ -53,15 +53,15 @@ class Preview {
     form.appendChild(renderingInput)
     this.iframe.contentDocument.body.appendChild(form)
     this.iframe.onload = () => {
-      addJs(this.iframe.contentDocument, `${__CONTEXT_PATH__}/dist/engine/admin.js${versionParam}`, () => {
+      addJs(this.iframe.contentDocument, `${__CONTEXT_PATH__}/dist/engine/admin.js${deploymentParam}`, () => {
         // when loaded dynamically, serial loading is unreliable, so we have to manually load serially
-        addJs(this.iframe.contentDocument, `${__CONTEXT_PATH__}/dist/components/combinations/${this.outputType}.js${versionParam}`, () => {
+        addJs(this.iframe.contentDocument, `${__CONTEXT_PATH__}/dist/components/combinations/${this.outputType}.js${deploymentParam}`, () => {
           this.isReady = true
           this.CSR()
         })
       })
-      addCss(this.iframe.contentDocument, `${__CONTEXT_PATH__}/dist/components/output-types/${this.outputType}.css${versionParam}`)
-      addCss(this.iframe.contentDocument, `${__CONTEXT_PATH__}/dist/components/combinations/${this.outputType}.css${versionParam}`)
+      addCss(this.iframe.contentDocument, `${__CONTEXT_PATH__}/dist/components/output-types/${this.outputType}.css${deploymentParam}`)
+      addCss(this.iframe.contentDocument, `${__CONTEXT_PATH__}/dist/components/combinations/${this.outputType}.css${deploymentParam}`)
     }
 
     form.submit()

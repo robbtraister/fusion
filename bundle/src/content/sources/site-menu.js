@@ -1,6 +1,6 @@
 'use strict'
 
-const resolve = (key) => `/site/v2/navigation?_id=${key.id}`
+const resolve = (query) => `/site/v2/navigation?_id=${query.id}`
 
 module.exports = {
   resolve,

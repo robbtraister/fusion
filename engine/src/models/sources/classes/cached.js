@@ -178,7 +178,7 @@ class CachedSource extends ResolveSource {
   }
 
   async update (query, options) {
-    this._update(this.resolve(query, options), options)
+    return this._update(this.resolve(query, options), options)
   }
 }
 

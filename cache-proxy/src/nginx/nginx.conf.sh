@@ -37,7 +37,6 @@ http {
   error_log                     ./logs/error.log;
 
   # ELB/ALB is likely set to 60s; ensure we stay open at least that long
-  keepalive_requests            100;
   keepalive_timeout             120;
 
   set_real_ip_from              0.0.0.0/0;
@@ -120,8 +119,8 @@ cat <<EOB
       memc_pass                 cache_cluster;
 
       statsd_timing "arc.fusion.cacheproxy.request_time#app:fusion-cache-proxy,nile_env:${NILE_ENV}" "\$request_time";
-      statsd_timing "arc.fusion.cacheproxy.upstream_connect_time#app:fusion-cache-proxy,nile_env:${NILE_ENV}" "\$upstream_connect_time";
-      statsd_timing "arc.fusion.cacheproxy.upstream_header_time#app:fusion-cache-proxy,nile_env:${NILE_ENV}" "\$upstream_header_time";
+      # statsd_timing "arc.fusion.cacheproxy.upstream_connect_time#app:fusion-cache-proxy,nile_env:${NILE_ENV}" "\$upstream_connect_time";
+      # statsd_timing "arc.fusion.cacheproxy.upstream_header_time#app:fusion-cache-proxy,nile_env:${NILE_ENV}" "\$upstream_header_time";
       statsd_timing "arc.fusion.cacheproxy.upstream_response_time#app:fusion-cache-proxy,nile_env:${NILE_ENV}" "\$upstream_response_time";
     }
 

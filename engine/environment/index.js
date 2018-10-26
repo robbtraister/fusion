@@ -2,9 +2,11 @@
 
 const path = require('path')
 
+const unpack = require('../src/utils/unpack')
+
 const optionalRequire = (fp) => {
   try {
-    return require(fp)
+    return unpack(require(fp))
   } catch (e) {
     return {}
   }
@@ -12,9 +14,32 @@ const optionalRequire = (fp) => {
 
 const bundleRoot = path.resolve(`${__dirname}/../bundle`)
 
+const bundleBuildRoot = `${bundleRoot}/build`
+const bundleDistRoot = `${bundleRoot}/dist`
+const bundleGeneratedRoot = `${bundleRoot}/generated`
+const bundleSrcRoot = `${bundleRoot}/src`
+
+const componentBuildRoot = `${bundleBuildRoot}/components`
+const componentDistRoot = `${bundleDistRoot}/components`
+const componentGeneratedRoot = `${bundleGeneratedRoot}/components`
+const componentSrcRoot = `${bundleSrcRoot}/components`
+
+const contentBuildRoot = `${bundleBuildRoot}/content`
+const contentDistRoot = `${bundleDistRoot}/content`
+const contentSrcRoot = `${bundleSrcRoot}/content`
+
+const schemasBuildRoot = `${contentBuildRoot}/schemas`
+const schemasSrcRoot = `${contentSrcRoot}/schemas`
+
+const sourcesBuildRoot = `${contentBuildRoot}/sources`
+const sourcesDistRoot = `${contentDistRoot}/sources`
+const sourcesSrcRoot = `${contentSrcRoot}/sources`
+
 const variables = Object.assign(
+  {},
   // ordered by increasing precedence
-  optionalRequire(path.join(bundleRoot, 'environment')),
+  optionalRequire(path.join(bundleBuildRoot, 'environment')),
+  optionalRequire(path.join(bundleSrcRoot, 'environment')),
   process.env
 )
 
@@ -40,27 +65,6 @@ const region = variables.AWS_REGION || 'us-east-1'
 const s3BucketDiscrete = variables.S3BUCKET_DISCRETE || variables.S3BUCKET || 'pagebuilder-fusion'
 const s3BucketVersioned = variables.S3BUCKET_VERSIONED || 'pagebuilder-fusion'
 const semver = variables.FUSION_RELEASE
-
-const bundleBuildRoot = `${bundleRoot}/build`
-const bundleDistRoot = `${bundleRoot}/dist`
-const bundleGeneratedRoot = `${bundleRoot}/generated`
-const bundleSrcRoot = `${bundleRoot}/src`
-
-const componentBuildRoot = `${bundleBuildRoot}/components`
-const componentDistRoot = `${bundleDistRoot}/components`
-const componentGeneratedRoot = `${bundleGeneratedRoot}/components`
-const componentSrcRoot = `${bundleSrcRoot}/components`
-
-const contentBuildRoot = `${bundleBuildRoot}/content`
-const contentDistRoot = `${bundleDistRoot}/content`
-const contentSrcRoot = `${bundleSrcRoot}/content`
-
-const schemasBuildRoot = `${contentBuildRoot}/schemas`
-const schemasSrcRoot = `${contentSrcRoot}/schemas`
-
-const sourcesBuildRoot = `${contentBuildRoot}/sources`
-const sourcesDistRoot = `${contentDistRoot}/sources`
-const sourcesSrcRoot = `${contentSrcRoot}/sources`
 
 const apiPrefix = `${contextPath}/api/v3`
 

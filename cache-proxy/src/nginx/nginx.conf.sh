@@ -110,7 +110,7 @@ cat <<EOB
 
     location /cache {
       set                       \$memc_key "\${remote_user}:\${arg_key}";
-      
+
       error_page                418 = @cacheput;
       if (\$request_method ~* ^(?:PUT|POST)\$) {
         return 418;
@@ -119,8 +119,6 @@ cat <<EOB
       memc_pass                 cache_cluster;
 
       statsd_timing "arc.fusion.cacheproxy.request_time#app:fusion-cache-proxy,nile_env:${NILE_ENV}" "\$request_time";
-      # statsd_timing "arc.fusion.cacheproxy.upstream_connect_time#app:fusion-cache-proxy,nile_env:${NILE_ENV}" "\$upstream_connect_time";
-      # statsd_timing "arc.fusion.cacheproxy.upstream_header_time#app:fusion-cache-proxy,nile_env:${NILE_ENV}" "\$upstream_header_time";
       statsd_timing "arc.fusion.cacheproxy.upstream_response_time#app:fusion-cache-proxy,nile_env:${NILE_ENV}" "\$upstream_response_time";
     }
 

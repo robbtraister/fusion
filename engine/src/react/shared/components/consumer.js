@@ -150,10 +150,16 @@ function HOC (Component) {
 
           const content = context.getContent(sourceName, query, filter, ConsumerWrapper)
 
+          const transform = (isConfig && sourceOrConfig.transform) || ((data) => data)
+
+          const cached = transform(content.cached && appendLocalEdits(content.cached))
+          const fetched = content.fetched
+            .then(appendLocalEdits)
+            .then(transform)
+
           return {
-            cached: content.cached && appendLocalEdits(content.cached),
-            fetched: content.fetched
-              .then(appendLocalEdits)
+            cached,
+            fetched
           }
         }
 

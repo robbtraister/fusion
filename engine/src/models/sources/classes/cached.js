@@ -24,13 +24,13 @@ function getCacheKey (uri, options = {}) {
   return `${cachePrefix}:${followRedirect}:${hash}`
 }
 
-async function makeCacheRequest ({ method, key, value }) {
+async function makeCacheRequest ({ method, key, value, ttl }) {
   return (cacheProxyUrl)
     ? request(
       Object.assign(
         {
           method: method || 'GET',
-          uri: `${cacheProxyUrl}?key=${key}`,
+          uri: `${cacheProxyUrl}?key=${key}${ttl ? `&ttl=${ttl}` : ''}`,
           json: true
         },
         // don't depend on existence of value, since you might want to push null/undefined
@@ -44,7 +44,7 @@ async function makeCacheRequest ({ method, key, value }) {
 
 const clearCacheContent = async (key) => makeCacheRequest({ key, method: 'DELETE' })
 const fetchCacheContent = async (key) => makeCacheRequest({ key })
-const pushCacheContent = async (key, value) => makeCacheRequest({ key, value, method: 'PUT' })
+const pushCacheContent = async (key, value, ttl) => makeCacheRequest({ key, value, ttl, method: 'PUT' })
 
 class CachedSource extends ResolveSource {
   async clear (query) {
@@ -149,7 +149,7 @@ class CachedSource extends ResolveSource {
 
     const tic = timer.tic()
 
-    await pushCacheContent(resolution.cacheKey, data)
+    await pushCacheContent(resolution.cacheKey, data, this.ttl())
 
     try {
       const elapsedTime = tic.toc()

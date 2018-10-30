@@ -144,7 +144,7 @@ const fusionTagGenerator = (globalContent, globalContentConfig, contentCache, ou
           if (queryCache.source && queryCache.filtered) {
             const condensedSourceCache = condensedCache[sourceName] = condensedCache[sourceName] || {
               entries: {},
-              expiresAt: now + ((queryCache.source && queryCache.source.ttl) || 300000)
+              expiresAt: now + ((queryCache.source && queryCache.source.ttl()) || 300) * 1000
             }
             condensedSourceCache.entries[queryString] = { cached: queryCache.filtered }
           }

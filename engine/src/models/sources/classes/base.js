@@ -120,6 +120,10 @@ class Source {
     return transformed
   }
 
+  ttl () {
+    return Math.max(this.config.ttl || 300, 120)
+  }
+
   async update (query) {
     throw new Error('`update` not implemented')
   }

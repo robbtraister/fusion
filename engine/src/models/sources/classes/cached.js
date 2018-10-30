@@ -116,13 +116,17 @@ class CachedSource extends ResolveSource {
       return data
     } catch (err) {
       const elapsedTime = tic.toc()
-      const tagResult = (err.statusCode && err.statusCode === 404) ? 'result:cache_miss' : 'result:cache_error'
+      const cacheMiss = (err.statusCode && err.statusCode === 404)
+      const tagResult = cacheMiss ? 'result:cache_miss' : 'result:cache_error'
       const tags = ['operation:fetch', tagResult, `source:${this.name}`]
       sendMetrics([
         // {type: METRIC_TYPES.CACHE_RESULT, value: 1, tags},
         { type: METRIC_TYPES.CACHE_LATENCY, value: elapsedTime, tags }
       ])
-      logger.logError({ logType: LOG_TYPES.CACHE, message: 'There was an error while trying to fetch.', stackTrace: err.stack })
+
+      if (!cacheMiss) {
+        logger.logError({ logType: LOG_TYPES.CACHE, message: 'There was an error while trying to fetch.', stackTrace: err.stack })
+      }
 
       return this._update(resolution, options)
     }

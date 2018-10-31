@@ -1,6 +1,6 @@
 # Layout API
 
-A Layout is a Fusion component used to wrap Features and/or Chain components as necessary. A Layout wraps all the content on the page not contained in the Output Type, and as such only one can be selected at a time. A Layout for a page or template is selected by an editor in PageBuilder, and its child elements are available to the component as [`props.children`](#children).
+A Layout is a Fusion component used to wrap Features and/or Chain components as necessary. Layouts consist of multiple named sections that are used to segment content and styling. A Layout wraps all the content on the page not contained in the Output Type, and as such only one can be selected for a given page/template at a time. A Layout for a page or template is selected by an editor in PageBuilder, and its child elements are available to the component as [`props.children`](#children).
 
 Layouts are rendered both on the server and the client (i.e. isomorphically), and can be rendered differently per Output Type. There are several different "syntactic sugar" methods of defining a Layout, depending on how specific your needs are.
 
@@ -20,7 +20,7 @@ A Layout is expected to be stored and named in one of the following formats:
 
 ##### Example
 
-There are multiple different "syntactic sugar" methods of creating a Layout, each with different levels of specificity. We will enumerate them here, going from least specific to most.
+There are multiple different "syntactic sugar" methods of creating a Layout, each with different levels of specificity and different ways of identifying the individual sections in the Layout. We will enumerate them here, going from least specific to most.
 
 *Raw Array Syntax*
 
@@ -137,7 +137,7 @@ export default ArticleRightRail
 
 ## Props
 
-### `children` - *Array*
+### `children` - (*Array*)
 
 See the `children` section in the [Output Type API](./output-type.md#children)
 
@@ -145,7 +145,7 @@ See the `children` section in the [Output Type API](./output-type.md#children)
 
 ## Instance Methods
 
-### `sections()`
+### `sections()` - (*Function*)
 
 ##### Description
 This method is for providing the names of sections available in this Layout to PageBuilder so they can be configured with content. This is primarily used with the 'JSX Syntax' version of a Layout.

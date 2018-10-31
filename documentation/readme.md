@@ -9,7 +9,6 @@
 | [Examining the Feature Pack](./recipes/examining-feature-pack.md) |
 | [Configuring a Feature Pack](./recipes/configuring-feature-pack.md) |
 | [Running Fusion Locally](./recipes/running-fusion-locally.md) |
-| [Keeping Up to Date](./recipes/keeping-up-to-date.md) |
 
 | Writing Components |
 |---|
@@ -17,7 +16,7 @@
 | [Creating a Feature Component](./recipes/creating-feature-component.md) |
 | [Creating a Layout Component](./recipes/creating-layout-component.md) |
 | [Creating a Chain Component](./recipes/creating-chain-component.md) |
-| [Event Handling and Interaction](./recipes/event-handling-interaction.md) |
+| [Event Handling and Interaction](./recipes/event-handling-interaction.md)
 | [Isomorphic vs. Server vs. SPA Rendering](./recipes/isomorphic-server-spa-rendering.md)
 
 | Using Data |
@@ -41,6 +40,10 @@
 
 ## API
 
+### Command Line
+
+**[CLI](./api/cli.md)**
+
 ### Feature Pack
 
 | Components |
@@ -58,10 +61,10 @@
 | [Content Sources](./api/feature-pack/content/source.md) |
 | [Content Schemas](./api/feature-pack/content/schema.md) |
 
-**[Environment Variables](./api/feature-pack/environment.md)**
+**[Environment](./api/feature-pack/environment.md)**
 
 **[Site Properties](./api/feature-pack/properties.md)**
 
 ### HTTP Endpoints
 
-**[API](./)**
+**[API](./api/http/API.md)**

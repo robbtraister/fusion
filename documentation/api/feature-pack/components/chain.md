@@ -45,7 +45,7 @@ export default TwoChainz
 
 ## Props
 
-### `children` - *Array*
+### `children` - (*Array*)
 
 See the `children` section in the [Output Type API](./output-type.md#children)
 

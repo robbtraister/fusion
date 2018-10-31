@@ -1,6 +1,6 @@
 # Configuring a Feature Pack
 
-This section is for instructions regarding configuring a Fusion bundle and getting it running for the first time. 
+This section is for instructions regarding configuring a Fusion bundle and getting it running for the first time.
 
 ## Before You Begin
 Sign up for an account at [quay.io](https://quay.io/), either via your email address or via OAuth with Github. Once you have that, request access to the Washington Post team by providing your Quay username in #nile-support channel.
@@ -16,7 +16,7 @@ In the root directory of your new Fusion bundle, find the `.env` file. Ensure th
 CONTENT_BASE=https://<redacted>:<redacted>@api.sandbox.demo.arcpublishing.com
 ```
 
-- For the CONTENT_BASE variable, you can get the API username and password you need from the Trident staging page to replace the "redacted" placeholders above. You'll need access to Trident first though.
+- For the `CONTENT_BASE` variable, you can get the API username and password you need from the Trident staging page to replace the "redacted" placeholders above. You'll need access to Trident first though.
 
 ## Populating the Admin Database
 

@@ -294,9 +294,19 @@ export default SocialLinks
 
 -----
 
+### `template` (*String*)
+
+##### Description
+
+The ID of the template that was used when rendering this page.
+
+<!-- TODO: example -->
+
+-----
+
 ## Instance Methods
 
-### `addEventListener()`
+### `addEventListener()` - (*Function*)
 
 ##### Description
 This method adds an event listener to a Fusion component that will respond to events of the specified `eventName` by invoking the specified `eventHandler`. Events are dispatched by invoking [`dispatchEvent`](#dispatchEvent) in other Fusion components. Listeners can be removed by the [`removeEventListener`](#removeEventListener) method.
@@ -335,7 +345,7 @@ export default ErrorMessage
 
 -----
 
-### `dispatchEvent()`
+### `dispatchEvent()` - (*Function*)
 
 ##### Description
 This method dispatches an event from a Fusion component of the specified `eventName` with an arbitrary `payload` to be received by another component's event handling function (which gets subscribed via the [`addEventListener`](#addEventListener) method).
@@ -377,7 +387,7 @@ export default WeatherLookup
 
 -----
 
-### `fetchContent()`
+### `fetchContent()` - (*Function*)
 
 ##### Description
 The `fetchContent` method is second-level syntactic sugar for using both [`getContent`](#getContent) and [`setContent`](#setContent) together. It takes a map whose keys are the names of content to be stored in the component's `state` (using `setContent`), and the values are configuration options used to fetch content from a content source (using `getContent`). `fetchContent` will then fetch the content using the content configuration and set it on the component's `state` using the key names in `contentConfigMap`.
@@ -435,7 +445,7 @@ export default Topics
 
 -----
 
-### `getContent()`
+### `getContent()` - (*Function*)
 
 ##### Description
 The `getContent` method will fetch content, both on the server and the client, from a content source (identified by the `sourceName` argument) defined in the bundle.
@@ -512,7 +522,7 @@ export default WeatherForecast
 
 -----
 
-### `removeEventListener()`
+### `removeEventListener()` - (*Function*)
 
 ##### Description
 This method 'unsubscribes' the specified event handling function (`eventHandler`) from the `eventName` specified. The `eventHandler` must be a reference to the exact function instance that was added via [`addEventListener`](#addEventListener), not a copy.
@@ -557,7 +567,7 @@ export default ErrorMessage
 
 -----
 
-### `setContent()`
+### `setContent()` - (*Function*)
 
 ##### Description
 

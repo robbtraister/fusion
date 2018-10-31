@@ -48,11 +48,11 @@ export default Headline
 
 ## Props
 
-### `displayProps` (*Object*)
+### `displayProperties` (*Object*)
 
 ##### Description
 
-`displayProps` is an object whose names and types are defined per-Output-Type by the [`displayPropTypes`](./output-type.md#displayPropTypes) , and whose values are then set in PageBuilder. The `displayProps` object is intended to be used for display-related properties such as column sizes, hide/show logic and more that may be specific to the Output Type this component is rendering in.
+`displayProperties` is an object whose names and types are defined per-Output-Type by the [`displayPropTypes`](./output-type.md#displayPropTypes) , and whose values are then set in PageBuilder. The `displayProperties` object is intended to be used for display-related properties such as column sizes, hide/show logic and more that may be specific to the Output Type this component is rendering in.
 
 ##### Example
 
@@ -62,7 +62,7 @@ export default Headline
 import React from 'react'
 
 export default (props) => {
-  const { fullWidth } = props.displayProps
+  const { fullWidth } = props.displayProperties
 
   return (
     <footer className={fullWidth ? 'col-sm-12' : null}>

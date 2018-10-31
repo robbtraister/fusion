@@ -122,7 +122,7 @@ export default MyComponent
 
 -----
 
-### `oneOf`
+### `oneOf()`
 
 ##### Description
 Will produce a `select` input in PageBuilder that allows users to select from one of the enumerated options in the array. Values in the array can be matched to human-readable text via the `labels` property passed to the [`tag`](#tag) method.
@@ -163,7 +163,7 @@ export default MyComponent
 
 -----
 
-### `string`
+### `string()`
 
 ##### Description
 Will produce a `text` input in PageBuilder that allows users to type a string value, which then gets returned to the component.

@@ -24,10 +24,6 @@
           {
             "title": "Running Fusion Locally",
             "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes/running-fusion-locally.md"
-          },
-          {
-            "title": "Keeping Up to Date",
-            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes/keeping-up-to-date.md"
           }
         ]
       },
@@ -128,6 +124,10 @@
     "title": "API",
     "items": [
       {
+        "title": "Command Line",
+        "canonical_url": "/arc-products/pagebuilder/fusion/documentation/api/cli.md"
+      },
+      {
         "title": "Feature Pack",
         "items": [
           {
@@ -164,7 +164,7 @@
               {
                 "title": "Content",
                 "canonical_url": "/arc-products/pagebuilder/fusion/documentation/api/feature-pack/components/content.md"
-              },
+              }
             ]
           },
           {

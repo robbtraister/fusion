@@ -37,16 +37,16 @@ RUN \
     # # download nginx let module
     # git clone --branch=master --single-branch --depth=1 https://github.com/arut/nginx-let-module ./modules/nginx-let && \
     # rm -rf ./modules/nginx-let/.git && \
-    # # download nginx statsd module
-    # git clone --branch=tags-12 --single-branch --depth=1 https://github.com/robbtraister/nginx-statsd ./modules/nginx-statsd && \
-    # rm -rf ./modules/nginx-statsd/.git && \
+    # download nginx statsd module
+    git clone --branch=tags-12 --single-branch --depth=1 https://github.com/robbtraister/nginx-statsd ./modules/nginx-statsd && \
+    rm -rf ./modules/nginx-statsd/.git && \
     # build nginx
     ./configure \
                 --user=${USER} \
                 --group=${USER} \
                 --with-http_realip_module \
                 # --add-module=modules/nginx-let \
-                # --add-module=modules/nginx-statsd \
+                --add-module=modules/nginx-statsd \
                 --add-module=./memc-nginx \
                 && \
     make -j2 && \

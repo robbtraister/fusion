@@ -25,6 +25,7 @@ events {
 }
 
 worker_rlimit_nofile            30000;
+worker_processes                auto;
 
 http {
   default_type                  application/json;
@@ -65,6 +66,8 @@ http {
 
   server_names_hash_bucket_size 128;
 
+  statsd_server                 ${DATADOG_STATSD_HOST:-172.17.0.1}:${DATADOG_STATSD_PORT:-8125};
+
   # proxy_cache_path              './tmp/$(hostname)/cache/' levels=1:2 keys_zone=proxy:${CACHE_SIZE:-512m} max_size=${CACHE_MAX_SIZE:-100g} inactive=${CACHE_INACTIVE:-48h};
   # proxy_cache_key               \$scheme\$proxy_host\$request_uri;
 
@@ -86,18 +89,19 @@ cat <<EOB
   }
 
   upstream cache_cluster {
-    hash \$memc_key;
+    hash                        \$memc_key;
 EOB
   for cache_node in $(echo $CACHE_NODES);
   do
 cat <<EOB
-      server $cache_node;
+    server                      $cache_node;
 EOB
   done
 
 cat <<EOB
+    keepalive                   1024;
   }
-
+  
   server {
     listen                      ${PORT:-8080};
     server_name                 _;
@@ -113,6 +117,9 @@ cat <<EOB
       }
 
       memc_pass                 cache_cluster;
+
+      statsd_timing             "arc.fusion.cacheproxy.request_time#nile_env:${NILE_ENV},environment:\${remote_user}" "\$request_time";
+      statsd_timing             "arc.fusion.cacheproxy.upstream_response_time#nile_env:${NILE_ENV},environment:\${remote_user}" "\$upstream_response_time";
     }
 
     location @cacheput {

@@ -18,7 +18,8 @@ const makeOptions = (req) => ({
 makeRouter.get('*', async (req, res, next) => {
   try {
     const response = await make(req.url, makeOptions(req))
-    res.send(response)
+    res.set(response.headers || {})
+    res.send(response.body)
   } catch (e) {
     next(e)
   }

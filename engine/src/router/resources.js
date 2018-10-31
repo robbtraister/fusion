@@ -10,7 +10,10 @@ const {
 
 const resourcesRouter = express.Router()
 
-const staticHandler = express.static(`${bundleSrcRoot}/resources`)
+const staticHandler = express.static(`${bundleSrcRoot}/resources`, {
+  immutable: true,
+  maxAge: 31536000
+})
 
 resourcesRouter.use((req, res, next) => {
   if (deploymentMatcher(req)) {

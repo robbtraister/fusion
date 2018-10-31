@@ -6,7 +6,7 @@
 
 A Content Source is expected to be stored and named in the following format:
 
-- `/src/content/sources/{sourceName}.(js|json)`
+- `/content/sources/{sourceName}.(js|json)`
 
 > This will build a content source whose name is represented by the `{sourceName}` portion of the filepath.
 
@@ -18,11 +18,11 @@ A Content Source defined in JavaScript should return an object with the followin
 
 - `resolve(query)` (*Function*): A function that, given an object of data values to perform a query with, returns a URI to fetch content from that will return JSON.
 - `params` (*Object*): A map of key/value pairs whose keys are the names of parameters to be used in the `query` object passed to the `resolve` method when invoked, and whose values are the "type" of data that parameter can hold. The available "types" are `text`, `number`, and `site`.
-- [`schemaName`] (*String*): The name of a content schema (without the file extension) defined in the `/src/content/schemas/` directory that this content source corresponds to.
+- [`schemaName`] (*String*): The name of a content schema (without the file extension) defined in the `/content/schemas/` directory that this content source corresponds to.
 - [`transform(json)`] (*Function*): A function that, given the JSON returned from the endpoint defined in the `resolve` function, returns a version of that JSON with some transformation applied to it.
 
 ```jsx
-/*  /src/content/sources/content-api.js  */
+/*  /content/sources/content-api.js  */
 
 const resolve = function resolve (query) {
   const requestUri = `/content/v3/stories/?canonical_url=${query.canonical_url || query.uri}`

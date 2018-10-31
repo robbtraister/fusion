@@ -1,14 +1,14 @@
 # Using Environment Variables and "Secrets"
 
-Environment variables are exactly what they sound like: variables that are set per environment. They are typically used for things like credentials or domains that may change from local to staging to production environments. In Fusion, environment variables are defined in a `.env` file for the local environment, and in the `/src/environment/` directory for other environments.
+Environment variables are exactly what they sound like: variables that are set per environment. They are typically used for things like credentials or domains that may change from local to staging to production environments. In Fusion, environment variables are defined in a `.env` file for the local environment, and in the `/environment/` directory for other environments.
 
 ## Local vs. production environments
 
 As mentioned previously, Fusion allows you to set environment variables differently depending on what environment you're in.
 
-In local development, you can define whatever environment variables you want in the `.env` file in the root of your repository. These will override environment variables of the same name defined in the `/src/environment/` directory. Variables defined in your `.env` file don't need to be encrypted since they are `.gitignore`d and only exist on your local system. So in general, use `.env` for environment variables defined on your local.
+In local development, you can define whatever environment variables you want in the `.env` file in the root of your repository. These will override environment variables of the same name defined in the `/environment/` directory. Variables defined in your `.env` file don't need to be encrypted since they are `.gitignore`d and only exist on your local system. So in general, use `.env` for environment variables defined on your local.
 
-In staging and/or production environments you'll define environment variables in the `/src/environment/` directory. This provides the advantage of keeping them in the repository so you don't need to configure environment variables separately on the server - however, this presents its own problem as many of these variables should be secret and not stored in plaintext in the repository. To alleviate this concern, Fusion has the ability to decrypt secret variables at "deploy" time when provided the correct key.
+In staging and/or production environments you'll define environment variables in the `/environment/` directory. This provides the advantage of keeping them in the repository so you don't need to configure environment variables separately on the server - however, this presents its own problem as many of these variables should be secret and not stored in plaintext in the repository. To alleviate this concern, Fusion has the ability to decrypt secret variables at "deploy" time when provided the correct key.
 
 ## Creating and using environment variables
 
@@ -24,11 +24,11 @@ OMDB_API_KEY=a1b2c3d4e5
 
 We now have everything we need for our content source to work locally!
 
-To get it working in staging/production environments, we'll need to first encrypt our secret variable, then create an `index.js` file in our `/src/environments/` directory.
+To get it working in staging/production environments, we'll need to first encrypt our secret variable, then create an `index.js` file in our `/environment/` directory.
 
 > **NOTE**
-> 
-> There are a few different formats you can use for naming the environment variables file. You can define it as a top level file called `/src/environment.js` or `/src/environment.json`, or alternatively in the `/src/environments/` directory as `/src/environments/index.js` or `/src/environments/index.json`. Just make sure you only have one of these!
+>
+> There are a few different formats you can use for naming the environment variables file. You can define it as a top level file called `/environment.js` or `/environment.json`, or alternatively in the `/environment/` directory as `/environment/index.js` or `/environment/index.json`. Just make sure you only have one of these!
 
 #### Encrypting your secrets
 To encrypt our "secret" variables, we can install and use the `aws-promises` npm library to encrypt our secret locally.
@@ -44,10 +44,10 @@ $ encrypt a1b2c3d4e5 arn:aws:kms:us-east-1:9876543210:key/0312fd47-9577-42c0-834
 > AQECAHhPwAyPK3nfERyAvmyWOWx9c41uht+ei4Zlv4NgrlmypwAAAMYwgcMGCSqGSIb3DQEHBqCBtTCBsgIBADCBrAYJKoZIhvcNAQcBMB4GCWCGSAFlAwQBLjARBAxwBJdfzqcQUpox1xsCARCAf2aXwBJ3pBUP12HWB3cdBboV1/qN0HFEsjNycADYIq7XSANeDYOlu2/Dwt/52R16hK4dbVOt0ofNKKx0b3vtZRaH9bX1Dkx6TDhmo5g32H0aWpiUW6PQIp72/g2CW1nr26T0zxmkxmX9u8ufoQGBXRd1pOfT2EliUhMKabNeSyk=
 ```
 
-Here, `a1b2c3d4e5` is the plaintext data (the OMDB API key) we want to encrypt, and `arn:aws:kms:us-east-1:9876543210:key/0312fd47-9577-42c0-834b-b89b724067da` is the KMS key for this client. Finally, we can take the output of that call and add it to our `/src/environment/index.js` file:
+Here, `a1b2c3d4e5` is the plaintext data (the OMDB API key) we want to encrypt, and `arn:aws:kms:us-east-1:9876543210:key/0312fd47-9577-42c0-834b-b89b724067da` is the KMS key for this client. Finally, we can take the output of that call and add it to our `/environment/index.js` file:
 
 ```js
-/*  /src/environments/index.js  */
+/*  /environment/index.js  */
 
 export default {
   OMDB_API_KEY: "%{AQECAHhPwAyPK3nfERyAvmyWOWx9c41uht+ei4Zlv4NgrlmypwAAAMYwgcMGCSqGSIb3DQEHBqCBtTCBsgIBADCBrAYJKoZIhvcNAQcBMB4GCWCGSAFlAwQBLjARBAxwBJdfzqcQUpox1xsCARCAf2aXwBJ3pBUP12HWB3cdBboV1/qN0HFEsjNycADYIq7XSANeDYOlu2/Dwt/52R16hK4dbVOt0ofNKKx0b3vtZRaH9bX1Dkx6TDhmo5g32H0aWpiUW6PQIp72/g2CW1nr26T0zxmkxmX9u8ufoQGBXRd1pOfT2EliUhMKabNeSyk=}"

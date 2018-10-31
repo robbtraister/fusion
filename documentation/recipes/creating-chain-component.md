@@ -13,10 +13,10 @@ Chain components are meant to be simple wrapper elements surrounding a single gr
 
 ## Creating a Chain
 
-Let's say we want to create a simple "sidebar" chain for our Feature Pack. In the `/src/components/chains/` directory we would create a file called `sidebar.jsx` that looks like this:
+Let's say we want to create a simple "sidebar" chain for our Feature Pack. In the `/components/chains/` directory we would create a file called `sidebar.jsx` that looks like this:
 
 ```jsx
-/*  /src/components/chains/sidebar.jsx`  */
+/*  /components/chains/sidebar.jsx`  */
 
 import PropTypes from 'prop-types'
 import React from 'react'

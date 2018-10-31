@@ -6,10 +6,16 @@ Since we don't know which Features might exist on a page or template when we def
 
 ## Writing a feature
 
-Let's define a simple Feature whose purpose is to display the title and details for a movie we've fetched from our content source. We'll create a new directory named `movies` in the `/src/components/features/` directory, and a file within that folder called `movie-detail.jsx`. The Feature might look like this:
+Let's define a simple Feature whose purpose is to display the title and details for a movie we've fetched from our content source. We'll create a new directory named `movies` in the `/components/features/` directory, and a file within that folder called `movie-detail.jsx`.
+
+> **NOTE**
+>
+> Feature components, unlike other components, are stored in directories based on their "group". A "group" is just a namespace of related Features - you might have an `article` group that contains `headline` and `mainStory` Features, for example. Here, the "group" we're creating is called `movies`, so we create a directory with that name and store our `movie-detail` Feature inside of it.
+
+The Feature might look like this:
 
 ```jsx
-/*  /src/components/features/movies/movie-detail.jsx  */
+/*  /components/features/movies/movie-detail.jsx  */
 
 import React, { Component } from 'react'
 
@@ -36,8 +42,8 @@ export default MovieDetail
 After creating this file, you should be able to go to the Page Editor in PageBuilder Admin and add this Feature to the `homepage` we created earlier. Once you do, you should see it displayed on the page!
 
 > **NOTE**
-> 
-> Remember, if you don't see your component show up right away, you may need to restart your Fusion app with `CTRL+C` and then re-running `npm start`!
+>
+> Remember, if you don't see your component show up right away, you may need to restart your Fusion app with `CTRL+C` and then re-running `npx fusion start`!
 
 While this very simple component will work, it doesn't really solve our problem since it doesn't render any dynamic content; just static information about a [single (awesome) movie](https://www.imdb.com/title/tt0107290/). For now, we'll leave it static so we can see it rendered, and we'll [fill it in with content later](./using-consumer-function.md).
 
@@ -74,10 +80,6 @@ Alternatively, if a Feature should act very similarly across multiple Output Typ
 ```
 
 In this example, we render slightly different links if the provided `outputType` is `amp` or not. Since AMP doesn't allow JavaScript, we send the user to a link - in all other cases, some client side JS is invoked.
-
-> **NOTE**
->
-> If you only have a single version of a Feature for all Output Types, you can add your Feature file directly to the `features/` directory rather than creating a new directory. Here, we could name our file `/src/components/features/headline.jsx` instead of having a separate `/src/components/features/headline/` directory.
 
 It's up to you whether it makes sense to create an entirely new version of a Feature for a different output type, or if the changes are small enough that they can be contained in 1 Feature definition.
 

@@ -25,7 +25,7 @@ An entity-relationship diagram of the different components that can exist on a F
     -----------------------           --------------------
                  \|/                        |
                   |                         |
-                  ---------------------------                        
+                  ---------------------------
 ```
 
 This diagram illustrates a few guidelines about how a page should be structured in Fusion:
@@ -43,10 +43,10 @@ Layout components are divided into named "sections" defined in the component its
 
 ### Creating a simple Layout
 
-If all you'd like is to list the sections your layout should contain and assign some `class`es to the containers for CSS purposes, your Layout can be a simple array of objects with the properties `id`, `cssClass` (or `className` alternatively), and `element` (this is optional, Fusion defaults to a `<section>` if not specified). We could define the following Layout inside the `/src/components/layouts/` directory named `basic.js`
+If all you'd like is to list the sections your layout should contain and assign some `class`es to the containers for CSS purposes, your Layout can be a simple array of objects with the properties `id`, `cssClass` (or `className` alternatively), and `element` (this is optional, Fusion defaults to a `<section>` if not specified). We could define the following Layout inside the `/components/layouts/` directory named `basic.js`
 
 ```js
-/*  /src/components/layouts/basic.js  */
+/*  /components/layouts/basic.js  */
 
 export default [
   {
@@ -91,14 +91,14 @@ This Layout would then result in HTML resembling the following on the webpage:
 
 This Layout, while uncomplicated, provides some simple class name wrapping around the different sections of our page that we can apply styling to. In the PageBuilder Admin, editors will see the section names `header`, `sidebar`, `main` and `footer` available to drop Features and Chains into.
 
-There is even more syntactic sugar for defining simple Layouts outlined in [the API docs](../api/feature-pack/components/layout.md). 
+There is even more syntactic sugar for defining simple Layouts outlined in [the API docs](../api/feature-pack/components/layout.md).
 
 ### Creating a JSX Layout
 
 However, sometimes you'll want more control over the structure of your Layout and its markup. For these situations, it's possible to define a Layout as a React component. Let's define a slightly more complicated Layout called `article-right-rail.jsx`:
 
 ```jsx
-/*  /src/components/layouts/article-right-rail.jsx  */
+/*  /components/layouts/article-right-rail.jsx  */
 
 import React from 'react'
 
@@ -132,7 +132,7 @@ export default ArticleRightRail
 
 In the above component, we've defined a Layout that has 4 sections, just like our initial `basic` Layout. However, in this Layout we're able to structure the HTML however we want, add in extra elements (like the `<img>` in the header or `<p>` in the footer) and then inject the child Feature and/or Chain components via `props.children`. For Layouts, `props.children` is an array of objects ordered by the list of section names provided in the component's `.sections` definition.
 
-The `.sections` property here is necessary to provide the PageBuilder Admin with the names of the sections available in this Layout - without it, editors won't know which section they are dragging and dropping Features into!  
+The `.sections` property here is necessary to provide the PageBuilder Admin with the names of the sections available in this Layout - without it, editors won't know which section they are dragging and dropping Features into!
 
 We could keep on defining Layouts and making them available in PageBuilder Admin, but for now 1 is enough.
 

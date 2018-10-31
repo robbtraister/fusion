@@ -10,11 +10,11 @@ Layouts are rendered both on the server and the client (i.e. isomorphically), an
 
 A Layout is expected to be stored and named in one of the following formats:
 
-- `/src/components/layouts/{layoutName}.(js|jsx)`
+- `/components/layouts/{layoutName}.(js|jsx)`
 
 > This will build one version of this component that is rendered for all Output Types, where the `{layoutName}` portion of the filepath represents the name of the Layout.
 
-- `/src/components/layouts/{layoutName}/{outputTypeName}.(js|jsx)`
+- `/components/layouts/{layoutName}/{outputTypeName}.(js|jsx)`
 
 > This will build a version of this component that corresponds to the name of the Output Type in the filename. The `{layoutName}` portion of the filepath represents the name of the Layout. If there is a component named `default.(js|jsx)`, that component will be rendered as a fallback if no file with the name of the relevant Output Type is found.
 
@@ -101,7 +101,7 @@ This will produce the following render:
 Finally, you can define each Layout as a full JSX component that accepts `props.children` and enumerates them as an array, with each index representing the next enumerated section. When using this syntax, you must manually enumerate the sections this Layout allows using the [`sections()`](#sections) method.
 
 ```jsx
-/*  /src/components/layouts/article-right-rail.jsx  */
+/*  /components/layouts/article-right-rail.jsx  */
 
 import React from 'react'
 

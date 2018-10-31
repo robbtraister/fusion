@@ -25,7 +25,7 @@ For our purposes, let's say we want to fetch some content from the `movie-search
 Let's define a simple component called `movie-list` for this purpose:
 
 ```jsx
-/*  /src/components/features/movies/movie-list.jsx  */
+/*  /components/features/movies/movie-list.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Fragment, Component } from 'react'
@@ -128,7 +128,7 @@ At this point our fetch should be working! The last problem is we aren't display
 Because React will re-render automatically whenever there is a change to the `state` or `props` of our component, and we're triggering a state change when we fetch our new movies, we can simply iterate over the `movies` array in our state and output the information we want (`Title`, `Year`, `Poster`) for each movie as if they'd always been there. This should result in a working component that fetches and displays data about movies with the word 'Rocky' in the title! Let's see the entire component together:
 
 ```jsx
-/*  /src/components/features/movies/movie-list.jsx  */
+/*  /components/features/movies/movie-list.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Fragment, Component } from 'react'
@@ -178,7 +178,7 @@ export default MovieList
 Unfortunately, this only fetches the *first page* of movies with "Jurassic" in the title from OMDB. But since OMDB's API allows us to send a `page` param, and our content source is already set up to accept such a param, it's easy to add pagination to this feature:
 
 ```jsx
-/*  /src/components/features/movies/movie-list.jsx  */
+/*  /components/features/movies/movie-list.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Fragment, Component } from 'react'

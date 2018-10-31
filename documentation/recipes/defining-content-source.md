@@ -8,10 +8,10 @@ A Fusion content source requires at least 2 pieces of information: a URL endpoin
 
 Since our website is supposed to be for movie lovers, let's see what a simple content source definition might look like if we were requesting some data from the [OMDB API](https://www.omdbapi.com/). For this content source, we want to be able to find a certain movie's information based on its title.
 
-Let's create a file called `movie-find.js` in the `/src/content/sources/` directory of our bundle. Because our file is named `movie-find.js`, we will refer to this content source as `movie-find` later in our code (and in PageBuilder Admin).
+Let's create a file called `movie-find.js` in the `/content/sources/` directory of our bundle. Because our file is named `movie-find.js`, we will refer to this content source as `movie-find` later in our code (and in PageBuilder Admin).
 
 ```jsx
-/*    /src/content/sources/movie-find.js    */
+/*    /content/sources/movie-find.js    */
 
 import { OMDB_API_KEY } from 'fusion:environment'
 

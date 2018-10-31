@@ -32,7 +32,7 @@ For now, we're going to keep running our server so we can develop locally with i
 $ npx fusion down
 ```
 
-in your command line (you may also be able to simply `CTRL+C` in the same Terminal window as your initial `npm start` command). To check if all the Fusion services have stopped running, run:
+in your command line (you may also be able to simply `CTRL+C` in the same Terminal window as your initial `npx fusion start` command). To check if all the Fusion services have stopped running, run:
 
 ```
 $ docker ps

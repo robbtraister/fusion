@@ -48,7 +48,7 @@ The Arc site used in this rendering, if multi-site enabled. This will be determi
 ##### Example
 
 ```jsx
-/*  /src/components/features/global/footer.jsx  */
+/*  /components/features/global/footer.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
@@ -73,7 +73,7 @@ This is the base context path of the application. In the client, you could calcu
 ##### Example
 
 ```jsx
-/*  /src/components/features/global/logo.jsx  */
+/*  /components/features/global/logo.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React from 'react'
@@ -97,7 +97,7 @@ The keys will be the actual data object returned from the content fetch; as such
 ##### Example
 
 ```jsx
-/*  /src/components/features/article/headline.jsx  */
+/*  /components/features/article/headline.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
@@ -127,7 +127,7 @@ This is the full config object used to fetch global content for the rendered pag
 ##### Example
 
 ```jsx
-/*  /src/components/features/article/story-feed.jsx  */
+/*  /components/features/article/story-feed.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
@@ -178,7 +178,7 @@ The name of the Layout that was used when rendering this page.
 ##### Example
 
 ```jsx
-/*  /src/components/features/common/image.jsx  */
+/*  /components/features/common/image.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
@@ -202,7 +202,7 @@ The Output Type that was used when rendering this page.
 ##### Example
 
 ```jsx
-/*  /src/components/features/common/link.jsx  */
+/*  /components/features/common/link.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
@@ -233,7 +233,7 @@ This is the URI that was requested to initiate this rendering. In the client, yo
 ##### Example
 
 ```jsx
-/*  /src/components/features/common/link.jsx  */
+/*  /components/features/common/link.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
@@ -265,12 +265,12 @@ export default Link
 
 ##### Description
 
-An object containing the site specific properties defined in the `/src/properties/` directory for the current [`arcSite`](#arcsite).
+An object containing the site specific properties defined in the `/properties/` directory for the current [`arcSite`](#arcsite).
 
 ##### Example
 
 ```jsx
-/*  /src/components/features/header/social-links.jsx  */
+/*  /components/features/header/social-links.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from react
@@ -323,7 +323,7 @@ This method returns `undefined`; its effect is to 'subscribe' the event handler 
 ##### Example
 
 ```jsx
-/*  /src/components/features/utils/error-message.jsx  */
+/*  /components/features/utils/error-message.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
@@ -362,7 +362,7 @@ This method returns `undefined`; its effect is to dispatch the event to each sub
 ##### Example
 
 ```jsx
-/*  /src/components/features/weather/weather-lookup.jsx  */
+/*  /components/features/weather/weather-lookup.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
@@ -410,7 +410,7 @@ This method returns `undefined`; its effect is to set the `state` properties lis
 ##### Example
 
 ```jsx
-/* /src/components/features/homepage/topics.jsx  */
+/* /components/features/homepage/topics.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
@@ -479,7 +479,7 @@ An object with 2 keys: `{ cached, fetched }`. `cached` will be an object contain
 ##### Example
 
 ```jsx
-/*  /src/components/features/weather/forecast.jsx  */
+/*  /components/features/weather/forecast.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
@@ -539,7 +539,7 @@ This method returns `undefined`; its effect is to 'unsubscribe' the event handle
 ##### Example
 
 ```jsx
-/*  /src/components/features/utils/error-message.jsx  */
+/*  /components/features/utils/error-message.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
@@ -584,7 +584,7 @@ This method returns `undefined`; its effect is to set the `state` properties lis
 ##### Example
 
 ```jsx
-/* /src/components/features/homepage/topics.jsx  */
+/* /components/features/homepage/topics.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'

@@ -10,7 +10,7 @@ When rendering a page, the `outputType` query parameter will be used to determin
 
 An Output Type is expected to be stored and named in the following format:
 
-- `/src/components/output-types/{outputTypeName}.(js|jsx)`
+- `/components/output-types/{outputTypeName}.(js|jsx)`
 
 > This will build an Output Type component where the `{outputTypeName}` portion of the filepath represents the name of the Output Type.
 
@@ -21,7 +21,7 @@ An Output Type is expected to be stored and named in the following format:
 ##### Example
 
 ```jsx
-/*  /src/components/output-types/default.jsx  */
+/*  /components/output-types/default.jsx  */
 
 import React from 'react'
 
@@ -62,7 +62,7 @@ React uses the convention of a prop named `children` to define content that shou
 ##### Example
 
 ```jsx
-/*  /src/components/output-types/default.jsx  */
+/*  /components/output-types/default.jsx  */
 
 import React from 'react'
 
@@ -114,7 +114,7 @@ Similar to `metaTag` above, but returns only the value, not a fully rendered HTM
 ##### Example
 
 ```jsx
-/*  /src/components/output-types/default.jsx  */
+/*  /components/output-types/default.jsx  */
 
 import React from 'react'
 
@@ -181,7 +181,7 @@ Renders the return value of the passed `renderProp` if one is provided; otherwis
 
 *No Render Props*
 ```jsx
-/*  /src/components/output-types/default.jsx  */
+/*  /components/output-types/default.jsx  */
 
 import React from 'react'
 
@@ -197,7 +197,7 @@ export default (props) => {
 *With Render Props*
 
 ```jsx
-/*  /src/components/output-types/default.jsx  */
+/*  /components/output-types/default.jsx  */
 
 import React from 'react'
 
@@ -240,7 +240,7 @@ Renders bootstrapped Fusion-specific values, as well as cached content fetched f
 ##### Example
 
 ```jsx
-/*  /src/components/output-types/default.jsx  */
+/*  /components/output-types/default.jsx  */
 
 import React from 'react'
 
@@ -278,7 +278,7 @@ Renders the React engine script and Fusion template script necessary to re-hydra
 ##### Example
 
 ```jsx
-/*  /src/components/output-types/default.jsx  */
+/*  /components/output-types/default.jsx  */
 
 import React from 'react'
 
@@ -322,7 +322,7 @@ Renders the specified `<meta>` tag by name if one is provided; if not, renders a
 ##### Example
 
 ```jsx
-/*  /src/components/output-types/default.jsx  */
+/*  /components/output-types/default.jsx  */
 
 import React from 'react'
 
@@ -370,7 +370,7 @@ Renders the return value of the passed `renderProp` if one is provided; otherwis
 *No Render Prop*
 
 ```jsx
-/*  /src/components/output-types/default.jsx  */
+/*  /components/output-types/default.jsx  */
 
 import React from 'react'
 
@@ -391,7 +391,7 @@ export default (props) => {
 *With Render Prop*
 
 ```jsx
-/*  /src/components/output-types/default.jsx  */
+/*  /components/output-types/default.jsx  */
 
 import React from 'react'
 
@@ -429,7 +429,7 @@ The value [`props.displayProperties`](./feature.md#displayProperties) will be av
 On the Output Type
 
 ```jsx
-/*  /src/components/output-types/default.jsx  */
+/*  /components/output-types/default.jsx  */
 
 import React from 'react'
 

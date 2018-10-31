@@ -8,18 +8,18 @@ Chains are Fusion components that serve as wrapping elements around a group of F
 
 A Chain is expected to be stored and named in one of the following formats:
 
-- `/src/components/chains/{chainName}.(js|jsx)`
+- `/components/chains/{chainName}.(js|jsx)`
 
 > This will build one version of this component that is rendered for all Output Types, where the `{chainName}` portion of the filepath represents the name of the Chain.
 
-- `/src/components/chains/{chainName}/{outputTypeName}.(js|jsx)`
+- `/components/chains/{chainName}/{outputTypeName}.(js|jsx)`
 
 > This will build a version of this component that corresponds to the name of the Output Type in the filename. The `{chainName}` portion of the filepath represents the name of the Chain. If there is a component named `default.(js|jsx)`, that component will be rendered as a fallback if no file with the name of the relevant Output Type is found.
 
 ##### Example
 
 ```jsx
-/*  /src/components/chains/two-chainz.jsx  */
+/*  /components/chains/two-chainz.jsx  */
 
 import React from 'react'
 

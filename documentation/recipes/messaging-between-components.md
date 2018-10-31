@@ -19,7 +19,7 @@ The `Consumer` provides two simple utility methods to help us send and receive m
 The first thing we'll want to do is to dispatch an event from our `MovieDetail` component whenever the plot of our movie is hidden or shown. That's easy enough, we'll just add a couple lines to the `togglePlot` method in our component:
 
 ```jsx
-/*  /src/components/features/movies/movie-detail.jsx  */
+/*  /components/features/movies/movie-detail.jsx  */
 
 @Consumer
 class MovieDetail extends Component {
@@ -43,7 +43,7 @@ As you can see, we can use the `dispatchEvent` method just like we would on a DO
 Now, we have to listen for that change in our `MovieList` component:
 
 ```jsx
-/*  /src/components/features/movies/movie-list.jsx  */
+/*  /components/features/movies/movie-list.jsx  */
 
 @Consumer
 class MovieList extends Component {
@@ -99,7 +99,7 @@ In addition to dispatching events and listening to them, Fusion offers a way to 
 Let's say in this instance we only want to toggle the MovieList component one time and never again; we can simply add a `removeEventListener` method invocation inside our event handler.
 
 ```jsx
-/*  /src/components/features/movies/movie-list.jsx  */
+/*  /components/features/movies/movie-list.jsx  */
 
 @Consumer
 class MovieList extends Component {

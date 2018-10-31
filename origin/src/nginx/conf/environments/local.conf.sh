@@ -70,7 +70,7 @@ cat <<EOB
       try_files                 \$p =404;
     }
 
-    location ~ ^${API_PREFIX}/(content|render|resolvers)(/.*|\$) {
+    location ~ ^${API_PREFIX}/(content|properties|render|resolvers)(/.*|\$) {
       error_page                418 = @engine;
       return                    418;
     }

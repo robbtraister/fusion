@@ -25,7 +25,6 @@ const {
   componentBuildRoot,
   contextPath
 } = require('../environment')
-const { LOG_TYPES, ...logger } = require('../src/utils/logger')
 
 childProcess.execSync(`mkdir -p '${propertiesSrcDir}'`)
 const propertiesSrcFile = path.resolve(propertiesSrcDir, `properties.js`)
@@ -34,7 +33,6 @@ const getRequirable = (fp) => {
   try {
     return require.resolve(fp)
   } catch (e) {
-    logger.logError({ logType: LOG_TYPES.WEBPACK_COMPILATION, message: 'An error occurred in getRequirable().', stackTrace: e.stack })
     return false
   }
 }

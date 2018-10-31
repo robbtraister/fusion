@@ -30,7 +30,10 @@ const handleResponse = function handleResponse (response) {
     throw new RedirectError(response.headers.location, response.statusCode)
   }
 
-  return parseJson(response.body)
+  return {
+    body: parseJson(response.body),
+    headers: response.headers
+  }
 }
 
 const getHttpEngine = function getHttpEngine () {

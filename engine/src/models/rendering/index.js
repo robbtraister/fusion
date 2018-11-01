@@ -218,6 +218,7 @@ class Rendering {
     try {
       return await render({ Component, content, request })
     } catch (_) {
+      // no need to log error here because we will get more specific logging in quarantine mode
       const Component = await this.getComponent(rendering, true)
       return render({ Component, content, request })
     }

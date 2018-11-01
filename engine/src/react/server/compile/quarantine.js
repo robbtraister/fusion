@@ -40,7 +40,16 @@ class QuarantineCompiler {
                 )
               )
             } catch (e) {
-              logger.logWarn({ logType: LOG_TYPES.COMPONENT, message: `An error occurred while attempting to render component [${node.collection}/${node.type}].`, stackTrace: e.stack })
+              logger.logWarn({
+                logType: LOG_TYPES.COMPONENT,
+                message: `An error occurred while attempting to render component [${node.collection}/${node.type}].`,
+                stackTrace: e.stack,
+                values: {
+                  collection: node.collection,
+                  type: node.type,
+                  action: 'render'
+                }
+              })
               return React.createElement(
                 'div',
                 {
@@ -91,7 +100,7 @@ class QuarantineCompiler {
                   type: node.props.type,
                   id: node.props.id,
                   name: node.props.name,
-                  dangerouslySetInnerHTML: { __html: `<!-- feature "${node.type}" could not be found -->` }
+                  'data-fusion-message': `feature [${node.type}] could not be rendered`
                 }
               )
           }

@@ -33,6 +33,7 @@ const logError = (isDev)
 const logWarn = (isDev)
   ? function logWarn (logData) {
     console.warn(logData.message)
+    console.warn(logData.stackTrace)
   }
   : function logWarn (logData) {
     const logObject = getJSONLogObject(LOG_LEVELS.WARN, logData)

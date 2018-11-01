@@ -111,15 +111,16 @@ cat <<EOB
     location /cache {
       set                       \$memc_key "\${remote_user}:\${arg_key}";
 
-      statsd_timing             "arc.fusion.cacheproxy.request_time#nile_env:${NILE_ENV},environment:\${remote_user},request_method:\${request_method}" "\$request_time";
-      statsd_timing             "arc.fusion.cacheproxy.upstream_response_time#nile_env:${NILE_ENV},environment:\${remote_user},request_method:\${request_method}" "\$upstream_response_time";
-
       error_page                418 = @cacheput;
       if (\$request_method ~* ^(?:PUT|POST)\$) {
         return 418;
       }
 
       memc_pass                 cache_cluster;
+
+      statsd_timing             "arc.fusion.cacheproxy.request_time#nile_env:${NILE_ENV},environment:\${remote_user},request_method:\${request_method}" "\$request_time";
+      statsd_timing             "arc.fusion.cacheproxy.upstream_response_time#nile_env:${NILE_ENV},environment:\${remote_user},request_method:\${request_method}" "\$upstream_response_time";
+      
     }
 
     location @cacheput {

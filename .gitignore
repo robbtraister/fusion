@@ -2,14 +2,12 @@
 .vscode
 **/.env
 **/.serverless
+**/node_modules
+**/dist
 
 docker-compose.linked.yml
 docker-compose.override.yml
 
-**/.dist
-**/.generated
-**/dist
-**/generated
-**/node_modules
+.fusion
 
 */release.txt

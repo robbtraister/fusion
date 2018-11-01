@@ -118,11 +118,14 @@ cat <<EOB
 
       memc_pass                 cache_cluster;
 
-      statsd_timing             "arc.fusion.cacheproxy.request_time#nile_env:${NILE_ENV},environment:\${remote_user}" "\$request_time";
-      statsd_timing             "arc.fusion.cacheproxy.upstream_response_time#nile_env:${NILE_ENV},environment:\${remote_user}" "\$upstream_response_time";
+      statsd_timing             "arc.fusion.cacheproxy.request_time#nile_env:${NILE_ENV},environment:\${remote_user},request_method:\${request_method}" "\$request_time";
+      statsd_timing             "arc.fusion.cacheproxy.upstream_response_time#nile_env:${NILE_ENV},environment:\${remote_user},request_method:\${request_method}" "\$upstream_response_time";
     }
 
     location @cacheput {
+      statsd_timing             "arc.fusion.cacheproxy.request_time#nile_env:${NILE_ENV},environment:\${remote_user},request_method:\${request_method}" "\$request_time";
+      statsd_timing             "arc.fusion.cacheproxy.upstream_response_time#nile_env:${NILE_ENV},environment:\${remote_user},request_method:\${request_method}" "\$upstream_response_time";
+
       set                       \$memc_exptime \$cache_ttl;
       memc_pass                 cache_cluster;
     }

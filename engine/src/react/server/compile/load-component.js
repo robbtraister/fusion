@@ -42,7 +42,15 @@ function loadComponent (componentCollection, componentType) {
         : OriginalComponent
       return TimedComponent(Component)
     } catch (e) {
-      logger.logWarn({ logType: LOG_TYPES.COMPONENT, message: `An error occurred while attempting to load component [${componentCollection}/${componentType}].`, stackTrace: e.stack })
+      logger.logWarn({
+        logType: LOG_TYPES.COMPONENT,
+        message: `An error occurred while attempting to load component [${componentCollection}/${componentType}].`,
+        stackTrace: e.stack,
+        values: {
+          collection: componentCollection,
+          type: componentType
+        }
+      })
     }
   }
   return null

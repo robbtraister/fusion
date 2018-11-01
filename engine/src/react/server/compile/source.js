@@ -77,7 +77,7 @@ class SourceCompiler extends ComponentCompiler {
         type: node.props.type,
         id: node.props.id,
         name: node.props.name,
-        dangerouslySetInnerHTML: { __html: `<!-- feature "${node.type}" could not be found -->` }
+        'data-fusion-message': `feature [${node.type}] could not be found`
       }
       return `Fusion.createElement('div', ${JSON.stringify(props)})`
     }

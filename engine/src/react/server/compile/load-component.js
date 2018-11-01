@@ -48,7 +48,8 @@ function loadComponent (componentCollection, componentType) {
         stackTrace: e.stack,
         values: {
           collection: componentCollection,
-          type: componentType
+          type: componentType,
+          action: 'load'
         }
       })
     }

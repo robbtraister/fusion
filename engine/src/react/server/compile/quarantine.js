@@ -46,7 +46,8 @@ class QuarantineCompiler {
                 stackTrace: e.stack,
                 values: {
                   collection: node.collection,
-                  type: node.type
+                  type: node.type,
+                  action: 'render'
                 }
               })
               return React.createElement(

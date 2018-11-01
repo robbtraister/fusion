@@ -1,7 +1,5 @@
 'use strict'
 
-const url = require('url')
-
 const bodyParser = require('body-parser')
 const express = require('express')
 
@@ -11,7 +9,8 @@ const {
   bodyLimit,
   bundleDistRoot,
   defaultOutputType,
-  deployment,
+  deploymentMatcher,
+  deploymentWrapper,
   isDev
 } = require('../../environment')
 
@@ -21,13 +20,10 @@ const staticHandler = (location) => express.static(`${bundleDistRoot}${location 
 const redirectHandler = (location) => {
   const useStatic = staticHandler(location)
   return (req, res, next) => {
-    if (req.query.v === deployment) {
+    if (deploymentMatcher(req)) {
       useStatic(req, res, next)
     } else {
-      const urlParts = url.parse(req.originalUrl, true)
-      delete urlParts.search
-      urlParts.query.v = deployment
-      res.redirect(url.format(urlParts))
+      res.redirect(deploymentWrapper(req.originalUrl))
     }
   }
 }

@@ -1,6 +1,7 @@
 'use strict'
 
 const path = require('path')
+const url = require('url')
 
 const unpack = require('../src/utils/unpack')
 
@@ -68,6 +69,24 @@ const semver = variables.FUSION_RELEASE
 
 const apiPrefix = `${contextPath}/api/v3`
 
+const deploymentMatcher = (obj) => {
+  if (!(typeof obj === 'object')) {
+    obj = url.parse(obj, true)
+  }
+  /* eslint-disable eqeqeq */
+  return (obj.query.d == deployment || obj.query.v == deployment)
+  /* eslint-enable eqeqeq */
+}
+deploymentMatcher.toString = () => deployment
+
+const deploymentWrapper = (uri) => {
+  const parts = url.parse(uri, true)
+  parts.query.d = deployment
+  parts.search = undefined
+  return url.format(parts)
+}
+deploymentWrapper.toString = () => deployment
+
 module.exports = {
   apiPrefix,
   binaryContentTypes,
@@ -91,6 +110,8 @@ module.exports = {
   datadogApiKey,
   defaultOutputType,
   deployment,
+  deploymentMatcher,
+  deploymentWrapper,
   environment,
   functionName,
   isDev,

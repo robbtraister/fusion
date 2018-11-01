@@ -4,7 +4,6 @@ const React = require('react')
 
 const fs = require('fs')
 const path = require('path')
-const url = require('url')
 
 const {
   readFile
@@ -14,16 +13,9 @@ const {
   componentDistRoot,
   contextPath,
   deployment,
+  deploymentWrapper,
   isDev
 } = require('../../../environment')
-
-const deploymentWrapper = (u) => {
-  const parts = url.parse(u, true)
-  parts.query.v = deployment
-  parts.search = undefined
-  return url.format(parts)
-}
-deploymentWrapper.toString = () => deployment
 
 const polyfillSrc = deploymentWrapper(`${contextPath}/dist/engine/polyfill.js`)
 const polyfillChecks = [

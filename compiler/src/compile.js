@@ -27,7 +27,7 @@ async function extractZip (fpPromise, destPromise) {
   const fp = await fpPromise
   const dest = await destPromise
   await extract(fp, dest)
-  promises.remove(fp)
+  await promises.remove(fp)
   return dest
 }
 
@@ -45,7 +45,6 @@ async function compile (bundleName, contextPath) {
       const extractPromise = extractZip(await downloadFilePromise, bundleSrcDir)
 
       await extractPromise
-
       await copySrcPromise
 
       await build(rootDir, contextPath)
@@ -57,17 +56,15 @@ async function compile (bundleName, contextPath) {
       })
 
       try {
-        const result = await upload(await zipFilePromise)
-
-        return result
+        return await upload(await zipFilePromise)
       } finally {
-        promises.remove(await zipFilePromise)
+        await promises.remove(await zipFilePromise)
       }
     } finally {
-      promises.remove(await downloadFilePromise)
+      await promises.remove(await downloadFilePromise)
     }
   } finally {
-    promises.remove(rootDir)
+    await promises.remove(rootDir)
   }
 }
 

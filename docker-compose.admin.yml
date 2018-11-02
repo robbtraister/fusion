@@ -87,9 +87,10 @@ services:
     volumes:
       # - '~/.aws:/root/.aws:ro'
       - './engine/src:/workdir/engine/src:ro'
-      - '${FUSION_REPO:-./bundle}/.dist:/workdir/engine/bundle/dist:rw'
-      - '${FUSION_REPO:-./bundle}/.generated:/workdir/engine/bundle/generated:rw'
-      - '${FUSION_REPO:-./bundle}:/workdir/engine/bundle/src:rw'
+      - '${FUSION_REPO:-./bundle}/.fusion/build:/workdir/engine/bundle/build:rw'
+      - '${FUSION_REPO:-./bundle}/.fusion/dist:/workdir/engine/bundle/dist:rw'
+      - '${FUSION_REPO:-./bundle}/.fusion/generated:/workdir/engine/bundle/generated:rw'
+      - '${FUSION_REPO:-./bundle}:/workdir/engine/bundle/src:ro'
 
   resolver:
     build: ./resolver
@@ -161,6 +162,6 @@ services:
     volumes:
       # - '~/.aws:/home/nginx/.aws:ro'
       - './origin/src:/etc/nginx/src:ro'
-      - '${FUSION_REPO:-./bundle}/.dist:/etc/nginx/dist:ro'
+      - '${FUSION_REPO:-./bundle}/.fusion/dist:/etc/nginx/dist:ro'
       - '${FUSION_REPO:-./bundle}/mocks:/etc/nginx/mocks:ro'
       - '${FUSION_REPO:-./bundle}/resources:/etc/nginx/resources:ro'

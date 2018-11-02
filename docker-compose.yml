@@ -86,10 +86,10 @@ services:
       - 9010:8080
     volumes:
       - './engine/src:/workdir/engine/src:ro'
-      - '${FUSION_REPO:-./bundle}/.fusion/build:/etc/nginx/build:ro'
-      - '${FUSION_REPO:-./bundle}/.fusion/dist:/etc/nginx/dist:ro'
-      - '${FUSION_REPO:-./bundle}/.generated:/workdir/engine/bundle/generated:rw'
-      - '${FUSION_REPO:-./bundle}:/workdir/engine/bundle/src:rw'
+      - '${FUSION_REPO:-./bundle}/.fusion/build:/workdir/engine/bundle/build:rw'
+      - '${FUSION_REPO:-./bundle}/.fusion/dist:/workdir/engine/bundle/dist:rw'
+      - '${FUSION_REPO:-./bundle}/.fusion/generated:/workdir/engine/bundle/generated:rw'
+      - '${FUSION_REPO:-./bundle}:/workdir/engine/bundle/src:ro'
 
   resolver:
     build: ./resolver

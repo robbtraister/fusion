@@ -159,7 +159,7 @@ ${usedCollections
     .map(collection =>
       Object.values(this.collections[collection].types)
         .filter(componentType => componentType)
-        .map(componentType => componentCss(componentType.manifest.css))
+        .map(componentType => componentCss(path.join(bundleRoot, componentType.manifest.css)))
         .join('\n')
     )
     .join('\n')

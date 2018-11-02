@@ -38,8 +38,8 @@ RUN \
     # git clone --branch=master --single-branch --depth=1 https://github.com/openresty/set-misc-nginx-module ./modules/nginx-set-misc && \
     # rm -rf ./modules/nginx-set-misc/.git && \
     # # download nginx statsd module
-    # git clone --branch=tags-12 --single-branch --depth=1 https://github.com/robbtraister/nginx-statsd ./modules/nginx-statsd && \
-    # rm -rf ./modules/nginx-statsd/.git && \
+    git clone --branch=tags-12 --single-branch --depth=1 https://github.com/robbtraister/nginx-statsd ./modules/nginx-statsd && \
+    rm -rf ./modules/nginx-statsd/.git && \
     # build nginx
     ./configure \
                 --user=${USER} \
@@ -48,7 +48,7 @@ RUN \
                 --add-module=modules/ngx_devel_kit \
                 # --add-module=modules/nginx-let \
                 # --add-module=modules/nginx-set-misc \
-                # --add-module=modules/nginx-statsd \
+                --add-module=modules/nginx-statsd \
                 && \
     make -j2 && \
     make install && \

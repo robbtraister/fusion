@@ -13,6 +13,7 @@ cat <<EOB
 
 EOB
 
+$(dirname "$0")/../metrics.conf.sh
 $(dirname "$0")/../locations/resolver.conf.sh
 
 cat <<EOB

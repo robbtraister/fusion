@@ -87,9 +87,11 @@ cat <<EOB
     location ~ ^${API_PREFIX}/(fuse|make)(/.*)/$ {
       rewrite                   (.*)/\$ \$1 last;
     }
+
     location ~ ^${API_PREFIX}/(fuse|make)(/.*|\$) {
 EOB
 
+$(dirname "$0")/../metrics.conf.sh
 $(dirname "$0")/../locations/resolver.conf.sh
 
 cat <<EOB
@@ -102,6 +104,6 @@ cat <<EOB
     # all other requests should be treated as a new page to render
     location / {
       rewrite                   ^(${CONTEXT_PATH})?(.*) ${API_PREFIX}/make\$2;
-    }
+   }
   }
 EOB

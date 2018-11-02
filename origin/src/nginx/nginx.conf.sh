@@ -37,9 +37,6 @@ EOB
 if [ "${IS_PROD}" ]
 then
   cat <<EOB
-  # set statsd server
-  statsd_server                 ${DATADOG_STATSD_HOST:-172.17.0.1}:${DATADOG_STATSD_PORT:-8125};
-
   # receive from upstream server
   proxy_read_timeout            10;
 EOB

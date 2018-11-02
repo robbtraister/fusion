@@ -7,23 +7,22 @@ const s3 = require('../aws/s3')
 const { S3BucketDiscrete } = require('../configs')
 const promises = require('../utils/promises')
 
-async function download (bundlePath) {
-  const destFilePromise = promises.tempFile()
+async function download (Key) {
+  const destFile = await promises.tempFile()
   try {
     const params = {
       Bucket: S3BucketDiscrete,
-      Key: bundlePath
+      Key
     }
 
-    const destFile = await destFilePromise
     debug(`downloading ${params.Bucket} ${params.Key} to ${destFile}`)
     const data = await s3.getObject(params)
     await promises.writeFile(destFile, data.Body)
     debug(`downloaded ${params.Bucket} ${params.Key} to ${destFile}`)
 
     return destFile
-  } finally {
-    promises.remove(await destFilePromise)
+  } catch (_) {
+    await promises.remove(destFile)
   }
 }
 

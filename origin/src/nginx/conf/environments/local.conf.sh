@@ -87,6 +87,7 @@ cat <<EOB
     location ~ ^${API_PREFIX}/(fuse|make)(/.*)/$ {
       rewrite                   (.*)/\$ \$1 last;
     }
+
     location ~ ^${API_PREFIX}/(fuse|make)(/.*|\$) {
 EOB
 

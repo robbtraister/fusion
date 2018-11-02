@@ -78,7 +78,7 @@ cat <<EOB
 
   server_names_hash_bucket_size 128;
 
-  # statsd_server                 ${DATADOG_STATSD_HOST:-172.17.0.1}:${DATADOG_STATSD_PORT:-8125};
+  statsd_server                 ${DATADOG_STATSD_HOST:-172.17.0.1}:${DATADOG_STATSD_PORT:-8125};
 
   # proxy_cache_path              './tmp/$(hostname)/cache/' levels=1:2 keys_zone=proxy:${CACHE_SIZE:-512m} max_size=${CACHE_MAX_SIZE:-100g} inactive=${CACHE_INACTIVE:-48h};
   # proxy_cache_key               \$scheme\$proxy_host\$request_uri;

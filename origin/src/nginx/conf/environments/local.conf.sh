@@ -103,6 +103,6 @@ cat <<EOB
     # all other requests should be treated as a new page to render
     location / {
       rewrite                   ^(${CONTEXT_PATH})?(.*) ${API_PREFIX}/make\$2;
-   }
+    }
   }
 EOB

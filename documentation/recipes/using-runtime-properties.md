@@ -45,7 +45,7 @@ Here, `siteName` and `twitter` are properties that only exist for AcmeFeed, and 
 
 Now, we're able to use our runtime properties in a component by using the `getProperties` method provided to us by `fusion:properties`. We just pass in the site name that we get from props like so:
 ```jsx
-/*  /components/features/my-component.jsx  */
+/*  /components/features/my-group/my-component.jsx  */
 
 import React, { Component } from 'react'
 import Consumer from 'fusion:consumer'

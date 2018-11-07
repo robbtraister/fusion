@@ -16,8 +16,8 @@
 | [Creating a Feature Component](./recipes/creating-feature-component.md) |
 | [Creating a Layout Component](./recipes/creating-layout-component.md) |
 | [Creating a Chain Component](./recipes/creating-chain-component.md) |
-| [Event Handling and Interaction](./recipes/event-handling-interaction.md)
-| [Isomorphic vs. Server vs. SPA Rendering](./recipes/isomorphic-server-spa-rendering.md)
+| [Event Handling and Interaction](./recipes/event-handling-interaction.md) |
+| [Isomorphic vs. Server vs. SPA Rendering](./recipes/isomorphic-server-spa-rendering.md) |
 
 | Using Data |
 |---|

@@ -48,11 +48,11 @@
           },
           {
             "title": "Event Handling and Interaction",
-            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes//event-handling-interaction.md"
+            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes/event-handling-interaction.md"
           },
           {
             "title": "Isomorphic vs. Server vs. SPA Rendering",
-            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes//event-handling-interaction.md"
+            "canonical_url": "/arc-products/pagebuilder/fusion/documentation/recipes/isomorphic-server-spa-rendering.md"
           }
         ]
       },

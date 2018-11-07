@@ -9,6 +9,7 @@ This document intends to be a high-level overview of the differences, from a Fea
 
 Below you will find a list of the categories and topics described in this document.
 
+- [Design Principles](#design-principles)
 - [Architecture](#architecture)
   - [Java, JSP && JSTL => JavaScript, React && JSX](#java-to-js)
   - [SSR => Isomorphic rendering](#ssr-isomoprhic-rendering)
@@ -34,6 +35,29 @@ Below you will find a list of the categories and topics described in this docume
 
 ---
 
+## *Design Principles*
+
+#### Stick to standards
+
+Fusion is built with modern web development standards and best practices in mind, so that Feature Pack developers can utilize the skills and knowledge they already have rather than learning a new, proprietary syntax or pattern for building web apps. This also means developers are able to benefit from the vast JavaScript ecosystem of developer knowledge and modular code that already exists.
+
+#### Keep it in the code
+
+As much as possible, Fusion attempts to keep values that are necessary parts of your Feature Pack defined in the code itself, not in a user interface or database. This is because values defined in code are:
+
+- able to use the full power of a programming language to execute logical statements
+- easier to track, version and revert if necessary
+- easier to reuse and share, even across repositories
+- harder to accidentally change, since changes need to be explicitly added, committed and merged via version control
+- when implemented correctly, potentially more secure for "secret" values than being stored in a database
+
+#### Power to the programmers
+
+Fusion intentionally gives Feature Pack developers more flexibility and functionality than previously possible in PageBuilder Classic. This means increased access to data and lower-level functionality, but also requires responsbility from developers to ensure their code works as expected.
+
+
+---
+
 ## *Architecture*
 
 <h3 id="java-to-js">Java, JSP && JSTL => JavaScript, React && JSX</h3>
@@ -46,9 +70,10 @@ Feature Packs written in Fusion are written in JavaScript, using the popular Rea
 
 ##### Reasoning
 Writing Feature Packs in JavaScript offers numerous benefits, including:
+
 - the ability to render isomorphically (discussed later)
 - native event handling in components via React (discussed later)
-- access to the vast JS ecosystem of modules via `npm`
+- access to the vast repository of JS modules available via `npm`
 - using a popular, modern development standard that web developers already know and love
 
 ##### More Info
@@ -184,7 +209,7 @@ Separating the meta information about the component from the component's definit
 In PageBuilder Classic, Features and Chains defined which custom fields those components used, their types, and more in the `config.json` file accompanying the component.
 
 ##### Fusion Way
-In Fusion, custom fields are defined using a Fusion-specific version of React's PropTypes library, which is an existing standard for typechecking inputs (in React's case, `props`) to components. Fusion will read the `propTypes` that are defined on Feature and Chain components to see if they should have custom fields, what their types are, and any additional info about them.
+In Fusion, custom fields are defined using a Fusion-specific version of React's [PropTypes](https://github.com/facebook/prop-types) library, which is an existing standard for typechecking inputs (in React's case, `props`) to components. Fusion will read the `.propTypes` property defined on Feature and Chain components to see if they should have custom fields, what their types are, and any additional info about them.
 
 ##### Reasoning
 Using the PropTypes library is in line with Fusion's goal to use current best practices and known standards as much as possible. By utilizing PropTypes for Custom Fields, we can kill two birds with one stone: denoting which custom fields each component needs, while also typechecking custom field values coming from PageBuilder Admin.
@@ -208,7 +233,7 @@ Using the PropTypes library is in line with Fusion's goal to use current best pr
 Layouts in PageBuilder Classic were simple JSON objects that contained an array of "section" objects, each with some meta information about them like the name of the section and the CSS class, etc. Layouts were devoid of markup, instead functioning as empty containers that Features and Chains could be dropped into.
 
 ##### Fusion Way
-There are a variety of possible ways to define Layouts in Fusion - most notably, Fusion now allows developers to write Layouts as regular components, with their own markup and logic.
+There are a variety of possible ways to define Layouts in Fusion - most notably, Fusion now allows developers to write Layouts as regular React components, with their own markup and logic just like any other component.
 
 ##### Reasoning
 Allowing developers to define Layouts as complete components increases their flexibility and usefulness. Layouts are no longer just "dumb" containers, but fully-fledged components that can consume data about the page that is being rendered.

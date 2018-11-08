@@ -1,4 +1,4 @@
-const request = require('request')
+const request = require('request-promise-native')
 const { datadogApiKey, deployment, environment, isDev, semver } = require('../../environment')
 
 const metricsMap = {}
@@ -51,11 +51,12 @@ const sendMetrics = function sendMetrics (metrics) {
     headers: {
       'Content-Type': 'application/json'
     },
+    timeout: 1000,
     body: JSON.stringify(metricsToSend)
   }
 
   const metricsPromises = metricsMap[global.awsRequestId] || []
-  metricsPromises.push(request(requestOptions))
+  metricsPromises.push(request(requestOptions).catch((err) => { console.log(err.message) }))
   metricsMap[global.awsRequestId] = metricsPromises
 }
 
@@ -63,8 +64,10 @@ const sendMetrics = function sendMetrics (metrics) {
  * Resolves all metrics promises for the current (globally set) AWS request 
  */
 const resolveMetrics = async function resolveMetrics () {
-  await Promise.all(metricsMap[global.awsRequestId])
-  delete metricsMap[global.awsRequestId]
+  if (metricsMap[global.awsRequestId] && metricsMap[global.awsRequestId].length) {
+    await Promise.all(metricsMap[global.awsRequestId])
+    delete metricsMap[global.awsRequestId]
+  }
 }
 
 function getTimestamp () {

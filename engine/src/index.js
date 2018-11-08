@@ -18,7 +18,6 @@ if (module === require.main) {
     err ? console.error(err) : console.log(`Listening on port: ${port}`)
   })
 } else {
-  console.log('not listening on port')
   const serverless = require('serverless-http')
 
   module.exports = {
@@ -32,12 +31,10 @@ if (module === require.main) {
       {
         binary: binaryContentTypes,
         request: (event, context) => {
-          // make the request ID available globally for the request lifecycle (i.e. send-metrics)
-          global.awsRequestId = context.requestId || 'undefined'
+          global.awsRequestId = context.requestId || ''
         },
         response: async () => {
           await resolveMetrics()
-          // delete the request ID from the global scope to complete request lifecycle
           delete global.awsRequestId
         }
       })

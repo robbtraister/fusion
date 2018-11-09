@@ -56,6 +56,7 @@ const render = async function render ({ Component, request, content }) {
         {
           arcSite: request.arcSite,
           contextPath,
+          deployment: deploymentWrapper,
           globalContent: content ? content.document : null,
           globalContentConfig: content ? { source: content.source, query: content.query } : null,
           outputType: Component.outputType,
@@ -176,6 +177,7 @@ const compileDocument = async function compileDocument ({ name, rendering, outpu
       {
         contextPath,
         deployment: deploymentWrapper,
+        // TODO: remove deprecated alias
         version: deploymentWrapper,
         tree: Template.tree,
         renderables: [Template.tree].concat(...getAncestors(Template.tree)),

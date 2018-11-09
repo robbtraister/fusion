@@ -15,7 +15,7 @@ Custom Fields can be added to either Features or Chains in a Feature Pack. Both 
 Custom Fields can be added to both functional components and class-based components. Here's an example using the `movie-detail` component we defined in the "Creating a Feature Component" guide:
 
 ```jsx
-/*  /src/components/features/movies/movie-detail.jsx  */
+/*  /components/features/movies/movie-detail.jsx  */
 
 import PropTypes from 'prop-types'
 import Consumer from 'fusion:consumer'

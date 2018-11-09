@@ -1,4 +1,4 @@
-# Fusion API
+# Fusion HTTP API
 
 All endpoints described below will be handled as displayed by the lambda function. However, the lambda functions will be exposed publicly at `/pb/api/v3`, so each endpoint must be prefixed to be accessed.
 

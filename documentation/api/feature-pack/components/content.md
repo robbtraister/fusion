@@ -49,7 +49,7 @@ const MyFeatureComponent = (props) =>
 
 MyFeatureComponent.propTypes = {
   customFields: PropTypes.shape({
-    myContentConfig: PropTypes.contentConfig()
+    myContentConfig: PropTypes.contentConfig('some-content-schema')
   })
 }
 

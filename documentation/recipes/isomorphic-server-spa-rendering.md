@@ -19,7 +19,7 @@ Sometimes, isomorphic rendering won't be appropriate for a certain component. Pe
 If you'd like to mark a Feature to be rendered on the server only, you can add a `.static = true` property to it like so:
 
 ```jsx
-/*  /src/components/features/movies/movie-detail.jsx  */
+/*  /components/features/movies/movie-detail.jsx  */
 
 import React, { Component } from 'react'
 

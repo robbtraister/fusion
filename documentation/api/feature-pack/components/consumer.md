@@ -48,7 +48,7 @@ The Arc site used in this rendering, if multi-site enabled. This will be determi
 ##### Example
 
 ```jsx
-/*  /src/components/features/global/footer.jsx  */
+/*  /components/features/global/footer.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
@@ -73,7 +73,7 @@ This is the base context path of the application. In the client, you could calcu
 ##### Example
 
 ```jsx
-/*  /src/components/features/global/logo.jsx  */
+/*  /components/features/global/logo.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React from 'react'
@@ -97,7 +97,7 @@ The keys will be the actual data object returned from the content fetch; as such
 ##### Example
 
 ```jsx
-/*  /src/components/features/article/headline.jsx  */
+/*  /components/features/article/headline.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
@@ -127,7 +127,7 @@ This is the full config object used to fetch global content for the rendered pag
 ##### Example
 
 ```jsx
-/*  /src/components/features/article/story-feed.jsx  */
+/*  /components/features/article/story-feed.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
@@ -178,7 +178,7 @@ The name of the Layout that was used when rendering this page.
 ##### Example
 
 ```jsx
-/*  /src/components/features/common/image.jsx  */
+/*  /components/features/common/image.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
@@ -202,7 +202,7 @@ The Output Type that was used when rendering this page.
 ##### Example
 
 ```jsx
-/*  /src/components/features/common/link.jsx  */
+/*  /components/features/common/link.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
@@ -233,7 +233,7 @@ This is the URI that was requested to initiate this rendering. In the client, yo
 ##### Example
 
 ```jsx
-/*  /src/components/features/common/link.jsx  */
+/*  /components/features/common/link.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
@@ -265,12 +265,12 @@ export default Link
 
 ##### Description
 
-An object containing the site specific properties defined in the `/src/properties/` directory for the current [`arcSite`](#arcsite).
+An object containing the site specific properties defined in the `/properties/` directory for the current [`arcSite`](#arcsite).
 
 ##### Example
 
 ```jsx
-/*  /src/components/features/header/social-links.jsx  */
+/*  /components/features/header/social-links.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from react
@@ -294,9 +294,19 @@ export default SocialLinks
 
 -----
 
+### `template` (*String*)
+
+##### Description
+
+The ID of the template that was used when rendering this page.
+
+<!-- TODO: example -->
+
+-----
+
 ## Instance Methods
 
-### `addEventListener()`
+### `addEventListener()` - (*Function*)
 
 ##### Description
 This method adds an event listener to a Fusion component that will respond to events of the specified `eventName` by invoking the specified `eventHandler`. Events are dispatched by invoking [`dispatchEvent`](#dispatchEvent) in other Fusion components. Listeners can be removed by the [`removeEventListener`](#removeEventListener) method.
@@ -313,7 +323,7 @@ This method returns `undefined`; its effect is to 'subscribe' the event handler 
 ##### Example
 
 ```jsx
-/*  /src/components/features/utils/error-message.jsx  */
+/*  /components/features/utils/error-message.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
@@ -335,7 +345,7 @@ export default ErrorMessage
 
 -----
 
-### `dispatchEvent()`
+### `dispatchEvent()` - (*Function*)
 
 ##### Description
 This method dispatches an event from a Fusion component of the specified `eventName` with an arbitrary `payload` to be received by another component's event handling function (which gets subscribed via the [`addEventListener`](#addEventListener) method).
@@ -352,7 +362,7 @@ This method returns `undefined`; its effect is to dispatch the event to each sub
 ##### Example
 
 ```jsx
-/*  /src/components/features/weather/weather-lookup.jsx  */
+/*  /components/features/weather/weather-lookup.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
@@ -377,7 +387,7 @@ export default WeatherLookup
 
 -----
 
-### `fetchContent()`
+### `fetchContent()` - (*Function*)
 
 ##### Description
 The `fetchContent` method is second-level syntactic sugar for using both [`getContent`](#getContent) and [`setContent`](#setContent) together. It takes a map whose keys are the names of content to be stored in the component's `state` (using `setContent`), and the values are configuration options used to fetch content from a content source (using `getContent`). `fetchContent` will then fetch the content using the content configuration and set it on the component's `state` using the key names in `contentConfigMap`.
@@ -400,7 +410,7 @@ This method returns `undefined`; its effect is to set the `state` properties lis
 ##### Example
 
 ```jsx
-/* /src/components/features/homepage/topics.jsx  */
+/* /components/features/homepage/topics.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
@@ -435,7 +445,7 @@ export default Topics
 
 -----
 
-### `getContent()`
+### `getContent()` - (*Function*)
 
 ##### Description
 The `getContent` method will fetch content, both on the server and the client, from a content source (identified by the `sourceName` argument) defined in the bundle.
@@ -469,7 +479,7 @@ An object with 2 keys: `{ cached, fetched }`. `cached` will be an object contain
 ##### Example
 
 ```jsx
-/*  /src/components/features/weather/forecast.jsx  */
+/*  /components/features/weather/forecast.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
@@ -512,7 +522,7 @@ export default WeatherForecast
 
 -----
 
-### `removeEventListener()`
+### `removeEventListener()` - (*Function*)
 
 ##### Description
 This method 'unsubscribes' the specified event handling function (`eventHandler`) from the `eventName` specified. The `eventHandler` must be a reference to the exact function instance that was added via [`addEventListener`](#addEventListener), not a copy.
@@ -529,7 +539,7 @@ This method returns `undefined`; its effect is to 'unsubscribe' the event handle
 ##### Example
 
 ```jsx
-/*  /src/components/features/utils/error-message.jsx  */
+/*  /components/features/utils/error-message.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'
@@ -557,7 +567,7 @@ export default ErrorMessage
 
 -----
 
-### `setContent()`
+### `setContent()` - (*Function*)
 
 ##### Description
 
@@ -574,7 +584,7 @@ This method returns `undefined`; its effect is to set the `state` properties lis
 ##### Example
 
 ```jsx
-/* /src/components/features/homepage/topics.jsx  */
+/* /components/features/homepage/topics.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'

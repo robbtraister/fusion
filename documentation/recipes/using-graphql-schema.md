@@ -9,7 +9,7 @@ Let's say we want to add some functionality to our webpage. In addition to the m
 You can see in the [OMDB API docs](http://www.omdbapi.com/#parameters) that it support 2 main endpoints: one for finding individual movies (which we used in our `movie-find.js` source) and one for searching for movies based on a title.  We'll define a new content source called `movie-search.js` to use the search endpoint:
 
 ```jsx
-/*  /src/content/sources/movie-search.js  */
+/*  /content/sources/movie-search.js  */
 
 import { OMDB_API_KEY } from 'fusion:environment'
 
@@ -69,9 +69,9 @@ The process of defining a schema involves looking at the expected JSON you'll re
 ```
 We can see that the JSON response has 3 top level fields (`Search`, `totalResults`, and `Response`). `Search` seems to contain the data we care about, namely an array of objects containing info about movies with "Rocky" in the title.
 
-Because in our `movie-search` content source above we specified the `schemaName` as `movies`, we need to create a file called `movies.js` in the `/src/content/schemas/` directory so Fusion can find the correct schema. We can define the following GraphQL schema in that file:
+Because in our `movie-search` content source above we specified the `schemaName` as `movies`, we need to create a file called `movies.js` in the `/content/schemas/` directory so Fusion can find the correct schema. We can define the following GraphQL schema in that file:
 ```js
-/*  /src/content/schemas/movies.js  */
+/*  /content/schemas/movies.js  */
 
 const schema = `
   type Movie {

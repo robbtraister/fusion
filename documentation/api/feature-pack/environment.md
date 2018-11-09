@@ -8,14 +8,14 @@ Environment variables can be configured within your repo so that they are provid
 
 *Local Development*
 
-Environment variables in local dev are expected to be stored in the `.env` file in the **root** of your repo (*not* within the `/src/` directory).
+Environment variables in local dev are expected to be stored in the `.env` file in the **root** of your repo (*not* within the `/` directory).
 
 *Production (non-local) Development*
 
 Environment values in all non-dev environments (heretofore referred to as "production" environments) are expected to be stored and named in one of the following formats:
 
-- `/src/environment.(js|json)`
-- `/src/environment/index.(js|json)`
+- `/environment.(js|json)`
+- `/environment/index.(js|json)`
 
 ##### Example
 
@@ -32,7 +32,7 @@ API_CREDENTIALS=user:password
 *Production (non-local) Development*
 
 ```js
-/*  /src/environment.js */
+/*  /environment.js */
 
 export default {
   API_CREDENTIALS: "%{AWS_ENCRYPTED_CIPHER_TEXT}"
@@ -58,7 +58,7 @@ OMDB_API_KEY=a1b2c3d4
 Here is how to use that same environment variable in a sample content source:
 
 ```jsx
-/*  /src/content/sources/movie-find.js  */
+/*  /content/sources/movie-find.js  */
 
 import { OMDB_API_KEY } from 'fusion:environment'
 

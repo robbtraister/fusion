@@ -5,7 +5,7 @@ Now we're really cooking with gas! We've written and rendered components, we've 
 But believe it or not, we can make our content fetching *even more* dynamic. Currently inside our `MovieList` component, we're hardcoding the name of our content source and the values it is using to query for content. Here's the relevant snippet in our `movie-list` component:
 
 ```jsx
-/*  /src/components/features/movies/movie-list.jsx  */
+/*  /components/features/movies/movie-list.jsx  */
 
   ...
   fetch () {
@@ -32,7 +32,7 @@ With this in mind, Fusion gives you the ability to specify a `contentConfig` pro
 Let's see how that works:
 
 ```jsx
-/*  /src/components/features/movies/movie-list.jsx  */
+/*  /components/features/movies/movie-list.jsx  */
 
 // We have to import the `PropTypes` module so we can use it later
 import PropTypes from 'prop-types'
@@ -75,7 +75,7 @@ The second key is `contentConfigValues`, whose value is an object containing the
 Armed with this knowledge, let's see how we can use the `movieListConfig` prop in our `fetch` method to make things more dynamic:
 
 ```jsx
-/*  /src/components/features/movies/movie-list.jsx  */
+/*  /components/features/movies/movie-list.jsx  */
 
   ...
   fetch () {
@@ -107,5 +107,5 @@ It may not seem like a huge change, but what we've done is completely decoupled 
 
 For the purposes of our `MovieList` component, the resulting output is the same - but this is a very common use case when working with Arc' Content API, when multiple content sources may return similarly structured data.
 
- **Next: [Using Runtime Properties](./using-runtime-properties.md)**
+ **Next: [Using Site Properties](./using-site-properties.md)**
 

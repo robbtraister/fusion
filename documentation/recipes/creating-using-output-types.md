@@ -14,12 +14,12 @@ We can have multiple Output Type components in our Feature Pack, each for differ
 
 ## Writing our First Component
 
-To create our first Output Type component, we'll create a new file in the `/src/components/output-types/` directory named `default.jsx`. The name `default` is important because it denotes to Fusion that this is the Output Type we should use unless a different one is specified.
+To create our first Output Type component, we'll create a new file in the `/components/output-types/` directory named `default.jsx`. The name `default` is important because it denotes to Fusion that this is the Output Type we should use unless a different one is specified.
 
 Here's the code for our first Output Type component:
 
 ```jsx
-/*    /src/components/output-types/default.jsx    */
+/*    /components/output-types/default.jsx    */
 
 import React from 'react'
 
@@ -70,8 +70,8 @@ One more subtle but important piece of code is the `id='fusion-app'` attribute a
 We're finally at the stage where we can start seeing something on a webpage! To do so, we'll need to go into the [PageBuilder Admin](http://localhost/pb/admin) and define a sample page to work with.
 
 > **NOTE**
-> 
-> At this point, you may need to restart your Fusion application for it to "see" the new Output Type file you've created. To do so, hit `CTRL+C` and then re-run `npm start`. Because of the way Webpack works, Fusion often doesn't know about newly created files until the application is restarted. If you create a new file and it doesn't show up in PageBuilder as expected, this may be the problem.
+>
+> At this point, you may need to restart your Fusion application for it to "see" the new Output Type file you've created. To do so, hit `CTRL+C` and then re-run `npx fusion start`. Because of the way Webpack works, Fusion often doesn't know about newly created components until the application is restarted. If you create a new file and it doesn't show up in PageBuilder as expected, this may be the problem.
 
 <!-- TODO: add PB Admin image -->
 
@@ -80,7 +80,7 @@ Let's create a page called "Homepage" at the path `/homepage` (or if you already
 Now that we know our Output Type is working, we can remove the "Welcome to Fusion" header since we won't need it. Onward!
 
 > **NOTE**
-> 
-> If you see an error message about the Output Type component not being found, or if the page isn't rendering, you may need to trigger a manual rebuild of the bundle. You can do so by running `npm run rebuild:bundle` from the root of the repo.
+>
+> If you see an error message about the Output Type component not being found, or if the page isn't rendering, you may need to trigger a manual rebuild of the bundle. You can do so by running `npx fusion rebuild` from the root of the repo.
 
 **Next: [Creating a Feature Component](./creating-feature-component.md)**

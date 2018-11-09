@@ -6,7 +6,7 @@
 
 A Content Source is expected to be stored and named in the following format:
 
-- `/src/content/schemas/{schemaName}.(js|json)`
+- `/content/schemas/{schemaName}.(js|json)`
 
 > This will build a content schema whose name is represented by the `{schemaName}` portion of the filepath.
 
@@ -17,7 +17,7 @@ A Content Source is expected to be stored and named in the following format:
 The string syntax is easy to use, but may not be suitable for very complex GraphQL schema implementations that use features like [Interfaces](https://graphql.org/learn/schema/#interfaces).
 
 ```jsx
-/*  /src/content/schemas/ans-content.js  */
+/*  /content/schemas/ans-content.js  */
 
 export default `
 
@@ -47,7 +47,7 @@ type Query {
 The GraphQL Object syntax is more verbose than the string syntax, but allows you to be more flexible.
 
 ```js
-/*  /src/content/schemas/ans-content.js  */
+/*  /content/schemas/ans-content.js  */
 
 const DescriptionType = new GraphQLObjectType({
   name: 'Description',

@@ -8,16 +8,16 @@ There are two different approaches to adding styling to a Fusion site: adding gl
 
 By far the easiest way to add styling to your Fusion site is to write static CSS and include it via `<link>` tags in the head of your document, defined in the Output Type. This approach has the advantage of being easy to implement and understand.
 
-Let's say we wanted to add some simple CSS to add common heights and classes to certain classes of images. To do so, let's create a directory called `css/` in our `/src/resources/` directory and a file called `main.css` within it.
+Let's say we wanted to add some simple CSS to add common heights and classes to certain classes of images. To do so, let's create a directory called `css/` in our `/resources/` directory and a file called `main.css` within it.
 
 > **NOTE**
 >
-> The `/src/resources/` directory is where Fusion expects static assets to be kept - things like images, fonts, CSS, and static JavaScript that can be served directly to the browser without being processed.
+> The `/resources/` directory is where Fusion expects static assets to be kept - things like images, fonts, CSS, and static JavaScript that can be served directly to the browser without being processed.
 
 Here's some simple CSS for our site:
 
 ```css
-/*  /src/resources/css/main.css  */
+/*  /resources/css/main.css  */
 
 .image-sm {
   height: 250px;
@@ -28,7 +28,7 @@ Here's some simple CSS for our site:
 Now in our `default.jsx` Output Type, we can add a `<link>` tag to our new CSS file.
 
 ```jsx
-/*  /src/components/output-types/default.jsx  */
+/*  /components/output-types/default.jsx  */
 
 export default (props) => {
   return (
@@ -62,7 +62,7 @@ We're using the `props.contextPath` helper above to prefix our path based on the
 All that's left is to actually apply our class to the images we want to resize:
 
 ```jsx
-/*  /src/components/features/movies/movie-list.jsx  */
+/*  /components/features/movies/movie-list.jsx  */
 
 ...
 class MovieList extends Component {
@@ -107,12 +107,28 @@ Because Fusion uses [Webpack](https://webpack.js.org/) under-the-hood to bundle 
 
 The more specific the styling is to a certain component, the more targeted we can be about where we import it. In other words, if a style is used across many components on the page, it may be best to import it at the Output Type level; however, styles that are specific to a certain Feature can be imported into that Feature alone, so they won't be included unnecessarily.
 
-Let's re-implement the same image resizing we did above, but this time by importing the CSS into the relevant Feature.
+Let's re-implement the same image resizing we did above, but this time by importing the styling into the relevant Feature.
 
-Let's create a new file in `/src/components/features/movie-list/` called `style.scss`. You'll notice that this is a SCSS file instead of plain CSS, and that we're creating it directly in the relevant component's directory, rather than in the `/src/resources/` directory.
+Since we're going to create a new file related to our `movie-list` component, let's create a directory for both the component definition and the style to live in, instead of just having our top-level component definition.
+- create a directory inside `/components/features/movies/` named `movie-list/`
+- then, move what used to be our `movie-list.jsx` file into the new directory and rename it `default.jsx` (it's important that it's named `default`, so Fusion knows what output type to use!)
+- finally, create a `style.scss` inside the new `movie-list/` directory
+
+The resulting structure should now be:
+
+```
+components/
+  features/
+    movies/
+      movie-list/
+        default.jsx
+        style.scss
+```
+
+You'll notice that `style.scss` is a SCSS file instead of plain CSS, and that we're creating it directly in the relevant component's directory, rather than in the `/resources/` directory.
 
 ```scss
-/*  /src/components/features/movie-list/style.scss  */
+/*  /components/features/movies/movie-list/style.scss  */
 
 $image-size: 250px;
 
@@ -127,7 +143,7 @@ In this very simple example, we're creating exactly the same styles as we did in
 Now, in our `MovieList` component we can simply import the relevant file and use it as we did before:
 
 ```jsx
-/*  /src/components/features/movies/movie-list.jsx  */
+/*  /components/features/movies/movie-list/default.jsx  */
 
 // We import the style here...
 import './style.scss'

@@ -23,7 +23,7 @@ Let's jump back to our `movie-detail.jsx` file we created in the ["Creating a Fe
 In this example, we want to access the title, director, list of actors, and more info associated with the movie the user requested. Now that we've fetched that content in our resolver, it should be available as `props.globalContent` provided by the Consumer. Let's wrap our component with the `Consumer` decorator and see what changes:
 
 ```jsx
-/*  /src/components/features/movies/movie-detail.jsx  */
+/*  /components/features/movies/movie-detail.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from 'react'

@@ -10,12 +10,12 @@ Site Properties have a set of "global" properties that act as defaults; if a sit
 
 Global property files are expected to be defined and named in one of the following formats:
 
-- `/src/properties/index.(js|json)`
+- `/properties/index.(js|json)`
 
 ##### Example
 
 ```jsx
-/*  /src/properties/index.js  */
+/*  /properties/index.js  */
 
 export default {
   description: 'Acme, Inc.',
@@ -27,14 +27,14 @@ export default {
 
 Site-specific property files are expected to be defined and named in one of the following formats:
 
-- `/src/properties/sites/{siteName}.(js|json)`
+- `/properties/sites/{siteName}.(js|json)`
 
-> Each site in your multi-site application can have its own file in the `/src/properties/sites/` directory that specifies properties for that site alone. The `{siteName}` value used to name the file should be the same value that is passed in the `_website` parameter to specify the site being requested.
+> Each site in your multi-site application can have its own file in the `/properties/sites/` directory that specifies properties for that site alone. The `{siteName}` value used to name the file should be the same value that is passed in the `_website` parameter to specify the site being requested.
 
 ##### Example
 
 ```jsx
-/*  /src/properties/sites/acmefeed.js  */
+/*  /properties/sites/acmefeed.js  */
 
 export default {
   description: 'Acme Feed: A Listicle Site',
@@ -55,7 +55,7 @@ The "function invocation" syntax expects a single argument: the name of the site
 The `getProperties` function is imported from the `fusion:properties` namespace.
 
 ```jsx
-/*  /src/components/features/header/social-links.jsx  */
+/*  /components/features/header/social-links.jsx  */
 
 import getProperties from 'fusion:properties'
 import Consumer from 'fusion:consumer'
@@ -83,7 +83,7 @@ export default SocialLinks
 If you already have a `Consumer` wrapped component, and simply want the Site Properties for the current `arcSite`, you can simply use the `siteProperties` prop that is part of the `Consumer`.
 
 ```jsx
-/*  /src/components/features/header/social-links.jsx  */
+/*  /components/features/header/social-links.jsx  */
 
 import Consumer from 'fusion:consumer'
 import React, { Component } from react

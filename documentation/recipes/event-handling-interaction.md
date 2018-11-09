@@ -22,7 +22,7 @@ We'll tackle these steps one by one.
 First, we'll add the `isPlotShown` key to the `state` of our component. We'll do that in the class `constructor` method like this:
 
 ```jsx
-/*  /src/components/features/movies/movie-detail.jsx  */
+/*  /components/features/movies/movie-detail.jsx  */
 
 class MovieDetail extends Component {
   constructor (props) {
@@ -42,7 +42,7 @@ This is how you would normally initialize some state in a React component - we n
 Next, we'll need to create a method called `togglePlot` on our class to toggle the `isPlotShown` method when it's invoked. Here we go:
 
 ```jsx
-/*  /src/components/features/movies/movie-detail.jsx  */
+/*  /components/features/movies/movie-detail.jsx  */
 
 class MovieDetail extends Component {
   ...
@@ -63,7 +63,7 @@ Our method just destructures the `isPlotShown` key out of the `state` object, th
 So we've got our togglePlot method ready to go - but it's not being invoked by anything. We'd like it so that when a user clicks the "Show Plot" button, they see the plot shown, and when they click "Hide Plot", the plot goes away.
 
 ```jsx
-/*  /src/components/features/movies/movie-detail.jsx  */
+/*  /components/features/movies/movie-detail.jsx  */
 
 class MovieDetail extends Component {
   ...
@@ -91,7 +91,7 @@ In this incomplete snippet from our `render` method, we're creating a `const` na
 Now all that's left to do is display our `Plot` and `plotButton`:
 
 ```jsx
-/*  /src/components/features/movies/movie-detail.jsx  */
+/*  /components/features/movies/movie-detail.jsx  */
 
 class MovieDetail extends Component {
   ...
@@ -136,7 +136,7 @@ Now if we refresh the page, we should see our "Show Plot" button where the "Lore
 Here's what our full component looks like now:
 
 ```jsx
-/*  /src/components/features/movies/movie-detail.jsx  */
+/*  /components/features/movies/movie-detail.jsx  */
 
 import React, { Component } from 'react'
 

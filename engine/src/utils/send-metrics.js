@@ -56,7 +56,7 @@ const sendMetrics = function sendMetrics (metrics) {
   }
 
   const metricsPromises = metricsMap[global.awsRequestId] || []
-  metricsPromises.push(request(requestOptions).catch((err) => { console.log(err.message) }))
+  metricsPromises.push(request(requestOptions).catch(() => null))
   metricsMap[global.awsRequestId] = metricsPromises
 }
 

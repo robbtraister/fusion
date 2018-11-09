@@ -1,19 +1,19 @@
-# Using Runtime Properties
+# Using Site Properties
 
-Since Fusion applications can support multiple websites with the same Feature Pack, it's often necessary for different sites in the application to have different values for certain pieces of data - and for that, we have runtime properties. Runtime properties are site-specific values that may be accessed anywhere in your bundle, and can hold any data type. Good use cases for runtime properties might include Twitter handles, mailto addresses for contact info, or even just the human-readable name of the site itself.
+Since Fusion applications can support multiple websites with the same Feature Pack, it's often necessary for different sites in the application to have different values for certain pieces of data - and for that, we have site properties. Site properties are site-specific values that may be accessed anywhere in your bundle, and can hold any data type. Good use cases for site properties might include Twitter handles, mailto addresses for contact info, or even just the human-readable name of the site itself.
 
-## Runtime properties vs. environment variables
+## Site properties vs. environment variables
 
-Runtime properties and environment variables serve similar purposes, so it can be easy to get confused between which one you want to use in a given situation. But there are a few key distinctions between the two that can help determine which is the right tool for the job:
+Site properties and environment variables serve similar purposes, so it can be easy to get confused between which one you want to use in a given situation. But there are a few key distinctions between the two that can help determine which is the right tool for the job:
 
-- Environment variables can be encrypted locally and decrypted on the server. For this reason, they are ideal for "secret" variables like API credentials that you don't want to be exposed in plain text in your code repository. Runtime properties do not have this capability.
-- Runtime properties can be set on a "per-site" basis in multisite Fusion applications, meaning each site can have its own unique value for a given property. Environment variables, on the other hand, are universal across sites (not to be confused with environments).
+- Environment variables can be encrypted locally and decrypted on the server. For this reason, they are ideal for "secret" variables like API credentials that you don't want to be exposed in plain text in your code repository. Site properties do not have this capability.
+- Site properties can be set on a "per-site" basis in multisite Fusion applications, meaning each site can have its own unique value for a given property. Environment variables, on the other hand, are universal across sites (not to be confused with environments).
 
 ## Global values
 
-Runtime properties have "global" values that will exist until they are overriden by more specific "site" values - this way, if a "site" value does not exist for a given piece of data, it can fall back to the "global" value. Global values should be defined in `/properties/index.js` (or `/properties/index.json` if you don't need to compute any values). These values will be the defaults and will be included for all sites, unless explicitly overridden.
+Site properties have "global" values that will exist until they are overriden by more specific "site" values - this way, if a "site" value does not exist for a given piece of data, it can fall back to the "global" value. Global values should be defined in `/properties/index.js` (or `/properties/index.json` if you don't need to compute any values). These values will be the defaults and will be included for all sites, unless explicitly overridden.
 
-Let's define a "global" runtime property here for a fake media conglomerate with many holdings, Acme Media Group:
+Let's define a "global" property here for a fake media conglomerate with many holdings, Acme Media Group:
 ```js
 /*  /properties/index.js  */
 
@@ -43,7 +43,7 @@ Here, `siteName` and `twitter` are properties that only exist for AcmeFeed, and 
 
 ## Using properties
 
-Now, we're able to use our runtime properties in a component by using the `getProperties` method provided to us by `fusion:properties`. We just pass in the site name that we get from props like so:
+Now, we're able to use our site properties in a component by using the `getProperties` method provided to us by `fusion:properties`. We just pass in the site name that we get from props like so:
 ```jsx
 /*  /components/features/my-group/my-component.jsx  */
 

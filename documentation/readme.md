@@ -28,7 +28,7 @@
 | [Using a GraphQL Schema](./recipes/using-graphql-schema.md) |
 | [Fetching Content](./recipes/fetching-content.md) |
 | [Dynamically Configuring Content](./recipes/dynamically-configuring-content.md) |
-| [Using Runtime Properties](./recipes/using-runtime-properties.md) |
+| [Using Site Properties](./recipes/using-site-properties.md) |
 
 | Tidying Up |
 |---|

@@ -50,7 +50,7 @@ export default MovieList
 
 You can see in the snippet above (the `contructor` and `render` methods have been removed for brevity) that we can import our module by its name, just like we would any other module, and use it right in our component.
 
-Modules can be used in any code in your Feature Pack that gets bundled by Webpack - in components, content sources, schemas, even in `environment.js` and runtime property definitions.
+Modules can be used in any code in your Feature Pack that gets bundled by Webpack - in components, content sources, schemas, even in `environment.js` and site property definitions.
 
 ## Considerations
 

@@ -23,9 +23,9 @@ The guide below will walk you through the structure of each directory and (most)
   - `restore/`: Allows you to [manually restore your database from a tarball](./configuring-feature-pack.md#populating-the-admin-database).
 - `/environment/`: Directory for defining environment values available on the *server only*. These values can be encrypted at rest and used for secret values like credentials.
 - `/node_modules/`: This is the directory where your local Node modules are installed, just like every other Node app you've ever developed. You shouldn't have to edit this directory manually, and it is `gitignore`d.
-- `/properties/`: This directory is meant for *non-secret* "runtime" properties whose values can differ on a per-site basis. They are available in components.
-  - `sites/`: This directory holds the site-specific overrides of the default runtime properties.
-  - `index.js{on}`: This file holds the default runtime properties. It can either export a JavaScript object or be a simple JSON file.
+- `/properties/`: This directory is meant for *non-secret* "site" properties whose values can differ on a per-site basis. They are available in components.
+  - `sites/`: This directory holds the site-specific overrides of the default site properties.
+  - `index.js{on}`: This file holds the default site properties. It can either export a JavaScript object or be a simple JSON file.
 - `/resources/`: This directory is for static resources like images, CSS, fonts and more that don't need processing.
 - `/.dockerignore`: [Reference](https://docs.docker.com/engine/reference/builder/#dockerignore-file). Consider this read-only.
 - `/.env`: This file is git-ignored and development environment specific. You'll [specify environment variables](./using-environment-secrets.md) here used by Docker and Fusion.

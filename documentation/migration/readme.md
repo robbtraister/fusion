@@ -66,7 +66,7 @@ Fusion intentionally gives Feature Pack developers more flexibility and function
 Feature Packs written in Classic were written in Java, using JSP syntax and the JSTL library.
 
 ##### Fusion Way
-Feature Packs written in Fusion are written in JavaScript, using the popular React framework. Components can be written using React's custom JSX syntax, which will then be transpiled into browser-compatible JavaScript. Fusion can render components on both the server and client.
+Feature Packs written in Fusion are written in JavaScript, using the popular React library. Components can be written using React's custom JSX syntax, which will then be transpiled into browser-compatible JavaScript. Fusion can render components on both the server and client.
 
 ##### Reasoning
 Writing Feature Packs in JavaScript offers numerous benefits, including:
@@ -192,16 +192,15 @@ Rather than having a separate configuration file for each component, Fusion allo
 Separating the meta information about the component from the component's definition itself can make it difficult to reason about how the component works, since these details are spread across multiple files. Co-locating all the information a component needs in the component's definition makes it easier to see everything that is going on in one place.
 
 ##### More Info
-
+None
 <!-- TODO: more info? -->
 
 ---
 
+<!-- TODO: Content editable docs
 ### Content Editable
-
-<!-- TODO: Content editable docs -->
-
 ---
+-->
 
 ### Custom Fields
 
@@ -221,11 +220,10 @@ Using the PropTypes library is in line with Fusion's goal to use current best pr
 
 ---
 
+<!-- TODO: display properties
 ### Display Properties
-
-<!-- TODO: display properties -->
-
 ---
+-->
 
 ### Layouts
 
@@ -294,16 +292,19 @@ GraphQL is a natural fit for defining content schemas and querying since it can 
 ### Content Fetching
 
 ##### Classic Way
+In PageBuilder Classic, developers could use `<pb:fetch-content` tags to fetch content on the server side. To make a client-side content fetch, developers would have to make their own AJAX call to synchronously render a feature on the server side, which would then return HTML to inject directly into the page. Features were only allowed to utilize one content source each.
 
 ##### Fusion Way
+In Fusion, server-side content fetching and client-side content fetching use the same API, and both go through a proxy endpoint that allows Fusion to serve cached content if it is available. Fusion content sources are expected to serve JSON, so both server-side and client-side fetching will receive JSON that can be manipulated rather than static HTML. Fusion Features can utilize as many content sources as they need, since content configurations for components are defined as custom fields.
 
 ##### Reasoning
+Fusion's approach to content fetching offers increased flexibility to developers by allowing them to use as many content sources as necessary in their components. However, it also reduces the amount of boilerplate code necessary to retrieve content by creating a common API to fetch content on both the server and client. Finally, Fusion's approach passes every content fetch through a proxy endpoint, giving Fusion the ability to cache content and serve it quickly, rather than continually fetching from the original content source.
 
 ##### More Info
 - [Fusion Recipes: Fetching Content](../recipes/fetching-content.md)
+- [Fusion Recipes: Dynamically Configuring Content](../recipes/dynamically-configuring-content.md)
 - [Fusion API: Consumer#fetchContent()](../api/feature-pack/components/consumer.md#fetchContent)
 - [GraphQL: Queries and Mutations](https://graphql.org/learn/queries/)
-- [JAMstack](https://jamstack.org/) (*Note*: While Fusion apps do not strictly adhere to the JAMstack definition, they borrow many ideas and offer many of the same advantages)
 
 ---
 
@@ -313,37 +314,56 @@ GraphQL is a natural fit for defining content schemas and querying since it can 
 <h3 id="properties-in-code">Properties in PB Admin => Properties in code</h3>
 
 ##### Classic Way
+In PageBuilder Classic, "runtime properties" were defined in the PageBuilder Admin. These properties could be scoped to a particular site, and were available in the Feature Pack by accessing the `system.properties` value.
 
 ##### Fusion Way
+In Fusion, "runtime properties" are now called "site properties", and are defined entirely in the `/properties/` directory inside of the Feature Pack. Site properties are defined in code, with one "default" set of properties that can be overriden by more specific "site" properties defined in namespaced files. These properties are available to components in the Feature Pack via the `Consumer` and `Context` components, or the `getProperties` function provided by `fusion:properties`. Site properties will be able to be *seen*, but not edited, in the PageBuilder Admin so that users can verify the values being used.
 
 ##### Reasoning
+Storing properties in the code comes with all the [aforementioned benefits of storing values in code](#keep-it-in-the-code) versus a database. In PageBuilder Classic, it was often difficult to locate the source of bugs in separate environments because their "runtime properties" could all be different. Moving "site properties" to code reduces the variance between environments, which helps prevent and identify bugs.
 
 ##### More Info
+- [Fusion Recipes: Using Site Properties](../recipes/using-site-properties.md)
+- [Fusion API: Site Properties](../api/feature-pack/properties.md)
 
 ---
 
 ## *Environment Variables*
 
+
 <h3 id="dotenv-environment-dir"><code>.env</code> and <code>/environment/</code> directory</h3>
 
 ##### Classic Way
 
+<!-- TODO: classic environment variables -->
+
 ##### Fusion Way
+Fusion allows developers to define environment variables in a `.env` file for local development, and in the `/environment/` directory for non-local environments (i.e. prod, staging, etc.) The `.env` file is git-ignored so no environment variables defined there will be under version control. Variables defined in the `/environment/` directory *are* version controlled, but can be encrypted if they are "secret" so they can be decrypted at upload time.
+
+Environment variables differ from site properties in that 1) environment variables are not site-specific, and 2) environment variables can be encrypted.
 
 ##### Reasoning
+Separating out environment variables from site properties allows developers to make the distinction between values that differ based on the *site* requested (site properties), and values that differ based on the *environment* they run in (environment variables). This separation simplifies the mental model for developers, and offers a more secure alternative to storing "secrets" than the Classic model.
 
 ##### More Info
+- [Fusion Recipes: Using Environment Secrets](../recipes/using-environment-secrets.md)
+- [Fusion API: Environment Variables](../api/feature-pack/environment.md)
 
 ---
 
 ### Secret encryption
 
 ##### Classic Way
+PageBuilder Classic did not provide any mechanism to encrypt "secret" values such as credentials or keys you might need to access an API. This is because "secret" values are primarily used in content sources, and content sources in Classic were defined in the Admin itself and stored in plaintext in the database.
 
 ##### Fusion Way
+Fusion provides a "secret encryptor" as part of the Maestro deployer, which allows developers to pass in "secret" data and receive an encrypted string back which is safe for use in code. This string can then be decrypted at upload time by the deployer, using the same key it used for encryption. In this way, secrets can be kept in the code safely, and used on the server easily.
 
 ##### Reasoning
+The PageBuilder Classic method of storing valuable information like credentials in plaintext in the database was potentially a security concern. As much as possible, "secrets" like these should not be stored in the database *or* in code, to prevent an attacker from gaining access to them. By allowing developers to encrypt their secrets and add them to code, Fusion prevents attackers from being able to find secrets at all in the database, and makes them unusable if found in code.
 
 ##### More Info
+- [Fusion Recipes: Using Environment Secrets](../recipes/using-environment-secrets.md)
+- [Fusion API: Environment Variables](../api/feature-pack/environment.md)
 
 ---

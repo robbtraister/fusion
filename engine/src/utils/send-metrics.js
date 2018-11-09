@@ -1,5 +1,7 @@
-const request = require('request')
-const { datadogApiKey, deployment, environment, isDev, semver } = require('../../environment')
+const request = require('request-promise-native')
+const { datadogApiKey, deployment, environment, isDev, metricsTimeout, semver } = require('../../environment')
+
+const metricsMap = {}
 
 const METRIC_TYPES = {
   CACHE_LATENCY: 'arc.fusion.cache.latency',
@@ -49,10 +51,23 @@ const sendMetrics = function sendMetrics (metrics) {
     headers: {
       'Content-Type': 'application/json'
     },
+    timeout: metricsTimeout,
     body: JSON.stringify(metricsToSend)
   }
 
-  request(requestOptions)
+  const metricsPromises = metricsMap[global.awsRequestId] || []
+  metricsPromises.push(request(requestOptions).catch(() => null))
+  metricsMap[global.awsRequestId] = metricsPromises
+}
+
+/**
+ * Resolves all metrics promises for the current (globally set) AWS request 
+ */
+const resolveMetrics = async function resolveMetrics () {
+  if (metricsMap[global.awsRequestId] && metricsMap[global.awsRequestId].length) {
+    await Promise.all(metricsMap[global.awsRequestId])
+    delete metricsMap[global.awsRequestId]
+  }
 }
 
 function getTimestamp () {
@@ -66,5 +81,6 @@ const sendMetricsStub = () => {}
 
 module.exports = {
   METRIC_TYPES,
-  sendMetrics: (!isDev && datadogApiKey) ? sendMetrics : sendMetricsStub
+  sendMetrics: (!isDev && datadogApiKey) ? sendMetrics : sendMetricsStub,
+  resolveMetrics
 }

@@ -7,6 +7,10 @@ const {
   port
 } = require('../environment')
 
+const {
+  resolveMetrics
+} = require('./utils/send-metrics')
+
 const app = require('./app')
 
 if (module === require.main) {
@@ -22,7 +26,18 @@ if (module === require.main) {
     // render: require('./react/server/render'),
     router: require('./router'),
     // schemas: require('./content/schemas'),
-    serverless: serverless(app, { binary: binaryContentTypes })
+
+    serverless: serverless(app,
+      {
+        binary: binaryContentTypes,
+        request: (event, context) => {
+          global.awsRequestId = context.requestId || ''
+        },
+        response: async () => {
+          await resolveMetrics()
+          delete global.awsRequestId
+        }
+      })
     // sources: require('./content/sources')
   }
 }

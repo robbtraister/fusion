@@ -20,7 +20,13 @@ Fusion.components.Quarantine = require('../shared/components/quarantine')(
           backgroundColor: '#fee',
           border: '2px dashed #e00',
           color: '#c00',
-          padding: '10px'
+          fontFamily: 'Arial, sans-serif',
+          fontSize: '16px',
+          fontStyle: 'normal',
+          fontWeight: '400',
+          lineHeight: '20px',
+          padding: '10px',
+          textAlign: 'left'
         }
       },
       [
@@ -28,15 +34,31 @@ Fusion.components.Quarantine = require('../shared/components/quarantine')(
           'h2',
           {
             style: {
-              textAlign: 'center'
+              textAlign: 'inherit',
+              fontFamily: 'inherit',
+              fontSize: '18px',
+              fontWeight: '600',
+              padding: '0px',
+              margin: '0px'
             }
           },
           'Component Code Error'
         ),
         React.createElement(
           'p',
-          {},
-          `An error occurred while rendering ${name}`
+          {
+            style: {
+              textAlign: 'inherit',
+              fontFamily: 'inherit',
+              fontSize: 'inherit',
+              fontStyle: 'inherit',
+              fontWeight: 'inherit',
+              lineHeight: 'inherit',
+              margin: '10px 0',
+              padding: '0px'
+            }
+          },
+          `An error occurred while rendering ${name}.`
         ),
         error.message
       ]

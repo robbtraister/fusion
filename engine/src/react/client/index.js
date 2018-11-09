@@ -9,6 +9,11 @@ const Provider = require('./provider')
 const React = window.react
 const ReactDOM = window.ReactDOM
 
+Fusion.components.Quarantine = require('../shared/components/quarantine')(
+  ({ error }) =>
+    React.createElement('div', { 'data-fusion-message': error })
+)
+
 let did404 = false
 const notFound = window.notFound = function () {
   if (!did404) {

@@ -126,7 +126,7 @@ services:
       NGINX_PORT: ""
       TOMCAT_PORT: "8888"
       PB_AUTH_DISABLED: "true"
-      PB_ASSETS_IMPORT_PATH: "/assets"
+      PB_ASSETS_IMPORT_PATH: /pb/classic/multisite
       PB_ASSETS_IMPORT_METHOD: "symlink"
       PB_MEMCACHED_HOST: "admin-cache:11211"
       PB_MONGODB_GARBAGE_COLLECTION: "false"
@@ -136,11 +136,6 @@ services:
       PB_CONTEXT: ${CONTEXT_PATH:-pf}
     networks:
       - fusion
-    volumes:
-      # Docker will mount the folder defined in $PROJECT_REPO environment
-      # variable inside the container as /assets so PageBuilder is agnostic
-      # to the actual location of the assets and resources
-      - "${CLASSIC_REPO:-./.classic}:/assets"
     ports:
       - 8888:8888
 

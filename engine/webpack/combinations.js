@@ -49,7 +49,7 @@ ${[].concat(
             ? ''
             : (componentCollection === 'layouts')
               ? `components['${componentCollection}']['${component.type}'] = Fusion.components.Layout(unpack(require('${path.join(bundleRoot, componentOutputType.src)}')))`
-              : `components['${componentCollection}']['${component.type}'] = unpack(require('${path.join(bundleRoot, componentOutputType.src)}'))`
+              : `components['${componentCollection}']['${component.type}'] = Fusion.components.Quarantine(unpack(require('${path.join(bundleRoot, componentOutputType.src)}')))`
         })
     })
   ).join('\n')}

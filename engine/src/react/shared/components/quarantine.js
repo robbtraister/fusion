@@ -27,7 +27,7 @@ module.exports =
 
         render () {
           return (this.state.error)
-            ? ErrorComponent({ name, error: this.state.error })
+            ? React.createElement(ErrorComponent, { name, error: this.state.error })
             : React.createElement(Component, this.props)
         }
       }

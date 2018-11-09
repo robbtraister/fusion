@@ -1,5 +1,5 @@
 const request = require('request-promise-native')
-const { datadogApiKey, deployment, environment, isDev, semver } = require('../../environment')
+const { datadogApiKey, deployment, environment, isDev, metricsTimeout, semver } = require('../../environment')
 
 const metricsMap = {}
 
@@ -51,7 +51,7 @@ const sendMetrics = function sendMetrics (metrics) {
     headers: {
       'Content-Type': 'application/json'
     },
-    timeout: 100,
+    timeout: metricsTimeout,
     body: JSON.stringify(metricsToSend)
   }
 

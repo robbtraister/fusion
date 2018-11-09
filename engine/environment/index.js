@@ -58,6 +58,7 @@ const deployment = variables.AWS_LAMBDA_FUNCTION_VERSION || '$LATEST'
 const environment = variables.ENVIRONMENT
 const functionName = variables.AWS_LAMBDA_FUNCTION_NAME || `fusion-engine-${environment}`
 const isDev = !/^prod/i.test(variables.NODE_ENV)
+const metricsTimeout = variables.METRICS_TIMEOUT || 100
 const minify = (isDev) ? /^true$/i.test(variables.MINIFY) : true
 const mongoUrl = variables.MONGO_URL
 const onDemand = /^true$/i.test(variables.ON_DEMAND)
@@ -115,6 +116,7 @@ module.exports = {
   environment,
   functionName,
   isDev,
+  metricsTimeout,
   minify,
   mongoUrl,
   onDemand,

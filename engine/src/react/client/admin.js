@@ -3,12 +3,45 @@
 /* global Fusion */
 
 require('./shared')
-Fusion.isAdmin = true
 
 const Provider = require('./provider')
 
 const React = window.react
 const ReactDOM = window.ReactDOM
+
+Fusion.isAdmin = true
+Fusion.components.Quarantine = require('../shared/components/quarantine')(
+  ({ error, name }) =>
+    React.createElement(
+      'div',
+      {
+        style: {
+          background: 'repeating-linear-gradient(-45deg, #fee, #fee 10px, #fff 10px, #fff 20px)',
+          backgroundColor: '#fee',
+          border: '2px dashed #e00',
+          color: '#c00',
+          padding: '10px'
+        }
+      },
+      [
+        React.createElement(
+          'h2',
+          {
+            style: {
+              textAlign: 'center'
+            }
+          },
+          'Component Code Error'
+        ),
+        React.createElement(
+          'p',
+          {},
+          `An error occurred while rendering ${name}`
+        ),
+        error.message
+      ]
+    )
+)
 
 const appendBoundary = (element, id) => {
   const boundaryProps = {

@@ -6,29 +6,33 @@ const React = require('react')
 const getName = (Component) =>
   (Component.displayName || Component.name || 'Component').replace(/.*\((.+)\)/, (_, name) => name)
 
-module.exports = (Component, fp) => {
-  class Quarantine extends React.Component {
-    constructor (props) {
-      super(props)
+module.exports =
+  (ErrorComponent) =>
+    (Component) => {
+      const name = getName(Component)
 
-      this.state = {
-        error: null
+      class Quarantine extends React.Component {
+        constructor (props) {
+          super(props)
+
+          this.state = {
+            error: null
+          }
+        }
+
+        componentDidCatch (error, info) {
+          console.error(error, info)
+          this.setState({ error })
+        }
+
+        render () {
+          return (this.state.error)
+            ? ErrorComponent({ name, error: this.state.error })
+            : React.createElement(Component, this.props)
+        }
       }
+
+      Quarantine.displayName = `FusionQuarantine(${name})`
+
+      return Quarantine
     }
-
-    componentDidCatch (error, info) {
-      console.error(fp, error, info)
-      this.setState({ error })
-    }
-
-    render () {
-      return (this.state.error)
-        ? React.createElement('div', { 'data-fusion-message': this.state.error })
-        : React.createElement(Component, this.props)
-    }
-  }
-
-  Quarantine.displayName = `FusionQuarantine(${getName(Component)})`
-
-  return Quarantine
-}

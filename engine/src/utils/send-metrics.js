@@ -51,7 +51,7 @@ const sendMetrics = function sendMetrics (metrics) {
     headers: {
       'Content-Type': 'application/json'
     },
-    timeout: 1000,
+    timeout: 100,
     body: JSON.stringify(metricsToSend)
   }
 

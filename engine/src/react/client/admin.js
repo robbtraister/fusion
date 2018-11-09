@@ -54,11 +54,11 @@ Fusion.components.Quarantine = require('../shared/components/quarantine')(
               fontStyle: 'inherit',
               fontWeight: 'inherit',
               lineHeight: 'inherit',
-              padding: '0px',
-              margin: '10px 0'
+              margin: '10px 0',
+              padding: '0px'
             }
           },
-          `An error occurred while rendering ${name}`
+          `An error occurred while rendering ${name}.`
         ),
         error.message
       ]

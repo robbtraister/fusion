@@ -23,10 +23,16 @@ $ mkdir My-Fusion-Repo
 $ cd My-Fusion-Repo
 ```
 
-Now, using the magic of `npx`, we're going to install the Fusion CLI and execute its `init` command all at once to create the skeleton of our repository:
+Now, we're going to install the `@arc-fusion/cli` module locally, so that we can then use it to initialize the rest of our app:
 
 ```bash
-$ npx @arc-fusion/cli init
+$ npm install -D @arc-fusion/cli
+```
+
+Finally, we're going to execute the `init` command to create the skeleton of our repository:
+
+```bash
+$ npx fusion init
 ```
 
 > **NOTE**
@@ -35,9 +41,9 @@ $ npx @arc-fusion/cli init
 
 If you run `ls` on the directory now, you should see that there are several files and folders created in your directory, and that your `package.json` lists `@arc-fusion/cli` as a `devDependency`! Here's a description of what just happened:
 
-1. Downloaded the `@arc-fusion/cli` package and invoked its `init` command, which created the skeleton of our repository's file structure
-2. The `init` command also initialized the folder as an NPM package and created an accompanying `package.json` file
-3. Finally, the `@arc-fusion/cli` was also added to our newly created `package.json` as a `devDependency` so we can use it later to invoke further commands via `npx` without re-downloading
+1. Downloaded and installed the `@arc-fusion/cli` package as a `devDependency` so we can use it later to invoke further commands via `npx` without re-downloading.
+2. Invoked the `init` command, which created the skeleton of our repository's file structure
+3. The `init` command also initialized the folder as an NPM package and created an accompanying `package.json` file
 
 Great job! Now let's take a closer look at what's inside our brand new Feature Pack.
 

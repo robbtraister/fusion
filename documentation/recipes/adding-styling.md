@@ -180,4 +180,4 @@ Our style should now be applied, just as it was in the first example - except in
 
 It's important to note that this only works because of the `{props.cssLinks}` line that we have in our Output Type - this code is responsible for injecting the compiled CSS code from Webpack into each page. Without it, our CSS would not have been added to the page at all!
 
- **Next: [Using Third Party Libraries](./using-third-party-libraries.md)**
+**Next: [Isomorphic vs. Server vs. SPA Rendering](./isomorphic-server-spa-rendering.md)**

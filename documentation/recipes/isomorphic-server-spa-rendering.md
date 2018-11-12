@@ -48,11 +48,52 @@ The final option available to us is rendering client-side only. This is a bit of
 
 In Fusion, there are two ways to ensure that code **only** gets run on the client side: use a conditional to check for the `window` object (which is only available on the client), or to put client-side code inside the `componentDidMount` React lifecycle method. This method will get triggered once your component gets mounted on the page client-side, but does not get executed server-side.
 
-Let's see how that might look:
+Let's see how that might look in our `MovieList` component:
 
+```jsx
+/*  /components/features/movies/movie-list/default.jsx  */
+import Consumer from 'fusion:consumer'
+import React, { Fragment, Component } from 'react'
+import './style.scss'
 
+@Consumer
+class MovieList extends Component {
+  constructor (props) {
+    super(props)
+    this.state = { movies: [], page: 1 }
+  }
 
-Now our content fetch will only occur client-side, meaning the HTML rendered from our component on the server will be empty initially and only get filled in later.
+  componentDidMount() {
+    // We moved our `this.fetch()` call to `componentDidMount` from `constructor`
+    this.fetch()
+  }
+
+  fetch () {
+    ... // All our fetching logic from earlier is still here
+  }
+
+  render () {
+    // If the window object doesn't exist, we will return an empty Fragment
+    if (!window) return (<Fragment></Fragment>)
+
+    ... // All our rendering logic for the rest of the component is still here
+  }
+}
+
+MovieList.propTypes = {
+  customFields: PropTypes.shape({
+    movieListConfig: PropTypes.contentConfig('movies')
+  })
+}
+
+export default MovieList
+```
+
+We've done two things to ensure our component doesn't fetch or render server side:
+- We moved our content fetch call inside of `componentDidMount`, so now it will only occur client-side
+- Additionally, we added a check in the `render` method to render an empty `Fragment` if the `window` object doesn't exist, which will only be true on the server.
+
+The effect of both these changes is that the HTML rendered from our component on the server will be empty initially, and content will only be fetched and fill the component on the client-side!
 
 ---
 

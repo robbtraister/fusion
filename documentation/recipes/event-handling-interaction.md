@@ -182,4 +182,5 @@ export default MovieDetail
 
 While this was a simple example of how to add client-side interactivity to a React component in Fusion, it should illustrate that there's nothing different about handling events in standard React vs. Fusion.
 
- **Next: [Isomorphic vs. Server vs. SPA Rendering](./isomorphic-server-spa-rendering.md)**
+**Next: [Adding Custom Fields to a Component](./recipes/adding-custom-fields.md)**
+

@@ -14,6 +14,7 @@ Site properties and environment variables serve similar purposes, so it can be e
 Site properties have "global" values that will exist until they are overriden by more specific "site" values - this way, if a "site" value does not exist for a given piece of data, it can fall back to the "global" value. Global values should be defined in `/properties/index.js` (or `/properties/index.json` if you don't need to compute any values). These values will be the defaults and will be included for all sites, unless explicitly overridden.
 
 Let's define a "global" property here for a fake media conglomerate with many holdings, Acme Media Group:
+
 ```js
 /*  /properties/index.js  */
 
@@ -44,6 +45,7 @@ Here, `siteName` and `twitter` are properties that only exist for AcmeFeed, and 
 ## Using properties
 
 Now, we're able to use our site properties in a component by using the `getProperties` method provided to us by `fusion:properties`. We just pass in the site name that we get from props like so:
+
 ```jsx
 /*  /components/features/my-group/my-component.jsx  */
 
@@ -67,6 +69,7 @@ class MyComponent extends Component {
 
 export default MyComponent
 ```
+
 Now, when a user requests a webpage on AcmeFeed's website that contains this component, they'll see links to AcmeFeed's Twitter handle (`acmefeed`) and their contact email address (`editor@acmefeed.com`). If AcmeFeed hadn't had a specific contact email address, that value would have fallen back to the "global" value `contact@acmemedia.com`.
 
 

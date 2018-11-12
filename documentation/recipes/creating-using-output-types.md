@@ -31,7 +31,7 @@ export default (props) => {
         <props.MetaTags />
         <props.Libs />
         <props.CssLinks />
-        <link rel='icon' type='image/x-icon' href={`${props.contextPath}/resources/img/favicon.ico`} />
+        <link rel='icon' type='image/x-icon' href={props.deployment(`${props.contextPath}/resources/img/favicon.ico`)} />
         <link rel='stylesheet' href='https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css' />
       </head>
       <body>
@@ -57,6 +57,7 @@ The parts of our component that are unique and interesting to Fusion are the `pr
 - `<props.MetaTags />` renders `<meta>` tags for any meta info provided to us by the Admin. <!-- TODO: examples -->
 - `<props.Libs />` includes the client side React library, as well as the component specific script for our single page app to render itself and handle events. Without this line, our code won't work client side!
 - `<props.CssLinks />` renders `<link>` tags for stylesheets that are generated based on any CSS files imported into the components being used on this page. We could have alternatively inlined our CSS for platforms like AMP that require it.
+- `props.deployment` is a function that wraps our local resources with a version number, so static resources included with different deployment versions don't collide.
 - `props.contextPath` is a helper that returns the root web path of our page. We can use it to prefix URLs we want to include on the page, like for our favicon above.
 - `props.children` is a React standard prop, but for our purposes it will include all the other components (layouts, chains, and features) that were configured in the Admin to exist on the page. Without it, none of the content on our page gets displayed.
 - `<props.Fusion />` bootstraps data from the server that will hydrate our React components.

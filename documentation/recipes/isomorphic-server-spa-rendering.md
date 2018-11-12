@@ -38,23 +38,62 @@ This will tell Fusion that this component should be rendered into HTML on the se
 
 **WARNING**
 
-There are downsides to rendering server-side only. Firstly, your component will be wrapped in a containing `div` that tells Fusion not to reload it client-side - this could affect your styling. Another downside is that your content may become stale if it changes before Fusion's CDN has expired it. In short, components should only be marked `static` if their content and structure change infrequently, and those changes don't need to be available immediately to all clients.
+There are downsides to rendering server-side only. Firstly, your component will be wrapped in a containing `div` that tells Fusion not to reload it client-side - this could affect your styling. Another downside is that your content may become stale if it changes before Fusion's CDN has expired it. In short, components should only be marked `static` if their content and structure change infrequently, and those changes don't need to be available immediately to all users.
 
 ---
 
 ## Rendering client-side only
 
-The final option available to us is rendering client-side only. This is a bit of a misnomer with Fusion, as your React components will get rendered on the server no matter what. However, you can choose to render the empty markup (without content) on the server, and then fill in the component with content on the client-side later. This may offer a small performance benefit, as you'll avoid fetching content for this component server-side. This option is best for Features that are not crucial to the content of the page and can be loaded with a small delay.
+The final option available to us is rendering client-side only. This is a bit of a misnomer with Fusion, as your React component's `render` function will get invoked on the server no matter what. However, you can choose to render empty markup (without content) on the server, and then fill in the component with content on the client-side later. This may offer a small performance benefit, as you'll avoid fetching content for this component server-side. This option is best for Features that are not crucial to the content of the page and can be loaded with a small delay.
 
-To fetch content on the client-side only, we simply need to move our initial content fetching call into a hook that will **only** get invoked client-side. That hook is usually React's `componentDidMount` lifecycle event. This event will get triggered once your component gets mounted on the page client-side, but does not get executed server-side.
+In Fusion, there are two ways to ensure that code **only** gets run on the client side: use a conditional to check for the `window` object (which is only available on the client), or to put client-side code inside the `componentDidMount` React lifecycle method. This method will get triggered once your component gets mounted on the page client-side, but does not get executed server-side.
 
-Let's see how that might look:
+Let's see how that might look in our `MovieList` component:
 
-> **NOTE**: This section of the document is under construction as it may need to move. Thanks for waiting!
+```jsx
+/*  /components/features/movies/movie-list/default.jsx  */
+import Consumer from 'fusion:consumer'
+import React, { Fragment, Component } from 'react'
+import './style.scss'
 
-<!-- TODO: move this doc until after content fetching to illustrate invoking a content fetch in `componentDidMount` -->
+@Consumer
+class MovieList extends Component {
+  constructor (props) {
+    super(props)
+    this.state = { movies: [], page: 1 }
+  }
 
-Now our content fetch will only occur client-side, meaning the HTML rendered from our component on the server will be empty initially and only get filled in later.
+  componentDidMount() {
+    // We moved our `this.fetch()` call to `componentDidMount` from `constructor`
+    this.fetch()
+  }
+
+  fetch () {
+    ... // All our fetching logic from earlier is still here
+  }
+
+  render () {
+    // If the window object doesn't exist, we will return an empty Fragment
+    if (!window) return (<Fragment></Fragment>)
+
+    ... // All our rendering logic for the rest of the component is still here
+  }
+}
+
+MovieList.propTypes = {
+  customFields: PropTypes.shape({
+    movieListConfig: PropTypes.contentConfig('movies')
+  })
+}
+
+export default MovieList
+```
+
+We've done two things to ensure our component doesn't fetch or render server side:
+- We moved our content fetch call inside of `componentDidMount`, so now it will only occur client-side
+- Additionally, we added a check in the `render` method to render an empty `Fragment` if the `window` object doesn't exist, which will only be true on the server.
+
+The effect of both these changes is that the HTML rendered from our component on the server will be empty initially, and content will only be fetched and fill the component on the client-side!
 
 ---
 
@@ -64,4 +103,4 @@ Rendering client-side only could affect SEO adversely, since web crawlers typica
 
 ---
 
- **Next: [Defining a Content Source](./defining-content-source.md)**
+**Next: [Using Third Party Libraries](./using-third-party-libraries.md)**

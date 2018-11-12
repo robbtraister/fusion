@@ -292,10 +292,18 @@ GraphQL is a natural fit for defining content schemas and querying since it can 
 ### Content Fetching
 
 ##### Classic Way
+<<<<<<< Updated upstream
 In PageBuilder Classic, developers could use `<pb:fetch-content` tags to fetch content on the server side. To make a client-side content fetch, developers would have to make their own AJAX call to synchronously render a feature on the server side, which would then return HTML to inject directly into the page. Features were only allowed to utilize one content source each.
 
 ##### Fusion Way
 In Fusion, server-side content fetching and client-side content fetching use the same API, and both go through a proxy endpoint that allows Fusion to serve cached content if it is available. Fusion content sources are expected to serve JSON, so both server-side and client-side fetching will receive JSON that can be manipulated rather than static HTML. Fusion Features can utilize as many content sources as they need, since content configurations for components are defined as custom fields.
+=======
+<!-- TODO: verify this is right? -->
+In PageBuilder Classic, there were 3 ways you could get content for your components: using "global" content provided by the resolver, using a `<pb:fetch-content>` tag that made a synchronous, server-side content fetch, or by making a client-side AJAX call to PageBuilder's `/render-feature` endpoint, which would respond with HTML snippets to be injected into the page. Each component could have only one content source.
+
+##### Fusion Way
+Fusion
+>>>>>>> Stashed changes
 
 ##### Reasoning
 Fusion's approach to content fetching offers increased flexibility to developers by allowing them to use as many content sources as necessary in their components. However, it also reduces the amount of boilerplate code necessary to retrieve content by creating a common API to fetch content on both the server and client. Finally, Fusion's approach passes every content fetch through a proxy endpoint, giving Fusion the ability to cache content and serve it quickly, rather than continually fetching from the original content source.

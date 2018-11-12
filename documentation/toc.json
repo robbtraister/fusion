@@ -121,6 +121,15 @@
     ]
   },
   {
+    "title": "Migration",
+    "items": [
+      {
+        "title": "Migration from PageBuilder 'Classic' to PageBuilder Fusion Engine",
+        "canonical_url": "/arc-products/pagebuilder/fusion-engine/documentation/migration/readme.md"
+      }
+    ]
+  },
+  {
     "title": "API",
     "items": [
       {

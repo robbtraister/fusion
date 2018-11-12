@@ -1,11 +1,11 @@
-# Migration from PageBuilder Classic to Fusion
+# Migration from PageBuilder "Classic" to PageBuilder Fusion Engine
 
-This document intends to be a high-level overview of the differences, from a Feature Pack developer's standpoint, between the current PageBuilder rendering engine (henceforth referred to as "PageBuilder Classic"), and PageBuilder's new rendering engine, Fusion. We have attempted to break these differences into categories of individual topics, and each topic is further described by:
+This document intends to be a high-level overview of the differences, from a PageBuilder developer's standpoint, between the current PageBuilder rendering engine (henceforth referred to as "PageBuilder Classic"), and PageBuilder's new rendering engine, Fusion. We have attempted to break these differences into categories of individual topics, and each topic is further described by:
 
-- the current implementation (i.e. the "Classic Way")
-- the new implementation (i.e. the "Fusion Way")
-- a description of why the change was made (i.e. "Reasoning")
-- and, finally, links to more information such as API documentation, examples, or external resources (i.e. "More Info")
+- the current implementation (i.e. the "Classic" Approach)
+- the new implementation (i.e. the Fusion Engine Approach)
+- a description of why the change was made (i.e. Reasoning)
+- and, finally, links to more information such as API documentation, examples, or external resources (i.e. More Info)
 
 Below you will find a list of the categories and topics described in this document.
 
@@ -41,9 +41,9 @@ Below you will find a list of the categories and topics described in this docume
 
 Fusion is built with modern web development standards and best practices in mind, so that Feature Pack developers can utilize the skills and knowledge they already have rather than learning a new, proprietary syntax or pattern for building web apps. This also means developers are able to benefit from the vast JavaScript ecosystem of developer knowledge and modular code that already exists.
 
-#### Keep it in the code
+#### Security and immutability
 
-As much as possible, Fusion attempts to keep values that are necessary parts of your Feature Pack defined in the code itself, not in a user interface or database. This is because values defined in code are:
+As much as possible, Fusion attempts to keep critical dependencies of your Feature Pack defined in the code itself, not in a user interface or database. This is because values defined in code are:
 
 - able to use the full power of a programming language to execute logical statements
 - easier to track, version and revert if necessary
@@ -51,7 +51,7 @@ As much as possible, Fusion attempts to keep values that are necessary parts of 
 - harder to accidentally change, since changes need to be explicitly added, committed and merged via version control
 - when implemented correctly, potentially more secure for "secret" values than being stored in a database
 
-#### Power to the programmers
+#### Flexibility and functionality
 
 Fusion intentionally gives Feature Pack developers more flexibility and functionality than previously possible in PageBuilder Classic. This means increased access to data and lower-level functionality, but also requires responsbility from developers to ensure their code works as expected.
 
@@ -62,10 +62,10 @@ Fusion intentionally gives Feature Pack developers more flexibility and function
 
 <h3 id="java-to-js">Java, JSP && JSTL => JavaScript, React && JSX</h3>
 
-##### Classic Way
+##### PageBuilder "Classic" Approach
 Feature Packs written in Classic were written in Java, using JSP syntax and the JSTL library.
 
-##### Fusion Way
+##### PageBuilder Fusion Engine Approach
 Feature Packs written in Fusion are written in JavaScript, using the popular React library. Components can be written using React's custom JSX syntax, which will then be transpiled into browser-compatible JavaScript. Fusion can render components on both the server and client.
 
 ##### Reasoning
@@ -86,10 +86,10 @@ Writing Feature Packs in JavaScript offers numerous benefits, including:
 
 <h3 id="ssr-isomoprhic-rendering">SSR => Isomorphic rendering</h3>
 
-##### Classic Way
+##### PageBuilder "Classic" Approach
 Feature Packs written in Classic were rendered entirely server side (i.e. SSR, or server-side rendering), due to the fact that they were written in Java, which is not executable in the browser.
 
-##### Fusion Way
+##### PageBuilder Fusion Engine Approach
 Feature Packs written in Fusion can render components on the server *and* on the client, otherwise known as [isomorphic rendering]((https://en.wikipedia.org/wiki/Isomorphic_JavaScript)). Developers can choose on a component-by-component basis to render isomorphically, server-side only, or client-side only.
 
 ##### Reasoning
@@ -107,10 +107,10 @@ Offering the ability to render on the server and client provides the following b
 
 <h3 id="events-in-react">Separate JS files per component => Event handling in React</h3>
 
-##### Classic Way
+##### PageBuilder "Classic" Approach
 In Classic, when a developer wanted to add some client-side interactivity into a Feature or component, they needed to provide a separate JavaScript file to accompany that component which would be injected into the page at runtime.
 
-##### Fusion Way
+##### PageBuilder Fusion Engine Approach
 In Fusion, client-side interactivity and event handling is managed by React. Because Fusion components are React components, you can listen for events and bind handlers inline in your JSX, and perform any accompanying logic directly in your components with the full power of JavaScript.
 
 ##### Reasoning
@@ -129,10 +129,10 @@ Using React for event handling and interactivity provides the following benefits
 
 ### Repo initialization
 
-##### Classic Way
+##### PageBuilder "Classic" Approach
 When initializing a new Feature Pack with PageBuilder Classic, it was common to fork an existing "base" Feature Pack repository that had commonly used Feature components and boilerplate code, and start the new Feature Pack in that fork.
 
-##### Fusion Way
+##### PageBuilder Fusion Engine Approach
 In Fusion, new Feature Packs are initialized using the Fusion Command Line tool and the `fusion init` command, which generates a brand new Feature Pack repository.
 
 ##### Reasoning
@@ -146,10 +146,10 @@ The convention of forking an existing repository with commonly used code can con
 
 ### Starting/stopping the application
 
-##### Classic Way
+##### PageBuilder "Classic" Approach
 PageBuilder Classic applications running locally would normally be started and stopped using Docker directly, relying on a local `docker-compose` configuration file in the Feature Pack to determine how to build and start the app.
 
-##### Fusion Way
+##### PageBuilder Fusion Engine Approach
 Fusion uses the Fusion CLI to start the Fusion application with `fusion start`, and to stop with `fusion stop`. Containers can be shut down entirely with `fusion down`.
 
 ##### Reasoning
@@ -163,10 +163,10 @@ In addition to being more terse and easier to remember for developers, moving th
 
 ### Automatic component watching/syncing
 
-##### Classic Way
+##### PageBuilder "Classic" Approach
 In PageBuilder Classic, each time a developer created a new component or updated an existing one, they would have to manually upload the component to the Admin via the web interface, so the Admin "knew" about the updated component.
 
-##### Fusion Way
+##### PageBuilder Fusion Engine Approach
 In Fusion, we use Webpack to automatically watch the files in your component tree to see if they have been updated, and then rebuild the Feature Pack accordingly. For now, the app will have to be restarted when *new* component files are created, to let Fusion find them (we're looking into solutions to this). However, updating files (which happens much more frequently) does not require a manual upload to "inform" the Admin about changes - it just works.
 
 ##### Reasoning
@@ -182,10 +182,10 @@ Automatic file-watching means developers can work much faster and with less fric
 
 ### No more component config files
 
-##### Classic Way
+##### PageBuilder "Classic" Approach
 Components written in PageBuilder Classic were required to contain a `config.json` file that contained meta information about the component. This file included information such as the name of the component, its custom fields, display properties, what content service it was using, and more.
 
-##### Fusion Way
+##### PageBuilder Fusion Engine Approach
 Rather than having a separate configuration file for each component, Fusion allows developers to set the different pieces of meta information about each component in the component's definition itself. For example: component names are simply based on the name of the file, custom fields are defined as PropTypes on the component, content sources are defined in the code of the component, etc. We will address each of these differences later, but the point is that there is no separate configuration file in Fusion.
 
 ##### Reasoning
@@ -193,21 +193,19 @@ Separating the meta information about the component from the component's definit
 
 ##### More Info
 None
-<!-- TODO: more info? -->
+
+[comment]: <> (TODO: more info?)
 
 ---
 
-<!-- TODO: Content editable docs
-### Content Editable
----
--->
+[comment]: <> (TODO: Content editable docs)
 
 ### Custom Fields
 
-##### Classic Way
+##### PageBuilder "Classic" Approach
 In PageBuilder Classic, Features and Chains defined which custom fields those components used, their types, and more in the `config.json` file accompanying the component.
 
-##### Fusion Way
+##### PageBuilder Fusion Engine Approach
 In Fusion, custom fields are defined using a Fusion-specific version of React's [PropTypes](https://github.com/facebook/prop-types) library, which is an existing standard for typechecking inputs (in React's case, `props`) to components. Fusion will read the `.propTypes` property defined on Feature and Chain components to see if they should have custom fields, what their types are, and any additional info about them.
 
 ##### Reasoning
@@ -220,17 +218,14 @@ Using the PropTypes library is in line with Fusion's goal to use current best pr
 
 ---
 
-<!-- TODO: display properties
-### Display Properties
----
--->
+[comment]: <> (TODO: display properties)
 
 ### Layouts
 
-##### Classic Way
+##### PageBuilder "Classic" Approach
 Layouts in PageBuilder Classic were simple JSON objects that contained an array of "section" objects, each with some meta information about them like the name of the section and the CSS class, etc. Layouts were devoid of markup, instead functioning as empty containers that Features and Chains could be dropped into.
 
-##### Fusion Way
+##### PageBuilder Fusion Engine Approach
 There are a variety of possible ways to define Layouts in Fusion - most notably, Fusion now allows developers to write Layouts as regular React components, with their own markup and logic just like any other component.
 
 ##### Reasoning
@@ -247,10 +242,10 @@ Allowing developers to define Layouts as complete components increases their fle
 
 ### Content Sources
 
-##### Classic Way
+##### PageBuilder "Classic" Approach
 In PageBuilder Classic, content sources were defined in the PageBuilder Admin UI in the "Content Sources" tab, where a user could enter the name of the content "service", the "content type", a URI pattern to request data from, and a set of parameters that could be interpolated into the URI pattern. These values were then saved in a database.
 
-##### Fusion Way
+##### PageBuilder Fusion Engine Approach
 In PageBuilder Fusion, content sources are defined entirely in code contained within your Feature Pack. All the data that used to be entered in the UI (and more) is now a part of your Feature Pack code, and can be version controlled accordingly.
 
 ##### Reasoning
@@ -269,10 +264,11 @@ Next to switching the actual programming language Feature Packs are written in, 
 
 ### Content Schemas
 
-##### Classic Way
-<!-- TODO: What is the classic equivalent of schemas? -->
+##### PageBuilder "Classic" Approach
 
-##### Fusion Way
+[comment]: <> (TODO: What is the classic equivalent of schemas?)
+
+##### PageBuilder Fusion Engine Approach
 Fusion uses GraphQL to allow developers to define schemas that match the expected responses that come from their data sources. Once a schema is defined, it can be used to filter data on a per-query basis within individual components fetching data.
 
 ##### Reasoning
@@ -291,19 +287,11 @@ GraphQL is a natural fit for defining content schemas and querying since it can 
 
 ### Content Fetching
 
-##### Classic Way
-<<<<<<< Updated upstream
+##### PageBuilder "Classic" Approach
 In PageBuilder Classic, developers could use `<pb:fetch-content` tags to fetch content on the server side. To make a client-side content fetch, developers would have to make their own AJAX call to synchronously render a feature on the server side, which would then return HTML to inject directly into the page. Features were only allowed to utilize one content source each.
 
-##### Fusion Way
+##### PageBuilder Fusion Engine Approach
 In Fusion, server-side content fetching and client-side content fetching use the same API, and both go through a proxy endpoint that allows Fusion to serve cached content if it is available. Fusion content sources are expected to serve JSON, so both server-side and client-side fetching will receive JSON that can be manipulated rather than static HTML. Fusion Features can utilize as many content sources as they need, since content configurations for components are defined as custom fields.
-=======
-<!-- TODO: verify this is right? -->
-In PageBuilder Classic, there were 3 ways you could get content for your components: using "global" content provided by the resolver, using a `<pb:fetch-content>` tag that made a synchronous, server-side content fetch, or by making a client-side AJAX call to PageBuilder's `/render-feature` endpoint, which would respond with HTML snippets to be injected into the page. Each component could have only one content source.
-
-##### Fusion Way
-Fusion
->>>>>>> Stashed changes
 
 ##### Reasoning
 Fusion's approach to content fetching offers increased flexibility to developers by allowing them to use as many content sources as necessary in their components. However, it also reduces the amount of boilerplate code necessary to retrieve content by creating a common API to fetch content on both the server and client. Finally, Fusion's approach passes every content fetch through a proxy endpoint, giving Fusion the ability to cache content and serve it quickly, rather than continually fetching from the original content source.
@@ -321,10 +309,10 @@ Fusion's approach to content fetching offers increased flexibility to developers
 
 <h3 id="properties-in-code">Properties in PB Admin => Properties in code</h3>
 
-##### Classic Way
+##### PageBuilder "Classic" Approach
 In PageBuilder Classic, "runtime properties" were defined in the PageBuilder Admin. These properties could be scoped to a particular site, and were available in the Feature Pack by accessing the `system.properties` value.
 
-##### Fusion Way
+##### PageBuilder Fusion Engine Approach
 In Fusion, "runtime properties" are now called "site properties", and are defined entirely in the `/properties/` directory inside of the Feature Pack. Site properties are defined in code, with one "default" set of properties that can be overriden by more specific "site" properties defined in namespaced files. These properties are available to components in the Feature Pack via the `Consumer` and `Context` components, or the `getProperties` function provided by `fusion:properties`. Site properties will be able to be *seen*, but not edited, in the PageBuilder Admin so that users can verify the values being used.
 
 ##### Reasoning
@@ -341,11 +329,11 @@ Storing properties in the code comes with all the [aforementioned benefits of st
 
 <h3 id="dotenv-environment-dir"><code>.env</code> and <code>/environment/</code> directory</h3>
 
-##### Classic Way
+##### PageBuilder "Classic" Approach
 
-<!-- TODO: classic environment variables -->
+[comment]: <> (TODO: What is the classic equivalent of env vars?)
 
-##### Fusion Way
+##### PageBuilder Fusion Engine Approach
 Fusion allows developers to define environment variables in a `.env` file for local development, and in the `/environment/` directory for non-local environments (i.e. prod, staging, etc.) The `.env` file is git-ignored so no environment variables defined there will be under version control. Variables defined in the `/environment/` directory *are* version controlled, but can be encrypted if they are "secret" so they can be decrypted at upload time.
 
 Environment variables differ from site properties in that 1) environment variables are not site-specific, and 2) environment variables can be encrypted.
@@ -361,14 +349,14 @@ Separating out environment variables from site properties allows developers to m
 
 ### Secret encryption
 
-##### Classic Way
+##### PageBuilder "Classic" Approach
 PageBuilder Classic did not provide any mechanism to encrypt "secret" values such as credentials or keys you might need to access an API. This is because "secret" values are primarily used in content sources, and content sources in Classic were defined in the Admin itself and stored in plaintext in the database.
 
-##### Fusion Way
+##### PageBuilder Fusion Engine Approach
 Fusion provides a "secret encryptor" as part of the Maestro deployer, which allows developers to pass in "secret" data and receive an encrypted string back which is safe for use in code. This string can then be decrypted at upload time by the deployer, using the same key it used for encryption. In this way, secrets can be kept in the code safely, and used on the server easily.
 
 ##### Reasoning
-The PageBuilder Classic method of storing valuable information like credentials in plaintext in the database was potentially a security concern. As much as possible, "secrets" like these should not be stored in the database *or* in code, to prevent an attacker from gaining access to them. By allowing developers to encrypt their secrets and add them to code, Fusion prevents attackers from being able to find secrets at all in the database, and makes them unusable if found in code.
+As much as possible, "secrets" should not be stored in the database *or* in code, to prevent an attacker from gaining access to them. By allowing developers to encrypt their secrets and add them to code, Fusion prevents attackers from being able to find secrets at all in the database, and makes them unusable if found in code.
 
 ##### More Info
 - [Fusion Recipes: Using Environment Secrets](../recipes/using-environment-secrets.md)

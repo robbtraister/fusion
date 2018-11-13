@@ -1,10 +1,10 @@
 'use strict'
 
-function deployment (uri) {
-  const dMatch = /(\?|&)d=([^&]*)/.exec(uri || window.location.search)
-  return dMatch ? decodeURIComponent(dMatch[2]) : ''
+function getDeployment (uri) {
+  const match = /(\?|&)[dv]=([^&]*)/.exec(uri || window.location.search)
+  return match ? decodeURIComponent(match[2]) : ''
 }
 
-deployment.toString = () => deployment()
+getDeployment.toString = () => getDeployment()
 
-module.exports = deployment
+module.exports = getDeployment

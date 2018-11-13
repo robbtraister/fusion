@@ -1,8 +1,8 @@
 'use strict'
 
 function deployment (uri) {
-  const vMatch = /(\?|&)v=([^&]*)/.exec(uri || window.location.search)
-  return vMatch ? decodeURIComponent(vMatch[2]) : ''
+  const dMatch = /(\?|&)d=([^&]*)/.exec(uri || window.location.search)
+  return dMatch ? decodeURIComponent(dMatch[2]) : ''
 }
 
 deployment.toString = () => deployment()

@@ -76,6 +76,21 @@ const getContentGenerator = function getContentGenerator (contentCache) {
 const contextMatch = (Fusion.contextPath) ? window.location.pathname.match(`^${Fusion.contextPath}(.*)`) : null
 const requestPath = (contextMatch) ? contextMatch[1] : window.location.pathname
 
+function deployment (href) {
+  const hrefParts = (href || '').split('#')
+  const uri = hrefParts[0]
+  const hash = hrefParts.slice(1).join('#')
+  const uriParts = uri.split('?')
+  const endpoint = uriParts[0]
+  const query = uriParts.slice(1).join('?')
+  const queryList = [`d=${Fusion.deployment}`]
+    .concat(
+      query.split('&').filter(q => q && !/^[vd]=/.test(q))
+    )
+  return `${endpoint}?${queryList.join('&')}${hash ? `#${hash}` : ''}`
+}
+deployment.toString = () => Fusion.deployment
+
 module.exports = ({ children, ...props }) => React.createElement(
   Fusion.context.Provider,
   {
@@ -85,6 +100,7 @@ module.exports = ({ children, ...props }) => React.createElement(
       props: {
         arcSite: Fusion.arcSite,
         contextPath: Fusion.contextPath,
+        deployment,
         globalContent: Fusion.globalContent,
         globalContentConfig: Fusion.globalContentConfig,
         // layout: <!-- provided by the render props -->

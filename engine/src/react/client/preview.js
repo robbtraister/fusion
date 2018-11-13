@@ -3,7 +3,7 @@
 /* global __CONTEXT_PATH__ */
 
 const deployment = undefined
-const deploymentParam = deployment ? `?v=${deployment}` : ''
+const deploymentParam = deployment ? `?d=${deployment}` : ''
 
 function addElement (tag, type, attr, rel) {
   return function (doc, url, onload) {

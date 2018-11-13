@@ -80,13 +80,13 @@ const requestPath = (contextMatch) ? contextMatch[1] : window.location.pathname
 // but the url package adds 5KB to the production payload
 //
 // url = require('url')
-// function deployment (href) {
+// function appendDeployment (href) {
 //   const urlParts = url.parse(href, true)
 //   urlParts.query.d = Fusion.deployment
 //   urlParts.search = undefined
 //   return url.format(urlParts)
 // }
-function setDeployment (href) {
+function appendDeployment (href) {
   const hrefParts = (href || '').split('#')
   const uri = hrefParts[0]
   const hash = hrefParts.slice(1).join('#')
@@ -99,7 +99,7 @@ function setDeployment (href) {
     )
   return `${endpoint}?${queryList.join('&')}${hash ? `#${hash}` : ''}`
 }
-setDeployment.toString = () => Fusion.deployment
+appendDeployment.toString = () => Fusion.deployment
 
 module.exports = ({ children, ...props }) => React.createElement(
   Fusion.context.Provider,
@@ -110,7 +110,7 @@ module.exports = ({ children, ...props }) => React.createElement(
       props: {
         arcSite: Fusion.arcSite,
         contextPath: Fusion.contextPath,
-        deployment: setDeployment,
+        deployment: appendDeployment,
         globalContent: Fusion.globalContent,
         globalContentConfig: Fusion.globalContentConfig,
         // layout: <!-- provided by the render props -->

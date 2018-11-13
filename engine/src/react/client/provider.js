@@ -76,6 +76,16 @@ const getContentGenerator = function getContentGenerator (contentCache) {
 const contextMatch = (Fusion.contextPath) ? window.location.pathname.match(`^${Fusion.contextPath}(.*)`) : null
 const requestPath = (contextMatch) ? contextMatch[1] : window.location.pathname
 
+// this is the simplified version of what we want
+// but the url package adds 5KB to the production payload
+//
+// url = require('url')
+// function deployment (href) {
+//   const urlParts = url.parse(href, true)
+//   urlParts.query.d = Fusion.deployment
+//   urlParts.search = undefined
+//   return url.format(urlParts)
+// }
 function deployment (href) {
   const hrefParts = (href || '').split('#')
   const uri = hrefParts[0]

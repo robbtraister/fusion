@@ -140,7 +140,7 @@ class AdminCompiler extends ComponentCompiler {
   }
 }
 
-function showLayoutError (error) {
+function showLayoutError (layoutName, error) {
   const shade = document.createElement('div')
   shade.style.backgroundColor = 'rgba(0,0,0,0.5)'
   shade.style.bottom = '0'
@@ -166,7 +166,7 @@ function showLayoutError (error) {
       React.createElement(
         ErrorDisplay,
         {
-          name: Fusion.Template.layout || Fusion.Template.id,
+          name: layoutName,
           error,
           footer: 'Please correct issue to continue editing'
         }
@@ -196,7 +196,7 @@ window.render = function render (rendering) {
     )
   } catch (err) {
     elem.innerHTML = html
-    showLayoutError(err)
+    showLayoutError(rendering.layout, err)
 
     throw err
   }

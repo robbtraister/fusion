@@ -1,8 +1,8 @@
 # Fusion HTTP API
 
-All endpoints described below will be handled as displayed by the lambda function. However, the lambda functions will be exposed publicly at `/pb/api/v3`, so each endpoint must be prefixed to be accessed.
+All endpoints described below will be handled as displayed by the lambda function. However, the lambda functions will be exposed publicly at `/pf/api/v3`, so each endpoint must be prefixed to be accessed.
 
-All requests that begin with `/pb/dist` or `/pb/resources` will be handled as if prefixed with `/pb/api/v3/dist`. All other requests that do not begin with `/pb/api/v3` will be handled as `/pb/api/v3/make/:request_uri`.
+All requests that begin with `/pf/dist` or `/pf/resources` will be handled as if prefixed with `/pf/api/v3/dist`. All other requests that do not begin with `/pf/api/v3` will be handled as `/pf/api/v3/make/:request_uri`.
 
 
 ## Content

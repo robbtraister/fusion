@@ -31,16 +31,26 @@ function getContentLabel (content, name) {
 function labelContent (content, name) {
   if (content) {
     const contentLabel = getContentLabel(content, name)
-    content[PROP_PREFIX_FIELD] = contentLabel
 
-    ELEMENT_FIELDS.forEach((elementField) => {
-      if (content && content[elementField]) {
-        content[elementField]
-          .forEach((contentElement) => {
-            contentElement[PROP_PREFIX_FIELD] = `${contentLabel}.${elementField}.${getId(contentElement)}`
-          })
-      }
-    })
+    return Object.assign(
+      {},
+      content,
+      ...ELEMENT_FIELDS.map((elementField) => {
+        if (content && content[elementField]) {
+          return {
+            [elementField]: content[elementField]
+              .map((contentElement) => {
+                return Object.assign(
+                  {},
+                  contentElement,
+                  { [PROP_PREFIX_FIELD]: `${contentLabel}.${elementField}.${getId(contentElement)}` }
+                )
+              })
+          }
+        }
+      }),
+      { [PROP_PREFIX_FIELD]: contentLabel }
+    )
   }
 
   return content
@@ -49,10 +59,14 @@ function labelContent (content, name) {
 function editContentElement (contentElement, editElements) {
   const elementId = getId(contentElement)
   return (elementId && editElements[elementId])
-    ? _merge(
-      {},
-      contentElement,
-      editElements[elementId]
+    ? Object.assign(
+      _merge(
+        {},
+        contentElement,
+        editElements[elementId]
+      ),
+      // _merge does not preserve Symbol props
+      { [PROP_PREFIX_FIELD]: contentElement[PROP_PREFIX_FIELD] }
     )
     : contentElement
 }
@@ -87,17 +101,21 @@ function editContent (content, localEdits, name) {
       {},
       ...ELEMENT_FIELDS.map((elementField) => {
         const elements = content && content[elementField]
-        if (elements) {
-          return { [elementField]: editContentElement(elements, contentEditElements[elementField]) }
+        if (elements && contentEditElements[elementField]) {
+          return { [elementField]: elements.map(element => editContentElement(element, contentEditElements[elementField])) }
         }
       })
     )
 
-    return _merge(
-      {},
-      content,
-      contentEdits,
-      contentElements
+    return Object.assign(
+      _merge(
+        {},
+        content,
+        contentEdits,
+        contentElements
+      ),
+      // _merge does not preserve Symbol props
+      { [PROP_PREFIX_FIELD]: content[PROP_PREFIX_FIELD] }
     )
   }
 

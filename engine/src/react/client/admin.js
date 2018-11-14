@@ -180,6 +180,8 @@ window.render = function render (rendering) {
   const elem = window.document.getElementById('fusion-app')
   const html = elem.innerHTML
   try {
+    Fusion.components.Consumer.labelContent(Fusion.globalContent)
+
     ReactDOM.render(
       React.createElement(
         Provider,

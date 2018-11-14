@@ -5,19 +5,135 @@
 const React = require('react')
 
 const isClient = typeof window !== 'undefined'
+const identity = (data) => data
 
 // these turn out to be slightly smaller than using 'lodash/get' and 'lodash/merge'
 const _get = require('lodash.get')
 const _merge = require('lodash.merge')
 
-const getContextProps = (props, context) => {
+const PROP_PREFIX_FIELD = Symbol('prop-prefix')
+const ELEMENT_FIELDS = [
+  // 'children',
+  'content_elements'
+]
+
+function getId (content) {
+  return (content) ? (content.id || content._id) : null
+}
+
+function getContentLabel (content, name) {
+  const contentId = getId(content)
+  return (contentId)
+    ? ((name) ? `${name}:${contentId}` : contentId)
+    : null
+}
+
+function labelContent (content, name) {
+  if (content) {
+    const contentLabel = getContentLabel(content, name)
+
+    return Object.assign(
+      {},
+      content,
+      ...ELEMENT_FIELDS.map((elementField) => {
+        if (content && content[elementField]) {
+          return {
+            [elementField]: content[elementField]
+              .map((contentElement) => {
+                return Object.assign(
+                  {},
+                  contentElement,
+                  { [PROP_PREFIX_FIELD]: `${contentLabel}.${elementField}.${getId(contentElement)}` }
+                )
+              })
+          }
+        }
+      }),
+      { [PROP_PREFIX_FIELD]: contentLabel }
+    )
+  }
+
+  return content
+}
+
+function editContentElement (contentElement, editElements) {
+  const elementId = getId(contentElement)
+  return (elementId && editElements[elementId])
+    ? Object.assign(
+      _merge(
+        {},
+        contentElement,
+        editElements[elementId]
+      ),
+      // _merge does not preserve Symbol props
+      { [PROP_PREFIX_FIELD]: contentElement[PROP_PREFIX_FIELD] }
+    )
+    : contentElement
+}
+
+function editContent (content, localEdits, name) {
+  const appendLocalEdits = (content) => {
+    const contentId = getId(content)
+    const contentLabel = getContentLabel(content, name)
+
+    if (!(localEdits && (localEdits[contentId] || localEdits[contentLabel]))) {
+      return content
+    }
+
+    const contentEdits = Object.assign(
+      {},
+      localEdits && localEdits[contentId],
+      localEdits && localEdits[contentLabel]
+    )
+
+    const contentEditElements = Object.assign(
+      {},
+      ...ELEMENT_FIELDS.map((elementField) => {
+        const elementEdits = contentEdits[elementField]
+        delete contentEdits[elementField]
+        if (elementEdits) {
+          return { [elementField]: elementEdits }
+        }
+      })
+    )
+
+    const contentElements = Object.assign(
+      {},
+      ...ELEMENT_FIELDS.map((elementField) => {
+        const elements = content && content[elementField]
+        if (elements && contentEditElements[elementField]) {
+          return { [elementField]: elements.map(element => editContentElement(element, contentEditElements[elementField])) }
+        }
+      })
+    )
+
+    return Object.assign(
+      _merge(
+        {},
+        content,
+        contentEdits,
+        contentElements
+      ),
+      // _merge does not preserve Symbol props
+      { [PROP_PREFIX_FIELD]: content[PROP_PREFIX_FIELD] }
+    )
+  }
+
+  return appendLocalEdits(labelContent(content, name))
+}
+
+function getContextProps (props, context) {
   return {
-    props: { ...context.props, ...props },
+    props: {
+      ...context.props,
+      globalContent: editContent(context.props.globalContent, props.localEdits),
+      ...props
+    },
     children: props.children
   }
 }
 
-const createContextElement = (Component, props, context) => {
+function createContextElement (Component, props, context) {
   const { props: contextProps, children } = getContextProps(props, context)
 
   contextProps.editableField = (isClient && Fusion.isAdmin)
@@ -29,11 +145,9 @@ const createContextElement = (Component, props, context) => {
     : () => ({})
 
   contextProps.editableContent = (isClient && Fusion.isAdmin)
-    ? (contentProp, contentName, elementId) => ({
+    ? (element, contentProp) => ({
       'data-feature': props.id,
-      'data-content-editable': contentProp,
-      'data-content-name': contentName,
-      'data-element-id': elementId,
+      'data-content-editable': `${element[PROP_PREFIX_FIELD]}.${contentProp}`,
       'contentEditable': 'true'
     })
     : () => ({})
@@ -49,6 +163,7 @@ function HOC (Component) {
   const elementGenerator = (Component.prototype instanceof React.Component)
     // if Component is a React Component class, wrap it with new class with context access and `getContent` instance method
     ? (props) => (context) => {
+      // don't use a constructor here, since the extended class may try to use these APIs in its own super constructor
       class ComponentConsumer extends Component {
         addEventListener (eventType, eventHandler) {
           const listeners = context.eventListeners[eventType] = context.eventListeners[eventType] || []
@@ -75,7 +190,12 @@ function HOC (Component) {
           this.setContent(
             Object.assign(
               ...Object.keys(contents)
-                .map(stateKey => ({ [stateKey]: this.getContent(contents[stateKey]) }))
+                .map(stateKey => ({
+                  [stateKey]: this.getContent({
+                    name: stateKey,
+                    ...contents[stateKey]
+                  })
+                }))
             )
           )
         }
@@ -136,30 +256,16 @@ function HOC (Component) {
               : filter
           }
 
-          const localEdits = Object.assign({}, this.props.localEdits || {})
-          const localEditItems = localEdits.items || {}
-          delete localEdits.items
+          const { cached, fetched } = context.getContent(sourceName, query, filter, ConsumerWrapper)
 
-          const appendLocalEdits = (content) => {
-            return _merge(
-              content,
-              localEdits,
-              localEditItems[(content && (content.id || content._id)) || null]
-            )
-          }
-
-          const content = context.getContent(sourceName, query, filter, ConsumerWrapper)
-
-          const transform = (isConfig && sourceOrConfig.transform) || ((data) => data)
-
-          const cached = transform(content.cached && appendLocalEdits(content.cached))
-          const fetched = content.fetched
-            .then(appendLocalEdits)
-            .then(transform)
+          const name = (isConfig && sourceOrConfig.name)
+          const transform = (isConfig && sourceOrConfig.transform) || identity
 
           return {
-            cached,
-            fetched
+            cached: editContent(transform(cached), props.localEdits, name),
+            fetched: fetched
+              .then(transform)
+              .then((fetched) => editContent(fetched, props.localEdits, name))
           }
         }
 
@@ -212,5 +318,7 @@ function Consumer (propsOrComponent) {
     return HOC(propsOrComponent)
   }
 }
+
+Consumer.labelContent = labelContent
 
 module.exports = Consumer

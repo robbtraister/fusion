@@ -20,9 +20,10 @@ const {
 const polyfillSrc = deploymentWrapper(`${contextPath}/dist/engine/polyfill.js`)
 const polyfillChecks = [
   '!Array.prototype.includes',
+  '!window.fetch',
   '!(window.Object && window.Object.assign)',
   '!window.Promise',
-  '!window.fetch'
+  '!window.Symbol'
 ]
 const polyfillHtml = `if(${polyfillChecks.join('||')}){document.write('<script type="application/javascript" src="${polyfillSrc}" defer=""><\\/script>')}`
 const polyfillScript = (polyfillChecks.length)

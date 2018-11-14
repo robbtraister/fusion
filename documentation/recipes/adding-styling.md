@@ -57,7 +57,7 @@ export default (props) => {
 }
 ```
 
-We're using the `props.contextPath` helper above to prefix our path based on the environment we're in (e.g. in the "staging" environment, paths are prefixed with `/pb/`, which `contextPath` handles for us). But other than that, this is a normal `<link>` tag.
+We're using the `props.contextPath` helper above to prefix our path based on the environment we're in (e.g. in the "staging" environment, paths are prefixed with `/pf/`, which `contextPath` handles for us). But other than that, this is a normal `<link>` tag.
 
 All that's left is to actually apply our class to the images we want to resize:
 

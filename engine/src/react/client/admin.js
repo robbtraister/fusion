@@ -9,61 +9,70 @@ const Provider = require('./provider')
 const React = window.react
 const ReactDOM = window.ReactDOM
 
+const ErrorDisplay = ({ error, footer, name }) =>
+  React.createElement(
+    'div',
+    {
+      style: {
+        background: 'repeating-linear-gradient(-45deg, #fee, #fee 10px, #fff 10px, #fff 20px)',
+        backgroundColor: '#fee',
+        border: '2px dashed #e00',
+        color: '#c00',
+        fontFamily: 'Arial, sans-serif',
+        fontSize: '16px',
+        fontStyle: 'normal',
+        fontWeight: '400',
+        lineHeight: '20px',
+        padding: '10px',
+        textAlign: 'left'
+      }
+    },
+    [
+      React.createElement(
+        'h2',
+        {
+          key: 'title',
+          style: {
+            textAlign: 'inherit',
+            fontFamily: 'inherit',
+            fontSize: '18px',
+            fontWeight: '600',
+            padding: '0px',
+            margin: '0px'
+          }
+        },
+        'Component Code Error'
+      ),
+      React.createElement(
+        'p',
+        {
+          key: 'body',
+          style: {
+            textAlign: 'inherit',
+            fontFamily: 'inherit',
+            fontSize: 'inherit',
+            fontStyle: 'inherit',
+            fontWeight: 'inherit',
+            lineHeight: 'inherit',
+            margin: '10px 0',
+            padding: '0px'
+          }
+        },
+        `An error occurred while rendering ${name}.`
+      ),
+      (error && error.message) || error,
+      (footer)
+        ? React.createElement(
+          'div',
+          {},
+          footer
+        )
+        : null
+    ]
+  )
+
 Fusion.isAdmin = true
-Fusion.components.Quarantine = require('../shared/components/quarantine')(
-  ({ error, name }) =>
-    React.createElement(
-      'div',
-      {
-        style: {
-          background: 'repeating-linear-gradient(-45deg, #fee, #fee 10px, #fff 10px, #fff 20px)',
-          backgroundColor: '#fee',
-          border: '2px dashed #e00',
-          color: '#c00',
-          fontFamily: 'Arial, sans-serif',
-          fontSize: '16px',
-          fontStyle: 'normal',
-          fontWeight: '400',
-          lineHeight: '20px',
-          padding: '10px',
-          textAlign: 'left'
-        }
-      },
-      [
-        React.createElement(
-          'h2',
-          {
-            style: {
-              textAlign: 'inherit',
-              fontFamily: 'inherit',
-              fontSize: '18px',
-              fontWeight: '600',
-              padding: '0px',
-              margin: '0px'
-            }
-          },
-          'Component Code Error'
-        ),
-        React.createElement(
-          'p',
-          {
-            style: {
-              textAlign: 'inherit',
-              fontFamily: 'inherit',
-              fontSize: 'inherit',
-              fontStyle: 'inherit',
-              fontWeight: 'inherit',
-              lineHeight: 'inherit',
-              margin: '10px 0',
-              padding: '0px'
-            }
-          },
-          `An error occurred while rendering ${name}.`
-        ),
-        error.message
-      ]
-    )
-)
+Fusion.components.Quarantine = require('../shared/components/quarantine')(ErrorDisplay)
 
 const appendBoundary = (element, id) => {
   const boundaryProps = {
@@ -131,9 +140,45 @@ class AdminCompiler extends ComponentCompiler {
   }
 }
 
+function showLayoutError (error) {
+  const shade = document.createElement('div')
+  shade.style.backgroundColor = 'rgba(0,0,0,0.5)'
+  shade.style.bottom = '0'
+  shade.style.left = '0'
+  shade.style.position = 'fixed'
+  shade.style.right = '0'
+  shade.style.top = '0'
+  shade.style.zIndex = '99999999'
+  document.getElementById('fusion-app').appendChild(shade)
+
+  ReactDOM.render(
+    React.createElement(
+      'div',
+      {
+        style: {
+          left: '50%',
+          maxWidth: '500px',
+          position: 'absolute',
+          top: '50%',
+          transform: 'translate(-50%, -50%)'
+        }
+      },
+      React.createElement(
+        ErrorDisplay,
+        {
+          name: Fusion.Template.layout || Fusion.Template.id,
+          error,
+          footer: 'Please correct issue to continue editing'
+        }
+      )
+    ),
+    shade
+  )
+}
+
 window.render = function render (rendering) {
   const elem = window.document.getElementById('fusion-app')
-  // const html = elem.innerHTML
+  const html = elem.innerHTML
   try {
     ReactDOM.render(
       React.createElement(
@@ -149,9 +194,10 @@ window.render = function render (rendering) {
       ),
       elem
     )
-  } catch (e) {
-    // elem.innerHTML = html
-    // don't catch this like in production
-    throw e
+  } catch (err) {
+    elem.innerHTML = html
+    showLayoutError(err)
+
+    throw err
   }
 }

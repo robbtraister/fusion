@@ -68,7 +68,7 @@ One more subtle but important piece of code is the `id='fusion-app'` attribute a
 
 ## Seeing Some Output
 
-We're finally at the stage where we can start seeing something on a webpage! To do so, we'll need to go into the [PageBuilder Admin](http://localhost/pb/admin) and define a sample page to work with.
+We're finally at the stage where we can start seeing something on a webpage! To do so, we'll need to go into the [PageBuilder Admin](http://localhost/pf/admin) and define a sample page to work with.
 
 > **NOTE**
 >

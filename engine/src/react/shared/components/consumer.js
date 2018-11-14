@@ -145,7 +145,7 @@ function createContextElement (Component, props, context) {
     : () => ({})
 
   contextProps.editableContent = (isClient && Fusion.isAdmin)
-    ? (contentProp, element) => ({
+    ? (element, contentProp) => ({
       'data-feature': props.id,
       'data-content-editable': `${element[PROP_PREFIX_FIELD]}.${contentProp}`,
       'contentEditable': 'true'

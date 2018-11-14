@@ -11,44 +11,11 @@ const identity = (data) => data
 const _get = require('lodash.get')
 const _merge = require('lodash.merge')
 
-const CONTENT_LABEL_FIELD = Symbol('content-label')
-const ELEMENT_ID_FIELD = Symbol('element-id')
-
-const getContextProps = (props, context) => {
-  return {
-    props: { ...context.props, ...props },
-    children: props.children
-  }
-}
-
-const createContextElement = (Component, props, context) => {
-  const { props: contextProps, children } = getContextProps(props, context)
-
-  contextProps.editableField = (isClient && Fusion.isAdmin)
-    ? (fieldProp) => ({
-      'data-feature': props.id,
-      'data-field-editable': fieldProp,
-      'contentEditable': 'true'
-    })
-    : () => ({})
-
-  contextProps.editableContent = (isClient && Fusion.isAdmin)
-    ? (contentProp, element) => ({
-      'data-feature': props.id,
-      'data-content-name': element[CONTENT_LABEL_FIELD],
-      'data-content-editable': (element[ELEMENT_ID_FIELD])
-        ? `content_elements.${element[ELEMENT_ID_FIELD]}.${contentProp}`
-        : contentProp,
-      'contentEditable': 'true'
-    })
-    : () => ({})
-
-  return React.createElement(
-    Component,
-    contextProps,
-    children
-  )
-}
+const PROP_PREFIX_FIELD = Symbol('prop-prefix')
+const ELEMENT_FIELDS = [
+  // 'children',
+  'content_elements'
+]
 
 function getId (content) {
   return (content) ? (content.id || content._id) : null
@@ -64,34 +31,121 @@ function getContentLabel (content, name) {
 function labelContent (content, name) {
   if (content) {
     const contentLabel = getContentLabel(content, name)
-    content[CONTENT_LABEL_FIELD] = contentLabel
+    content[PROP_PREFIX_FIELD] = contentLabel
 
-    if (content && content.content_elements) {
-      content.content_elements
-        .forEach((contentElement) => {
-          contentElement[CONTENT_LABEL_FIELD] = contentLabel
-          contentElement[ELEMENT_ID_FIELD] = getId(contentElement)
-        })
-    }
+    ELEMENT_FIELDS.forEach((elementField) => {
+      if (content && content[elementField]) {
+        content[elementField]
+          .forEach((contentElement) => {
+            contentElement[PROP_PREFIX_FIELD] = `${contentLabel}.${elementField}.${getId(contentElement)}`
+          })
+      }
+    })
   }
 
   return content
 }
 
-function transformContent ({ cached, fetched }, transform) {
-  transform = (transform || identity)
+function editContentElement (contentElement, editElements) {
+  const elementId = getId(contentElement)
+  return (elementId && editElements[elementId])
+    ? _merge(
+      {},
+      contentElement,
+      editElements[elementId]
+    )
+    : contentElement
+}
 
-  return {
-    cached: transform(cached),
-    fetched: fetched
-      .then(transform)
+function editContent (content, localEdits, name) {
+  const appendLocalEdits = (content) => {
+    const contentId = getId(content)
+    const contentLabel = getContentLabel(content, name)
+
+    if (!(localEdits && (localEdits[contentId] || localEdits[contentLabel]))) {
+      return content
+    }
+
+    const contentEdits = Object.assign(
+      {},
+      localEdits && localEdits[contentId],
+      localEdits && localEdits[contentLabel]
+    )
+
+    const contentEditElements = Object.assign(
+      {},
+      ...ELEMENT_FIELDS.map((elementField) => {
+        const elementEdits = contentEdits[elementField]
+        delete contentEdits[elementField]
+        if (elementEdits) {
+          return { [elementField]: elementEdits }
+        }
+      })
+    )
+
+    const contentElements = Object.assign(
+      {},
+      ...ELEMENT_FIELDS.map((elementField) => {
+        const elements = content && content[elementField]
+        if (elements) {
+          return { [elementField]: editContentElement(elements, contentEditElements[elementField]) }
+        }
+      })
+    )
+
+    return _merge(
+      {},
+      content,
+      contentEdits,
+      contentElements
+    )
   }
+
+  return appendLocalEdits(labelContent(content, name))
+}
+
+function getContextProps (props, context) {
+  return {
+    props: {
+      ...context.props,
+      globalContent: editContent(context.props.globalContent, props.localEdits),
+      ...props
+    },
+    children: props.children
+  }
+}
+
+function createContextElement (Component, props, context) {
+  const { props: contextProps, children } = getContextProps(props, context)
+
+  contextProps.editableField = (isClient && Fusion.isAdmin)
+    ? (fieldProp) => ({
+      'data-feature': props.id,
+      'data-field-editable': fieldProp,
+      'contentEditable': 'true'
+    })
+    : () => ({})
+
+  contextProps.editableContent = (isClient && Fusion.isAdmin)
+    ? (contentProp, element) => ({
+      'data-feature': props.id,
+      'data-content-editable': `${element[PROP_PREFIX_FIELD]}.${contentProp}`,
+      'contentEditable': 'true'
+    })
+    : () => ({})
+
+  return React.createElement(
+    Component,
+    contextProps,
+    children
+  )
 }
 
 function HOC (Component) {
   const elementGenerator = (Component.prototype instanceof React.Component)
     // if Component is a React Component class, wrap it with new class with context access and `getContent` instance method
     ? (props) => (context) => {
+      // don't use a constructor here, since the extended class may try to use these APIs in its own super constructor
       class ComponentConsumer extends Component {
         addEventListener (eventType, eventHandler) {
           const listeners = context.eventListeners[eventType] = context.eventListeners[eventType] || []
@@ -111,50 +165,6 @@ function HOC (Component) {
           const listeners = context.eventListeners[eventType] || null
           if (listeners) {
             context.eventListeners[eventType] = listeners.filter((listener) => listener !== eventHandler)
-          }
-        }
-
-        editContent ({ cached, fetched }, name) {
-          const appendLocalEdits = (content) => {
-            const localEdits = Object.assign(
-              {},
-              props.localEdits && props.localEdits[getId(content)],
-              props.localEdits && props.localEdits[getContentLabel(content, name)]
-            )
-            const localEditElements = localEdits.content_elements || {}
-            delete localEdits.content_elements
-
-            const appendLocalEditElement = (contentElement) => {
-              const id = getId(contentElement)
-              return (id && localEditElements[id])
-                ? _merge(
-                  {},
-                  contentElement,
-                  localEditElements[id]
-                )
-                : contentElement
-            }
-
-            const contentElements = (content && content.content_elements)
-              ? {
-                content_elements: content.content_elements
-                  .map(appendLocalEditElement)
-              }
-              : {}
-
-            return _merge(
-              {},
-              content,
-              localEdits,
-              contentElements
-            )
-          }
-
-          return {
-            cached: appendLocalEdits(labelContent(cached, name)),
-            fetched: fetched
-              .then(content => labelContent(content, name))
-              .then(appendLocalEdits)
           }
         }
 
@@ -179,64 +189,66 @@ function HOC (Component) {
             ? sourceOrConfig.inherit
             : inherit
 
-          const content = (inherit)
-            ? {
+          if (inherit) {
+            return {
               cached: this.props.globalContent,
               fetched: Promise.resolve(this.props.globalContent)
             }
-            : (() => {
-              const sourceName = (isConfig)
-                ? sourceOrConfig.contentService || sourceOrConfig.sourceName || sourceOrConfig.source
-                : sourceOrConfig
+          }
 
-              if (!sourceName) {
-                return {
-                  cached: null,
-                  fetched: Promise.resolve(null)
-                }
-              }
+          const sourceName = (isConfig)
+            ? sourceOrConfig.contentService || sourceOrConfig.sourceName || sourceOrConfig.source
+            : sourceOrConfig
 
-              if (isConfig && sourceOrConfig.hasOwnProperty('key')) {
-                console.warn('--- WARNING: The \'key\' property on content configs has been renamed as \'query\'. Use of \'key\' has been DEPRECATED. ---')
-                if (isConfig && sourceOrConfig.hasOwnProperty('query')) {
-                  console.warn('--- WARNING: The \'query\' property on content configs has been renamed as \'filter\'. ---')
-                }
-                query = sourceOrConfig.key
+          if (!sourceName) {
+            return {
+              cached: null,
+              fetched: Promise.resolve(null)
+            }
+          }
 
-                query = JSON.parse(JSON.stringify(query).replace(/\{\{([^}]+)\}\}/g, (match, propName) => {
-                  return _get(this.props, propName) || match
-                }))
+          if (isConfig && sourceOrConfig.hasOwnProperty('key')) {
+            console.warn('--- WARNING: The \'key\' property on content configs has been renamed as \'query\'. Use of \'key\' has been DEPRECATED. ---')
+            if (isConfig && sourceOrConfig.hasOwnProperty('query')) {
+              console.warn('--- WARNING: The \'query\' property on content configs has been renamed as \'filter\'. ---')
+            }
+            query = sourceOrConfig.key
 
-                filter = sourceOrConfig.filter || sourceOrConfig.query
-              } else {
-                if (isConfig && sourceOrConfig.hasOwnProperty('contentConfigValues') && sourceOrConfig.hasOwnProperty('query') && !sourceOrConfig.hasOwnProperty('filter')) {
-                  console.warn('--- WARNING: The \'query\' property on content configs has been renamed as \'filter\'. ---')
-                  sourceOrConfig.filter = sourceOrConfig.query
-                }
+            query = JSON.parse(JSON.stringify(query).replace(/\{\{([^}]+)\}\}/g, (match, propName) => {
+              return _get(this.props, propName) || match
+            }))
 
-                query = (isConfig)
-                  ? sourceOrConfig.contentConfigValues || sourceOrConfig.query
-                  : query
+            filter = sourceOrConfig.filter || sourceOrConfig.query
+          } else {
+            if (isConfig && sourceOrConfig.hasOwnProperty('contentConfigValues') && sourceOrConfig.hasOwnProperty('query') && !sourceOrConfig.hasOwnProperty('filter')) {
+              console.warn('--- WARNING: The \'query\' property on content configs has been renamed as \'filter\'. ---')
+              sourceOrConfig.filter = sourceOrConfig.query
+            }
 
-                query = JSON.parse(JSON.stringify(query).replace(/\{\{([^}]+)\}\}/g, (match, propName) => {
-                  return _get(this.props, propName) || match
-                }))
+            query = (isConfig)
+              ? sourceOrConfig.contentConfigValues || sourceOrConfig.query
+              : query
 
-                filter = (isConfig)
-                  ? sourceOrConfig.filter
-                  : filter
-              }
+            query = JSON.parse(JSON.stringify(query).replace(/\{\{([^}]+)\}\}/g, (match, propName) => {
+              return _get(this.props, propName) || match
+            }))
 
-              return context.getContent(sourceName, query, filter, ConsumerWrapper)
-            })()
+            filter = (isConfig)
+              ? sourceOrConfig.filter
+              : filter
+          }
+
+          const { cached, fetched } = context.getContent(sourceName, query, filter, ConsumerWrapper)
 
           const name = (isConfig && sourceOrConfig.name)
-          const transform = (isConfig && sourceOrConfig.transform)
+          const transform = (isConfig && sourceOrConfig.transform) || identity
 
-          return this.editContent(
-            transformContent(content, transform),
-            name
-          )
+          return {
+            cached: editContent(transform(cached), props.localEdits, name),
+            fetched: fetched
+              .then(transform)
+              .then((fetched) => editContent(fetched, props.localEdits, name))
+          }
         }
 
         setContent (contents) {
@@ -288,5 +300,7 @@ function Consumer (propsOrComponent) {
     return HOC(propsOrComponent)
   }
 }
+
+Consumer.labelContent = labelContent
 
 module.exports = Consumer

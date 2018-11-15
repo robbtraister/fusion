@@ -3,6 +3,7 @@
 const path = require('path')
 
 const mockRequire = require('mock-require')
+const React = require('react')
 
 const {
   bundleBuildRoot,
@@ -12,6 +13,7 @@ const {
 
 require('./shared')
 
+mockRequire('react', React)
 mockRequire('fusion:environment', FusionEnvironment)
 
 // const FusionManifest = require('../manifest')

@@ -124,11 +124,14 @@ function editContent (content, localEdits, name) {
 
 function getContextProps (props, context) {
   return {
-    props: {
-      ...context.props,
-      globalContent: editContent(context.props.globalContent, props.localEdits),
-      ...props
-    },
+    props: (context && context.props)
+      ? {
+        ...context.props,
+        globalContent: editContent(context.props.globalContent, props.localEdits),
+        ...props
+      }
+      // incoming props does not allow extensions, but we need to extend it
+      : { ...props },
     children: props.children
   }
 }

@@ -22,7 +22,7 @@ contentRouter.route(['/clear', '/clear/:source', '/clear/:source/:query'])
       try {
         const sourceName = req.params.source || req.query.source
         const queryString = req.params.query || req.query.query || req.query.key
-        const website = req.query._website
+        const website = req.arcSite
 
         const sourcePromise = getSource(sourceName)
         const query = getQuery(queryString, website)
@@ -44,7 +44,7 @@ const fetchHandler = (forceUpdate) =>
       const sourceName = req.params.source || req.query.source
       const queryString = req.params.query || req.query.query || req.query.key
       const filter = req.query.filter
-      const website = req.query._website
+      const website = req.arcSite
       const followRedirect = req.query.followRedirect !== 'false'
       const maxRedirects = +req.query.maxRedirects
 

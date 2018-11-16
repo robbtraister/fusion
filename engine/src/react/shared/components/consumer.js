@@ -148,11 +148,16 @@ function createContextElement (Component, props, context) {
     : () => ({})
 
   contextProps.editableContent = (isClient && Fusion.isAdmin)
-    ? (element, contentProp) => ({
-      'data-feature': props.id,
-      'data-content-editable': `${element[PROP_PREFIX_FIELD]}.${contentProp}`,
-      'contentEditable': 'true'
-    })
+    ? (element, contentProp) => {
+      const prefix = (element && element[PROP_PREFIX_FIELD])
+        ? `${element[PROP_PREFIX_FIELD]}.`
+        : ''
+      return {
+        'data-feature': props.id,
+        'data-content-editable': `${prefix}${contentProp}`,
+        'contentEditable': 'true'
+      }
+    }
     : () => ({})
 
   return React.createElement(

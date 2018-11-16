@@ -39,18 +39,8 @@ cat <<EOB
     default                     \$request_uri;
   }
 
-  map \$http_referer \$referer_vDeployment {
-    ~(\?|&)v=([0-9]+)(&|\$)     \$2;
-    default                     'live';
-  }
-
-  map \$http_referer \$referer_dDeployment {
-    ~(\?|&)d=([0-9]+)(&|\$)     \$2;
-    default                     \$referer_vDeployment;
-  }
-
   map \$cookie_deployment \$cookieDeployment {
-    ''                          \$referer_dDeployment;
+    ''                          'live';
     default                     \$cookie_deployment;
   }
 
@@ -127,13 +117,8 @@ cat <<EOB
     ''                          \$headerSite;
   }
 
-  map \$http_user_agent \$defaultOutputType {
-    ~*(phone|mobile)            'mobile';
-    default                     'default';
-  }
-
   map \$arg_outputType \$outputType {
     default                     \$arg_outputType;
-    ''                          \$defaultOutputType;
+    ''                          'default';
   }
 EOB

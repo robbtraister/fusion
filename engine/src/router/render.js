@@ -62,7 +62,7 @@ function getTypeRouter (routeType) {
 
         const request = Object.assign(
           {
-            arcSite: req.query._website
+            arcSite: req.arcSite
           },
           (req.body && req.body.request) || {}
         )

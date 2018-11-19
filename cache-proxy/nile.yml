@@ -38,6 +38,8 @@ _services: &_services
 environments:
   - name: staging
     <<: *_services
+    labels:
+      - all
     namespace: pagebuilder-arc2
     override:
       cache-proxy:
@@ -68,6 +70,8 @@ environments:
             - subnet-9d4bafb2
             - subnet-42943209
   - name: eu-central-1
+    labels:
+      - all
     namespace: fusion-ecs-eu-central-1
     services:
       - deploymentConfiguration:
@@ -96,6 +100,8 @@ environments:
             fusion-eu-prod.xl3vuh.0002.euc1.cache.amazonaws.com:11211
             fusion-eu-prod.xl3vuh.0003.euc1.cache.amazonaws.com:11211
   - name: us-east-1
+    labels:
+      - all
     namespace: fusion-ecs-us-east-1
     services:
       - deploymentConfiguration:

@@ -205,14 +205,16 @@ cat <<EOB
       rewrite                   ^ ${API_PREFIX}/content/fetch/\${arg_service}?v=\${arg_v}&key=\${arg_config};
     }
 
-    location ~ ^${CONTEXT_PATH}/admin/api/(chain|feature|layout)-config/?\$ {
-      set                       \$type \$1;
-      rewrite                   ^ ${API_PREFIX}/configs/\${type}s;
+    location ~ ^${CONTEXT_PATH}/admin/api/(chain|feature|layout)-config($|/.*) {
+      set                       \$collection \$1;
+      set                       \$type \$2;
+      rewrite                   ^ ${API_PREFIX}/configs/\${collection}s\${type};
     }
 
-    location ~ ^${CONTEXT_PATH}/admin/api/(output-type)/?\$ {
-      set                       \$type \$1;
-      rewrite                   ^ ${API_PREFIX}/configs/\${type}s;
+    location ~ ^${CONTEXT_PATH}/admin/api/(output-type)($|/.*) {
+      set                       \$collection \$1;
+      set                       \$type \$2;
+      rewrite                   ^ ${API_PREFIX}/configs/\${collection}s\${type};
     }
 
     location ~ ^${CONTEXT_PATH}/api/v2/resolve/?\$ {

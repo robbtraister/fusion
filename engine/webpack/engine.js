@@ -48,12 +48,13 @@ const siteFiles = Object.assign(
 
 fs.writeFileSync(propertiesSrcFile,
   `
+const unpack = require('${require.resolve('../src/utils/unpack')}')
 const properties = {
-  global: ${globalFile ? `require('${path.relative(propertiesSrcDir, globalFile)}')` : '{}'},
+  global: ${globalFile ? `unpack(require('${path.relative(propertiesSrcDir, globalFile)}'))` : '{}'},
   sites: {
     ${
   Object.keys(siteFiles)
-    .map(name => `'${name}': require('${path.relative(propertiesSrcDir, siteFiles[name])}')`).join(',\n    ')
+    .map(name => `'${name}': unpack(require('${path.relative(propertiesSrcDir, siteFiles[name])}'))`).join(',\n    ')
 }
   }
 }

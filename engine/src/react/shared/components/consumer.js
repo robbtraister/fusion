@@ -56,19 +56,25 @@ function labelContent (content, name) {
   return content
 }
 
-function editContentElement (contentElement, editElements) {
-  const elementId = getId(contentElement)
-  return (elementId && editElements[elementId])
+function mergeEdits (base, ...edits) {
+  const existingEdits = edits.filter((edit) => !!edit)
+
+  return (existingEdits.length)
     ? Object.assign(
       _merge(
         {},
-        contentElement,
-        editElements[elementId]
+        base,
+        ...existingEdits
       ),
       // _merge does not preserve Symbol props
-      { [PROP_PREFIX_FIELD]: contentElement[PROP_PREFIX_FIELD] }
+      { [PROP_PREFIX_FIELD]: base[PROP_PREFIX_FIELD] }
     )
-    : contentElement
+    : base
+}
+
+function editContentElement (contentElement, editElements) {
+  const elementId = getId(contentElement)
+  return mergeEdits(contentElement, editElements && editElements[elementId])
 }
 
 function editContent (content, localEdits, name) {
@@ -107,16 +113,7 @@ function editContent (content, localEdits, name) {
       })
     )
 
-    return Object.assign(
-      _merge(
-        {},
-        content,
-        contentEdits,
-        contentElements
-      ),
-      // _merge does not preserve Symbol props
-      { [PROP_PREFIX_FIELD]: content[PROP_PREFIX_FIELD] }
-    )
+    return mergeEdits(content, contentEdits, contentElements)
   }
 
   return appendLocalEdits(labelContent(content, name))
@@ -136,28 +133,37 @@ function getContextProps (props, context) {
   }
 }
 
+function getEditablePropName (prop, prefix) {
+  return `${prefix ? `${prefix}.` : ''}${prop}`
+}
+
+function getEditablePropAttribute (prop, prefix) {
+  if (prop instanceof Object) {
+    return Object.keys(prop)
+      .map((label) => `${label}:${getEditablePropName(prop[label], prefix)}`)
+      .join(';')
+  } else {
+    return getEditablePropName(prop, prefix)
+  }
+}
+
 function createContextElement (Component, props, context) {
   const { props: contextProps, children } = getContextProps(props, context)
 
   contextProps.editableField = (isClient && Fusion.isAdmin)
     ? (fieldProp) => ({
       'data-feature': props.id,
-      'data-field-editable': fieldProp,
+      'data-field-editable': getEditablePropAttribute(fieldProp),
       'contentEditable': 'true'
     })
     : () => ({})
 
   contextProps.editableContent = (isClient && Fusion.isAdmin)
-    ? (element, contentProp) => {
-      const prefix = (element && element[PROP_PREFIX_FIELD])
-        ? `${element[PROP_PREFIX_FIELD]}.`
-        : ''
-      return {
-        'data-feature': props.id,
-        'data-content-editable': `${prefix}${contentProp}`,
-        'contentEditable': 'true'
-      }
-    }
+    ? (element, contentProp) => ({
+      'data-feature': props.id,
+      'data-content-editable': getEditablePropAttribute(contentProp, element && element[PROP_PREFIX_FIELD]),
+      'contentEditable': 'true'
+    })
     : () => ({})
 
   return React.createElement(

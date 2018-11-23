@@ -87,7 +87,7 @@ cat <<EOB
       add_header                'Fusion-Source' 's3';
     }
 
-    location ~ ^${API_PREFIX}/(content|resolvers)(/.*|\$) {
+    location ~ ^${API_PREFIX}/(content|properties|resolvers)(/.*|\$) {
       error_page                418 = @engine;
       return                    418;
     }

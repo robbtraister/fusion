@@ -12,7 +12,7 @@
     "sls:dev": "sls --stage=dev offline start",
     "sls:prod": "sls --stage=prod offline start",
     "test": "mocha",
-    "watch:dev": "cd ./bundle && npm install --production && npm run watch",
+    "watch:dev": "(cd ./bundle && npm install --production) && npm run watch",
     "watch": "npm run build -- --watch"
   },
   "keywords": [],

@@ -14,12 +14,15 @@ const { RedirectError, NotFoundError } = require('../../errors')
 
 const fetch = async function fetch (contentSource, contentKey, { version, cacheMode }) {
   // TODO: update this to use `query` param name after clients are updated to 0.4+
-  const { body } = await engine({
+  const { body, headers } = await engine({
     uri: `/content/fetch/${contentSource}?key=${encodeURIComponent(JSON.stringify(contentKey))}&followRedirect=false`,
     version,
     cacheMode
   })
-  return body
+  return {
+    data: body || null,
+    expires: +new Date(headers.expires)
+  }
 }
 
 const getParamMapper = function getParamMapper (param) {

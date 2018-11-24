@@ -46,12 +46,14 @@ class BaseResolver {
         // remove versions from page config
         resolver: Object.assign({}, this.config, { versions: undefined })
       },
-      (query)
+      (content)
         ? {
           content: {
             source: this.config.contentSourceId,
             query,
-            document: content
+            // TODO: rename to .data after migrating everyone to 2.1
+            document: content.data,
+            expires: content.expires
           }
         }
         : {}

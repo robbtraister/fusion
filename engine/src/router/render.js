@@ -43,7 +43,7 @@ module.exports = (env) => {
         outputTypeFile,
         {
           arcSite: req.arcSite,
-          globalContent: req.body.content.document,
+          globalContent: req.body.content.data || req.body.content.document,
           isAdmin: /^true$/i.test(req.query.isAdmin),
           outputType: path.parse(outputTypeFile).name,
           rendering,

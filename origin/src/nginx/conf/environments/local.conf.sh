@@ -9,6 +9,9 @@ cat <<EOB
     listen                      ${PORT:-8081};
     # server_name                 _;
 
+    # this server only accessible via self-redirect; logging here is duplicative
+    access_log                  off;
+
     location @engine {
       proxy_read_timeout        60;
 EOB

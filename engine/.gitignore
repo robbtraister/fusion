@@ -1,6 +1,0 @@
-**/.DS_Store
-.env
-
-build/
-dist/
-node_modules/

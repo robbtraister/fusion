@@ -5,13 +5,13 @@ const path = require('path')
 const DefinePlugin = require('webpack').DefinePlugin
 
 module.exports = (env) => {
-  const { distRoot, engineSrcRoot } = env
+  const { distRoot, engineSrcRoot, generatedRoot } = env
+
+  const propertiesFile = path.resolve(generatedRoot, 'properties.js')
 
   return [
     {
-      ...require('../_shared/mode')(env),
-      ...require('../_shared/optimization')(env),
-      ...require('../_shared/resolve')(env),
+      ...require('../_shared')(env),
       entry: {
         admin: require.resolve(path.resolve(engineSrcRoot, 'engines', 'jsx', 'client', 'admin')),
         polyfill: require.resolve(path.resolve(engineSrcRoot, 'engines', 'jsx', 'client', 'polyfill')),
@@ -29,7 +29,7 @@ module.exports = (env) => {
       },
       plugins: [
         new DefinePlugin({
-          __FUSION_PROPERTIES_FILE__: `'${require('../bundle/properties/get-file')(env)}'`
+          __FUSION_PROPERTIES_FILE__: `'${propertiesFile}'`
         })
       ],
       target: 'web'

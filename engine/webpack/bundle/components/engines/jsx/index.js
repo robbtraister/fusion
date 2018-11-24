@@ -5,23 +5,11 @@ const path = require('path')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OnBuildWebpackPlugin = require('on-build-webpack')
 
-const getEntries = require('../utils/entries')
+const getEntries = require('../../utils/entries')
 
 const {
   exec
-} = require('../../../../src/utils/promises')
-
-const externals = {
-  '@arc-fusion/prop-types': '@arc-fusion/prop-types',
-  'fusion:consumer': 'fusion:consumer',
-  'fusion:content': 'fusion:content',
-  'fusion:context': 'fusion:context',
-  'fusion:environment': 'fusion:environment',
-  'fusion:properties': 'fusion:properties',
-  'prop-types': '@arc-fusion/prop-types',
-  react: 'react',
-  'react-dom': 'react-dom'
-}
+} = require('../../../../../src/utils/promises')
 
 module.exports = (env) => {
   const { buildRoot, bundleRoot, distRoot } = env
@@ -45,14 +33,12 @@ module.exports = (env) => {
 
   return [
     {
-      ...require('../../../_shared/mode')(env),
-      ...require('../../../_shared/optimization')(env),
-      ...require('../../../_shared/resolve')(env),
+      ...require('../../../../_shared')(env),
+      ...require('./externals')(env),
       entry,
-      externals,
       module: {
         rules: [
-          require('../../../_shared/rules/jsx')(env),
+          require('../../../../_shared/rules/jsx')(env),
           {
             test: /\.s?[ac]ss$/,
             use: [
@@ -79,16 +65,14 @@ module.exports = (env) => {
       target: 'node'
     },
     {
-      ...require('../../../_shared/mode')(env),
-      ...require('../../../_shared/optimization')(env),
-      ...require('../../../_shared/resolve')(env),
+      ...require('../../../../_shared')(env),
+      ...require('./externals')(env),
       entry: cssEntry,
-      externals,
       module: {
         rules: [
-          require('../../../_shared/rules/jsx')(env),
-          require('../../../_shared/rules/css')(env),
-          require('../../../_shared/rules/sass')(env)
+          require('../../../../_shared/rules/jsx')(env),
+          require('../../../../_shared/rules/css')(env),
+          require('../../../../_shared/rules/sass')(env)
         ]
       },
       output: {

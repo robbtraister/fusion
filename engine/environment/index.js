@@ -13,9 +13,9 @@ function optionalRequire (fp) {
 }
 
 const projectRoot = path.resolve(__dirname, '..')
-const bundleRoot = path.resolve(projectRoot, 'bundle')
 const engineSrcRoot = path.resolve(projectRoot, 'src')
 
+const bundleRoot = process.env.BUNDLE_ROOT || path.resolve(projectRoot, 'bundle')
 const buildRoot = path.resolve(bundleRoot, '.fusion', 'build')
 const distRoot = path.resolve(bundleRoot, '.fusion', 'dist')
 const generatedRoot = path.resolve(bundleRoot, '.fusion', 'generated')

@@ -12,9 +12,7 @@ module.exports = (env) => {
 
   return [
     {
-      ...require('../../../_shared/mode')(env),
-      ...require('../../../_shared/optimization')(env),
-      ...require('../../../_shared/resolve')(env),
+      ...require('../../../_shared')(env),
       entry,
       externals: {
         handlebars: 'handlebars',

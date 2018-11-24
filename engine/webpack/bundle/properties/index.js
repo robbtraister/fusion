@@ -5,6 +5,8 @@ const path = require('path')
 
 const glob = require('glob')
 
+const template = require('./template')
+
 const getRequirable = (fp) => {
   try {
     return require.resolve(fp)
@@ -14,10 +16,10 @@ const getRequirable = (fp) => {
 }
 
 module.exports = (env) => {
-  const { buildRoot, bundleRoot } = env
+  const { buildRoot, bundleRoot, generatedRoot } = env
 
   const srcDir = `${bundleRoot}/properties`
-  const propertiesFile = require('./get-file')(env)
+  const propertiesFile = path.resolve(generatedRoot, 'properties.js')
 
   const globalFile = getRequirable(srcDir)
   const siteFiles = Object.assign(
@@ -27,35 +29,11 @@ module.exports = (env) => {
       .map(fp => ({ [path.parse(fp).name]: fp }))
   )
 
-  fs.writeFileSync(propertiesFile,
-    `
-const unpack = require('${require.resolve('../../../src/utils/unpack')}')
-const properties = {
-  global: ${globalFile ? `unpack(require('${globalFile}'))` : '{}'},
-  sites: {
-    ${
-  Object.keys(siteFiles)
-    .map(name => `'${name}': unpack(require('${siteFiles[name]}'))`).join(',\n    ')
-}
-  }
-}
-
-const siteCache = {}
-module.exports = (siteName) => {
-  siteCache[siteName] = siteCache[siteName] || Object.assign(
-    {},
-    properties.global || {},
-    properties.sites[siteName] || {}
-  )
-  return siteCache[siteName]
-}
-`)
+  fs.writeFileSync(propertiesFile, template({ globalFile, siteFiles }))
 
   return [
     {
-      ...require('../../_shared/mode')(env),
-      ...require('../../_shared/optimization')(env),
-      ...require('../../_shared/resolve')(env),
+      ...require('../../_shared')(env),
       entry: {
         'properties.js': propertiesFile
       },

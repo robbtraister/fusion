@@ -19,9 +19,50 @@ function outputTypeFactory (bundleRoot, defaultOutputType) {
 }
 
 module.exports = (env) => {
-  const { bodyLimit, bundleRoot, defaultOutputType, getRendering } = env
+  const { bodyLimit, bundleRoot, defaultOutputType, getContentSource, getRendering } = env
 
   const getOutputType = outputTypeFactory(bundleRoot, defaultOutputType)
+
+  async function getGlobalContent ({ content, globalContentConfig }) {
+    const globalContent = (!content)
+      ? undefined
+      : (content.hasOwnProperty('data'))
+        ? content.data
+        : content.document
+
+    if (globalContent !== undefined) {
+      if (content.expires) {
+        // we already have all of the information
+        return {
+          data: globalContent,
+          expires: content.expires
+        }
+      } else {
+        // we have the data, but no expiration
+        const source = globalContentConfig &&
+          globalContentConfig.contentService &&
+          getContentSource(globalContentConfig.contentService)
+
+        const expires = (source)
+          //  calculate an expiration based on content source TTL
+          ? source.getExpiration()
+          // default to 10min
+          : +new Date() + (600 * 1000)
+
+        return {
+          data: globalContent,
+          expires
+        }
+      }
+    } else if (globalContentConfig) {
+      // fetch data
+      const { contentService, contentConfigValues } = globalContentConfig
+      return getContentSource(contentService).fetch(contentConfigValues)
+    } else {
+      // no data and no config
+      return {}
+    }
+  }
 
   const renderRouter = express.Router()
 
@@ -33,17 +74,23 @@ module.exports = (env) => {
 
   renderRouter.use(
     async (req, res, next) => {
-      req.verifyAuthentication('READ')
-
-      const rendering = await getRendering(req.body && req.body.rendering)
+      const body = req.body || {}
 
       const outputTypeFile = getOutputType(req.query.outputType || defaultOutputType)
+
+      const rendering = await getRendering(body.rendering)
+
+      const { data: globalContent, expires } = await getGlobalContent({ content: body.content, globalContentConfig: rendering.globalContentConfig })
+      if (expires) {
+        res.set('Expires', new Date(expires).toUTCString())
+      }
+      res.set('Content-Type', 'text/html')
 
       res.render(
         outputTypeFile,
         {
           arcSite: req.arcSite,
-          globalContent: req.body.content.data || req.body.content.document,
+          globalContent,
           isAdmin: /^true$/i.test(req.query.isAdmin),
           outputType: path.parse(outputTypeFile).name,
           rendering,

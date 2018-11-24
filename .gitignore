@@ -8,6 +8,6 @@
 docker-compose.linked.yml
 docker-compose.override.yml
 
-.fusion
+**/.fusion
 
 */release.txt

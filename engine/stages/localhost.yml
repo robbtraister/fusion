@@ -3,4 +3,5 @@ events:
   - http: 'ANY /{proxy+}'
 
 skipCacheInvalidation: false
-cacheInvalidationRegex: '^(?!/workdir/engine/(build|bundle|dist)/(?!node_modules/))'
+# cacheInvalidationRegex: '^(?!/workdir/engine/bundle/(?!node_modules/))'
+cacheInvalidationRegex: '(/node_modules/|^/workdir/engine/(?!bundle))'

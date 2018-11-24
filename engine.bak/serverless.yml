@@ -1,0 +1,35 @@
+# serverless.yml
+
+service: fusion-engine
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  stage: ${opt:stage, 'localhost'}
+  region: us-east-1
+  environment:
+    NODE_ENV: ${env:NODE_ENV, 'development'}
+    ENVIRONMENT: ${self:provider.stage}
+    ON_DEMAND: ${env:ON_DEMAND, 'true'}
+
+functions:
+  engine:
+    handler: src/index.serverless
+    # we don't want to include http events in production, as that will create API Gateway routes
+    # but, we do need http events in offline development
+    events: ${file(./events.${self:provider.stage}.yml):events}
+
+package:
+  exclude:
+    - package-lock.json
+    - serverless.yml
+
+plugins:
+  - serverless-offline
+
+custom:
+  serverless-offline:
+    host: '0.0.0.0'
+    port: ${env:PORT, '8080'}
+    dontPrintOutput: true
+    cacheInvalidationRegex: /node_modules/(?!@arc-fusion/)

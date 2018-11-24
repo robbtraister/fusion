@@ -1,126 +1,70 @@
 'use strict'
 
+const path = require('path')
+
 const bodyParser = require('body-parser')
 const express = require('express')
 
-const Rendering = require('../models/rendering')
+module.exports = (env) => {
+  const { bodyLimit, defaultOutputType, deployment, distRoot, getRendering } = env
 
-const {
-  bodyLimit,
-  bundleDistRoot,
-  defaultOutputType,
-  deploymentMatcher,
-  deploymentWrapper,
-  isDev
-} = require('../../environment')
-
-const distRouter = express.Router()
-
-const staticHandler = (location) => express.static(`${bundleDistRoot}${location || ''}`)
-const redirectHandler = (location) => {
-  const useStatic = staticHandler(location)
-  return (req, res, next) => {
-    if (deploymentMatcher(req)) {
-      useStatic(req, res, next)
-    } else {
-      res.redirect(deploymentWrapper(req.originalUrl))
+  function deploymentSpecificStaticHandler (dir) {
+    const useStatic = express.static(dir)
+    return (req, res, next) => {
+      if (deployment.test(req.originalUrl)) {
+        useStatic(req, res, next)
+      } else {
+        res.redirect(deployment(req.originalUrl))
+      }
     }
   }
-}
 
-const assetHandler = (isDev)
-  ? staticHandler
-  : redirectHandler
+  const distRouter = express.Router()
 
-const publishMethod = (isDev)
-  ? 'compileAll'
-  : 'publish'
+  distRouter.use('/page', deploymentSpecificStaticHandler(path.resolve(distRoot, 'page')))
+  distRouter.use('/template', deploymentSpecificStaticHandler(path.resolve(distRoot, 'template')))
 
-distRouter.use('/engine', assetHandler('/engine'))
-distRouter.all(/\.css$/, assetHandler())
-
-// if POSTed, we will re-generate
-distRouter.get(/\.js$/, assetHandler())
-
-function getTypeRouter (routeType, allowPost) {
-  const typeRouter = express.Router()
-
-  typeRouter.get('/:id/:outputType.js',
+  distRouter.all(
+    '/:type(page|template)/:id/:outputType.js',
+    bodyParser.json({ limit: bodyLimit }),
+    bodyParser.urlencoded({ extended: true }),
     async (req, res, next) => {
       try {
+        const type = req.params.type
         const id = req.params.id
-        const type = routeType
+        const outputType = req.params.outputType || defaultOutputType
 
-        const rendering = new Rendering(type, id)
-        const src = await rendering.getScript(req.params.outputType || defaultOutputType)
+        // const rendering = req.body.rendering || { id, type }
+
         res.set('Content-Type', 'application/javascript')
-        res.send(src)
-      } catch (e) {
-        next(e)
+        res.set('Cache-Control', 's-max-age=120')
+
+        req.app.render(
+          // this file isn't used, but must exist to trigger the appropriate rendering engine
+          path.resolve(__dirname, '../engines/jsx/compile/template.jsx-js'),
+          Object.assign(
+            {
+              type,
+              id,
+              outputType,
+              rendering: await getRendering({ type, id })
+            }
+          ),
+          (err, compilation) => {
+            if (err) {
+              next(err)
+            } else {
+              res.send(compilation.script)
+            }
+          }
+        )
+      } catch (err) {
+        next(err)
       }
     }
   )
 
-  if (allowPost) {
-    const publishRenderingHandlers = [
-      bodyParser.json({ limit: bodyLimit }),
-      async (req, res, next) => {
-        try {
-          const id = req.params.id || req.body.id || req.body._id
-          const type = req.body.type || routeType
+  distRouter.use(deploymentSpecificStaticHandler(path.resolve(distRoot)))
 
-          const rendering = new Rendering(type, id, req.body)
-          await rendering[publishMethod](!isDev && req.query.propagate !== 'false')
-          res.sendStatus(200)
-        } catch (e) {
-          next(e)
-        }
-      }
-    ]
-
-    typeRouter.route(['/', '/:id'])
-      .post(publishRenderingHandlers)
-      .put(publishRenderingHandlers)
-
-    const publishOutputTypeHandlers = [
-      bodyParser.json({ limit: bodyLimit }),
-      async (req, res, next) => {
-        try {
-          const id = req.params.id || req.body.id || req.body._id
-          const type = req.body.type || routeType
-          const outputType = req.params.outputType || defaultOutputType
-
-          const rendering = new Rendering(type, id, req.body)
-          await rendering.compile(outputType)
-          res.sendStatus(200)
-        } catch (e) {
-          next(e)
-        }
-      }
-    ]
-
-    typeRouter.route(['/:id/:outputType.js', '/:id/:outputType'])
-      .post(publishOutputTypeHandlers)
-      .put(publishOutputTypeHandlers)
-  }
-
-  return typeRouter
+  return distRouter
 }
-
-distRouter.use('/page', getTypeRouter('page', true))
-distRouter.use('/rendering', getTypeRouter('rendering'))
-distRouter.use('/template', getTypeRouter('template', true))
-
-if (!isDev) {
-  distRouter.post('/compile',
-    async (req, res, next) => {
-      await Promise.all([
-        Rendering.compile('page'),
-        Rendering.compile('template')
-      ])
-
-      res.send(200)
-    })
-}
-
-module.exports = distRouter

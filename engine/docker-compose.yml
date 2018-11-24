@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  webpack:
+    build: .
+    command: watch
+    volumes:
+      - ./build:/workdir/engine/build:rw
+      - ./bundle:/workdir/engine/bundle:ro
+      - ./dist:/workdir/engine/dist:rw
+      - ./src:/workdir/engine/src:ro
+      - ./webpack:/workdir/engine/webpack:ro
+
+  engine:
+    build: .
+    command: sls:dev
+    ports:
+      - 80:8080
+    volumes:
+      - ./build:/workdir/engine/build:ro
+      - ./bundle:/workdir/engine/bundle:ro
+      - ./dist:/workdir/engine/dist:rw
+      - ./src:/workdir/engine/src:ro

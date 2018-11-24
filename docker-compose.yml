@@ -37,9 +37,9 @@ services:
     ports:
       - 27017:27017
     volumes:
-      - '${FUSION_REPO:-.}/data/db:/data/db:rw'
-      - '${FUSION_REPO:-.}/data/dumps:/data/dumps:rw'
-      - '${FUSION_REPO:-.}/data/restore:/data/restore:rw'
+      - ${FUSION_REPO:-.}/data/db:/data/db:rw
+      - ${FUSION_REPO:-.}/data/dumps:/data/dumps:rw
+      - ${FUSION_REPO:-.}/data/restore:/data/restore:rw
 
   content-cache:
     image: memcached
@@ -62,11 +62,28 @@ services:
       CACHE_NODES: |
         content-cache:11211
     volumes:
-      - './cache-proxy/src:/etc/nginx/src:ro'
+      - ./cache-proxy/src:/etc/nginx/src:ro
+
+  webpack:
+    build: ./engine
+    command: watch:dev
+    env_file:
+      - .env
+    environment:
+      <<: *_environment
+      MINIFY:
+    volumes:
+      - ./engine/src:/workdir/engine/src:ro
+      - ./engine/webpack:/workdir/engine/webpack:ro
+      - ${FUSION_REPO:-./engine/bundle}/.fusion/build:/workdir/engine/bundle/.fusion/build:rw
+      - ${FUSION_REPO:-./engine/bundle}/.fusion/dist:/workdir/engine/bundle/.fusion/dist:rw
+      - ${FUSION_REPO:-./engine/bundle}/.fusion/generated:/workdir/engine/bundle/.fusion/generated:rw
+      # need to be able to npm install
+      - ${FUSION_REPO:-./engine/bundle}:/workdir/engine/bundle:rw
 
   engine:
     build: ./engine
-    command: start:dev
+    command: sls:dev
     depends_on:
       - data
       - cache-proxy
@@ -85,11 +102,11 @@ services:
     ports:
       - 9010:8080
     volumes:
-      - './engine/src:/workdir/engine/src:ro'
-      - '${FUSION_REPO:-./bundle}/.fusion/build:/workdir/engine/bundle/build:rw'
-      - '${FUSION_REPO:-./bundle}/.fusion/dist:/workdir/engine/bundle/dist:rw'
-      - '${FUSION_REPO:-./bundle}/.fusion/generated:/workdir/engine/bundle/generated:rw'
-      - '${FUSION_REPO:-./bundle}:/workdir/engine/bundle/src:ro'
+      - ./engine/src:/workdir/engine/src:ro
+      - ${FUSION_REPO:-./engine/bundle}/.fusion/build:/workdir/engine/bundle/.fusion/build:ro
+      - ${FUSION_REPO:-./engine/bundle}/.fusion/dist:/workdir/engine/bundle/.fusion/dist:rw
+      - ${FUSION_REPO:-./engine/bundle}/.fusion/generated:/workdir/engine/bundle/.fusion/generated:ro
+      - ${FUSION_REPO:-./engine/bundle}:/workdir/engine/bundle:ro
 
   resolver:
     build: ./resolver
@@ -105,9 +122,9 @@ services:
     ports:
       - 9020:8080
     volumes:
-      - '~/.aws:/root/.aws'
-      - './resolver/config:/workdir/resolver/config:ro'
-      - './resolver/src:/workdir/resolver/src:ro'
+      - ~/.aws:/root/.aws
+      - ./resolver/config:/workdir/resolver/config:ro
+      - ./resolver/src:/workdir/resolver/src:ro
 
   origin:
     build: ./origin
@@ -123,8 +140,8 @@ services:
       - 80:8080
       - 9000:9000
     volumes:
-      - '~/.aws:/root/.aws'
-      - './origin/src:/etc/nginx/src:ro'
-      - '${FUSION_REPO:-./bundle}/.fusion/dist:/etc/nginx/dist:ro'
-      - '${FUSION_REPO:-./bundle}/mocks:/etc/nginx/mocks:ro'
-      - '${FUSION_REPO:-./bundle}/resources:/etc/nginx/resources:ro'
+      - ~/.aws:/root/.aws
+      - ./origin/src:/etc/nginx/src:ro
+      - ${FUSION_REPO:-./engine/bundle}/.fusion/dist:/etc/nginx/dist:ro
+      - ${FUSION_REPO:-./engine/bundle}/mocks:/etc/nginx/mocks:ro
+      - ${FUSION_REPO:-./engine/bundle}/resources:/etc/nginx/resources:ro

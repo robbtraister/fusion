@@ -1,0 +1,6 @@
+events:
+  - http: ANY /
+  - http: 'ANY /{proxy+}'
+
+skipCacheInvalidation: false
+cacheInvalidationRegex: /node_modules/

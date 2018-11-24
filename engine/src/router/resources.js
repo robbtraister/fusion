@@ -1,26 +1,29 @@
 'use strict'
 
+const path = require('path')
+
+// const bodyParser = require('body-parser')
 const express = require('express')
 
-const {
-  bundleSrcRoot,
-  deploymentMatcher,
-  deploymentWrapper
-} = require('../../environment')
+// const classicToFusion = require('../utils/classic-to-fusion')
 
-const resourcesRouter = express.Router()
+module.exports = (env) => {
+  const { bundleRoot, deployment } = env
 
-const staticHandler = express.static(`${bundleSrcRoot}/resources`, {
-  immutable: true,
-  maxAge: 31536000
-})
-
-resourcesRouter.use((req, res, next) => {
-  if (deploymentMatcher(req)) {
-    staticHandler(req, res, next)
-  } else {
-    res.redirect(deploymentWrapper(req.originalUrl))
+  function deploymentSpecificStaticHandler (dir) {
+    const useStatic = express.static(dir)
+    return (req, res, next) => {
+      if (deployment.test(req.originalUrl)) {
+        useStatic(req, res, next)
+      } else {
+        res.redirect(deployment(req.originalUrl))
+      }
+    }
   }
-})
 
-module.exports = resourcesRouter
+  const distRouter = express.Router()
+
+  distRouter.use(deploymentSpecificStaticHandler(path.resolve(bundleRoot, 'resources')))
+
+  return distRouter
+}

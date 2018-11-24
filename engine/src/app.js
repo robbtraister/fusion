@@ -1,20 +1,45 @@
 'use strict'
 
+const path = require('path')
+
 const express = require('express')
 
-const logger = require('debug')('fusion:engine:app')
+module.exports = (env) => {
+  const system = Object.assign(
+    {},
+    env,
+    require('./content')(env),
+    require('./io')(env),
+    require('./properties')(env)
+  )
 
-const app = express()
+  const app = express()
 
-app.disable('x-powered-by')
+  app.engine(
+    '.hbs',
+    require('./engines/hbs')(system)
+  )
 
-app.use((req, res, next) => {
-  logger(`${req.method} - ${req.originalUrl}`)
-  next()
-})
+  app.engine(
+    '.js',
+    require('./engines/js')(system)
+  )
 
-app.use(require('./router'))
+  app.engine(
+    '.jsx',
+    require('./engines/jsx/render')(system)
+  )
 
-app.use(require('./errors/handlers'))
+  app.engine(
+    '.jsx-js',
+    require('./engines/jsx/compile')(system)
+  )
 
-module.exports = app
+  app.set('view engine', '.jsx')
+  app.set('views', path.resolve(env.buildRoot, 'components/output-types'))
+
+  app.use(require('./router')(system))
+  app.use(require('./errors/middleware')(system))
+
+  return app
+}

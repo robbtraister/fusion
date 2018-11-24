@@ -1,11 +1,10 @@
 'use strict'
 
 const path = require('path')
-const url = require('url')
 
 const unpack = require('../src/utils/unpack')
 
-const optionalRequire = (fp) => {
+function optionalRequire (fp) {
   try {
     return unpack(require(fp))
   } catch (e) {
@@ -13,55 +12,43 @@ const optionalRequire = (fp) => {
   }
 }
 
-const bundleRoot = path.resolve(`${__dirname}/../bundle`)
+const projectRoot = path.resolve(__dirname, '..')
+const bundleRoot = path.resolve(projectRoot, 'bundle')
+const engineSrcRoot = path.resolve(projectRoot, 'src')
 
-const bundleBuildRoot = `${bundleRoot}/build`
-const bundleDistRoot = `${bundleRoot}/dist`
-const bundleGeneratedRoot = `${bundleRoot}/generated`
-const bundleSrcRoot = `${bundleRoot}/src`
-
-const componentBuildRoot = `${bundleBuildRoot}/components`
-const componentDistRoot = `${bundleDistRoot}/components`
-const componentGeneratedRoot = `${bundleGeneratedRoot}/components`
-const componentSrcRoot = `${bundleSrcRoot}/components`
-
-const contentBuildRoot = `${bundleBuildRoot}/content`
-const contentDistRoot = `${bundleDistRoot}/content`
-const contentSrcRoot = `${bundleSrcRoot}/content`
-
-const schemasBuildRoot = `${contentBuildRoot}/schemas`
-const schemasSrcRoot = `${contentSrcRoot}/schemas`
-
-const sourcesBuildRoot = `${contentBuildRoot}/sources`
-const sourcesDistRoot = `${contentDistRoot}/sources`
-const sourcesSrcRoot = `${contentSrcRoot}/sources`
+const buildRoot = path.resolve(bundleRoot, '.fusion', 'build')
+const distRoot = path.resolve(bundleRoot, '.fusion', 'dist')
+const generatedRoot = path.resolve(bundleRoot, '.fusion', 'generated')
 
 const variables = Object.assign(
   {},
   // ordered by increasing precedence
-  optionalRequire(path.join(bundleBuildRoot, 'environment')),
-  optionalRequire(path.join(bundleSrcRoot, 'environment')),
+  optionalRequire(path.join(buildRoot, 'environment')),
+  optionalRequire(path.join(bundleRoot, 'environment')),
   process.env
 )
 
-const binaryContentTypes = variables.BINARY_CONTENT_TYPES
+const isProd = /^prod/i.test(variables.NODE_ENV)
+const isDev = !isProd
+
+const binaryContentTypes = (variables.BINARY_CONTENT_TYPES)
   ? variables.BINARY_CONTENT_TYPES.split(/[,;]/)
   : require('./binary-content-types.json')
+
 const bodyLimit = '100mb'
 const cacheProxyUrl = variables.CACHE_PROXY_URL || ''
 const cachePrefix = variables.CACHE_PREFIX || ''
 const contentBase = variables.CONTENT_BASE || ''
 const contextPath = (variables.CONTEXT_PATH || 'pf').replace(/^\/*/, '/').replace(/\/+$/, '')
 const datadogApiKey = variables.DATADOG_API_KEY || ''
+const defaultTTL = Math.max(Number(variables.DEFAULT_TTL) || 300, 120)
 const defaultOutputType = variables.DEFAULT_OUTPUT_TYPE || 'default'
-const deployment = variables.AWS_LAMBDA_FUNCTION_VERSION || '$LATEST'
 const environment = variables.ENVIRONMENT
 const functionName = variables.AWS_LAMBDA_FUNCTION_NAME || `fusion-engine-${environment}`
-const isDev = !/^prod/i.test(variables.NODE_ENV)
 const metricsTimeout = +variables.METRICS_TIMEOUT || 100
-const minify = (isDev) ? /^true$/i.test(variables.MINIFY) : true
+const minify = isProd || /^true$/i.test(variables.MINIFY)
 const mongoUrl = variables.MONGO_URL
-const onDemand = /^true$/i.test(variables.ON_DEMAND)
+// const onDemand = /^true$/i.test(variables.ON_DEMAND)
 const port = variables.PORT || 8080
 const region = variables.AWS_REGION || 'us-east-1'
 const s3BucketDiscrete = variables.S3BUCKET_DISCRETE || variables.S3BUCKET || 'pagebuilder-fusion'
@@ -70,66 +57,35 @@ const semver = variables.FUSION_RELEASE
 
 const apiPrefix = `${contextPath}/api/v3`
 
-const deploymentMatcher = (obj) => {
-  if (!(typeof obj === 'object')) {
-    obj = url.parse(obj, true)
-  }
-  /* eslint-disable eqeqeq */
-  return (obj.query.d == deployment || obj.query.v == deployment)
-  /* eslint-enable eqeqeq */
-}
-deploymentMatcher.toString = () => deployment
-
-const deploymentWrapper = (uri) => {
-  const parts = url.parse(uri, true)
-  parts.query.d = deployment
-  parts.search = undefined
-  return url.format(parts)
-}
-deploymentWrapper.toString = () => deployment
+const deployment = require('./deployment')(variables.AWS_LAMBDA_FUNCTION_VERSION || '$LATEST')
 
 module.exports = {
   apiPrefix,
   binaryContentTypes,
   bodyLimit,
+  buildRoot,
   bundleRoot,
-  bundleBuildRoot,
-  bundleDistRoot,
-  bundleGeneratedRoot,
-  bundleSrcRoot,
   cacheProxyUrl,
   cachePrefix,
-  componentBuildRoot,
-  componentDistRoot,
-  componentGeneratedRoot,
-  componentSrcRoot,
   contentBase,
-  contentBuildRoot,
-  contentDistRoot,
-  contentSrcRoot,
   contextPath,
   datadogApiKey,
   defaultOutputType,
+  defaultTTL,
   deployment,
-  deploymentMatcher,
-  deploymentWrapper,
-  environment,
+  distRoot,
+  engineSrcRoot,
   functionName,
+  generatedRoot,
   isDev,
+  isProd,
   metricsTimeout,
   minify,
   mongoUrl,
-  onDemand,
   port,
   region,
   s3BucketDiscrete,
   s3BucketVersioned,
-  schemasBuildRoot,
-  schemasSrcRoot,
   semver,
-  sourcesBuildRoot,
-  sourcesDistRoot,
-  sourcesSrcRoot,
-  variables,
-  version: deployment
+  variables
 }

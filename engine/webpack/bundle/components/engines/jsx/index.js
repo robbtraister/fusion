@@ -14,7 +14,7 @@ const {
 module.exports = (env) => {
   const { buildRoot, bundleRoot, distRoot } = env
 
-  const entries = getEntries({ bundleRoot, ext: '.jsx' })
+  const entries = getEntries({ bundleRoot, ext: '.{jsx,tsx}' })
   const { outputTypes } = entries
 
   const entry = Object.assign(
@@ -31,7 +31,8 @@ module.exports = (env) => {
       })
   )
 
-  return [
+  return [].concat(
+    require('./combinations')(env),
     {
       ...require('../../../../_shared')(env),
       ...require('./externals')(env),
@@ -91,5 +92,5 @@ module.exports = (env) => {
       ],
       target: 'node'
     }
-  ]
+  )
 }

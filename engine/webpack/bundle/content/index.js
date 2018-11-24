@@ -4,12 +4,14 @@ const path = require('path')
 
 const glob = require('glob')
 
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+
 module.exports = (env) => {
   const { buildRoot, bundleRoot } = env
 
   const entry = Object.assign(
     {},
-    ...glob.sync(`${bundleRoot}/content/{schemas,sources}/*.js`)
+    ...glob.sync(`${bundleRoot}/content/{schemas,sources}/*.{js,ts}`)
       .map((filePath) => ({
         [path.relative(bundleRoot, filePath)]: filePath
       }))
@@ -33,6 +35,12 @@ module.exports = (env) => {
         path: buildRoot,
         libraryTarget: 'commonjs2'
       },
+      plugins: [
+        new CopyWebpackPlugin([{
+          from: `${bundleRoot}/*.json`,
+          to: `${buildRoot}/[name].[ext]`
+        }])
+      ],
       target: 'node'
     }
   ]

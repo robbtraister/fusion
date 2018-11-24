@@ -7,7 +7,7 @@ module.exports = (env) => {
 
   const entry = Object.assign(
     {},
-    ...Object.values(getEntries({ bundleRoot, ext: '.js' }))
+    ...Object.values(getEntries({ bundleRoot, ext: '.{js,ts}' }))
   )
 
   return [

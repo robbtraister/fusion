@@ -8,30 +8,58 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 const template = require('./template')
 
-const { components } = require('../manifest')
-
 module.exports = (env) => {
   const {
     bundleRoot,
+    distRoot,
     generatedRoot,
-    distRoot
+    projectRoot
   } = env
-
-  const outputTypes = Object.keys(components.outputTypes)
 
   const combinationSrcDir = path.resolve(generatedRoot, 'combinations')
   childProcess.execSync(`mkdir -p '${combinationSrcDir}'`)
 
-  const config = (outputType) => {
-    const combinationSrcFile = path.resolve(combinationSrcDir, `${outputType}.js`)
-    fs.writeFileSync(combinationSrcFile, template({ bundleRoot, components, outputType }))
+  function getCombinationEntry (outputTypeManifest) {
+    const { chains, ext, features, layouts, outputType } = outputTypeManifest
+    const outputTypeName = path.parse(outputType).name
+
+    const combinationSrcPath = path.resolve(combinationSrcDir, `${outputTypeName}${ext}`)
+
+    fs.writeFileSync(
+      combinationSrcPath,
+      template({
+        bundleRoot,
+        collections: {
+          chains,
+          features,
+          layouts
+        }
+      })
+    )
 
     return {
+      [outputTypeName]: combinationSrcPath
+    }
+  }
+
+  // execute this as a separate process because it needs inline babel
+  const { components } = JSON.parse(
+    childProcess.execSync(`node ${path.resolve(projectRoot, 'manifest', 'components')}`)
+      .toString()
+  )
+
+  const entry = Object.assign(
+    {},
+    ...Object.values(components)
+      .filter((manifest) => /^\.jsx$/.test(manifest.ext))
+      .map(getCombinationEntry)
+  )
+
+  return Object.keys(entry).length
+    ? {
       ...require('../../../../../_shared')(env),
       ...require('../externals')(env),
-      entry: {
-        [outputType]: combinationSrcFile
-      },
+      entry,
       module: {
         rules: [
           require('../../../../../_shared/rules/jsx')(env),
@@ -50,9 +78,5 @@ module.exports = (env) => {
       ],
       target: 'web'
     }
-  }
-
-  return outputTypes.length
-    ? outputTypes.map(config)
     : null
 }

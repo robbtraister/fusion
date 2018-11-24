@@ -15,7 +15,7 @@ function optionalRequire (fp) {
 const projectRoot = path.resolve(__dirname, '..')
 const engineSrcRoot = path.resolve(projectRoot, 'src')
 
-const bundleRoot = process.env.BUNDLE_ROOT || path.resolve(projectRoot, 'bundle')
+const bundleRoot = path.resolve(process.env.BUNDLE_ROOT || path.join(projectRoot, 'bundle'))
 const buildRoot = path.resolve(bundleRoot, '.fusion', 'build')
 const distRoot = path.resolve(bundleRoot, '.fusion', 'dist')
 const generatedRoot = path.resolve(bundleRoot, '.fusion', 'generated')
@@ -23,8 +23,8 @@ const generatedRoot = path.resolve(bundleRoot, '.fusion', 'generated')
 const variables = Object.assign(
   {},
   // ordered by increasing precedence
-  optionalRequire(path.join(buildRoot, 'environment')),
-  optionalRequire(path.join(bundleRoot, 'environment')),
+  optionalRequire(path.resolve(buildRoot, 'environment')),
+  optionalRequire(path.resolve(bundleRoot, 'environment')),
   process.env
 )
 
@@ -83,6 +83,7 @@ module.exports = {
   minify,
   mongoUrl,
   port,
+  projectRoot,
   region,
   s3BucketDiscrete,
   s3BucketVersioned,

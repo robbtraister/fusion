@@ -15,7 +15,7 @@ module.exports = ({ distRoot }) => {
   const getConfigHandler = (section, collection, idField) => {
     let configs
     try {
-      configs = require(path.resolve(distRoot, section, `${collection}.json`))
+      configs = require(path.resolve(distRoot, 'configs', section, `${collection}.json`))
     } catch (err) {
       console.error(err)
       // no-op

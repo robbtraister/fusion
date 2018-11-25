@@ -21,17 +21,13 @@ module.exports = (env) => {
   }
 
   return {
+    ...require('../_shared')(env),
+
     fetchTemplateHash,
 
     async fetchTemplateStyles (id) {
       const hash = await fetchTemplateHash(id)
       return readFile(path.resolve(distRoot, 'styles', `${hash}.css`))
-    },
-
-    async getOutputTypeStyles (outputType) {
-      try {
-        return await readFile(path.resolve(distRoot, 'components', 'output-types', `${outputType}.css`))
-      } catch (err) {}
     },
 
     async getRendering ({ type, id }) {
@@ -64,6 +60,15 @@ module.exports = (env) => {
         writeFile(path.resolve(distRoot, `${id}.js`), script),
         writeFile(path.resolve(distRoot, `${id}.json`), JSON.stringify({ hash }))
       ])
-    }
+    },
+
+    // no-op on local
+    putHtml: async () => {},
+
+    // no-op on local
+    putRendering: async () => {},
+
+    // no-op on local
+    putResolvers: async () => {}
   }
 }

@@ -28,10 +28,10 @@ module.exports = ({ distRoot }) => {
 
   const configRouter = express.Router()
 
-  configRouter.get(/\/chains(?:\/(.*))?/, getConfigHandler('components', 'chains'))
-  configRouter.get(/\/features(?:\/(.*))?/, getConfigHandler('components', 'features'))
-  configRouter.get(/\/layouts(?:\/(.*))?/, getConfigHandler('components', 'layouts'))
-  configRouter.get(/\/output-types(?:\/(.*))?/, getConfigHandler('components', 'output-types'))
+  // configRouter.get(/\/chains(?:\/(.*))?/, getConfigHandler('components', 'chains'))
+  // configRouter.get(/\/features(?:\/(.*))?/, getConfigHandler('components', 'features'))
+  // configRouter.get(/\/layouts(?:\/(.*))?/, getConfigHandler('components', 'layouts'))
+  // configRouter.get(/\/output-types(?:\/(.*))?/, getConfigHandler('components', 'output-types'))
 
   configRouter.get(/\/content\/schemas(?:\/(.*))?/, getConfigHandler('content', 'schemas'))
   configRouter.get(/\/content\/sources(?:\/(.*))?/, getConfigHandler('content', 'sources', 'service'))

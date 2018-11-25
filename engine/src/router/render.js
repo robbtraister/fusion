@@ -6,7 +6,9 @@ const bodyParser = require('body-parser')
 const express = require('express')
 const glob = require('glob')
 
-function outputTypeFactory (bundleRoot, defaultOutputType) {
+function outputTypeFactory (env) {
+  const { bundleRoot, defaultOutputType } = env
+
   const outputTypeMap = {}
   glob.sync(path.resolve(bundleRoot, 'components', 'output-types', '*.{hbs,js,jsx}'))
     .forEach((outputTypePath) => {
@@ -18,12 +20,10 @@ function outputTypeFactory (bundleRoot, defaultOutputType) {
   return (outputType) => outputTypeMap[outputType || defaultOutputType] || `${defaultOutputType}.jsx`
 }
 
-module.exports = (env) => {
-  const { bodyLimit, bundleRoot, defaultOutputType, getContentSource, getRendering } = env
+function globalContentFactory (env) {
+  const { getContentSource } = env
 
-  const getOutputType = outputTypeFactory(bundleRoot, defaultOutputType)
-
-  async function getGlobalContent ({ content, globalContentConfig }) {
+  return async function getGlobalContent ({ content, globalContentConfig }) {
     const globalContent = (!content)
       ? undefined
       : (content.hasOwnProperty('data'))
@@ -63,6 +63,13 @@ module.exports = (env) => {
       return {}
     }
   }
+}
+
+module.exports = (env) => {
+  const { bodyLimit, defaultOutputType, getRendering, putHtml } = env
+
+  const getOutputType = outputTypeFactory(env)
+  const getGlobalContent = globalContentFactory(env)
 
   const renderRouter = express.Router()
 
@@ -76,17 +83,15 @@ module.exports = (env) => {
     async (req, res, next) => {
       const body = req.body || {}
 
+      const isAdmin = req.query.isAdmin === 'true'
+      const cacheMode = req.get('Fusion-Cache-Mode')
+      const writeToCache = !isAdmin && /^(allowed|preferr?ed|update)$/i.test(cacheMode)
       const outputTypeFile = getOutputType(req.query.outputType || defaultOutputType)
 
       const rendering = await getRendering(body.rendering)
-
       const { data: globalContent, expires } = await getGlobalContent({ content: body.content, globalContentConfig: rendering.globalContentConfig })
-      if (expires) {
-        res.set('Expires', new Date(expires).toUTCString())
-      }
-      res.set('Content-Type', 'text/html')
 
-      res.render(
+      req.app.render(
         outputTypeFile,
         {
           arcSite: req.arcSite,
@@ -95,6 +100,21 @@ module.exports = (env) => {
           outputType: path.parse(outputTypeFile).name,
           rendering,
           template: 'template/article'
+        },
+        (err, html) => {
+          if (err) {
+            next(err)
+          } else {
+            if (writeToCache) {
+              putHtml(req.url, html)
+            }
+
+            if (expires) {
+              res.set('Expires', new Date(expires).toUTCString())
+            }
+            res.set('Content-Type', 'text/html')
+            res.send(html)
+          }
         }
       )
     }

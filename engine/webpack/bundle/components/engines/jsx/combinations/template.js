@@ -9,7 +9,7 @@ module.exports = (options) => {
   return `
 window.Fusion = window.Fusion || {}
 const components = window.Fusion.components = window.Fusion.components || {}
-const unpack = require('${require.resolve('../../../../../src/utils/unpack')}')
+const unpack = require('${require.resolve('../../../../../../src/utils/unpack')}')
 ${componentCollections.map(componentCollection => `components['${componentCollection}'] = components['${componentCollection}'] || {}`).join('\n')}
 ${[].concat(
     ...componentCollections.map(collection => {

@@ -1,13 +1,15 @@
 'use strict'
 
-const getManifest = require('./get-manifest')
+// const path = require('path')
 
-// make this async so it is similar to the sources one
-module.exports = async () => {
-  const schemaManifest = getManifest('schemas')
+module.exports = (env) => {
+  // const { buildRoot } = env
 
-  return Object.assign(
-    ...Object.keys(schemaManifest)
-      .map((schemaName) => ({ [schemaName]: schemaName }))
-  )
+  return function getSchemaConfig (schemaName) {
+    // const schemaFile = path.resolve(buildRoot, 'content', 'schemas', schemaName)
+
+    return {
+      id: schemaName
+    }
+  }
 }

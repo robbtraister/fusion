@@ -1,8 +1,8 @@
 'use strict'
 
-const getManifest = require('./get-manifest')
+const path = require('path')
 
-const getSource = require('../../models/sources')
+const unpack = require('../../../../src/utils/unpack')
 
 function getPatternParams (p) {
   const idMatcher = /\{([^}]+)\}/g
@@ -18,32 +18,45 @@ function getPatternParams (p) {
   return result
 }
 
-function transformContentConfigs (manifest) {
-  const idFields = (manifest.pattern)
-    ? getPatternParams(manifest.pattern)
+function expandConfigFields (sourceConfig) {
+  const idFields = (sourceConfig.pattern)
+    ? getPatternParams(sourceConfig.pattern)
       .map((key) => ({ key, type: 'text' }))
-    : null
+    : []
+
+  const params = sourceConfig.params
+  const paramFields = (!params)
+    ? []
+    : (params instanceof Object && !(params instanceof Array))
+      ? Object.keys(params)
+        .map((name) => ({
+          name,
+          type: params[name]
+        }))
+      : params
 
   return {
-    service: manifest.service || manifest.name,
-    config: manifest.content || manifest.config || manifest.schemaName,
-    idFields: idFields || [],
-    paramFields: manifest.params || []
+    idFields: idFields,
+    paramFields: paramFields
+      .map((paramField) => Object.assign(
+        paramField,
+        { displayName: paramField.displayName || paramField.name }
+      ))
   }
 }
 
-module.exports = async () => {
-  const sourceManifest = getManifest('sources')
+module.exports = (env) => {
+  const { buildRoot } = env
 
-  const sources = await Promise.all(
-    Object.keys(sourceManifest)
-      .map((sourceName) =>
-        getSource(sourceName)
-          .catch(() => null)
-      )
-  )
+  return function getSourceConfig (sourceName) {
+    const sourceFile = path.resolve(buildRoot, 'content', 'sources', sourceName)
+    const config = unpack(require(sourceFile))
 
-  return sources
-    .filter(source => source)
-    .map(transformContentConfigs)
+    return {
+      id: sourceName,
+      service: sourceName,
+      config,
+      ...expandConfigFields(config)
+    }
+  }
 }

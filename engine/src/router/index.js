@@ -13,6 +13,7 @@ module.exports = (env) => {
   })
 
   router.use(['/assets', '/dist'], require('./assets')(env))
+  router.use('/configs', require('./configs')(env))
   router.use('/content', require('./content')(env))
   router.use('/properties', require('./properties')(env))
   router.use('/render', require('./render')(env))

@@ -20,31 +20,36 @@ function stripExt (filePath) {
 module.exports = (env) => {
   const { bundleRoot } = env
 
-  return (outputType) => {
-    const { options } = outputType
-    const fileGlob = (options.length > 1) ? `{${options.join(',')}}` : options.join('')
-
+  return (outputTypes) => {
     return function getCollectionManifest (collection) {
       const levels = LEVELS[collection] || 1
       const collectionRoot = path.resolve(bundleRoot, 'components', collection)
 
-      function getComponentName (componentPath) {
-        const relativePath = path.relative(collectionRoot, componentPath)
-        return stripExt(relativePath.split(path.sep).slice(0, levels).join('/'))
-      }
+      const result = {}
+      Object.values(outputTypes)
+        .forEach(outputTypeManifest => {
+          const { options, outputType } = outputTypeManifest
+          const fileGlob = (options.length > 1) ? `{${options.join(',')}}` : options.join('')
 
-      const sourceFiles = [].concat(
-        glob.sync(path.resolve(collectionRoot, `${getWildcards(levels)}.{js,jsx,ts,tsx}`)),
-        glob.sync(path.resolve(collectionRoot, `${getWildcards(levels)}/${fileGlob}`))
-      )
+          function getComponentName (componentPath) {
+            const relativePath = path.relative(collectionRoot, componentPath)
+            return stripExt(relativePath.split(path.sep).slice(0, levels).join('/'))
+          }
+
+          const sourceFiles = [].concat(
+            glob.sync(path.resolve(collectionRoot, `${getWildcards(levels)}.{js,jsx,ts,tsx}`)),
+            glob.sync(path.resolve(collectionRoot, `${getWildcards(levels)}/${fileGlob}`))
+          )
+
+          sourceFiles.forEach((sourceFile) => {
+            const componentName = getComponentName(sourceFile)
+            result[componentName] = result[componentName] || {}
+            result[componentName][outputType] = path.relative(bundleRoot, sourceFile)
+          })
+        })
 
       return {
-        [collection]: Object.assign(
-          {},
-          ...sourceFiles.map((sourceFile) => ({
-            [getComponentName(sourceFile)]: path.relative(bundleRoot, sourceFile)
-          }))
-        )
+        [collection]: result
       }
     }
   }

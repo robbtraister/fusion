@@ -6,13 +6,10 @@ const path = require('path')
 
 const glob = require('glob')
 
-const collectionFactory = require('./get-collection')
-
 const unpack = require('../../src/utils/unpack')
 
 function getOutputTypeManifest (env) {
   const { bundleRoot, defaultOutputType } = env
-  const outputTypeCollectionFactory = collectionFactory(env)
 
   const outputTypeFiles = glob.sync(path.resolve(bundleRoot, 'components', 'output-types', `*.{js,jsx,ts,tsx}`))
 
@@ -47,21 +44,13 @@ function getOutputTypeManifest (env) {
         .map((fallback) => fallbackOptions[fallback])
         .filter((fallback) => fallback)
 
-      const outputType = {
-        ext: fileParts.ext,
-        src: path.relative(bundleRoot, outputTypeFile),
-        outputType: fileParts.base,
-        options
-      }
-
-      const getCollection = outputTypeCollectionFactory(outputType)
-
       return {
-        [path.parse(outputTypeFile).base]: {
-          ...outputType,
-          ...getCollection('chains'),
-          ...getCollection('features'),
-          ...getCollection('layouts')
+        [fileParts.base]: {
+          outputType: fileParts.base,
+          name: fileParts.name,
+          ext: fileParts.ext,
+          src: path.relative(bundleRoot, outputTypeFile),
+          options
         }
       }
     } catch (err) {

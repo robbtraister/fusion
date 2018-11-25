@@ -15,14 +15,14 @@ module.exports = (env) => {
   const { buildRoot, bundleRoot, distRoot } = env
 
   const entries = getEntries({ bundleRoot, ext: '.{jsx,tsx}' })
-  const { outputTypes } = entries
+  const { outputTypes, ...componentEntries } = entries
 
-  const entry = Object.assign(
+  const componentEntry = Object.assign(
     {},
-    ...Object.values(entries)
+    ...Object.values(componentEntries)
   )
 
-  const cssEntry = Object.assign(
+  const outputTypeEntry = Object.assign(
     {},
     ...Object.keys(outputTypes)
       .map((relativePath) => {
@@ -36,7 +36,7 @@ module.exports = (env) => {
     {
       ...require('../../../../_shared')(env),
       ...require('./externals')(env),
-      entry,
+      entry: componentEntry,
       module: {
         rules: [
           require('../../../../_shared/rules/jsx')(env),
@@ -68,7 +68,7 @@ module.exports = (env) => {
     {
       ...require('../../../../_shared')(env),
       ...require('./externals')(env),
-      entry: cssEntry,
+      entry: outputTypeEntry,
       module: {
         rules: [
           require('../../../../_shared/rules/jsx')(env),
@@ -77,17 +77,13 @@ module.exports = (env) => {
         ]
       },
       output: {
-        filename: 'junk/[name].no-css.js',
-        path: distRoot,
+        filename: '[name].jsx',
+        path: buildRoot,
         libraryTarget: 'commonjs2'
       },
       plugins: [
         new MiniCssExtractPlugin({
           filename: '[name].css'
-        }),
-        new OnBuildWebpackPlugin(function (stats) {
-          // we don't actually need this js, so delete it
-          exec(`rm -rf ${path.resolve(distRoot, 'junk')}`)
         })
       ],
       target: 'node'

@@ -2,6 +2,7 @@
 
 'use strict'
 
+const collectionFactory = require('./get-collection')
 const getOutputTypes = require('./get-output-types')
 
 function getComponentManifest (env) {
@@ -10,9 +11,14 @@ function getComponentManifest (env) {
 
   const { outputTypes } = getOutputTypes(env)
 
+  const getCollection = collectionFactory(env)(outputTypes)
+
   return {
     components: {
-      ...outputTypes
+      ...getCollection('chains'),
+      ...getCollection('features'),
+      ...getCollection('layouts'),
+      outputTypes
     }
   }
 }

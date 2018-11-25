@@ -19,11 +19,18 @@ module.exports = (env) => {
   const combinationSrcDir = path.resolve(generatedRoot, 'combinations')
   childProcess.execSync(`mkdir -p '${combinationSrcDir}'`)
 
-  function getCombinationEntry (outputTypeManifest) {
-    const { chains, ext, features, layouts, outputType } = outputTypeManifest
-    const outputTypeName = path.parse(outputType).name
+  // execute this as a separate process because it needs inline babel
+  const { components } = JSON.parse(
+    childProcess.execSync(`node ${path.resolve(projectRoot, 'manifest', 'components')}`)
+      .toString()
+  )
 
-    const combinationSrcPath = path.resolve(combinationSrcDir, `${outputTypeName}${ext}`)
+  const { chains, features, layouts, outputTypes } = components
+
+  function getCombinationEntry (outputTypeManifest) {
+    const { name, outputType } = outputTypeManifest
+
+    const combinationSrcPath = path.resolve(combinationSrcDir, outputType)
 
     fs.writeFileSync(
       combinationSrcPath,
@@ -33,24 +40,19 @@ module.exports = (env) => {
           chains,
           features,
           layouts
-        }
+        },
+        outputType
       })
     )
 
     return {
-      [outputTypeName]: combinationSrcPath
+      [name]: combinationSrcPath
     }
   }
 
-  // execute this as a separate process because it needs inline babel
-  const { components } = JSON.parse(
-    childProcess.execSync(`node ${path.resolve(projectRoot, 'manifest', 'components')}`)
-      .toString()
-  )
-
   const entry = Object.assign(
     {},
-    ...Object.values(components)
+    ...Object.values(outputTypes)
       .filter((manifest) => /^\.jsx$/.test(manifest.ext))
       .map(getCombinationEntry)
   )

@@ -54,7 +54,7 @@ cat <<EOB
     }
 
     location ~ ^${API_PREFIX}/configs/content(/.*|\$) {
-      set                       \$p /content\$1/fusion.configs.json;
+      set                       \$p /configs/content\$1.json;
 
       proxy_intercept_errors    on;
       error_page                400 403 404 418 = @engine;
@@ -64,7 +64,7 @@ cat <<EOB
     }
 
     location ~ ^${API_PREFIX}/configs(/.*|\$) {
-      set                       \$p /components\$1/fusion.configs.json;
+      set                       \$p /configs/components\$1.json;
 
       proxy_intercept_errors    on;
       error_page                400 403 404 418 = @engine;

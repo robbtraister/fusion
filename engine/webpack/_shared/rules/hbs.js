@@ -7,16 +7,10 @@ module.exports = (env) => ({
   exclude: /\/node_modules\/(?!@arc-fusion\/)/,
   use: [
     {
-      loader: 'handlebars-loader',
+      loader: path.resolve(__dirname, '..', '..', 'loaders', 'hbs-frontmatter-loader.js'),
       options: {
         runtime: 'handlebars/runtime'
       }
-    },
-    {
-      loader: path.resolve(__dirname, '..', '..', 'loaders', 'strip-frontmatter-loader.js')
-    },
-    {
-      loader: 'yaml-frontmatter-loader'
     }
   ]
 })

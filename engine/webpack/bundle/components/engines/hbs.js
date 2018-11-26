@@ -20,7 +20,7 @@ module.exports = (env) => {
       },
       module: {
         rules: [
-          require('../../../_shared/rules/hbs')
+          require('../../../_shared/rules/hbs')(env)
         ]
       },
       output: {

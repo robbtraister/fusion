@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = env => ({
+module.exports = (env) => ({
   test: /\.jsx?$/i,
   exclude: /\/node_modules\/(?!@arc-fusion\/)/,
   use: [

@@ -20,7 +20,7 @@ function fetch ({ cached, filter, queryString, source }) {
       .trim()
     : null
 
-  const uri = `${Fusion.contextPath || ''}/api/v3/content/fetch/${source}?d=${Fusion.deployment}&query=${encodeURIComponent(queryString)}` +
+  const uri = `${Fusion.contextPath || ''}/api/v3/content/fetch/${source}?${Fusion.deployment ? `d=${Fusion.deployment}&` : ''}query=${encodeURIComponent(queryString)}` +
     (filter ? `&filter=${encodeURIComponent(filter)}` : '') +
     (Fusion.arcSite ? `&_website=${encodeURIComponent(Fusion.arcSite)}` : '')
 

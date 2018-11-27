@@ -1,6 +1,6 @@
 'use strict'
 
-const getRenderables = require('../../utils/renderables')
+const getRenderables = require('../../../_shared/renderables')
 
 const fileFactory = require('../../../_shared/loaders/file-finder')
 

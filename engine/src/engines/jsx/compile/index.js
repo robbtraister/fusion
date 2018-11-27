@@ -12,7 +12,6 @@ require('../mocks')
 const config = require('./config')
 const generateSource = require('./source')
 
-const getTree = require('../../_shared/rendering-to-tree')
 const getFallbacks = require('../../_shared/fallbacks')
 
 const { putCompilation } = require('../../../io')
@@ -33,13 +32,16 @@ const STYLES_FILE = `${SCRIPT_FILE}.css`
 const componentRoot = path.resolve(bundleRoot, 'components')
 
 async function compile (props) {
+  console.log({ props })
+
   const source = generateSource({
     componentRoot,
     outputTypes: getFallbacks({
       ext: '.jsx',
       outputType: props.outputType
     }),
-    tree: getTree(props)
+    props
+    // tree: getTree(props)
   })
 
   const tempDir = await mkdtemp(`${os.tmpdir()}${path.sep}`)

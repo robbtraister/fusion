@@ -75,24 +75,26 @@ renderRouter.post(
 renderRouter.use(
   async (req, res, next) => {
     const body = req.body || {}
+    const { content, rendering: renderingInfo, request } = body
 
-    const isAdmin = req.query.isAdmin === 'true'
+    const isAdmin = /^true$/i.test(req.query.isAdmin)
     const cacheMode = req.get('Fusion-Cache-Mode')
     const writeToCache = !isAdmin && /^(allowed|preferr?ed|update)$/i.test(cacheMode)
     const outputTypeFile = getOutputType(req.query.outputType || defaultOutputType)
 
-    const rendering = await getRendering(body.rendering)
-    const { data: globalContent, expires } = await getGlobalContent({ content: body.content, globalContentConfig: rendering.globalContentConfig })
+    const rendering = await getRendering(renderingInfo)
+    const { data: globalContent, expires } = await getGlobalContent({ content, globalContentConfig: rendering.globalContentConfig })
 
     req.app.render(
       outputTypeFile,
       {
         arcSite: req.arcSite,
         globalContent,
-        isAdmin: /^true$/i.test(req.query.isAdmin),
+        isAdmin,
         outputType: path.parse(outputTypeFile).name,
         rendering,
-        template: 'template/article'
+        requestUri: (request && request.uri) || '',
+        template: `${rendering.type}/${rendering.id}`
       },
       (err, html) => {
         if (err) {

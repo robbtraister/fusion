@@ -14,6 +14,8 @@ const ServerLoader = require('../loaders/server-loader')
 const QuarantineLoader = require('../loaders/quarantine-loader')
 
 const getFallbacks = require('../../_shared/fallbacks')
+const getRenderables = require('../../_shared/renderables')
+const substitute = require('../../_shared/substitute')
 const getTree = require('../../_shared/rendering-to-tree')
 const unpack = require('../../_shared/unpack')
 
@@ -30,15 +32,15 @@ module.exports = async function renderJsx (outputTypePath, props, callback) {
     delete props._locals
 
     const OutputType = unpack(require(outputTypePath))
-    props.tree = getTree(props)
+    props.tree = substitute(getTree(props), props)
+    props.layout = props.tree.type
+    props.renderables = getRenderables(props.tree)
 
     const context = getContext(props)
-    const tags = getTags(context)
 
     const rootProps = {
       ...context.props,
-      ...tags,
-      ...props
+      ...getTags(context)
     }
 
     const loaderOptions = {

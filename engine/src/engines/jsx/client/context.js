@@ -2,8 +2,8 @@
 
 /* global Fusion */
 
-const getRenderables = require('../utils/renderables')
-const substitute = require('../utils/substitute')
+const getRenderables = require('../../_shared/renderables')
+const substitute = require('../../_shared/substitute')
 const deployment = require('./deployment')
 
 const lastModified = new Date(Fusion.lastModified || null).toUTCString()
@@ -81,23 +81,19 @@ module.exports = (rawTree) => {
     getProperties: Fusion.getProperties,
     globalContent: Fusion.globalContent,
     globalContentConfig: Fusion.globalContentConfig,
-    isAdmin: Fusion.isAdmin,
+    isAdmin: !!Fusion.isAdmin,
     outputType: Fusion.outputType,
-    siteProperties: Fusion.getProperties(Fusion.arcSite)
+    siteProperties: Fusion.getProperties(Fusion.arcSite),
+    template: Fusion.template
   }
 
-  const tree = substitute(rawTree, props)
-  const renderables = getRenderables(tree)
+  props.tree = substitute(rawTree, props)
+  props.renderables = getRenderables(props.tree)
+  props.layout = props.tree.type
 
   return {
     eventListeners: {},
     getContent,
-    props: Object.assign(
-      props,
-      {
-        tree,
-        renderables
-      }
-    )
+    props
   }
 }

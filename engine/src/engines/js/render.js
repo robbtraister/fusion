@@ -5,6 +5,9 @@ const path = require('path')
 const BaseLoader = require('../_shared/loaders/base-loader')
 const componentFactory = require('../_shared/loaders/component-loader')
 const getFallbacks = require('../_shared/fallbacks')
+const getRenderables = require('../_shared/renderables')
+const substitute = require('../_shared/substitute')
+const getTree = require('../_shared/rendering-to-tree')
 
 const unpack = require('../_shared/unpack')
 
@@ -33,8 +36,10 @@ class JsLoader extends BaseLoader {
   }
 
   createChildren (node) {
+    const children = super.createChildren(node)
     // join with an empty string to prevent the default comma delimiter
-    return super.createChildren(node).join('')
+    children.toString = () => children.join('')
+    return children
   }
 }
 
@@ -46,6 +51,9 @@ module.exports = (ext) => {
       delete props._locals
 
       const OutputType = unpack(require(outputTypePath))
+      props.tree = substitute(getTree(props), props)
+      props.renderables = getRenderables(props.tree)
+
       const loader = new JsLoader({
         componentRoot: path.resolve(buildRoot, 'components'),
         ext,
@@ -55,11 +63,13 @@ module.exports = (ext) => {
         })
       })
 
+      const children = loader.createElement(props.tree)
+
       callback(
         null,
         OutputType({
           ...props,
-          children: loader.createChildren(props)
+          children
         })
       )
     } catch (err) {

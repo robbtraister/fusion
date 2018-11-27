@@ -11,11 +11,11 @@ module.exports = (context) => {
 
   const {
     arcSite,
-    contextPath,
-    deployment,
+    // contextPath,
+    // deployment,
     globalContent,
-    globalContentConfig,
-    outputType
+    globalContentConfig
+    // outputType
   } = props
 
   return {
@@ -39,9 +39,9 @@ module.exports = (context) => {
         })
 
       const __html = `window.Fusion=window.Fusion||{};` +
-        `Fusion.contextPath='${contextPath}';` +
-        `Fusion.deployment='${deployment}';` +
-        `Fusion.outputType='${outputType}';` +
+        // `Fusion.contextPath='${contextPath}';` +
+        // `Fusion.deployment='${deployment}';` +
+        // `Fusion.outputType='${outputType}';` +
         (arcSite ? `Fusion.arcSite='${arcSite}';` : '') +
         `Fusion.lastModified=${now};` +
         `Fusion.globalContent=${escapeScriptContent(globalContent || {})};` +

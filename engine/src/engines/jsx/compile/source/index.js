@@ -2,7 +2,16 @@
 
 const importsFactory = require('./imports')
 
-function generateSource ({ componentRoot, outputTypes, tree }) {
+const getTree = require('../../../_shared/rendering-to-tree')
+
+const {
+  contextPath,
+  deployment
+} = require('../../../../../environment')
+
+function generateSource ({ componentRoot, outputTypes, props }) {
+  const tree = getTree(props)
+
   const getImports = importsFactory({
     componentRoot,
     outputTypes
@@ -14,7 +23,7 @@ function generateSource ({ componentRoot, outputTypes, tree }) {
     .filter((collection) => Object.keys(imports[collection]).length)
 
   return `
-const identity = item => item
+const identity = (item) => item
 const Fusion = window.Fusion = window.Fusion || {}
 const components = Fusion.components = Fusion.components || {}
 const Layout = components.Layout || identity
@@ -41,6 +50,11 @@ ${
     })
     .join('\n')
 }
+Fusion.contextPath = '${contextPath}'
+Fusion.deployment = '${deployment}'
+Fusion.outputType = '${outputTypes[0]}'
+Fusion.template = '${props.type}/${props.id}'
+Fusion.layout = ${tree.type ? `'${tree.type}'` : 'null'}
 Fusion.tree = ${JSON.stringify(tree)}
 `
 }

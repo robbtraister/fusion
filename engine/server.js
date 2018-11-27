@@ -2,12 +2,10 @@
 
 const env = require('./environment')
 
-const App = require('./src/app')
+const app = require('./src/app')
 
 function server (port) {
   port = port || env.PORT || 8080
-
-  const app = App(env)
 
   return app.listen(port, (err) => {
     err ? console.error(err) : console.log(`Listening on port: ${port}`)

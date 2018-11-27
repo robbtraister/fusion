@@ -1,9 +1,7 @@
 'use strict'
 
-module.exports = (env) => {
-  const { isProd } = env
+const { isProd } = require('../../environment')
 
-  return (isProd)
-    ? require('./aws')(env)
-    : require('./local')(env)
-}
+module.exports = (isProd)
+  ? require('./aws')
+  : require('./local')

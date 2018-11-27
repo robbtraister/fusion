@@ -1,7 +1,9 @@
 'use strict'
 
-module.exports = (env) => ({
-  test: /\.jsx?$/i,
+const { bundleRoot } = require('../../../environment')
+
+module.exports = {
+  test: /\.[jt]sx?$/i,
   exclude: /\/node_modules\/(?!@arc-fusion\/)/,
   use: [
     {
@@ -24,7 +26,7 @@ module.exports = (env) => ({
             'root-import',
             {
               rootPathPrefix: '~',
-              rootPathSuffix: env.bundleRoot
+              rootPathSuffix: bundleRoot
             }
           ],
           [
@@ -44,4 +46,4 @@ module.exports = (env) => ({
       }
     }
   ]
-})
+}

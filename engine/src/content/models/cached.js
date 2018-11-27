@@ -6,17 +6,19 @@ const request = require('request-promise-native')
 
 const ResolveSource = require('./resolve')
 
-class CachedSource extends ResolveSource {
-  constructor (config, env) {
-    super(config, env)
+const { cachePrefix, cacheProxyUrl } = require('../../../environment')
 
-    const makeCacheRequest = (this.env.cacheProxyUrl)
+class CachedSource extends ResolveSource {
+  constructor (config) {
+    super(config)
+
+    const makeCacheRequest = (cacheProxyUrl)
       ? async ({ method, key, value, ttl }) => {
         return request(
           Object.assign(
             {
               method: method || 'GET',
-              uri: `${this.env.cacheProxyUrl}?key=${key}${ttl ? `&ttl=${ttl}` : ''}`,
+              uri: `${cacheProxyUrl}?key=${key}${ttl ? `&ttl=${ttl}` : ''}`,
               json: true
             },
             // don't depend on existence of value, since you might want to push null/undefined
@@ -45,7 +47,7 @@ class CachedSource extends ResolveSource {
       return super.fetchResolution(resolution, options)
     }
 
-    if (this.env.cacheProxyUrl && options.forceUpdate !== true) {
+    if (cacheProxyUrl && options.forceUpdate !== true) {
       try {
         const response = await this.fetchCacheContent(cacheKey)
         if (!response) {
@@ -61,7 +63,7 @@ class CachedSource extends ResolveSource {
   getCacheKey (uri, options = {}) {
     const followRedirect = options.followRedirect !== false
     const hash = crypto.createHash('sha256').update(uri).digest('hex')
-    return `${this.env.cachePrefix}:${followRedirect}:${hash}`
+    return `${cachePrefix}:${followRedirect}:${hash}`
   }
 
   resolve (query, options) {
@@ -78,7 +80,7 @@ class CachedSource extends ResolveSource {
   async updateResolution (resolution, options) {
     const data = await super.fetchResolution(resolution, options)
 
-    if (!this.env.cacheProxyUrl) {
+    if (!cacheProxyUrl) {
       return data
     }
 

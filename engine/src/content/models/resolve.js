@@ -9,6 +9,8 @@ const BaseSource = require('./base')
 
 const { RedirectError } = require('../../errors')
 
+const { contentBase } = require('../../../environment')
+
 function sanitizeUri (uri) {
   const uriParts = url.parse(uri)
   return (uriParts.auth)
@@ -80,7 +82,7 @@ class ResolveSource extends BaseSource {
 
   resolve (query /*, options */) {
     const uri = this.resolveQuery(query)
-    const resolvedUri = url.resolve(this.env.contentBase || '', uri)
+    const resolvedUri = url.resolve(contentBase || '', uri)
     const sanitizedUri = sanitizeUri(resolvedUri)
 
     return {

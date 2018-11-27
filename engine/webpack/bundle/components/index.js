@@ -1,8 +1,8 @@
 'use strict'
 
-module.exports = (env) =>
+module.exports =
   [].concat(
-    require('./engines/hbs')(env),
-    require('./engines/js')(env),
-    require('./engines/jsx')(env)
+    require('./engines/hbs'),
+    require('./engines/js'),
+    require('./engines/jsx')
   )

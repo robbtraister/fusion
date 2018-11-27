@@ -4,6 +4,8 @@ const path = require('path')
 
 const unpack = require('../../../../src/utils/unpack')
 
+const { buildRoot } = require('../../../../environment')
+
 function getPatternParams (p) {
   const idMatcher = /\{([^}]+)\}/g
   const result = []
@@ -45,18 +47,14 @@ function expandConfigFields (sourceConfig) {
   }
 }
 
-module.exports = (env) => {
-  const { buildRoot } = env
+module.exports = function getSourceConfig (sourceName) {
+  const sourceFile = path.resolve(buildRoot, 'content', 'sources', sourceName)
+  const config = unpack(require(sourceFile))
 
-  return function getSourceConfig (sourceName) {
-    const sourceFile = path.resolve(buildRoot, 'content', 'sources', sourceName)
-    const config = unpack(require(sourceFile))
-
-    return {
-      id: sourceName,
-      service: sourceName,
-      config,
-      ...expandConfigFields(config)
-    }
+  return {
+    id: sourceName,
+    service: sourceName,
+    config,
+    ...expandConfigFields(config)
   }
 }

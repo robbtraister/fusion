@@ -2,17 +2,17 @@
 
 const express = require('express')
 
-module.exports = ({ getProperties }) => {
-  const propertiesRouter = express.Router()
+const { getProperties } = require('../properties')
 
-  propertiesRouter.get(
-    ['/', '/:site'],
-    (req, res, next) => {
-      const site = req.params.site || req.arcSite
+const propertiesRouter = express.Router()
 
-      res.send({ properties: getProperties(site) })
-    }
-  )
+propertiesRouter.get(
+  ['/', '/:site'],
+  (req, res, next) => {
+    const site = req.params.site || req.arcSite
 
-  return propertiesRouter
-}
+    res.send({ properties: getProperties(site) })
+  }
+)
+
+module.exports = propertiesRouter

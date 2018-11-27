@@ -7,11 +7,12 @@ mockRequire('fusion:context', () => {})
 mockRequire('fusion:environment', {})
 mockRequire('fusion:layout', () => {})
 mockRequire('fusion:properties', {})
+mockRequire('fusion:prop-types', {})
 mockRequire('fusion:static', {})
 
-module.exports = (env) =>
+module.exports =
   [].concat(
-    require('./components')(env),
-    require('./content')(env),
-    require('./properties')(env)
+    require('./components'),
+    require('./content'),
+    require('./properties')
   )

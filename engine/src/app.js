@@ -4,42 +4,25 @@ const path = require('path')
 
 const express = require('express')
 
-module.exports = (env) => {
-  const system = Object.assign(
-    {},
-    env,
-    require('./content')(env),
-    require('./io')(env),
-    require('./properties')(env)
-  )
+require('./mocks')
 
-  const app = express()
+const { buildRoot } = require('../environment')
 
-  app.engine(
-    '.hbs',
-    require('./engines/hbs')(system)
-  )
+const app = express()
 
-  app.engine(
-    '.js',
-    require('./engines/js')(system)
-  )
+const engines = require('./engines')
+Object.keys(engines)
+  .forEach((ext) => {
+    app.engine(
+      ext,
+      engines[ext]
+    )
+  })
 
-  app.engine(
-    '.jsx',
-    require('./engines/jsx/render')(system)
-  )
+app.set('view engine', '.jsx')
+app.set('views', path.resolve(buildRoot, 'components/output-types'))
 
-  app.engine(
-    '.jsx-js',
-    require('./engines/jsx/compile')(system)
-  )
+app.use(require('./router'))
+app.use(require('./errors/middleware'))
 
-  app.set('view engine', '.jsx')
-  app.set('views', path.resolve(env.buildRoot, 'components/output-types'))
-
-  app.use(require('./router')(system))
-  app.use(require('./errors/middleware')(system))
-
-  return app
-}
+module.exports = app

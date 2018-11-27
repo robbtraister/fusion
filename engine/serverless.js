@@ -2,14 +2,12 @@
 
 const serverless = require('serverless-http')
 
-const App = require('./src/app')
-const env = require('./environment')
-
-const { binaryContentTypes } = env
+const app = require('./src/app')
+const { binaryContentTypes } = require('./environment')
 
 module.exports = {
   lambda: serverless(
-    App(env),
+    app,
     {
       binary: binaryContentTypes
       // request: (event, context) => {

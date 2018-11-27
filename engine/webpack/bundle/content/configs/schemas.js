@@ -2,14 +2,12 @@
 
 // const path = require('path')
 
-module.exports = (env) => {
-  // const { buildRoot } = env
+// const { buildRoot } = require('../../../../environment')
 
-  return function getSchemaConfig (schemaName) {
-    // const schemaFile = path.resolve(buildRoot, 'content', 'schemas', schemaName)
+module.exports = function getSchemaConfig (schemaName) {
+  // const schemaFile = path.resolve(buildRoot, 'content', 'schemas', schemaName)
 
-    return {
-      id: schemaName
-    }
+  return {
+    id: schemaName
   }
 }

@@ -6,14 +6,12 @@ const {
   readFile
 } = require('../../utils/promises')
 
-module.exports = (env) => {
-  const { distRoot } = env
+const { distRoot } = require('../../../environment')
 
-  return {
-    async getOutputTypeStyles (outputType) {
-      try {
-        return await readFile(path.resolve(distRoot, 'components', 'output-types', `${outputType}.css`))
-      } catch (err) {}
-    }
+module.exports = {
+  async getOutputTypeStyles (outputType) {
+    try {
+      return await readFile(path.resolve(distRoot, 'components', 'output-types', `${outputType}.css`))
+    } catch (err) {}
   }
 }

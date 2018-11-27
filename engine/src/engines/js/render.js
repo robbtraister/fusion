@@ -4,9 +4,11 @@ const path = require('path')
 
 const BaseLoader = require('../_shared/loaders/base-loader')
 const componentFactory = require('../_shared/loaders/component-loader')
-const fallbackFactory = require('../_shared/fallbacks')
+const getFallbacks = require('../_shared/fallbacks')
 
 const unpack = require('../_shared/unpack')
+
+const { buildRoot } = require('../../../environment')
 
 class JsLoader extends BaseLoader {
   constructor (loaderOptions) {
@@ -36,11 +38,7 @@ class JsLoader extends BaseLoader {
   }
 }
 
-module.exports = (env) => (ext) => {
-  const { buildRoot } = env
-
-  const getFallbacks = fallbackFactory(env)
-
+module.exports = (ext) => {
   return function renderJs (outputTypePath, props, callback) {
     try {
       delete props.settings

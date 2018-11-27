@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = (env) => ({
+module.exports = {
   resolve: {
     cacheWithContext: false,
     extensions: ['.tsx', '.jsx', '.ts', '.js', '.json'],
@@ -12,4 +12,4 @@ module.exports = (env) => ({
     ],
     symlinks: false
   }
-})
+}

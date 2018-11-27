@@ -2,6 +2,8 @@
 
 const dynamoose = require('dynamoose')
 
+const { environment, region } = require('../../../../environment')
+
 const getSchema = modelName => {
   try {
     return require(`./schemas/${modelName}`)
@@ -10,68 +12,66 @@ const getSchema = modelName => {
   }
 }
 
-module.exports = (env) => {
-  const { environment, region } = env
+const db = new dynamoose.Dynamoose()
+db.AWS.config.update({ region })
 
-  const db = new dynamoose.Dynamoose()
-  db.AWS.config.update({ region })
+const createModel = (modelName) => {
+  const _model = db.model(`fusion.${environment}.${modelName}`, getSchema(modelName))
 
-  const createModel = (modelName) => {
-    const _model = db.model(`fusion.${environment}.${modelName}`, getSchema(modelName))
+  return {
+    get (id) {
+      return _model.get((id instanceof Object) ? id : { id })
+    },
 
-    return {
-      get (id) {
-        return _model.get((id instanceof Object) ? id : { id })
-      },
+    find (query) {
+      return new Promise((resolve, reject) => {
+        const result = []
 
-      find (query) {
-        return new Promise((resolve, reject) => {
-          const result = []
+        function scan (lastKey) {
+          _model.scan(query).startAt(lastKey).exec((err, data) => {
+            if (err) {
+              return reject(err)
+            } else {
+              Array.prototype.push.apply(result, data)
 
-          function scan (lastKey) {
-            _model.scan(query).startAt(lastKey).exec((err, data) => {
-              if (err) {
-                return reject(err)
+              if (data.lastKey) {
+                scan(data.lastKey)
               } else {
-                Array.prototype.push.apply(result, data)
-
-                if (data.lastKey) {
-                  scan(data.lastKey)
-                } else {
-                  resolve(result)
-                }
+                resolve(result)
               }
-            })
-          }
-
-          scan()
-        })
-      },
-
-      findOne (query) {
-        return new Promise((resolve, reject) => {
-          _model.scan(query).exec((err, data) => {
-            (err)
-              ? reject(err)
-              : resolve(data && data[0])
+            }
           })
-        })
-      },
+        }
 
-      put (doc) {
-        return new Promise((resolve, reject) => {
-          const obj = new _model(doc)
-          obj.put({}, (err, data) => (err ? reject(err) : resolve(data)))
+        scan()
+      })
+    },
+
+    findOne (query) {
+      return new Promise((resolve, reject) => {
+        _model.scan(query).exec((err, data) => {
+          (err)
+            ? reject(err)
+            : resolve(data && data[0])
         })
-      }
+      })
+    },
+
+    put (doc) {
+      return new Promise((resolve, reject) => {
+        const obj = new _model(doc)
+        obj.put({}, (err, data) => (err ? reject(err) : resolve(data)))
+      })
     }
   }
+}
 
-  const models = {}
-  const getModel = function (modelName) {
-    models[modelName] = models[modelName] || createModel(modelName)
-    return models[modelName]
-  }
+const models = {}
+const getModel = function (modelName) {
+  models[modelName] = models[modelName] || createModel(modelName)
+  return models[modelName]
+}
 
-  return getModel
+module.exports = {
+  getModel
 }

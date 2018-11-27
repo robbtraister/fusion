@@ -2,6 +2,8 @@
 
 const express = require('express')
 
+const { isProd } = require('../../environment')
+
 const parsePermissions = (arcPermissions) => {
   const result = {
     global: [],
@@ -22,27 +24,25 @@ const parsePermissions = (arcPermissions) => {
   return result
 }
 
-module.exports = (env) => {
-  const permissionsRouter = express.Router()
+const permissionsRouter = express.Router()
 
-  permissionsRouter.use((req, res, next) => {
-    const permissions = parsePermissions(req.get('Arc-Permissions') || '')
+permissionsRouter.use((req, res, next) => {
+  const permissions = parsePermissions(req.get('Arc-Permissions') || '')
 
-    req.verifyAuthentication = (env.isProd)
-      ? (permission) => {
-        const authorized = permissions.global.includes(permission) ||
-        (permissions.sites[req.arcSite] || []).includes(permission)
+  req.verifyAuthentication = (isProd)
+    ? (permission) => {
+      const authorized = permissions.global.includes(permission) ||
+      (permissions.sites[req.arcSite] || []).includes(permission)
 
-        if (!authorized) {
-          const error = new Error()
-          error.statusCode = 403
-          throw error
-        }
+      if (!authorized) {
+        const error = new Error()
+        error.statusCode = 403
+        throw error
       }
-      : (permission) => {}
+    }
+    : (permission) => {}
 
-    next()
-  })
+  next()
+})
 
-  return permissionsRouter
-}
+module.exports = permissionsRouter

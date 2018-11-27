@@ -1,7 +1,9 @@
 'use strict'
 
+/* global Fusion */
+
 const React = require('react')
-const ReactDOM = require('react-dom')
+const ReactDOM = require('react-dom/server')
 const reactParser = require('html-react-parser')
 
 const JsxLoader = require('./server-loader')
@@ -14,7 +16,7 @@ class QuarantineLoader extends JsxLoader {
       return reactParser(
         ReactDOM.renderToStaticMarkup(
           React.createElement(
-            global.Fusion.context.Provider,
+            Fusion.context.Provider,
             {
               value: this.context
             },

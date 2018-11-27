@@ -1,4 +1,3 @@
 'use strict'
 
-module.exports = (env) =>
-  require('../js/render')(env)('.hbs')
+module.exports = require('../js/render')('.hbs')

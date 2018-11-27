@@ -1,9 +1,7 @@
 'use strict'
 
-const env = require('../environment')
-
 module.exports = [].concat(
-  require('./bundle')(env),
-  require('./engine')(env)
+  require('./bundle'),
+  require('./engine')
 )
   .filter((config) => (config && config.entry && Object.keys(config.entry).length))

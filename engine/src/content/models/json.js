@@ -13,8 +13,8 @@ const expandProperties = function expandProperties (string, properties) {
 }
 
 class JsonSource extends CachedSource {
-  constructor (config, env) {
-    super(config, env)
+  constructor (config) {
+    super(config)
 
     if (config.params) {
       this.params = (config.params instanceof Object && !(config.params instanceof Array))

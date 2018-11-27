@@ -134,6 +134,4 @@ function Mongo (mongoUrl) {
   }
 }
 
-module.exports = (env) => {
-  return Mongo(env.mongoUrl).getModel
-}
+module.exports = Mongo

@@ -1,4 +1,3 @@
 'use strict'
 
-module.exports = (env) =>
-  require('./render')(env)('.js')
+module.exports = require('./render')('.js')

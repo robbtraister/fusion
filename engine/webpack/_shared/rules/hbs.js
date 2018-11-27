@@ -2,7 +2,7 @@
 
 const path = require('path')
 
-module.exports = (env) => ({
+module.exports = {
   test: /\.hbs$/i,
   exclude: /\/node_modules\/(?!@arc-fusion\/)/,
   use: [
@@ -13,4 +13,4 @@ module.exports = (env) => ({
       }
     }
   ]
-})
+}

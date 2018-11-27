@@ -2,29 +2,27 @@
 
 const getEntries = require('../utils/entries')
 
-module.exports = (env) => {
-  const { buildRoot, bundleRoot } = env
+const { buildRoot, bundleRoot } = require('../../../../environment')
 
-  const entry = Object.assign(
-    {},
-    ...Object.values(getEntries({ bundleRoot, ext: '.{js,ts}' }))
-  )
+const entry = Object.assign(
+  {},
+  ...Object.values(getEntries({ bundleRoot, ext: '.{js,ts}' }))
+)
 
-  return [
-    {
-      ...require('../../../_shared')(env),
-      entry,
-      module: {
-        rules: [
-          require('../../../_shared/rules/js')(env)
-        ]
-      },
-      output: {
-        filename: '[name]',
-        path: buildRoot,
-        libraryTarget: 'commonjs2'
-      },
-      target: 'node'
-    }
-  ]
-}
+module.exports = [
+  {
+    ...require('../../../_shared'),
+    entry,
+    module: {
+      rules: [
+        require('../../../_shared/rules/js')
+      ]
+    },
+    output: {
+      filename: '[name]',
+      path: buildRoot,
+      libraryTarget: 'commonjs2'
+    },
+    target: 'node'
+  }
+]

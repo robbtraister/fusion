@@ -18,8 +18,8 @@ module.exports = (value) => {
   }
 
   deployment.toString = () => value
-
   deployment.value = value
+  deployment.valueOf = () => value
 
   return deployment
 }

@@ -2,10 +2,8 @@
 
 const path = require('path')
 
-module.exports = (env) => {
-  const { buildRoot } = env
+const { buildRoot } = require('../../environment')
 
-  return {
-    getProperties: require(path.resolve(buildRoot, 'properties'))
-  }
+module.exports = {
+  getProperties: require(path.resolve(buildRoot, 'properties'))
 }

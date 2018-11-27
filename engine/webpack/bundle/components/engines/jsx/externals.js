@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = () => ({
+module.exports = {
   externals: {
     '@arc-fusion/prop-types': '@arc-fusion/prop-types',
     'fusion:consumer': 'fusion:consumer',
@@ -8,8 +8,9 @@ module.exports = () => ({
     'fusion:context': 'fusion:context',
     'fusion:environment': 'fusion:environment',
     'fusion:properties': 'fusion:properties',
+    'fusion:prop-types': 'fusion:properties',
     'prop-types': '@arc-fusion/prop-types',
     react: 'react',
     'react-dom': 'react-dom'
   }
-})
+}

@@ -17,5 +17,6 @@ function appendDeployment (href) {
 }
 appendDeployment.toString = () => Fusion.deployment
 appendDeployment.value = Fusion.deployment
+appendDeployment.valueOf = () => Fusion.deployment
 
 module.exports = appendDeployment

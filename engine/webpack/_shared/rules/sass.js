@@ -7,7 +7,7 @@ const mockRequire = require('mock-require')
 mockRequire('node-sass', 'sass')
 mockRequire('node-sass/package.json', { version: 4 })
 
-module.exports = (env) => ({
+module.exports = {
   test: /\.s[ac]ss$/,
-  use: require('./css')(env).use.concat('sass-loader')
-})
+  use: require('./css').use.concat('sass-loader')
+}

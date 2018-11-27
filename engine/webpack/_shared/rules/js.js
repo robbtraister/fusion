@@ -1,7 +1,7 @@
 'use strict'
 
-module.exports = (env) => ({
-  test: /\.js$/i,
+module.exports = {
+  test: /\.[jt]s$/i,
   exclude: /\/node_modules\/(?!@arc-fusion\/)/,
   use: [
     {
@@ -9,9 +9,16 @@ module.exports = (env) => ({
       options: {
         babelrc: false,
         presets: [
-          '@babel/env'
+          '@babel/env',
+          [
+            '@babel/typescript',
+            {
+              allExtensions: true,
+              isTSX: false
+            }
+          ]
         ]
       }
     }
   ]
-})
+}

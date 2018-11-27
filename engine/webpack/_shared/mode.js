@@ -1,5 +1,7 @@
 'use strict'
 
-module.exports = (env) => ({
-  mode: (env.minify) ? 'production' : 'development'
-})
+const { minify } = require('../../environment')
+
+module.exports = {
+  mode: (minify) ? 'production' : 'development'
+}

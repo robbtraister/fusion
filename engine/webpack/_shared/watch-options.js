@@ -1,7 +1,7 @@
 'use strict'
 
-module.exports = (env) => ({
+module.exports = {
   watchOptions: {
     ignored: /\/node_modules\//
   }
-})
+}

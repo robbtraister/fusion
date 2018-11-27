@@ -2,16 +2,18 @@
 
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
-module.exports = (env) => ({
+const { minify } = require('../../../environment')
+
+module.exports = {
   test: /\.css$/,
   use: [
     MiniCssExtractPlugin.loader,
     {
       loader: 'css-loader',
       options: {
-        minimize: env.minify,
+        minimize: minify,
         url: false
       }
     }
   ]
-})
+}

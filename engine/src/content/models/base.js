@@ -7,6 +7,8 @@ const { graphql, buildSchema, GraphQLSchema } = require('graphql')
 
 const unpack = require('../../utils/unpack')
 
+const { buildRoot } = require('../../../environment')
+
 // keep these in priority order
 // `_id` is ahead of `id` because we set it to `_id`
 const ID_FIELDS = [
@@ -20,13 +22,12 @@ const KEEP_FIELDS = ID_FIELDS.concat([])
 const schemaCache = {}
 
 class BaseSource {
-  constructor (config, env) {
+  constructor (config) {
     this.config = config
-    this.env = env
 
     this.schema = null
     if (config.schemaName) {
-      const schemaFile = path.resolve(env.buildRoot, 'content', 'schemas', config.schemaName)
+      const schemaFile = path.resolve(buildRoot, 'content', 'schemas', config.schemaName)
       if (!(schemaFile in schemaCache)) {
         try {
           const schema = unpack(require(schemaFile))

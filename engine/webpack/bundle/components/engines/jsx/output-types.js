@@ -8,7 +8,10 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OnBuildWebpackPlugin = require('on-build-webpack')
 
 const combinationTemplate = require('./combinations/template')
-const getComponentManifest = require('./get-manifest')
+
+const getEntries = require('../_shared/get-entries')('jsx')
+
+const getComponentManifest = require('../../../manifest')
 
 const { buildRoot, bundleRoot, generatedRoot } = require('../../../../../environment')
 
@@ -20,41 +23,30 @@ function writeCombinationFiles (manifest) {
 
   return Object.values(outputTypes)
     .forEach((outputTypeManifest) => {
-      const { outputType } = outputTypeManifest
+      const { base, type } = outputTypeManifest
 
-      const combinationSrcPath = path.resolve(combinationSrcDir, outputType)
+      const combinationSrcPath = path.resolve(combinationSrcDir, base)
 
       return fs.writeFileSync(
         combinationSrcPath,
         combinationTemplate({
           bundleRoot,
           collections,
-          outputType
+          outputType: type
         })
       )
     })
 }
 
-const componentManifest = getComponentManifest()
-writeCombinationFiles(componentManifest)
+module.exports = (manifest) => {
+  writeCombinationFiles(manifest)
 
-module.exports = function getOutputTypeConfigs (componentManifest) {
-  const { outputTypes } = componentManifest
-
-  const outputTypeEntry = Object.assign(
-    {},
-    ...Object.values(outputTypes)
-      .map((outputType) => outputType.src)
-      .map((relativePath) => {
-        const relativeParts = path.parse(relativePath)
-        return { [path.join(relativeParts.dir, relativeParts.name)]: path.resolve(bundleRoot, relativePath) }
-      })
-  )
+  const { outputTypes } = getEntries(manifest)
 
   return {
     ...require('../../../../_shared'),
     ...require('./externals'),
-    entry: outputTypeEntry,
+    entry: outputTypes,
     module: {
       rules: [
         require('../../../../_shared/rules/jsx'),
@@ -73,7 +65,7 @@ module.exports = function getOutputTypeConfigs (componentManifest) {
       }),
       new OnBuildWebpackPlugin(async function (stats) {
         // rewrite combination files on output-type changes in case fallbacks are modified
-        writeCombinationFiles(getComponentManifest())
+        writeCombinationFiles(getComponentManifest().components)
       })
     ],
     target: 'node'

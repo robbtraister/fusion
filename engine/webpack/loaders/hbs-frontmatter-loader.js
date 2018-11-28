@@ -1,11 +1,10 @@
 'use strict'
 
 const hbsLoader = require('handlebars-loader')
-const frontMatterLoader = require('yaml-frontmatter-loader')
+const frontMatter = require('front-matter')
 
 function parse (source) {
-  const json = frontMatterLoader.call(this, source)
-  const { attributes, body } = JSON.parse(json)
+  const { attributes, body } = frontMatter(source)
 
   const callback = this.async()
   const hbsContext = Object.assign(

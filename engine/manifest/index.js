@@ -2,16 +2,16 @@
 
 'use strict'
 
-function getManifest (env) {
+function getManifest () {
   return {
-    ...require('./components')(env),
-    ...require('./content')(env),
-    ...require('./properties')(env)
+    ...require('./components')(),
+    ...require('./content')(),
+    ...require('./properties')()
   }
 }
 
 module.exports = getManifest
 
 if (module === require.main) {
-  console.log(JSON.stringify(getManifest(require('../environment')), null, 2))
+  console.log(JSON.stringify(getManifest(), null, 2))
 }

@@ -6,24 +6,27 @@ const path = require('path')
 
 const glob = require('glob')
 
+const getEngine = require('./get-engine')
+
 const unpack = require('../../src/utils/unpack')
 
-function getOutputTypeManifest (env) {
-  const { bundleRoot, defaultOutputType } = env
+const { bundleRoot, defaultOutputType } = require('../../environment')
 
-  const outputTypeFiles = glob.sync(path.resolve(bundleRoot, 'components', 'output-types', `*.{js,jsx,ts,tsx}`))
+function getOutputTypeManifests () {
+  const outputTypeFiles = glob.sync(path.resolve(bundleRoot, 'components', 'output-types', `*.{hbs,js,jsx,ts,tsx}`))
 
   const outputTypeMap = {}
   outputTypeFiles.forEach((outputTypeFile) => {
     const fileParts = path.parse(outputTypeFile)
     const map = outputTypeMap[fileParts.ext] = outputTypeMap[fileParts.ext] || {}
-    map[fileParts.base] = fileParts.base
-    map[fileParts.name] = fileParts.base
+    map[fileParts.base] = fileParts.name
+    map[fileParts.name] = fileParts.name
   })
 
   function getOutputTypeManifest (outputTypeFile) {
     try {
-      const fileParts = path.parse(outputTypeFile)
+      const src = path.relative(bundleRoot, outputTypeFile)
+      const fileParts = path.parse(src)
       const isDefault = (defaultOutputType === fileParts.base) || (defaultOutputType === fileParts.name)
       const fallbackOptions = outputTypeMap[fileParts.ext]
 
@@ -45,11 +48,15 @@ function getOutputTypeManifest (env) {
         .filter((fallback) => fallback)
 
       return {
-        [fileParts.base]: {
-          outputType: fileParts.base,
-          name: fileParts.name,
+        [fileParts.name]: {
+          category: 'components',
+          collection: 'output-types',
+          type: fileParts.name,
+          base: fileParts.base,
           ext: fileParts.ext,
-          src: path.relative(bundleRoot, outputTypeFile),
+          engine: getEngine(fileParts.ext),
+          entry: path.join(fileParts.dir, fileParts.name),
+          src,
           options
         }
       }
@@ -67,8 +74,8 @@ function getOutputTypeManifest (env) {
   }
 }
 
-module.exports = getOutputTypeManifest
+module.exports = getOutputTypeManifests
 
 if (module === require.main) {
-  console.log(JSON.stringify(getOutputTypeManifest(require('../../environment'))(process.argv[2]), null, 2))
+  console.log(JSON.stringify(getOutputTypeManifests(), null, 2))
 }

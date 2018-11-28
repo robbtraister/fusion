@@ -10,9 +10,11 @@ mockRequire('fusion:properties', {})
 mockRequire('fusion:prop-types', {})
 mockRequire('fusion:static', {})
 
+const manifest = require('./manifest')()
+
 module.exports =
   [].concat(
-    require('./components'),
-    require('./content'),
-    require('./properties')
+    require('./components')(manifest),
+    require('./content')(manifest),
+    require('./properties')(manifest)
   )

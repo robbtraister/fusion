@@ -4,6 +4,8 @@ const path = require('path')
 
 const glob = require('glob')
 
+const { bundleRoot } = require('../../environment')
+
 const getRequirable = (fp) => {
   try {
     return require.resolve(fp)
@@ -12,9 +14,7 @@ const getRequirable = (fp) => {
   }
 }
 
-module.exports = (env) => {
-  const { bundleRoot } = env
-
+module.exports = () => {
   const globalFile = getRequirable(`${bundleRoot}/properties`)
 
   const siteFiles = Object.assign(

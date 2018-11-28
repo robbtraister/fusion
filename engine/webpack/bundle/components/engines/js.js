@@ -1,28 +1,30 @@
 'use strict'
 
-const getEntries = require('../utils/entries')
+const getEntries = require('./_shared/get-entries')('js')
 
-const { buildRoot, bundleRoot } = require('../../../../environment')
+const { buildRoot } = require('../../../../environment')
 
-const entry = Object.assign(
-  {},
-  ...Object.values(getEntries({ bundleRoot, ext: '.{js,ts}' }))
-)
+module.exports = (manifest) => {
+  const collections = getEntries(manifest)
 
-module.exports = [
-  {
-    ...require('../../../_shared'),
-    entry,
-    module: {
-      rules: [
-        require('../../../_shared/rules/js')
-      ]
-    },
-    output: {
-      filename: '[name]',
-      path: buildRoot,
-      libraryTarget: 'commonjs2'
-    },
-    target: 'node'
-  }
-]
+  return [
+    {
+      ...require('../../../_shared'),
+      entry: Object.assign(
+        {},
+        ...Object.values(collections)
+      ),
+      module: {
+        rules: [
+          require('../../../_shared/rules/js')
+        ]
+      },
+      output: {
+        filename: '[name].js',
+        path: buildRoot,
+        libraryTarget: 'commonjs2'
+      },
+      target: 'node'
+    }
+  ]
+}

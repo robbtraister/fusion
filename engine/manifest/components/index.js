@@ -5,13 +5,15 @@
 const collectionFactory = require('./get-collection')
 const getOutputTypes = require('./get-output-types')
 
-function getComponentManifest (env) {
-  require('./mocks')
-  require('../babel/register')(env)
+const env = require('../../environment')
 
-  const { outputTypes } = getOutputTypes(env)
+require('./mocks')
+require('../babel/register')(env)
 
-  const getCollection = collectionFactory(env)(outputTypes)
+function getComponentManifest () {
+  const { outputTypes } = getOutputTypes()
+
+  const getCollection = collectionFactory(outputTypes)
 
   return {
     components: {
@@ -26,5 +28,5 @@ function getComponentManifest (env) {
 module.exports = getComponentManifest
 
 if (module === require.main) {
-  console.log(JSON.stringify(getComponentManifest(require('../../environment')), null, 2))
+  console.log(JSON.stringify(getComponentManifest(), null, 2))
 }

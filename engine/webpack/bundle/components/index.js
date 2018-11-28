@@ -1,8 +1,9 @@
 'use strict'
 
-module.exports =
-  [].concat(
-    require('./engines/hbs'),
-    require('./engines/js'),
-    require('./engines/jsx')
+module.exports = ({ components }) => {
+  return [].concat(
+    require('./engines/hbs')(components),
+    require('./engines/js')(components),
+    require('./engines/jsx')(components)
   )
+}

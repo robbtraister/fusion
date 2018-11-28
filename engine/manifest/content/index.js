@@ -2,11 +2,9 @@
 
 'use strict'
 
-const collectionManifestGetter = require('./get-collection')
+const getCollectionManifest = require('./get-collection')
 
-function getContentManifest (env) {
-  const getCollectionManifest = collectionManifestGetter(env)
-
+function getContentManifest () {
   return {
     content: {
       ...getCollectionManifest('schemas'),
@@ -18,5 +16,5 @@ function getContentManifest (env) {
 module.exports = getContentManifest
 
 if (module === require.main) {
-  console.log(JSON.stringify(getContentManifest(require('../../environment')), null, 2))
+  console.log(JSON.stringify(getContentManifest(), null, 2))
 }

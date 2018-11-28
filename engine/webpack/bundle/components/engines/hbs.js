@@ -1,32 +1,34 @@
 'use strict'
 
-const getEntries = require('../utils/entries')
+const getEntries = require('./_shared/get-entries')('hbs')
 
-const { buildRoot, bundleRoot } = require('../../../../environment')
+const { buildRoot } = require('../../../../environment')
 
-const entry = Object.assign(
-  {},
-  ...Object.values(getEntries({ bundleRoot, ext: '.hbs' }))
-)
+module.exports = (manifest) => {
+  const collections = getEntries(manifest)
 
-module.exports = [
-  {
-    ...require('../../../_shared'),
-    entry,
-    externals: {
-      handlebars: 'handlebars',
-      'handlebars/runtime': 'handlebars/runtime'
-    },
-    module: {
-      rules: [
-        require('../../../_shared/rules/hbs')
-      ]
-    },
-    output: {
-      filename: '[name]',
-      path: buildRoot,
-      libraryTarget: 'commonjs2'
-    },
-    target: 'node'
-  }
-]
+  return [
+    {
+      ...require('../../../_shared'),
+      entry: Object.assign(
+        {},
+        ...Object.values(collections)
+      ),
+      externals: {
+        handlebars: 'handlebars',
+        'handlebars/runtime': 'handlebars/runtime'
+      },
+      module: {
+        rules: [
+          require('../../../_shared/rules/hbs')
+        ]
+      },
+      output: {
+        filename: '[name].hbs',
+        path: buildRoot,
+        libraryTarget: 'commonjs2'
+      },
+      target: 'node'
+    }
+  ]
+}

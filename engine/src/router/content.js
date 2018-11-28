@@ -24,10 +24,9 @@ contentRouter.route(['/clear', '/clear/:source', '/clear/:source/:query'])
         const queryString = req.params.query || req.query.query || req.query.key
         const website = req.arcSite
 
-        const sourcePromise = getContentSource(sourceName)
+        const source = await getContentSource(sourceName)
         const query = getQuery(queryString, website)
 
-        const source = await sourcePromise
         await source.clear(query)
 
         res.sendStatus(204)
@@ -45,14 +44,24 @@ const fetchHandler = (forceUpdate) =>
       const queryString = req.params.query || req.query.query || req.query.key
       const filter = req.query.filter
       const website = req.arcSite
-      const followRedirect = req.query.followRedirect !== 'false'
-      const maxRedirects = +req.query.maxRedirects
 
-      const sourcePromise = getContentSource(sourceName)
+      const cacheMode = req.get('Fusion-Cache-Mode')
+      const followRedirect = !/^false$/i.test(req.query.followRedirect)
+      const maxRedirects = req.query.maxRedirects
+      const ignoreCache = /^true$/i.test(req.query._ignoreCache)
+
+      const source = await getContentSource(sourceName)
       const query = getQuery(queryString, website)
-      const source = await sourcePromise
 
-      const { data } = await source.fetch(query, { forceUpdate, followRedirect, maxRedirects })
+      const { data } = await source.fetch(
+        query,
+        {
+          forceUpdate: forceUpdate || /^update$/i.test(cacheMode),
+          followRedirect,
+          ignoreCache,
+          maxRedirects
+        }
+      )
       const filtered = await source.filter(filter, data)
       res.send(filtered)
     } catch (e) {
@@ -60,21 +69,12 @@ const fetchHandler = (forceUpdate) =>
     }
   }
 
-const freshHandler = fetchHandler(true)
-const staleHandler = fetchHandler(false)
-
 contentRouter.route(['/fetch', '/fetch/:source', '/fetch/:source/:query'])
-  .get((req, res, next) => {
-    const cacheMode = req.get('Fusion-Cache-Mode')
-    const handler = (cacheMode === 'update')
-      ? freshHandler
-      : staleHandler
-    handler(req, res, next)
-  })
+  .get(fetchHandler(false))
   .all((req, res, next) => { res.sendStatus(405) })
 
 contentRouter.route(['/update', '/update/:source', '/update/:source/:query'])
-  .post(freshHandler)
+  .post(fetchHandler(true))
   .all((req, res, next) => { res.sendStatus(405) })
 
 module.exports = contentRouter

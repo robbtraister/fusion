@@ -4,24 +4,34 @@ const path = require('path')
 
 module.exports = (options) => {
   const { bundleRoot, collections, outputType } = options
-  const componentCollections = Object.keys(collections).filter(collection => collection !== 'outputTypes')
+  const { outputTypes, ...componentCollections } = collections
 
   return `
 window.Fusion = window.Fusion || {}
 const components = window.Fusion.components = window.Fusion.components || {}
 const unpack = require('${require.resolve('../../../../../../src/utils/unpack')}')
-${componentCollections.map(componentCollection => `components['${componentCollection}'] = components['${componentCollection}'] || {}`).join('\n')}
-${[].concat(
-    ...componentCollections.map(collection => {
-      const componentCollection = collections[collection]
-      return Object.keys(componentCollection)
-        .filter(type => componentCollection[type][outputType])
-        .map(type => {
-          const componentPath = componentCollection[type][outputType]
-          const Wrapper = (collection === 'layouts') ? 'Layout' : 'Quarantine'
-          return `components['${collection}']['${type}'] = Fusion.components.${Wrapper}(unpack(require('${path.join(bundleRoot, componentPath)}')))`
+${
+  Object.keys(componentCollections)
+    .map((collection) =>
+      `components['${collection}'] = components['${collection}'] || {}`
+    )
+    .join('\n')
+}
+${
+  []
+    .concat(
+      ...Object.values(componentCollections)
+        .map(componentCollection => {
+          return Object.values(componentCollection)
+            .map(({ outputTypes }) => outputTypes[outputType])
+            .filter((outputType) => outputType && outputType.engine === 'jsx')
+            .map((component) => {
+              const { collection, src, type } = component
+              const Wrapper = (collection === 'layouts') ? 'Layout' : 'Quarantine'
+              return `components['${collection}']['${type}'] = Fusion.components.${Wrapper}(unpack(require('${path.join(bundleRoot, src)}')))`
+            })
         })
-    })
-  ).join('\n')}
+    )
+    .join('\n')}
 `
 }

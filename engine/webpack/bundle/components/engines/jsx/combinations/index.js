@@ -6,16 +6,17 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 const { distRoot, generatedRoot } = require('../../../../../../environment')
 
-module.exports = function getCombinationConfigs (componentManifest) {
-  const { outputTypes } = componentManifest
+module.exports = function getCombinationConfigs (manifest) {
+  const { outputTypes } = manifest
 
   const entry = Object.assign(
     {},
     ...Object.values(outputTypes)
+      .filter(({ engine }) => engine === 'jsx')
       .map((outputTypeManifest) => {
-        const { name, outputType } = outputTypeManifest
+        const { base, type } = outputTypeManifest
         return {
-          [name]: path.resolve(generatedRoot, 'combinations', outputType)
+          [type]: path.resolve(generatedRoot, 'combinations', `${base}`)
         }
       })
   )

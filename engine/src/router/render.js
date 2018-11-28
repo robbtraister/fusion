@@ -101,7 +101,8 @@ renderRouter.use(
           next(err)
         } else {
           if (writeToCache) {
-            putHtml(req.url, html)
+            const filePath = url.parse(request.uri).pathname.replace(/\/$/, '/index.html')
+            await pushHtml(path.join(request.arcSite || 'default', outputType, filePath), html)
           }
 
           if (expires) {

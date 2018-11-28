@@ -86,12 +86,7 @@ PROXY_PREFIX=${API_PREFIX} $(dirname "$0")/../locations/resolver.conf.sh
 cat <<EOB
     }
 
-    # strip trailing slashes
-    location ~ ^${API_PREFIX}/(fuse|make)(/.*)/$ {
-      rewrite                   (.*)/\$ \$1 last;
-    }
-
-    location ~ ^${API_PREFIX}/(fuse|make)(/.*|\$) {
+    location ~ ^${API_PREFIX}/(fuse|make)(/.*) {
 EOB
 
 $(dirname "$0")/../locations/resolver.conf.sh

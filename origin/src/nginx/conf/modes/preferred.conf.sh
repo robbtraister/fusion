@@ -10,12 +10,8 @@ $(dirname "$0")/../locations/resolver.conf.sh
 cat <<EOB
     }
 
-    # strip trailing slashes
-    location ~ ^${API_PREFIX}/(fuse|make)(/.*)/\$ {
-      rewrite                   (.*)/\$ \$1 last;
-    }
-    location ~ ^${API_PREFIX}/(fuse|make)(/.*|\$) {
-      set                       \$p \$2;
+    location ~ ^${API_PREFIX}/(fuse|make)(/.*) {
+      set                       \$p \$2\$s3Suffix;
 
       proxy_intercept_errors    on;
       error_page                400 403 404 418 = @resolver;

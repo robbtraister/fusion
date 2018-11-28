@@ -121,4 +121,9 @@ cat <<EOB
     default                     \$arg_outputType;
     ''                          'default';
   }
+
+  map \$uri \$s3Suffix {
+    default                     '';
+    ~/$                         'index.html';
+  }
 EOB

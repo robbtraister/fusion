@@ -28,7 +28,10 @@ const customRenderHandler = async function customRenderHandler (err, req, res, n
           { pagesOnly: true }
         )
       )
-      return res.send(response)
+      if (response) {
+        res.set(response.headers || {})
+        res.send(response.body)
+      }
     } catch (e) {}
   }
   next(err)

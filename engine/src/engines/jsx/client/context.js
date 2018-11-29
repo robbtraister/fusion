@@ -52,7 +52,7 @@ function getContent ({ source, query, filter, inherit }) {
 
     return {
       cached,
-      fetched: (sourceCache.expiresAt > now)
+      fetched: (sourceCache.expiresAt < now)
         ? fetch({ source, queryString, filter, cached })
           .catch((err) => {
             if (!isUnchanged(err)) {

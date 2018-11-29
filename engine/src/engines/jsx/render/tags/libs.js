@@ -17,7 +17,7 @@ module.exports = (context) => {
     deployment,
     isAdmin,
     outputType,
-    rendering
+    template
   } = props
 
   const polyfillSrc = deployment(`${contextPath}/dist/engine/polyfill.js`)
@@ -49,14 +49,14 @@ module.exports = (context) => {
     }
   )
 
-  const templateScriptTag = (rendering)
+  const templateScriptTag = (template)
     ? React.createElement(
       'script',
       {
         key: 'fusion-template-script',
         id: 'fusion-template-script',
         type: 'application/javascript',
-        src: deployment(`${contextPath}/dist/${rendering.type}/${rendering.id}/${outputType}.js`),
+        src: deployment(`${contextPath}/dist/${template}/${outputType}.js`),
         defer: true
       }
     )

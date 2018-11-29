@@ -5,9 +5,6 @@ const path = require('path')
 const BaseLoader = require('../_shared/loaders/base-loader')
 const componentFactory = require('../_shared/loaders/component-loader')
 const getFallbacks = require('../_shared/fallbacks')
-const getRenderables = require('../_shared/renderables')
-const substitute = require('../_shared/substitute')
-const getTree = require('../_shared/rendering-to-tree')
 
 const unpack = require('../_shared/unpack')
 
@@ -51,8 +48,6 @@ module.exports = (ext) => {
       delete props._locals
 
       const OutputType = unpack(require(outputTypePath))
-      props.tree = substitute(getTree(props), props)
-      props.renderables = getRenderables(props.tree)
 
       const loader = new JsLoader({
         componentRoot: path.resolve(buildRoot, 'components'),

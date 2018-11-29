@@ -10,6 +10,10 @@ const glob = require('glob')
 const { getContentSource } = require('../content')
 const { getRendering, putHtml } = require('../io')
 
+const getRenderables = require('../engines/_shared/renderables')
+const substitute = require('../engines/_shared/substitute')
+const getTree = require('../engines/_shared/rendering-to-tree')
+
 const { bodyLimit, bundleRoot, defaultOutputType } = require('../../environment')
 
 const outputTypeMap = {}
@@ -78,6 +82,7 @@ renderRouter.use(
     const body = req.body || {}
     const { content, rendering: renderingInfo, request } = body
 
+    const arcSite = req.arcSite
     const isAdmin = /^true$/i.test(req.query.isAdmin)
     const cacheMode = req.get('Fusion-Cache-Mode')
     const writeToCache = !isAdmin && /^(allowed|preferr?ed|update)$/i.test(cacheMode)
@@ -85,26 +90,33 @@ renderRouter.use(
     const outputType = path.parse(outputTypeFile).name
 
     const rendering = await getRendering(renderingInfo)
-    const { data: globalContent, expires } = await getGlobalContent({ content, globalContentConfig: rendering.globalContentConfig })
+    const globalContentConfig = rendering.globalContentConfig
+    const { data: globalContent, expires } = await getGlobalContent({ content, globalContentConfig })
+
+    const tree = getTree({ outputType, rendering })
+    const props = {
+      arcSite,
+      globalContent,
+      globalContentConfig,
+      isAdmin,
+      layout: tree.type,
+      outputType,
+      requestUri: (request && request.uri) || '',
+      template: `${rendering.type}/${rendering.id}`
+    }
+    props.tree = substitute(tree, props)
+    props.renderables = getRenderables(props.tree)
 
     req.app.render(
       outputTypeFile,
-      {
-        arcSite: req.arcSite,
-        globalContent,
-        isAdmin,
-        outputType,
-        rendering,
-        requestUri: (request && request.uri) || '',
-        template: `${rendering.type}/${rendering.id}`
-      },
+      props,
       async (err, html) => {
         if (err) {
           next(err)
         } else {
           if (writeToCache) {
             const filePath = url.parse(request.uri).pathname.replace(/\/$/, '/index.html')
-            await putHtml(path.join(request.arcSite || 'default', outputType, filePath), html)
+            await putHtml(path.join(arcSite || 'default', outputType, filePath), html)
           }
 
           if (expires) {

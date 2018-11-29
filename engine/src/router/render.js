@@ -86,8 +86,9 @@ renderRouter.use(
     const isAdmin = /^true$/i.test(req.query.isAdmin)
     const cacheMode = req.get('Fusion-Cache-Mode')
     const writeToCache = !isAdmin && /^(allowed|preferr?ed|update)$/i.test(cacheMode)
-    const outputTypeFile = getOutputType(req.query.outputType || defaultOutputType)
+    const outputTypeFile = getOutputType(req.query.outputType)
     const outputType = path.parse(outputTypeFile).name
+    const requestUri = (request && request.uri) || ''
 
     const rendering = await getRendering(renderingInfo)
     const globalContentConfig = rendering.globalContentConfig
@@ -101,7 +102,7 @@ renderRouter.use(
       isAdmin,
       layout: tree.type,
       outputType,
-      requestUri: (request && request.uri) || '',
+      requestUri,
       template: `${rendering.type}/${rendering.id}`
     }
     props.tree = substitute(tree, props)
@@ -114,8 +115,8 @@ renderRouter.use(
         if (err) {
           next(err)
         } else {
-          if (writeToCache) {
-            const filePath = url.parse(request.uri).pathname.replace(/\/$/, '/index.html')
+          if (writeToCache && requestUri) {
+            const filePath = url.parse(requestUri).pathname.replace(/\/$/, '/index.html')
             await putHtml(path.join(arcSite || 'default', outputType, filePath), html)
           }
 

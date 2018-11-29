@@ -9,7 +9,20 @@ const glob = require('glob')
 
 const exec = promisify(childProcess.exec.bind(childProcess))
 const copyFile = promisify(fs.copyFile.bind(fs))
-const readFile = promisify(fs.readFile.bind(fs))
+
+function readFile (filePath) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(
+      filePath,
+      (err, data) => {
+        if (err) {
+          return reject(err)
+        }
+        resolve(data.toString())
+      }
+    )
+  })
+}
 
 function writeFile (filePath, contents) {
   return new Promise((resolve, reject) => {

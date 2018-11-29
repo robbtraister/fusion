@@ -31,6 +31,7 @@ const renderErrorHandler = async function renderErrorHandler (err, req, res, nex
       if (response) {
         res.set(response.headers || {})
         res.send(response.body)
+        return
       }
     } catch (e) {}
   }
@@ -53,8 +54,8 @@ const failureHandler = (isDev)
     res.sendStatus(err.statusCode || 500)
   }
 
-module.exports = {
+module.exports = [
   redirectHandler,
   renderErrorHandler,
   failureHandler
-}
+]

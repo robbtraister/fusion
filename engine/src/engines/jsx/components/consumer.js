@@ -138,7 +138,7 @@ function getEditablePropName (prop, prefix) {
 function getEditablePropAttribute (prop, prefix) {
   if (prop instanceof Object) {
     return Object.keys(prop)
-      .map((label) => `${label}:${getEditablePropName(prop[label], prefix)}`)
+      .map((label) => `${label}=${getEditablePropName(prop[label], prefix)}`)
       .join(';')
   } else {
     return getEditablePropName(prop, prefix)

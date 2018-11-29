@@ -8,7 +8,8 @@ module.exports = (obj, content = {}, prefix = '') => {
     JSON.stringify(obj)
       .replace(regexp, function (_, ...groups) {
         const property = groups.pop()
-        return _get(content, property) || property
+        const replacement = _get(content, property) || property
+        return JSON.stringify(replacement).replace(/^"(.*)"$/, (_, value) => value)
       })
   )
 }

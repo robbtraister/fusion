@@ -64,7 +64,10 @@ const putAsset = async (name, src, ContentType) =>
   putKey(path.join(DeploymentPrefix, 'dist', name), src, { ContentType })
 
 async function fetchTemplateHash (id) {
-  return getModel('hash').get({ version: deploymentValue, id })
+  const record = await getModel('hash').get({ version: deploymentValue, id })
+  if (record) {
+    return record.hash
+  }
 }
 
 module.exports = {
@@ -81,7 +84,7 @@ module.exports = {
     return getModel(type).get(id)
   },
 
-  putCompilation (id, { hash, script, styles }) {
+  async putCompilation (id, { hash, script, styles }) {
     return Promise.all([
       putAsset(path.join('styles', `${hash}.css`), styles, 'application/javascript'),
       putAsset(`${id}.js`, script, 'text/css'),
@@ -89,15 +92,16 @@ module.exports = {
     ])
   },
 
-  putHtml: async (name, src) =>
-    putKey(path.join(EnvPrefix, 'html', name), src, { ContentType: 'text/html' }),
-
-  putRendering ({ type, json }) {
-    getModel(type).put(json)
+  async putHtml (name, src) {
+    return putKey(path.join(EnvPrefix, 'html', name), src, { ContentType: 'text/html' })
   },
 
-  putResolvers: async (resolvers) =>
-    putKey(
+  async putRendering ({ type, json }) {
+    return getModel(type).put(json)
+  },
+
+  async putResolvers (resolvers) {
+    return putKey(
       `${EnvPrefix}/resolvers.json`,
       JSON.stringify(resolvers, null, 2),
       {
@@ -106,4 +110,5 @@ module.exports = {
       },
       s3BucketVersioned
     )
+  }
 }

@@ -40,7 +40,13 @@ const customRenderHandler = async function customRenderHandler (err, req, res, n
 const failureHandler = (isDev)
   ? function failureHandler (err, req, res, next) {
     !err.isEngine && console.error(err)
-    res.status(err.statusCode || 500).send(err.message || err)
+    res.status(err.statusCode || 500)
+    if (err.body) {
+      res.set(err.headers || {})
+      res.send(err.body)
+    } else {
+      res.send(err.message || err)
+    }
   }
   : function failureHandler (err, req, res, next) {
     !err.isEngine && console.error(err)

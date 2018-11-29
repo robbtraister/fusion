@@ -16,6 +16,7 @@ router.use(['/assets', '/dist'], require('./assets'))
 router.use('/content', require('./content'))
 router.use('/properties', require('./properties'))
 router.use('/render', require('./render'))
+router.use('/resolvers', require('./resolvers'))
 router.use('/resources', require('./resources'))
 
 module.exports = router

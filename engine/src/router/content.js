@@ -13,7 +13,7 @@ const getQuery = function getQuery (queryString, website) {
   } catch (e) {
     query = { query: queryString }
   }
-  return Object.assign({ 'arc-site': website }, query)
+  return Object.assign(query, { 'arc-site': website })
 }
 
 contentRouter.route(['/clear', '/clear/:source', '/clear/:source/:query'])

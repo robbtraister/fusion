@@ -1,6 +1,7 @@
 'use strict'
 
 const path = require('path')
+const url = require('url')
 
 const bodyParser = require('body-parser')
 const express = require('express')
@@ -81,6 +82,7 @@ renderRouter.use(
     const cacheMode = req.get('Fusion-Cache-Mode')
     const writeToCache = !isAdmin && /^(allowed|preferr?ed|update)$/i.test(cacheMode)
     const outputTypeFile = getOutputType(req.query.outputType || defaultOutputType)
+    const outputType = path.parse(outputTypeFile).name
 
     const rendering = await getRendering(renderingInfo)
     const { data: globalContent, expires } = await getGlobalContent({ content, globalContentConfig: rendering.globalContentConfig })
@@ -91,18 +93,18 @@ renderRouter.use(
         arcSite: req.arcSite,
         globalContent,
         isAdmin,
-        outputType: path.parse(outputTypeFile).name,
+        outputType,
         rendering,
         requestUri: (request && request.uri) || '',
         template: `${rendering.type}/${rendering.id}`
       },
-      (err, html) => {
+      async (err, html) => {
         if (err) {
           next(err)
         } else {
           if (writeToCache) {
             const filePath = url.parse(request.uri).pathname.replace(/\/$/, '/index.html')
-            await pushHtml(path.join(request.arcSite || 'default', outputType, filePath), html)
+            await putHtml(path.join(request.arcSite || 'default', outputType, filePath), html)
           }
 
           if (expires) {

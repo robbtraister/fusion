@@ -3,9 +3,9 @@
 const express = require('express')
 
 const {
-  customRenderHandler,
   failureHandler,
-  redirectHandler
+  redirectHandler,
+  renderErrorHandler
 } = require('./errors/middleware')
 
 const { trailingSlashRedirect } = require('./utils/trailing-slash-rule')
@@ -20,7 +20,7 @@ app.use(require('./router'))
 
 app.use([
   redirectHandler,
-  customRenderHandler,
+  renderErrorHandler,
   failureHandler
 ])
 

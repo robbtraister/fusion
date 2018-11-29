@@ -18,7 +18,7 @@ const redirectHandler = function redirectHandler (err, req, res, next) {
   }
 }
 
-const customRenderHandler = async function customRenderHandler (err, req, res, next) {
+const renderErrorHandler = async function renderErrorHandler (err, req, res, next) {
   if (err && err.statusCode) {
     try {
       const response = await make(
@@ -55,6 +55,6 @@ const failureHandler = (isDev)
 
 module.exports = {
   redirectHandler,
-  customRenderHandler,
+  renderErrorHandler,
   failureHandler
 }

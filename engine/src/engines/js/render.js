@@ -2,43 +2,13 @@
 
 const path = require('path')
 
-const BaseLoader = require('../_shared/loaders/base-loader')
-const componentFactory = require('../_shared/loaders/component-loader')
+const JsLoader = require('./loader')
+
 const getFallbacks = require('../_shared/fallbacks')
 
 const unpack = require('../_shared/unpack')
 
 const { buildRoot } = require('../../../environment')
-
-class JsLoader extends BaseLoader {
-  constructor (loaderOptions) {
-    super()
-
-    this.loadComponent = componentFactory(loaderOptions)
-  }
-
-  createElement (node) {
-    const Component = this.loadComponent(node)
-    if (Component) {
-      try {
-        return Component({
-          ...node.props,
-          children: this.createChildren(node)
-        })
-      } catch (err) {
-        console.error(err)
-        return ''
-      }
-    }
-  }
-
-  createChildren (node) {
-    const children = super.createChildren(node)
-    // join with an empty string to prevent the default comma delimiter
-    children.toString = () => children.join('')
-    return children
-  }
-}
 
 module.exports = (ext) => {
   return function renderJs (outputTypePath, props, callback) {

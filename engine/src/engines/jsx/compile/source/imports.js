@@ -2,7 +2,7 @@
 
 const getRenderables = require('../../../_shared/renderables')
 
-const fileFactory = require('../../../_shared/loaders/file-finder')
+const { fileFactory } = require('../../../_shared/loaders/component-loader')
 
 module.exports = ({ componentRoot, outputTypes }) => {
   const getComponentFile = fileFactory({

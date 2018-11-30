@@ -9,7 +9,7 @@ const glob = require('glob')
 const { bundleRoot } = require('../../environment')
 
 function getCollectionManifest (collection) {
-  const sourceFiles = glob.sync(path.resolve(bundleRoot, 'content', collection, `*.{js,json,ts}`))
+  const sourceFiles = glob.sync(path.resolve(bundleRoot, 'content', collection, `*.{js,json,ts,yml,yaml}`))
 
   return {
     [collection]: Object.assign(
@@ -22,8 +22,7 @@ function getCollectionManifest (collection) {
             category: 'content',
             collection,
             type,
-            src,
-            dst: src.replace(/\.ts$/, '.js')
+            src
           }
         }
       })

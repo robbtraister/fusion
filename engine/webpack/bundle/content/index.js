@@ -2,7 +2,6 @@
 
 const path = require('path')
 
-const CopyWebpackPlugin = require('copy-webpack-plugin')
 const OnBuildWebpackPlugin = require('on-build-webpack')
 
 const getContentConfigs = require('./configs')
@@ -20,9 +19,10 @@ module.exports = ({ content }) => {
     const entry = Object.assign(
       {},
       ...Object.values(collectionManifest)
-        .map((item) => ({
-          [`content/${item.collection}/${item.type}`]: path.resolve(bundleRoot, item.src)
-        }))
+        .map((item) => {
+          const srcParts = path.parse(item.src)
+          return { [path.join(srcParts.dir, srcParts.name)]: path.resolve(bundleRoot, item.src) }
+        })
     )
 
     async function writeCollectionConfigs () {
@@ -58,7 +58,8 @@ module.exports = ({ content }) => {
       },
       module: {
         rules: [
-          require('../../_shared/rules/js')
+          require('../../_shared/rules/js'),
+          require('../../_shared/rules/yml')
         ]
       },
       output: {
@@ -67,10 +68,6 @@ module.exports = ({ content }) => {
         libraryTarget: 'commonjs2'
       },
       plugins: [
-        new CopyWebpackPlugin([{
-          from: `${bundleRoot}/content/${collection}/*.json`,
-          to: `${buildRoot}/[name].[ext]`
-        }]),
         new OnBuildWebpackPlugin(async function (stats) {
           writeCollectionConfigs()
         })

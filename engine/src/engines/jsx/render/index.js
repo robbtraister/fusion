@@ -53,11 +53,13 @@ module.exports = async function renderJsx (outputTypePath, props, callback) {
         {
           value: context
         },
-        React.createElement(
-          OutputType,
-          rootProps,
-          loader.createElement(props.tree)
-        )
+        (props.child)
+          ? loader.createElement(props.child)
+          : React.createElement(
+            OutputType,
+            rootProps,
+            loader.createElement(props.tree)
+          )
       )
 
       let html = ReactDOM.renderToStaticMarkup(root)
@@ -67,7 +69,7 @@ module.exports = async function renderJsx (outputTypePath, props, callback) {
         html = ReactDOM.renderToStaticMarkup(root)
       }
 
-      return `<!DOCTYPE html>${html}`
+      return `${props.child ? '' : '<!DOCTYPE html>'}${html}`
     }
 
     try {

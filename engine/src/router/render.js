@@ -78,7 +78,7 @@ renderRouter.post(
   bodyParser.urlencoded({ extended: true })
 )
 
-renderRouter.use(
+renderRouter.all(['/', '/:type(page|template)/:id', '/:type(page|template)/:id/:child'],
   async (req, res, next) => {
     const body = req.body || {}
     const { content, rendering: renderingInfo, request } = body
@@ -91,7 +91,16 @@ renderRouter.use(
     const outputType = path.parse(outputTypeFile).name
     const requestUri = (request && request.uri) || ''
 
-    const rendering = await getRendering(renderingInfo)
+    const rendering = await getRendering(
+      Object.assign(
+        {
+          type: req.params.type,
+          id: req.params.id
+        },
+        renderingInfo
+      )
+    )
+    const child = req.params.child
     const globalContentConfig = rendering.globalContentConfig
     const { data: globalContent, expires } = await getGlobalContent({ content, globalContentConfig })
 
@@ -109,6 +118,9 @@ renderRouter.use(
     }
     props.tree = substitute(tree, props)
     props.renderables = getRenderables(props.tree)
+    if (child) {
+      props.child = props.renderables.find((renderable) => renderable.props.id === child)
+    }
 
     req.app.render(
       outputTypeFile,

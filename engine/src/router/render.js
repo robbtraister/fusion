@@ -9,6 +9,7 @@ const glob = require('glob')
 
 const { getContentSource } = require('../content')
 const { getRendering, putHtml } = require('../io')
+const { getProperties } = require('../properties')
 
 const getRenderables = require('../engines/_shared/renderables')
 const substitute = require('../engines/_shared/substitute')
@@ -103,6 +104,7 @@ renderRouter.use(
       layout: tree.type,
       outputType,
       requestUri,
+      siteProperties: getProperties(arcSite),
       template: `${rendering.type}/${rendering.id}`
     }
     props.tree = substitute(tree, props)

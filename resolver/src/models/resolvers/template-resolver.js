@@ -64,6 +64,7 @@ class TemplateResolver extends BaseResolver {
 
     this.pattern = new RegExp(config.pattern) // the resolver URI pattern
     this.template = config.page
+    this.priority = config.priority
 
     this.contentMapping = config.content2pageMapping
 

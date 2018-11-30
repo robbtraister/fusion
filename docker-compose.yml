@@ -72,6 +72,7 @@ services:
     environment:
       <<: *_environment
       MINIFY:
+    network_mode: none
     volumes:
       - ./engine/src:/workdir/engine/src:ro
       - ./engine/webpack:/workdir/engine/webpack:ro

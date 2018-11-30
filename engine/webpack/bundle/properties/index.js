@@ -35,7 +35,8 @@ module.exports = ({ properties }) => {
       },
       module: {
         rules: [
-          require('../../_shared/rules/js')
+          require('../../_shared/rules/js'),
+          require('../../_shared/rules/yml')
         ]
       },
       output: {

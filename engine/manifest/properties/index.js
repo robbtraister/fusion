@@ -6,6 +6,8 @@ const glob = require('glob')
 
 const { bundleRoot } = require('../../environment')
 
+const extGlob = '{js,json,ts,yml,yaml}'
+
 const getRequirable = (fp) => {
   try {
     return require.resolve(fp)
@@ -15,11 +17,14 @@ const getRequirable = (fp) => {
 }
 
 module.exports = () => {
-  const globalFile = getRequirable(`${bundleRoot}/properties`)
+  const globalFile = [].concat(
+    glob.sync(`${bundleRoot}/properties.${extGlob}`),
+    glob.sync(`${bundleRoot}/properties/index.${extGlob}`)
+  ).find(getRequirable)
 
   const siteFiles = Object.assign(
     {},
-    ...glob.sync(`${bundleRoot}/properties/sites/*.{js,json,ts}`)
+    ...glob.sync(`${bundleRoot}/properties/sites/*.${extGlob}`)
       .filter(getRequirable)
       .map(sitePath => ({
         [path.parse(sitePath).name]: path.relative(bundleRoot, sitePath)

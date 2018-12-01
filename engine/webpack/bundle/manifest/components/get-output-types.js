@@ -8,9 +8,9 @@ const glob = require('glob')
 
 const getEngine = require('./get-engine')
 
-const unpack = require('../../src/utils/unpack')
+const unpack = require('../../../../src/utils/unpack')
 
-const { bundleRoot, defaultOutputType } = require('../../environment')
+const { bundleRoot, defaultOutputType } = require('../../../../environment')
 
 function getOutputTypeManifests () {
   const outputTypeFiles = glob.sync(path.resolve(bundleRoot, 'components', 'output-types', `*.{hbs,js,jsx,ts,tsx}`))

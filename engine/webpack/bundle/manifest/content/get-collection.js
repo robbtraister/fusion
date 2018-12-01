@@ -6,7 +6,7 @@ const path = require('path')
 
 const glob = require('glob')
 
-const { bundleRoot } = require('../../environment')
+const { bundleRoot } = require('../../../../environment')
 
 function getCollectionManifest (collection) {
   const sourceFiles = glob.sync(path.resolve(bundleRoot, 'content', collection, `*.{js,json,ts,yml,yaml}`))

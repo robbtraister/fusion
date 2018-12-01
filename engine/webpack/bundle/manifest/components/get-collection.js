@@ -6,7 +6,7 @@ const glob = require('glob')
 
 const getEngine = require('./get-engine')
 
-const { bundleRoot } = require('../../environment')
+const { bundleRoot } = require('../../../../environment')
 
 const LEVELS = {
   features: 2

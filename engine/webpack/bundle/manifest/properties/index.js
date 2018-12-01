@@ -4,7 +4,7 @@ const path = require('path')
 
 const glob = require('glob')
 
-const { bundleRoot } = require('../../environment')
+const { bundleRoot } = require('../../../../environment')
 
 const extGlob = '{js,json,ts,yml,yaml}'
 

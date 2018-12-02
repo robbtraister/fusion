@@ -69,19 +69,25 @@ module.exports = async function renderJsx (outputTypePath, props, callback) {
         html = ReactDOM.renderToStaticMarkup(root)
       }
 
-      return `${props.child ? '' : '<!DOCTYPE html>'}${html}`
+      return html
     }
 
     try {
       callback(
         null,
-        await render(ServerLoader)
+        {
+          contentType: OutputType.contentType,
+          data: await render(ServerLoader)
+        }
       )
     } catch (err) {
       console.error(err)
       callback(
         null,
-        await render(QuarantineLoader)
+        {
+          contentType: OutputType.contentType,
+          data: await render(QuarantineLoader)
+        }
       )
     }
   } catch (err) {

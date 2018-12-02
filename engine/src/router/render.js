@@ -8,7 +8,7 @@ const express = require('express')
 const glob = require('glob')
 
 const { getContentSource } = require('../content')
-const { getRendering, putHtml } = require('../io')
+const { getRendering, putRender } = require('../io')
 const { getProperties } = require('../properties')
 
 const getRenderables = require('../engines/_shared/renderables')
@@ -16,6 +16,8 @@ const substitute = require('../engines/_shared/substitute')
 const getTree = require('../engines/_shared/rendering-to-tree')
 
 const { bodyLimit, bundleRoot, defaultOutputType } = require('../../environment')
+
+const HTML_CONTENT_TYPE = 'text/html'
 
 const outputTypeMap = {}
 glob.sync(path.resolve(bundleRoot, 'components', 'output-types', '*.{hbs,js,jsx}'))
@@ -125,20 +127,27 @@ renderRouter.all(['/', '/:type(page|template)/:id', '/:type(page|template)/:id/:
     req.app.render(
       outputTypeFile,
       props,
-      async (err, html) => {
+      async (err, result) => {
         if (err) {
           next(err)
         } else {
+          result = result || {}
+          const contentType = result.contentType || HTML_CONTENT_TYPE
+          const data = (contentType === HTML_CONTENT_TYPE && !props.child)
+            ? `<!DOCTYPE html>${result.data}`
+            : result.data
+
           if (writeToCache && requestUri) {
             const filePath = url.parse(requestUri).pathname.replace(/\/$/, '/index.html')
-            await putHtml(path.join(arcSite || 'default', outputType, filePath), html)
+            const cacheKey = path.join(arcSite || 'default', outputType, filePath)
+            await putRender(cacheKey, data, contentType)
           }
 
           if (expires) {
             res.set('Expires', new Date(expires).toUTCString())
           }
-          res.set('Content-Type', 'text/html')
-          res.send(html)
+          res.set('Content-Type', contentType)
+          res.send(data)
         }
       }
     )

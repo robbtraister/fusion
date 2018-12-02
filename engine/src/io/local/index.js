@@ -60,7 +60,7 @@ module.exports = {
   },
 
   // no-op on local
-  putHtml: async () => {},
+  putRender: async () => {},
 
   // no-op on local
   putRendering: async () => {},

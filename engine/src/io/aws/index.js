@@ -92,8 +92,8 @@ module.exports = {
     ])
   },
 
-  async putHtml (name, src) {
-    return putKey(path.join(EnvPrefix, 'html', name), src, { ContentType: 'text/html' })
+  async putRender (name, src, ContentType) {
+    return putKey(path.join(EnvPrefix, 'html', name), src, { ContentType })
   },
 
   async putRendering ({ type, json }) {

@@ -30,12 +30,17 @@ module.exports = (ext) => {
 
       const children = loader.createElement(props.tree)
 
+      const data = OutputType({
+        ...props,
+        children
+      })
+
       callback(
         null,
-        OutputType({
-          ...props,
-          children
-        })
+        {
+          contentType: OutputType.contentType,
+          data
+        }
       )
     } catch (err) {
       callback(err)

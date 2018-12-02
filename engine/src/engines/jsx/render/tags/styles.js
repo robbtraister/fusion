@@ -21,7 +21,7 @@ module.exports = (context) => {
     outputType
   } = props || {}
 
-  function CssTags () {
+  function CssTags ({ outputType: includeOutputType, template: includeTemplate }) {
     if (isAdmin) {
       return null
     }
@@ -29,8 +29,8 @@ module.exports = (context) => {
     const { cssLinks } = getInlines({
       cssLinks: async () => {
         const [outputTypeStyles, templateHash] = await Promise.all([
-          getOutputTypeStyles(outputType),
-          getTemplateHash()
+          (includeOutputType === false) ? undefined : getOutputTypeStyles(outputType),
+          (includeTemplate === false) ? undefined : getTemplateHash()
         ])
 
         return {
@@ -79,20 +79,20 @@ module.exports = (context) => {
     )
   }
 
-  function Styles ({ children, inline }) {
+  function Styles ({ children, inline, outputType: includeOutputType, template: includeTemplate }) {
     if (isAdmin) {
       return null
     }
 
     if (inline === false) {
-      return CssTags()
+      return CssTags({ outputType: includeOutputType, template: includeTemplate })
     }
 
     const { styles } = getInlines({
       styles: async () => {
         const [outputTypeStyles, templateStyles] = await Promise.all([
-          getOutputTypeStyles(),
-          getTemplateStyles()
+          (includeOutputType === false) ? undefined : getOutputTypeStyles(),
+          (includeTemplate === false) ? undefined : getTemplateStyles()
         ])
 
         return {
@@ -107,7 +107,9 @@ module.exports = (context) => {
       : React.createElement(
         'style',
         {
-          dangerouslySetInnerHTML: { __html: `${styles.outputTypeStyles || ''}${styles.templateStyles || ''}` }
+          dangerouslySetInnerHTML: {
+            __html: `${styles.outputTypeStyles || ''}${styles.templateStyles || ''}`
+          }
         }
       )
   }

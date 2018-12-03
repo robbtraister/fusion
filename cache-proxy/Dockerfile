@@ -4,12 +4,12 @@ RUN \
     apk update && \
     apk upgrade && \
     # used for mongodb-tools
-    apk add --update --no-cache \
+    apk add --no-cache --update \
+            apache2-utils \
+            busybox-extras \
             openssl \
             pcre \
             zlib \
-            apache2-utils \
-            busybox-extras \
             && \
     rm -rf /var/cache/apk/* && \
     openssl version

@@ -4,7 +4,7 @@ RUN \
     apk update && \
     apk upgrade && \
     # used for mongodb-tools
-    apk add --update --no-cache \
+    apk add --no-cache --update \
             curl \
             openssl \
             pcre \

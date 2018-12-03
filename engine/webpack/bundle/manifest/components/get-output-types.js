@@ -2,8 +2,10 @@
 
 'use strict'
 
+const fs = require('fs')
 const path = require('path')
 
+const frontMatter = require('front-matter')
 const glob = require('glob')
 
 const getEngine = require('./get-engine')
@@ -11,6 +13,12 @@ const getEngine = require('./get-engine')
 const unpack = require('../../../../src/utils/unpack')
 
 const { bundleRoot, defaultOutputType } = require('../../../../environment')
+
+function getConfigs (outputTypeFile) {
+  return (/\.hbs$/i.test(outputTypeFile))
+    ? frontMatter(fs.readFileSync(outputTypeFile).toString()).attributes
+    : unpack(require(outputTypeFile))
+}
 
 function getOutputTypeManifests () {
   const outputTypeFiles = glob.sync(path.resolve(bundleRoot, 'components', 'output-types', `*.{hbs,js,jsx,ts,tsx}`))
@@ -30,7 +38,7 @@ function getOutputTypeManifests () {
       const isDefault = (defaultOutputType === fileParts.base) || (defaultOutputType === fileParts.name)
       const fallbackOptions = outputTypeMap[fileParts.ext]
 
-      const OutputType = unpack(require(outputTypeFile))
+      const OutputType = getConfigs(outputTypeFile)
 
       // I don't remember if the official API was supposed to be singular or plural
       // and I don't know that I have a preference, so support either
@@ -61,6 +69,7 @@ function getOutputTypeManifests () {
         }
       }
     } catch (err) {
+      console.error(err)
       return {}
     }
   }

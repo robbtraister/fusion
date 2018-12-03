@@ -5,12 +5,12 @@
     "start": "node ."
   },
   "dependencies": {
-    "debug": "^3.2.5",
+    "debug": "^4.1.0",
     "glob": "^7.1.3",
     "yauzl": "^2.10.0",
-    "yazl": "^2.4.3"
+    "yazl": "^2.5.1"
   },
   "devDependencies": {
-    "aws-sdk": "^2.313.0"
+    "aws-sdk": "^2.368.0"
   }
 }

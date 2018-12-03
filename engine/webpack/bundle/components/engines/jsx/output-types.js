@@ -11,7 +11,7 @@ const combinationTemplate = require('./combinations/template')
 
 const getEntries = require('../_shared/get-entries')('jsx')
 
-const getComponentManifest = require('../../../manifest')
+const getComponentManifest = require('../../../manifest/components')
 
 const { buildRoot, bundleRoot, generatedRoot } = require('../../../../../environment')
 

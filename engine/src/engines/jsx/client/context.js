@@ -87,8 +87,14 @@ module.exports = (rawTree) => {
     siteProperties: Fusion.getProperties(Fusion.arcSite),
     template: Fusion.template
   }
-
-  props.tree = substitute(rawTree, props)
+  props.tree = substitute(
+    rawTree,
+    {
+      ...props,
+      // legacy API for hydration used `content.` to reference globalContent
+      content: props.globalContent
+    }
+  )
   props.renderables = getRenderables(props.tree)
   props.layout = props.tree.type
 

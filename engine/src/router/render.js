@@ -15,7 +15,13 @@ const getRenderables = require('../engines/_shared/renderables')
 const substitute = require('../engines/_shared/substitute')
 const getTree = require('../engines/_shared/rendering-to-tree')
 
-const { bodyLimit, bundleRoot, defaultOutputType } = require('../../environment')
+const {
+  bodyLimit,
+  bundleRoot,
+  contextPath,
+  defaultOutputType,
+  deployment
+} = require('../../environment')
 
 const HTML_CONTENT_TYPE = 'text/html'
 
@@ -86,6 +92,7 @@ renderRouter.all(['/', '/:type(page|template)/:id', '/:type(page|template)/:id/:
     const { content, rendering: renderingInfo, request } = body
 
     const arcSite = req.arcSite
+    const child = req.params.child
     const isAdmin = /^true$/i.test(req.query.isAdmin)
     const cacheMode = req.get('Fusion-Cache-Mode')
     const writeToCache = !isAdmin && /^(allowed|preferr?ed|update)$/i.test(cacheMode)
@@ -102,23 +109,38 @@ renderRouter.all(['/', '/:type(page|template)/:id', '/:type(page|template)/:id/:
         renderingInfo
       )
     )
-    const child = req.params.child
     const globalContentConfig = rendering.globalContentConfig
     const { data: globalContent, expires } = await getGlobalContent({ content, globalContentConfig })
 
-    const tree = getTree({ outputType, rendering })
     const props = {
       arcSite,
+      contextPath,
+      deployment,
       globalContent,
       globalContentConfig,
       isAdmin,
-      layout: tree.type,
+      layout: rendering.layout,
       outputType,
       requestUri,
       siteProperties: getProperties(arcSite),
       template: `${rendering.type}/${rendering.id}`
     }
-    props.tree = substitute(tree, props)
+    const hydratedRendering = substitute(
+      rendering,
+      {
+        ...props,
+        // legacy API for hydration used `content.` to reference globalContent
+        content: props.globalContent
+      }
+    )
+
+    props.metas = hydratedRendering.meta || {}
+    props.metaValue = (name) => {
+      const meta = props.metas[name]
+      return meta && meta.value
+    }
+
+    props.tree = getTree({ outputType, rendering })
     props.renderables = getRenderables(props.tree)
     if (child) {
       props.child = props.renderables.find((renderable) => renderable.props.id === child)

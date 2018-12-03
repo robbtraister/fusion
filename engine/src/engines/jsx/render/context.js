@@ -5,11 +5,6 @@ const _merge = require('lodash.merge')
 const { compile } = require('../compile')
 
 const {
-  contextPath,
-  deployment
-} = require('../../../../environment')
-
-const {
   getContentSource
 } = require('../../../content')
 
@@ -113,10 +108,6 @@ module.exports = ({ children, ...props }) => {
     wait () {
       return Promise.all(promises)
     },
-    props: {
-      contextPath,
-      deployment,
-      ...props
-    }
+    props
   }
 }

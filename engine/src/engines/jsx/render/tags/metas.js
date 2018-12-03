@@ -4,12 +4,7 @@ const React = require('react')
 
 module.exports = (context) => {
   const { props } = context
-  const metas = props.meta || {}
-
-  function metaValue (name) {
-    const meta = metas[name]
-    return meta && meta.value
-  }
+  const { metas, metaValue } = props
 
   function MetaTag ({ name }) {
     return React.createElement(
@@ -32,7 +27,6 @@ module.exports = (context) => {
           .filter((name) => metas[name].html)
           .map((name) => MetaTag({ name }))
       )
-    },
-    metaValue
+    }
   }
 }

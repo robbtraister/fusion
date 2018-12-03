@@ -27,11 +27,11 @@ function createSource (sourceName) {
   debug('loaded source', sourceName, sourceConfig)
 
   if (sourceConfig.fetch && sourceConfig.fetch instanceof Function) {
-    return new FetchSource(sourceConfig)
+    return new FetchSource(sourceName, sourceConfig)
   } else if (sourceConfig.resolve && sourceConfig.resolve instanceof Function) {
-    return new CachedSource(sourceConfig)
+    return new CachedSource(sourceName, sourceConfig)
   } else {
-    return new JsonSource(sourceConfig)
+    return new JsonSource(sourceName, sourceConfig)
   }
 }
 

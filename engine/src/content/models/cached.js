@@ -9,8 +9,8 @@ const ResolveSource = require('./resolve')
 const { cachePrefix, cacheProxyUrl } = require('../../../environment')
 
 class CachedSource extends ResolveSource {
-  constructor (config) {
-    super(config)
+  constructor (name, config) {
+    super(name, config)
 
     const makeCacheRequest = (cacheProxyUrl)
       ? async ({ method, key, value, ttl }) => {

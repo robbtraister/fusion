@@ -22,7 +22,8 @@ const KEEP_FIELDS = ID_FIELDS.concat([])
 const schemaCache = {}
 
 class BaseSource {
-  constructor (config) {
+  constructor (name, config) {
+    this.name = name
     this.config = config
 
     this.schema = null
@@ -84,7 +85,7 @@ class BaseSource {
         return result.data
       } catch (err) {
         // we don't need a full stacktrace to know the filter failed
-        console.error(err.message)
+        console.error(`Error filtering source [${this.name}]:`, err.message)
         return data
       }
     } else {

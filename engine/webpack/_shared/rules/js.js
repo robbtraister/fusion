@@ -1,5 +1,7 @@
 'use strict'
 
+const { bundleRoot } = require('../../../environment')
+
 module.exports = {
   test: /\.[jt]s$/i,
   exclude: /\/node_modules\/(?!@arc-fusion\/)/,
@@ -17,6 +19,28 @@ module.exports = {
               isTSX: false
             }
           ]
+        ],
+        plugins: [
+          [
+            'root-import',
+            {
+              rootPathPrefix: '~',
+              rootPathSuffix: bundleRoot
+            }
+          ],
+          [
+            '@babel/proposal-decorators',
+            {
+              legacy: true
+            }
+          ],
+          [
+            '@babel/proposal-class-properties',
+            {
+              loose: true
+            }
+          ],
+          '@babel/proposal-object-rest-spread'
         ]
       }
     }

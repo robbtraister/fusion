@@ -51,10 +51,12 @@ module.exports = {
     }
   },
 
-  async putCompilation (id, { hash, script, styles }) {
+  async putCompilation (id, { hash, script, scriptMap, styles, stylesMap }) {
     return Promise.all([
       writeFile(path.resolve(distRoot, 'styles', `${hash}.css`), styles),
+      stylesMap && writeFile(path.resolve(distRoot, 'styles', `${hash}.css.map`), stylesMap),
       writeFile(path.resolve(distRoot, `${id}.js`), script),
+      scriptMap && writeFile(path.resolve(distRoot, `${id}.js.map`), scriptMap),
       writeFile(path.resolve(distRoot, `${id}.json`), JSON.stringify({ hash }))
     ])
   },

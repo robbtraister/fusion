@@ -13,7 +13,7 @@ const getEntries = require('../_shared/get-entries')('jsx')
 
 const getComponentManifest = require('../../../manifest/components')
 
-const { buildRoot, bundleRoot, generatedRoot } = require('../../../../../environment')
+const { buildRoot, bundleRoot, distRoot, generatedRoot } = require('../../../../../environment')
 
 const combinationSrcDir = path.resolve(generatedRoot, 'combinations')
 childProcess.execSync(`mkdir -p '${combinationSrcDir}'`)
@@ -55,17 +55,19 @@ module.exports = (manifest) => {
       ]
     },
     output: {
-      filename: '[name].jsx',
-      path: buildRoot,
+      // webpack doesn't allow absolute file paths, but we need separate locations for js and css
+      // so just make them relative to root
+      filename: path.relative('/', `${buildRoot}/[name].jsx`),
+      path: '/',
       libraryTarget: 'commonjs2'
     },
     plugins: [
       new MiniCssExtractPlugin({
-        filename: '[name].css'
+        filename: path.relative('/', `${distRoot}/[name].css`)
       }),
       new OnBuildWebpackPlugin(async function (stats) {
         // rewrite combination files on output-type changes in case fallbacks are modified
-        writeCombinationFiles(getComponentManifest().components)
+        writeCombinationFiles(getComponentManifest(true).components)
       })
     ],
     target: 'node'

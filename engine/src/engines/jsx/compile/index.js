@@ -16,7 +16,7 @@ const getFallbacks = require('../../_shared/fallbacks')
 
 const { putCompilation } = require('../../../io')
 
-const { bundleRoot, minify } = require('../../../../environment')
+const { bundleRoot, deployment, minify } = require('../../../../environment')
 
 const mkdtemp = promisify(fs.mkdtemp.bind(fs))
 const readFile = promisify(fs.readFile.bind(fs))
@@ -26,19 +26,23 @@ const writeFile = promisify(fs.writeFile.bind(fs))
 
 const SOURCE_FILE = 'source.js'
 const MANIFEST_FILE = 'manifest.json'
-const SCRIPT_FILE = 'target.js'
-const STYLES_FILE = `${SCRIPT_FILE}.css`
+const getScriptFile = (targetName) => `${targetName}.js`
+const getScriptMapFile = (targetName) => `${targetName}.js.map`
+const getStylesFile = (targetName) => `${targetName}.css`
+const getStylesMapFile = (targetName) => `${targetName}.css.map`
 
 const componentRoot = path.resolve(bundleRoot, 'components')
 
 async function compile (props) {
   console.log({ props })
 
+  const { outputType } = props
+
   const source = generateSource({
     componentRoot,
     outputTypes: getFallbacks({
       ext: '.jsx',
-      outputType: props.outputType
+      outputType
     }),
     props
     // tree: getTree(props)
@@ -49,7 +53,7 @@ async function compile (props) {
   try {
     const sourceFilePath = path.join(tempDir, SOURCE_FILE)
     const manifestFilePath = path.join(tempDir, MANIFEST_FILE)
-    const scriptFilePath = path.join(tempDir, SCRIPT_FILE)
+    const scriptFilePath = path.join(tempDir, getScriptFile(outputType))
 
     await writeFile(sourceFilePath, source)
 
@@ -57,7 +61,7 @@ async function compile (props) {
       const compiler = webpack(
         config({
           entry: {
-            [ SCRIPT_FILE ]: sourceFilePath
+            [ outputType ]: sourceFilePath
           },
           minify,
           outputDir: tempDir,
@@ -66,31 +70,51 @@ async function compile (props) {
       )
 
       const build = promisify(compiler.run.bind(compiler))
-
       await build()
 
-      const stylesFile = require(manifestFilePath)[STYLES_FILE]
-      const stylesFilePath = (stylesFile)
-        ? path.join(tempDir, stylesFile)
-        : null
+      const manifest = require(manifestFilePath)
+
+      const getManifestPath = (entry) => {
+        const fileName = manifest[entry]
+        return (fileName)
+          ? path.join(tempDir, fileName)
+          : null
+      }
+
+      const scriptMapPath = getManifestPath(getScriptMapFile(outputType))
+      const stylesPath = getManifestPath(getStylesFile(outputType))
+      const stylesMapPath = getManifestPath(getStylesMapFile(outputType))
 
       try {
-        const [ script, styles ] = await Promise.all([
+        const [ script, scriptMap, styles, stylesMap ] = await Promise.all([
           (await readFile(scriptFilePath)).toString(),
-          stylesFilePath
-            ? (await readFile(stylesFilePath)).toString()
+          scriptMapPath
+            ? (await readFile(scriptMapPath)).toString()
+            : null,
+          stylesPath
+            ? (await readFile(stylesPath)).toString()
+            : null,
+          stylesMapPath
+            ? (await readFile(stylesMapPath)).toString()
             : null
         ])
 
-        const hash = stylesFile
-          ? path.parse(stylesFile).name
+        const hash = stylesPath
+          ? path.parse(stylesPath).name
           : null
 
         const compilation = {
           hash,
-          script: script
-            .replace(/;*$/, `;Fusion.tree.cssHash=${hash ? `'${hash}'` : 'null'}`),
-          styles
+          script: (
+            (script && scriptMap)
+              ? script.replace(/\s*$/, `?d=${deployment}`)
+              : script
+          ) + `\n/**/;Fusion.tree.cssHash=${hash ? `'${hash}'` : 'null'}`,
+          scriptMap,
+          styles: (styles && stylesMap)
+            ? styles.replace(/\s*\*\/\s*$/, `?d=${deployment}*/`)
+            : styles,
+          stylesMap
         }
 
         putCompilation && putCompilation(`${props.type}/${props.id}/${props.outputType}`, compilation)
@@ -99,13 +123,16 @@ async function compile (props) {
       } catch (err) {
         console.error(err)
       } finally {
-        stylesFilePath && await unlink(stylesFilePath)
+        await Promise.all(
+          Object.values(manifest)
+            .map(fileName => path.join(tempDir, fileName))
+            .map(filePath => unlink(filePath))
+        )
       }
     } catch (err) {
       console.error(err)
     } finally {
       await unlink(sourceFilePath)
-      await unlink(scriptFilePath)
       await unlink(manifestFilePath)
     }
   } catch (err) {

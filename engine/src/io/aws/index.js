@@ -84,10 +84,12 @@ module.exports = {
     return getModel(type).get(id)
   },
 
-  async putCompilation (id, { hash, script, styles }) {
+  async putCompilation (id, { hash, script, scriptMap, styles, stylesMap }) {
     return Promise.all([
-      putAsset(path.join('styles', `${hash}.css`), styles, 'application/javascript'),
-      putAsset(`${id}.js`, script, 'text/css'),
+      putAsset(path.join('styles', `${hash}.css`), styles, 'text/css'),
+      stylesMap && putAsset(path.join('styles', `${hash}.css.map`), stylesMap, 'application/json'),
+      putAsset(`${id}.js`, script, 'application/javascript'),
+      scriptMap && putAsset(`${id}.js.map`, scriptMap, 'application/json'),
       getModel('hash').put({ id, version: deploymentValue, hash })
     ])
   },

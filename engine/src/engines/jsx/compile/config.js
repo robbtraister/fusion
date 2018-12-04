@@ -24,6 +24,7 @@ module.exports = (options) => {
     : {}
 
   return {
+    devtool: (minify) ? 'source-map' : 'eval-source-map',
     externals: {
       'fusion:consumer': 'Fusion.components.Consumer',
       'fusion:content': 'Fusion.components.Content',
@@ -99,7 +100,7 @@ module.exports = (options) => {
     },
     optimization,
     output: {
-      filename: '[name]',
+      filename: '[name].js',
       path: outputDir
       // library: `window.Fusion=window.Fusion||{};window.Fusion.tree`,
       // libraryTarget: 'assign'

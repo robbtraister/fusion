@@ -24,24 +24,40 @@ http {
 
 
   log_format simple             '\$status \$request_method \$uri\$query_params \$bytes_sent \$latency';
-
-  access_log                    ./logs/access.log simple;
-  error_log                     ./logs/error.log;
+  log_format json               '{ "time": "\$time_iso8601", '
+                                  '"environment": "\$environment", '
+                                  '"arc_site": "\$arcSite", '
+                                  '"bytes_sent": "\$bytes_sent", '
+                                  '"latency": "\$latency", '
+                                  '"remote_addr": "\$remote_addr", '
+                                  '"remote_user": "\$remote_user", '
+                                  '"request_time": "\$request_time", '
+                                  '"request": "\$request", '
+                                  '"request_method": "\$request_method", '
+                                  '"status_code": "\$status", '
+                                  '"uri": "\$uri\$query_params"} ';
 
   # ELB/ALB is likely set to 60s; ensure we stay open at least that long
   keepalive_timeout             120;
+
   # send to upstream server
   proxy_send_timeout            10;
+
+  error_log                     ./logs/error.log;
 EOB
 
 if [ "${IS_PROD}" ]
 then
   cat <<EOB
+  access_log                    ./logs/access.log json;
+
   # receive from upstream server
   proxy_read_timeout            10;
 EOB
 else
   cat <<EOB
+  access_log                    ./logs/access.log simple;
+
   # receive from upstream server
   proxy_read_timeout            60;
 EOB
@@ -202,7 +218,7 @@ cat <<EOB
     }
 
     location = ${CONTEXT_PATH}/content/api/fetch {
-      rewrite                   ^ ${API_PREFIX}/content/fetch/\${arg_service}?v=\${arg_v}&key=\${arg_config};
+      rewrite                   ^ ${API_PREFIX}/content/fetch/\${arg_service}?query=\${arg_config};
     }
 
     location ~ ^${CONTEXT_PATH}/admin/api/(chain|feature|layout)-config($|/.*) {

@@ -12,12 +12,11 @@ const engine = require('../../utils/engine')
 
 const { RedirectError, NotFoundError } = require('../../errors')
 
-const fetch = async function fetch (contentSource, contentKey, { version, cacheMode }) {
+const fetch = async function fetch (contentSource, contentKey, params) {
   // TODO: update this to use `query` param name after clients are updated to 0.4+
   const { body, headers } = await engine({
     uri: `/content/fetch/${contentSource}?key=${encodeURIComponent(JSON.stringify(contentKey))}&followRedirect=false`,
-    version,
-    cacheMode
+    ...params
   })
   return {
     data: body || null,
@@ -80,17 +79,16 @@ class TemplateResolver extends BaseResolver {
     this.paramExtractor = getParamExtractor(config.contentConfigMapping, this.pattern)
   }
 
-  async hydrate (requestParts, { arcSite, version, cacheMode }) {
+  async hydrate (requestParts, params) {
     const query = Object.assign(
       {
-        uri: requestParts.pathname,
-        'arc-site': arcSite
+        uri: requestParts.pathname
       },
       this.paramExtractor(requestParts)
     )
 
     try {
-      const content = await fetch(this.config.contentSourceId, query, { version, cacheMode })
+      const content = await fetch(this.config.contentSourceId, query, params)
       return { query, content }
     } catch (err) {
       if (err.statusCode === 404) {

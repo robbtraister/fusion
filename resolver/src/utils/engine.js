@@ -37,12 +37,13 @@ const handleResponse = function handleResponse (response) {
 }
 
 const getHttpEngine = function getHttpEngine () {
-  return async function httpEngineHandler ({ method, uri, data, cacheMode }) {
+  return async function httpEngineHandler ({ method, uri, data, arcSite, cacheMode }) {
     return request[(method || 'get').toLowerCase()]({
       uri: `${httpEngine}${uri}`,
       body: data,
       json: true,
       headers: {
+        'Arc-Site': arcSite,
         'Fusion-Cache-Mode': cacheMode
       },
       followRedirect: false,
@@ -56,7 +57,7 @@ const getLambdaEngine = function getLambdaEngine () {
   const region = lambdaEngine.split(':')[3]
   const lambda = new AWS.Lambda(Object.assign({ region }))
 
-  return async function lambdaEngineHandler ({ method, uri, data, cacheMode, version }) {
+  return async function lambdaEngineHandler ({ method, uri, data, arcSite, cacheMode, version }) {
     const METHOD = (method || 'GET').toUpperCase()
     const parts = url.parse(uri, true)
     return new Promise((resolve, reject) => {
@@ -68,6 +69,7 @@ const getLambdaEngine = function getLambdaEngine () {
           method: METHOD,
           httpMethod: METHOD,
           headers: {
+            'Arc-Site': arcSite,
             'Content-Type': 'application/json',
             'Fusion-Cache-Mode': cacheMode
           },

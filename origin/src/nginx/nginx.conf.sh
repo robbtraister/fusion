@@ -43,7 +43,7 @@ EOB
 else
   cat <<EOB
   # receive from upstream server
-  proxy_read_timeout            30;
+  proxy_read_timeout            60;
 EOB
 fi
 

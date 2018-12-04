@@ -8,7 +8,9 @@ const deployment = require('./deployment')
 
 const lastModified = new Date(Fusion.lastModified || null).toUTCString()
 
-const isUnchanged = ({ status }) => status === 304
+const pageParams =
+  (Fusion.deployment ? `&d=${Fusion.deployment}` : '') +
+  (Fusion.arcSite ? `&_website=${encodeURIComponent(Fusion.arcSite)}` : '')
 
 function fetch ({ cached, filter, queryString, source }) {
   filter = (filter)
@@ -22,23 +24,27 @@ function fetch ({ cached, filter, queryString, source }) {
 
   const uri = `${Fusion.contextPath || ''}/api/v3/content/fetch/${source}?query=${encodeURIComponent(queryString)}` +
     (filter ? `&filter=${encodeURIComponent(filter)}` : '') +
-    (Fusion.deployment ? `&d=${Fusion.deployment}` : '') +
-    (Fusion.arcSite ? `&_website=${encodeURIComponent(Fusion.arcSite)}` : '')
+    pageParams
 
   return window.fetch(
     uri,
-    {
-      headers: {
-        'If-Modified-Since': lastModified
+    (cached === undefined)
+      ? {}
+      : {
+        headers: {
+          'If-Modified-Since': lastModified
+        }
       }
-    }
   )
     .then((resp) => {
-      if (isUnchanged(resp)) {
-        // use cache
-        throw resp
+      if (resp.status === 304) {
+        return cached
       }
       return resp.json()
+    })
+    .catch((err) => {
+      console.error(err)
+      return cached
     })
 }
 
@@ -54,22 +60,11 @@ function getContent ({ source, query, filter, inherit }) {
       cached,
       fetched: (sourceCache.expiresAt < now)
         ? fetch({ source, queryString, filter, cached })
-          .catch((err) => {
-            if (!isUnchanged(err)) {
-              console.error(err)
-            }
-            return cached
-          })
         : Promise.resolve(cached)
     }
   } else {
     return {
       fetched: fetch({ source, queryString, filter })
-        .catch((err) => {
-          if (!isUnchanged(err)) {
-            console.error(err)
-          }
-        })
     }
   }
 }

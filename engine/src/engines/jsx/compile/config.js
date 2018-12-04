@@ -8,6 +8,7 @@ mockRequire('node-sass/package.json', { version: 4 })
 
 const ManifestPlugin = require('webpack-manifest-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const UglifyWebpackPlugin = require('uglifyjs-webpack-plugin')
 
 module.exports = (options) => {
@@ -15,11 +16,14 @@ module.exports = (options) => {
 
   const optimization = (minify)
     ? {
-      minimizer: [new UglifyWebpackPlugin({
-        parallel: true,
-        sourceMap: true,
-        test: /\.[jt]sx?$/i
-      })]
+      minimizer: [
+        new UglifyWebpackPlugin({
+          parallel: true,
+          sourceMap: true,
+          test: /\.[jt]sx?$/i
+        }),
+        new OptimizeCSSAssetsPlugin({})
+      ]
     }
     : {}
 

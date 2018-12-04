@@ -28,7 +28,7 @@ module.exports = (options) => {
     : {}
 
   return {
-    devtool: (minify) ? 'source-map' : 'eval-source-map',
+    devtool: (minify) ? undefined : 'eval-source-map',
     externals: {
       'fusion:consumer': 'Fusion.components.Consumer',
       'fusion:content': 'Fusion.components.Content',

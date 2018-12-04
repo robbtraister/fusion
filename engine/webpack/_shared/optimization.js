@@ -6,10 +6,12 @@ const { minify } = require('../../environment')
 
 module.exports = (minify)
   ? {
-    minimizer: [new UglifyWebpackPlugin({
-      parallel: true,
-      sourceMap: true,
-      test: /\.[jt]sx?$/i
-    })]
+    optimization: {
+      minimizer: [new UglifyWebpackPlugin({
+        parallel: true,
+        sourceMap: true,
+        test: /\.[jt]sx?$/i
+      })]
+    }
   }
   : {}

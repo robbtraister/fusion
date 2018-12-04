@@ -30,8 +30,9 @@ module.exports = (options) => {
       'fusion:context': 'Fusion.components.Context',
       'fusion:environment': '{}',
       'fusion:properties': 'Fusion.getProperties',
+      'fusion:prop-types': 'PropTypes',
       'prop-types': 'PropTypes',
-      'react': 'react',
+      react: 'react',
       'react-dom': 'ReactDOM'
     },
     entry,

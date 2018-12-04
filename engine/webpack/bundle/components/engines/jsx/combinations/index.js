@@ -24,8 +24,19 @@ module.exports = function getCombinationConfigs (manifest) {
   return Object.keys(entry).length
     ? {
       ...require('../../../../../_shared'),
-      ...require('../externals'),
       entry,
+      externals: {
+        '@arc-fusion/prop-types': 'PropTypes',
+        'fusion:consumer': 'Fusion.components.Consumer',
+        'fusion:content': 'Fusion.components.Content',
+        'fusion:context': 'Fusion.components.Context',
+        'fusion:environment': '{}',
+        'fusion:properties': 'Fusion.getProperties',
+        'fusion:prop-types': 'PropTypes',
+        'prop-types': 'PropTypes',
+        react: 'react',
+        'react-dom': 'ReactDOM'
+      },
       module: {
         rules: [
           require('../../../../../_shared/rules/jsx'),

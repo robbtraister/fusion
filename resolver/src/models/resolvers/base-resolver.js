@@ -35,8 +35,6 @@ class BaseResolver {
 
     return Object.assign(
       {
-        // keep requestUri temporarily for backwards compatibility
-        requestUri: requestParts.href,
         request: {
           uri: requestParts.href,
           path: requestParts.pathname,

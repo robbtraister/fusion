@@ -15,6 +15,8 @@ const generateSource = require('./source')
 const getFallbacks = require('../../_shared/fallbacks')
 
 const { putCompilation } = require('../../../io')
+const metrics = require('../../../metrics')
+const timer = require('../../../utils/timer')
 
 const { bundleRoot, deployment, minify } = require('../../../../environment')
 
@@ -33,20 +35,35 @@ const getStylesMapFile = (targetName) => `${targetName}.css.map`
 
 const componentRoot = path.resolve(bundleRoot, 'components')
 
-async function compile (props) {
-  console.log({ props })
+async function trackLatency (operation, fn) {
+  const latencyTic = timer.tic()
+  const result = await fn()
+  metrics({
+    'arc.fusion.webpack.duration':
+      {
+        operation,
+        value: latencyTic.toc()
+      }
+  })
+  return result
+}
 
+async function compile (props) {
   const { outputType } = props
 
-  const source = generateSource({
-    componentRoot,
-    outputTypes: getFallbacks({
-      ext: '.jsx',
-      outputType
-    }),
-    props
-    // tree: getTree(props)
-  })
+  const source = await trackLatency(
+    'generate',
+    () =>
+      generateSource({
+        componentRoot,
+        outputTypes: getFallbacks({
+          ext: '.jsx',
+          outputType
+        }),
+        props
+        // tree: getTree(props)
+      })
+  )
 
   const tempDir = await mkdtemp(`${os.tmpdir()}${path.sep}`)
 
@@ -58,19 +75,22 @@ async function compile (props) {
     await writeFile(sourceFilePath, source)
 
     try {
-      const compiler = webpack(
-        config({
-          entry: {
-            [ outputType ]: sourceFilePath
-          },
-          minify,
-          outputDir: tempDir,
-          rootPath: bundleRoot
-        })
+      const compiler = await trackLatency(
+        'setup',
+        () =>
+          webpack(
+            config({
+              entry: {
+                [ outputType ]: sourceFilePath
+              },
+              minify,
+              outputDir: tempDir,
+              rootPath: bundleRoot
+            })
+          )
       )
 
-      const build = promisify(compiler.run.bind(compiler))
-      await build()
+      await trackLatency('compile', promisify(compiler.run.bind(compiler)))
 
       const manifest = require(manifestFilePath)
 

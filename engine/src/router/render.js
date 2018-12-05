@@ -38,18 +38,21 @@ function getOutputType (outputType) {
 }
 
 async function getGlobalContent ({ content, globalContentConfig }) {
-  const globalContent = (!content)
+  const data = (!content)
     ? undefined
     : (content.hasOwnProperty('data'))
       ? content.data
       : content.document
 
-  if (globalContent !== undefined) {
+  if (data !== undefined) {
+    const lastModified = content.lastModified || +new Date()
+
     if (content.expires) {
       // we already have all of the information
       return {
-        data: globalContent,
-        expires: content.expires
+        data,
+        expires: content.expires,
+        lastModified
       }
     } else {
       // we have the data, but no expiration
@@ -64,8 +67,9 @@ async function getGlobalContent ({ content, globalContentConfig }) {
         : +new Date() + (600 * 1000)
 
       return {
-        data: globalContent,
-        expires
+        data,
+        expires,
+        lastModified
       }
     }
   } else if (globalContentConfig) {

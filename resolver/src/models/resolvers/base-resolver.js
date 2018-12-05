@@ -42,9 +42,9 @@ class BaseResolver {
           path: requestParts.pathname,
           query: requestParts.query
         },
-        rendering: this.rendering(content),
         // remove versions from page config
-        resolver: Object.assign({}, this.config, { versions: undefined })
+        resolver: Object.assign({}, this.config, { versions: undefined }),
+        rendering: this.rendering(content)
       },
       (content)
         ? {
@@ -53,7 +53,8 @@ class BaseResolver {
             query,
             // TODO: rename to .data after migrating everyone to 2.1
             document: content.data,
-            expires: content.expires
+            expires: content.expires,
+            lastModified: content.lastModified
           }
         }
         : {}

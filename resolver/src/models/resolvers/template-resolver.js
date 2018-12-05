@@ -20,7 +20,8 @@ const fetch = async function fetch (contentSource, contentKey, params) {
   })
   return {
     data: body || null,
-    expires: +new Date(headers.expires)
+    expires: +new Date(headers.expires),
+    lastModified: +new Date(headers['last-modified'])
   }
 }
 

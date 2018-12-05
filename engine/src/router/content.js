@@ -53,7 +53,7 @@ const fetchHandler = (forceUpdate) =>
       const source = await getContentSource(sourceName)
       const query = getQuery(queryString, website)
 
-      const { data } = await source.fetch(
+      const { data, expires, lastModified } = await source.fetch(
         query,
         {
           forceUpdate: forceUpdate || /^update$/i.test(cacheMode),
@@ -63,6 +63,12 @@ const fetchHandler = (forceUpdate) =>
         }
       )
       const filtered = await source.filter(filter, data)
+      if (expires) {
+        res.set('Expires', new Date(expires).toUTCString())
+      }
+      if (lastModified) {
+        res.set('Last-Modified', new Date(lastModified).toUTCString())
+      }
       res.send(filtered)
     } catch (e) {
       next(e)

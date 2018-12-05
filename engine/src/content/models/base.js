@@ -65,7 +65,7 @@ class BaseSource {
 
   getExpiration (date) {
     const timestamp = +(date || new Date())
-    return timestamp + this.ttl
+    return timestamp + (this.ttl * 1000)
   }
 
   async filter (filter, data) {

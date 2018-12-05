@@ -108,15 +108,19 @@ class CachedSource extends ResolveSource {
   }
 
   async updateResolution (resolution, options) {
-    const data = await super.fetchResolution(resolution, options)
+    const payload = await super.fetchResolution(resolution, options)
 
     if (!cacheProxyUrl) {
-      return data
+      return payload
     }
 
-    await this.pushCacheContent(resolution.cacheKey, data, this.ttl)
+    const ttl = (payload.expires)
+      ? Math.min(this.ttl, (+payload.expires - +new Date()) / 1000)
+      : this.ttl
 
-    return data
+    await this.pushCacheContent(resolution.cacheKey, payload, ttl)
+
+    return payload
   }
 }
 

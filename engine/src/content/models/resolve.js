@@ -65,6 +65,7 @@ class ResolveSource extends BaseSource {
     let success = false
     const latencyTic = timer.tic()
     try {
+      const now = +new Date()
       const response = await request({
         uri: resolvedUri,
         followRedirect: false,
@@ -91,10 +92,11 @@ class ResolveSource extends BaseSource {
 
       return {
         data,
-        expires: this.getExpiration(),
+        expires: +new Date(response.headers['expires']) || this.getExpiration(now),
         headers: response.headers,
+        lastModified: +new Date(response.headers['last-modified']) || now,
         size,
-        statusCode: response.statusCode
+        statusCode: +response.statusCode
       }
     } finally {
       metrics({

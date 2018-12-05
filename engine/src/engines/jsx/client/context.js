@@ -12,7 +12,7 @@ const pageParams =
   (Fusion.deployment ? `&d=${Fusion.deployment}` : '') +
   (Fusion.arcSite ? `&_website=${encodeURIComponent(Fusion.arcSite)}` : '')
 
-function fetch ({ cached, filter, queryString, source }) {
+function fetch ({ filter, queryCache, queryString, source }) {
   filter = (filter)
     ? filter
       .replace(/\s*{\s*/g, '{')
@@ -28,23 +28,23 @@ function fetch ({ cached, filter, queryString, source }) {
 
   return window.fetch(
     uri,
-    (cached === undefined)
+    (queryCache && queryCache.data)
       ? {}
       : {
         headers: {
-          'If-Modified-Since': lastModified
+          'If-Modified-Since': queryCache.lastModified || lastModified
         }
       }
   )
     .then((resp) => {
       if (resp.status === 304) {
-        return cached
+        return queryCache.data
       }
       return resp.json()
     })
     .catch((err) => {
       console.error(err)
-      return cached
+      return queryCache.data
     })
 }
 
@@ -52,20 +52,19 @@ function getContent ({ source, query, filter, inherit }) {
   const queryString = JSON.stringify(query)
   const sourceCache = Fusion.contentCache[source]
   if (sourceCache) {
-    const queryCache = sourceCache.entries[queryString]
-    const cached = queryCache && queryCache.cached
-    const now = +new Date()
-
-    return {
-      cached,
-      fetched: (sourceCache.expiresAt < now)
-        ? fetch({ source, queryString, filter, cached })
-        : Promise.resolve(cached)
+    const queryCache = sourceCache[queryString]
+    if (queryCache) {
+      const now = +new Date()
+      return {
+        cached: queryCache.data,
+        fetched: (queryCache.expires < now)
+          ? fetch({ filter, queryCache, queryString, source })
+          : Promise.resolve(queryCache.data)
+      }
     }
-  } else {
-    return {
-      fetched: fetch({ source, queryString, filter })
-    }
+  }
+  return {
+    fetched: fetch({ source, queryString, filter })
   }
 }
 

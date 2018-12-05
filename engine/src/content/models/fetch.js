@@ -10,6 +10,7 @@ class FetchSource extends BaseSource {
     let success = false
     const latencyTic = timer.tic()
     try {
+      const now = +new Date()
       const data = await this.config.fetch(...args)
       success = true
       metrics({
@@ -23,7 +24,8 @@ class FetchSource extends BaseSource {
 
       return {
         data,
-        expires: this.getExpiration()
+        expires: this.getExpiration(now),
+        lastModified: now
       }
     } finally {
       metrics({

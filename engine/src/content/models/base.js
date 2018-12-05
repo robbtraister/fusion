@@ -54,11 +54,12 @@ class BaseSource {
   }
 
   async fetch (...args) {
-    const { data, expires } = await this.fetchImpl(...args)
+    const { data, expires, lastModified } = await this.fetchImpl(...args)
 
     return {
       data: this.appendId(this.transform(data)),
-      expires: (expires instanceof Date) ? expires : new Date(expires)
+      expires,
+      lastModified
     }
   }
 

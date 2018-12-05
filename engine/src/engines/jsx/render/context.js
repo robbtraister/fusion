@@ -29,8 +29,10 @@ module.exports = ({ children, ...props }) => {
         // default to true; it will be flipped later if no filter is provided
         isFiltered: true,
         fetched: contentSource.fetch(query)
-          .then(({ data }) => {
+          .then(({ data, expires, lastModified }) => {
             contentFetch.cached = data
+            contentFetch.expires = expires
+            contentFetch.lastModified = lastModified
             return data
           })
       }

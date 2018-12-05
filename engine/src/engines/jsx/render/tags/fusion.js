@@ -29,11 +29,12 @@ module.exports = (context) => {
             .forEach(queryString => {
               const queryCache = sourceCache[queryString]
               if (queryCache.source && queryCache.filtered) {
-                const condensedSourceCache = condensedCache[sourceName] = condensedCache[sourceName] || {
-                  entries: {},
-                  expiresAt: now + ((queryCache.source && queryCache.source.ttl) || 300) * 1000
+                const condensedSourceCache = condensedCache[sourceName] = condensedCache[sourceName] || {}
+                condensedSourceCache[queryString] = {
+                  data: queryCache.filtered,
+                  expires: queryCache.expires,
+                  lastModified: queryCache.lastModified
                 }
-                condensedSourceCache.entries[queryString] = { cached: queryCache.filtered }
               }
             })
         })

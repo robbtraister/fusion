@@ -13,9 +13,8 @@ const engine = require('../../utils/engine')
 const { RedirectError, NotFoundError } = require('../../errors')
 
 const fetch = async function fetch (contentSource, contentKey, params) {
-  // TODO: update this to use `query` param name after clients are updated to 0.4+
   const { body, headers } = await engine({
-    uri: `/content/fetch/${contentSource}?key=${encodeURIComponent(JSON.stringify(contentKey))}&followRedirect=false`,
+    uri: `/content/fetch/${contentSource}?query=${encodeURIComponent(JSON.stringify(contentKey))}&followRedirect=false`,
     ...params
   })
   return {

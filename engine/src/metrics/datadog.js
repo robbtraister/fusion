@@ -74,5 +74,5 @@ function getTimestamp () {
 }
 
 module.exports = sendMetrics
-module.exports.send = sendMetrics
-module.exports.resolve = resolveMetrics
+module.exports.sendMetrics = sendMetrics
+module.exports.resolveMetrics = resolveMetrics

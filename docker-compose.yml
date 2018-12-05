@@ -14,7 +14,7 @@ x-environment: &_environment
   ENVIRONMENT: localhost
   CONTEXT_PATH:
   ON_DEMAND:
-  DEBUG: fusion:*
+  DEBUG: arc.fusion.*
 
 networks:
   fusion:

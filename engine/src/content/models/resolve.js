@@ -8,6 +8,8 @@ const _merge = require('lodash.merge')
 const BaseSource = require('./base')
 
 const { RedirectError } = require('../../errors')
+const metrics = require('../../metrics')
+const timer = require('../../utils/timer')
 
 const { contentBase } = require('../../../environment')
 
@@ -60,19 +62,50 @@ class ResolveSource extends BaseSource {
   }
 
   async fetchResolution ({ query, resolvedUri }, options) {
-    const response = await request({
-      uri: resolvedUri,
-      json: true,
-      followRedirect: false,
-      resolveWithFullResponse: true,
-      simple: false
-    })
+    let success = false
+    const latencyTic = timer.tic()
+    try {
+      const response = await request({
+        uri: resolvedUri,
+        followRedirect: false,
+        resolveWithFullResponse: true,
+        simple: false
+      })
 
-    return {
-      data: response.body,
-      expires: this.getExpiration(),
-      headers: response.headers,
-      statusCode: response.statusCode
+      let data = response.body
+      const size = +response.headers['content-length'] || data.length
+
+      success = (response.statusCode < 400)
+      success && metrics({
+        'arc.fusion.content.bytes':
+          {
+            operation: 'fetch',
+            source: this.name,
+            value: size
+          }
+      })
+
+      try {
+        data = JSON.parse(data)
+      } catch (_) {}
+
+      return {
+        data,
+        expires: this.getExpiration(),
+        headers: response.headers,
+        size,
+        statusCode: response.statusCode
+      }
+    } finally {
+      metrics({
+        'arc.fusion.content.latency':
+          {
+            operation: 'fetch',
+            source: this.name,
+            result: success ? 'success' : 'error',
+            value: latencyTic.toc()
+          }
+      })
     }
   }
 

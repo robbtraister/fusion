@@ -6,6 +6,9 @@ const request = require('request-promise-native')
 
 const ResolveSource = require('./resolve')
 
+const metrics = require('../../metrics')
+const timer = require('../../utils/timer')
+
 const { cachePrefix, cacheProxyUrl } = require('../../../environment')
 
 class CachedSource extends ResolveSource {
@@ -48,13 +51,40 @@ class CachedSource extends ResolveSource {
     }
 
     if (cacheProxyUrl && options.forceUpdate !== true) {
+      let result = 'error'
+      const latencyTic = timer.tic()
       try {
         const response = await this.fetchCacheContent(cacheKey)
         if (!response) {
           throw new Error('Response error from cache')
         }
+
+        result = 'success'
+        metrics({
+          'arc.fusion.cache.bytes':
+            {
+              operation: 'fetch',
+              source: this.name,
+              value: response.size
+            }
+        })
+
         return response
-      } catch (_) {}
+      } catch (err) {
+        result = (err.statusCode === 404)
+          ? 'miss'
+          : 'error'
+      } finally {
+        metrics({
+          'arc.fusion.cache.latency':
+            {
+              operation: 'fetch',
+              source: this.name,
+              result,
+              value: latencyTic.toc()
+            }
+        })
+      }
     }
 
     return this.updateResolution(resolution, options)

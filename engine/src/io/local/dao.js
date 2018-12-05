@@ -2,13 +2,9 @@
 
 const url = require('url')
 
-const debugTimer = require('debug')('fusion:timer:dao:mongo')
-
-const timer = require('../../utils/timer')
-
 const MongoClient = require('mongodb').MongoClient
 
-// const { sendMetrics, METRIC_TYPES } = require('../../reporutils/send-metrics')
+const metricsWrapper = require('../_shared/metrics')
 
 async function getNewConnection (mongoUrl) {
   return new Promise((resolve, reject) => {
@@ -60,74 +56,33 @@ function Mongo (mongoUrl) {
   const models = {}
   return {
     getModel (modelName) {
-      models[modelName] = models[modelName] || {
-        name: modelName,
+      models[modelName] = models[modelName] ||
+        {
+          name: modelName,
 
-        async find (query) {
-          const collection = await getCollection(modelName)
+          ...metricsWrapper({
+            async find (query) {
+              const collection = await getCollection(modelName)
+              const cursor = await collection.find(query)
+              return cursor.toArray()
+            },
 
-          const tic = timer.tic()
-          const cursor = await collection.find(query)
-          const data = await cursor.toArray()
-          const elapsedTime = tic.toc()
-          debugTimer(`${modelName}.find()`, elapsedTime)
+            async findOne (query) {
+              const collection = await getCollection(modelName)
+              return collection.findOne(query)
+            },
 
-          // sendMetrics([
-          //   { type: METRIC_TYPES.DB_DURATION, value: elapsedTime, tag: ['operation:find'] },
-          //   { type: METRIC_TYPES.DB_RESULT, value: 1, tags: ['operation:find', 'result:success'] }
-          // ])
+            async get (_id) {
+              const collection = await getCollection(modelName)
+              return collection.findOne({ _id })
+            },
 
-          return data
-        },
-
-        async findOne (query) {
-          const collection = await getCollection(modelName)
-
-          const tic = timer.tic()
-          const data = await collection.findOne(query)
-          const elapsedTime = tic.toc()
-          debugTimer(`${modelName}.findOne()`, elapsedTime)
-
-          // sendMetrics([
-          //   { type: METRIC_TYPES.DB_DURATION, value: elapsedTime, tags: ['operation:findOne'] },
-          //   { type: METRIC_TYPES.DB_RESULT, value: 1, tags: ['result:success', 'operation:findOne'] }
-          // ])
-
-          return data
-        },
-
-        async get (_id) {
-          const collection = await getCollection(modelName)
-
-          const tic = timer.tic()
-          const data = await collection.findOne({ _id })
-          const elapsedTime = tic.toc()
-          debugTimer(`${modelName}.get(${_id})`, elapsedTime)
-
-          // sendMetrics([
-          //   { type: METRIC_TYPES.DB_DURATION, value: elapsedTime, tags: ['operation:get'] },
-          //   { type: METRIC_TYPES.DB_RESULT, value: 1, tags: ['operation:get', 'result:success'] }
-          // ])
-
-          return data
-        },
-
-        async put (doc) {
-          const collection = await getCollection(modelName)
-
-          const tic = timer.tic()
-          const data = await collection.update({ _id: doc._id }, doc, { upsert: true })
-          const elapsedTime = tic.toc()
-          debugTimer(`${modelName}.put()`, elapsedTime)
-
-          // sendMetrics([
-          //   { type: METRIC_TYPES.DB_DURATION, value: elapsedTime, tags: ['operation:put'] },
-          //   { type: METRIC_TYPES.DB_RESULT, value: 1, tags: ['operation:put', 'result:success'] }
-          // ])
-
-          return data
+            async put (doc) {
+              const collection = await getCollection(modelName)
+              return collection.update({ _id: doc._id }, doc, { upsert: true })
+            }
+          })
         }
-      }
 
       return models[modelName]
     }

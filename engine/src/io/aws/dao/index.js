@@ -2,6 +2,8 @@
 
 const dynamoose = require('dynamoose')
 
+const metricsWrapper = require('../../_shared/metrics')
+
 const { environment, region } = require('../../../../environment')
 
 const getSchema = modelName => {
@@ -18,12 +20,8 @@ db.AWS.config.update({ region })
 const createModel = (modelName) => {
   const _model = db.model(`fusion.${environment}.${modelName}`, getSchema(modelName))
 
-  return {
-    get (id) {
-      return _model.get((id instanceof Object) ? id : { id })
-    },
-
-    find (query) {
+  return metricsWrapper({
+    async find (query) {
       return new Promise((resolve, reject) => {
         const result = []
 
@@ -47,7 +45,7 @@ const createModel = (modelName) => {
       })
     },
 
-    findOne (query) {
+    async findOne (query) {
       return new Promise((resolve, reject) => {
         _model.scan(query).exec((err, data) => {
           (err)
@@ -57,13 +55,17 @@ const createModel = (modelName) => {
       })
     },
 
-    put (doc) {
+    async get (id) {
+      return _model.get((id instanceof Object) ? id : { id })
+    },
+
+    async put (doc) {
       return new Promise((resolve, reject) => {
         const obj = new _model(doc)
         obj.put({}, (err, data) => (err ? reject(err) : resolve(data)))
       })
     }
-  }
+  })
 }
 
 const models = {}

@@ -5,7 +5,7 @@ const path = require('path')
 const PropTypes = require('prop-types')
 const React = require('react')
 
-const App = require('../../components/app')
+const App = require('@robbtraister/fusion-components/app')
 
 const {
   distRoot

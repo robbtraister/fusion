@@ -6,7 +6,7 @@ const React = require('react')
 const ReactDOM = require('react-dom')
 const ReactRouterDOM = require('react-router-dom')
 
-const App = require('../components/app')
+const App = require('@robbtraister/fusion-components/app')
 
 window.History = History
 window.PropTypes = PropTypes

@@ -6,13 +6,15 @@ const React = require('react')
 const ReactDOM = require('react-dom')
 const ReactRouterDOM = require('react-router-dom')
 
-const App = require('@robbtraister/fusion-components/app')
+const FusionComponents = require('@robbtraister/fusion-components')
+const { App } = FusionComponents
 
 window.History = History
 window.PropTypes = PropTypes
 window.React = React
 window.ReactDOM = ReactDOM
 window.ReactRouterDOM = ReactRouterDOM
+window.FusionComponents = FusionComponents
 
 const Fusion = (window.Fusion = window.Fusion || {})
 

@@ -6,7 +6,6 @@ const path = require('path')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 const {
-  buildRoot,
   distRoot,
   generatedRoot
 } = require('./env')
@@ -19,7 +18,6 @@ const {
 const manifest = require('./src/manifest')()
 require('./src/manifest/generate')(manifest)
 const { components } = manifest
-
 
 const OnBuildPlugin = require('./webpack/plugins/on-build-plugin')
 
@@ -129,7 +127,7 @@ module.exports = [
             .toString('hex')
 
           return `components/chunks/${hash}`
-         }
+        }
       }
     },
     output: {

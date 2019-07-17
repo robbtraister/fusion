@@ -1,0 +1,14 @@
+{
+  "collection": "layouts",
+  "type": "themed",
+  "children": [
+    {
+      "collection": "features",
+      "type": "article/header"
+    },
+    {
+      "collection": "features",
+      "type": "article/body"
+    }
+  ]
+}

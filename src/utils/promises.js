@@ -6,10 +6,7 @@ const os = require('os')
 const path = require('path')
 const { promisify } = require('util')
 
-const glob = require('glob')
-
 const execPromise = promisify(childProcess.exec.bind(childProcess))
-const globPromise = promisify(glob)
 const mkdirPromise = dir => execPromise(`mkdir -p '${dir}'`)
 const readFilePromise = promisify(fs.readFile.bind(fs))
 const writeFilePromise = promisify(fs.writeFile.bind(fs))
@@ -27,7 +24,6 @@ async function writeFile (filePath, content) {
 
 module.exports = {
   exec: execPromise,
-  glob: globPromise,
   mkdir: mkdirPromise,
   readFile: readFilePromise,
   tempDir,

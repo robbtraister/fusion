@@ -10,7 +10,7 @@ const {
   distRoot
 } = require('../../../env')
 
-const getTemplateStyleHash = (template) => require(path.join(distRoot, 'templates', `${template}.css`)).styleHash
+const getTemplateStyleHash = ({ outputType, template }) => require(path.join(distRoot, 'templates', template, `${outputType}.css`)).styleHash
 
 async function resolve (uri) {
   const outputType = defaultOutputType
@@ -19,10 +19,10 @@ async function resolve (uri) {
 
   let styleHash = null
   try {
-    styleHash = getTemplateStyleHash(template)
+    styleHash = getTemplateStyleHash({ outputType, template })
   } catch (_) {
-    await compile({ template, tree })
-    styleHash = getTemplateStyleHash(template)
+    await compile({ outputType, template, tree })
+    styleHash = getTemplateStyleHash({ outputType, template })
   }
 
   return {

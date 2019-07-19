@@ -42,8 +42,10 @@ function componentImport (component) {
 }
 
 class Compiler {
-  constructor ({ template, tree }) {
+  constructor ({ outputType, template, tree }) {
+    this.outputType = outputType
     this.template = template
+    this.name = `${template}/${outputType}`
     this.tree = tree
     this.renderables = getDescendants({ children: tree })
 
@@ -55,8 +57,7 @@ class Compiler {
     await this.generate()
 
     try {
-      const config = getConfig(await this.rootDir, this.template)
-      // console.log({ config })
+      const config = getConfig(await this.rootDir, this.name)
       const compiler = webpack(config)
 
       await new Promise((resolve, reject) => {
@@ -66,7 +67,7 @@ class Compiler {
       })
 
       const result = await this.concat()
-      console.log(`${this.template} compiled in ${(Date.now() - start) / 1000}s`)
+      console.log(`${this.name} compiled in ${(Date.now() - start) / 1000}s`)
       return result
     } catch (e) {
       console.error(e)
@@ -101,7 +102,7 @@ class Compiler {
       .update(css)
       .digest('hex')
 
-    const concat = new Concat(true, `dist/templates/${this.template}.js`, '\n')
+    const concat = new Concat(true, `dist/templates/${this.name}.js`, '\n')
 
     ;(await Promise.all(
       mappedAssets
@@ -112,8 +113,8 @@ class Compiler {
           path: path.join(distRoot, asset)
         }))
         .concat({
-          asset: `templates/${this.template}.js`,
-          path: path.join(await this.rootDir, `dist/templates/${this.template}.js`)
+          asset: `templates/${this.name}.js`,
+          path: path.join(await this.rootDir, `dist/templates/${this.name}.js`)
         })
         .map(async entry => {
           const source = await readFile(entry.path)
@@ -145,14 +146,14 @@ class Compiler {
     }
 
     await Promise.all([
-      writeFile(path.join(distRoot, `templates/${this.template}.js`), template.js),
+      writeFile(path.join(distRoot, `templates/${this.name}.js`), template.js),
       template.jsMap &&
         writeFile(
-          path.join(distRoot, `templates/${this.template}.js.map`),
+          path.join(distRoot, `templates/${this.name}.js.map`),
           template.jsMap
         ),
       writeFile(
-        path.join(distRoot, `templates/${this.template}.css.json`),
+        path.join(distRoot, `templates/${this.name}.css.json`),
         JSON.stringify({ styleHash })
       ),
       writeFile(
@@ -184,6 +185,13 @@ window.Fusion = window.Fusion || {}
 Fusion.components = Fusion.components || {}
 ${imports}
 
+Fusion.layout = ${JSON.stringify(
+  this.renderables && this.renderables[0] && this.renderables[0].collection === 'layouts'
+    ? this.renderables[0].type
+    : undefined
+)}
+Fusion.outputType = ${JSON.stringify(this.outputType)}
+Fusion.template = ${JSON.stringify(this.template)}
 Fusion.tree = ${JSON.stringify(this.tree)}
 `
 

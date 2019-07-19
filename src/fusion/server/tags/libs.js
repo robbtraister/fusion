@@ -39,7 +39,7 @@ module.exports = context => props => (
       Script,
       {
         id: 'fusion-template-script',
-        src: `/dist/templates/${context.template}.js`
+        src: `/dist/templates/${context.template}/${context.outputType}.js`
       }
     )
   ]

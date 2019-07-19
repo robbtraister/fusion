@@ -31,6 +31,7 @@ function render () {
   if (targetElement) {
     const serverHTML = targetElement.innerHTML
     try {
+      console.log(Fusion)
       ReactDOM[Fusion.method || 'render'](
         React.createElement(
           App,

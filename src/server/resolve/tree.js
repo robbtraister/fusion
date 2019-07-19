@@ -1,7 +1,7 @@
 'use strict'
 
-function getTree (template) {
-  const tree = require(`../../trees/${template}`)
+async function getTree (template) {
+  return require(`../../trees/${template}`)
 }
 
 module.exports = getTree

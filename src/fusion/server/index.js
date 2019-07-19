@@ -46,17 +46,6 @@ function render (context = {}) {
   } finally {
     sheet.seal()
   }
-  // const html = ReactDOM.renderToStaticMarkup(
-  //   React.createElement(
-  //     OutputType,
-  //     {
-  //       ...getTags(context),
-  //       context
-  //     }
-  //   )
-  // )
-
-  // return `<!DOCTYPE html>${html}`
 }
 
 module.exports = render

@@ -10,9 +10,11 @@
     "jest": "echo done",
     "lint": "prettier-standard {bin,env,src,webpack}/**/*.{js,jsx}",
     "prod": "NODE_ENV=production npm run build && NODE_ENV=production npm run start",
+    "prepublishOnly": "cd ./src/fusion/components && npm publish",
     "start": "node .",
     "test": "npm run lint && npm run jest",
     "preversion": "npm run test",
+    "version": "(VERSION=$(node -p \"require('./package.json').version\") && cd ./src/fusion/components && npm version $VERSION > /dev/null) && git add -A",
     "postversion": "git push && git push --tags",
     "watch": "npm run build -- --watch"
   },
@@ -55,5 +57,13 @@
     "url-loader": "^2.0.1",
     "webpack-cli": "^3.3.6",
     "yaml-loader": "^0.5.0"
-  }
+  },
+  "files": [
+    "babel.config.js",
+    "webpack.config.js",
+    "/bin",
+    "/env",
+    "/src",
+    "/webpack"
+  ]
 }

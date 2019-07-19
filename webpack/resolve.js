@@ -1,10 +1,19 @@
 'use strict'
 
-const { getAbsoluteRequire } = require('./utils')
-
 const {
   bundleRoot
 } = require('../env')
+
+function getAbsoluteRequire (mod) {
+  return require
+    .resolve(mod)
+    .replace(
+      new RegExp(
+        `([\\/]node_modules[\\/]${mod.replace(/[\\/]/g, '[\\\\/]')}).*`
+      ),
+      (_, g) => g
+    )
+}
 
 const resolve = {
   alias: {
@@ -15,7 +24,7 @@ const resolve = {
     'react-dom/server': getAbsoluteRequire('react-dom/server'),
     'react-router-dom': getAbsoluteRequire('react-router-dom'),
     'styled-components': getAbsoluteRequire('styled-components'),
-    '@robbtraister/fusion-components': getAbsoluteRequire('@robbtraister/fusion-components'),
+    '@robbtraister/fusion-components': getAbsoluteRequire('../src/fusion/components'),
     '~': bundleRoot
   },
   extensions: [

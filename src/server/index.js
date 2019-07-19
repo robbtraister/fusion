@@ -16,6 +16,11 @@ function server (options = {}) {
 
 if (module === require.main) {
   const path = require('path')
-  const packagePath = path.join(bundleRoot, 'package.json')
-  server(require(packagePath).fusion || {})
+  let options
+  try {
+    const packagePath = path.join(bundleRoot, 'package.json')
+    option = require(packagePath).fusion
+  } catch (_) {}
+
+  server(options || {})
 }

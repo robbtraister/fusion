@@ -1,6 +1,6 @@
 {
   "name": "@robbtraister/fusion",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "",
   "main": "src/server",
   "scripts": {

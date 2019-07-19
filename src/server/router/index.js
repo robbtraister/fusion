@@ -3,6 +3,7 @@
 const { Router } = require('express')
 
 const render = require('../render')
+const resolve = require('../resolve')
 
 function router (options) {
   const router = Router()
@@ -11,7 +12,11 @@ function router (options) {
 
   router.use(async (req, res, next) => {
     try {
-      res.send(await render())
+      res.send(
+        await render(
+          await resolve(req.url)
+        )
+      )
     } catch (err) {
       next(err)
     }

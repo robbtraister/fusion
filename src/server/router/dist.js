@@ -3,7 +3,7 @@
 const express = require('express')
 
 const compile = require('../compile')
-const resolve = require('../resolve')
+const getTree = require('../resolve/tree')
 
 const { distRoot } = require('../../../env')
 
@@ -13,7 +13,12 @@ function distRouter (options) {
   distRouter.get('*', express.static(distRoot, { fallthrough: true }))
   distRouter.get('/templates/:template.js', async (req, res, next) => {
     try {
-      res.send((await compile(await resolve(req.params.template))).js)
+      const template = req.params.template
+      const { js } = await compile({
+        template,
+        tree: await getTree(template)
+      })
+      res.send(js)
     } catch (err) {
       next(err)
     }

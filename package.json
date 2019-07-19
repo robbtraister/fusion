@@ -59,8 +59,8 @@
     "yaml-loader": "^0.5.0"
   },
   "files": [
-    "babel.config.js",
-    "webpack.config.js",
+    "/babel.config.js",
+    "/webpack.config.js",
     "/bin",
     "/env",
     "/src",

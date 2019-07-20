@@ -8,7 +8,7 @@ const webpack = require('webpack')
 
 const getConfig = require('./webpack.config')
 
-const { getDescendants } = require('@robbtraister/fusion-components/utils')
+const { getDescendants } = require('../../fusion/components/utils')
 
 const {
   exec,

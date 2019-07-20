@@ -25,7 +25,6 @@
     "fusion": "./bin/fusion.js"
   },
   "dependencies": {
-    "@robbtraister/fusion-components": "robbtraister/fusion-components#master",
     "body-parser": "^1.19.0",
     "compression": "^1.7.4",
     "concat-with-sourcemaps": "^1.1.0",

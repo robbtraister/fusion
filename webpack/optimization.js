@@ -8,7 +8,6 @@ module.exports = {
     new TerserWebpackPlugin({
       sourceMap: true
     }),
-    new OptimizeCSSAssetsWebpackPlugin({
-    })
+    new OptimizeCSSAssetsWebpackPlugin({})
   ]
 }

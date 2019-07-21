@@ -12,11 +12,7 @@ function router (options) {
 
   router.use(async (req, res, next) => {
     try {
-      res.send(
-        await render(
-          await resolve(req.url)
-        )
-      )
+      res.send(await render(await resolve(req.url)))
     } catch (err) {
       next(err)
     }

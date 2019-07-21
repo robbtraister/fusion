@@ -1,8 +1,8 @@
 'use strict'
 
-const {
-  bundleRoot
-} = require('../env')
+const path = require('path')
+
+const { bundleRoot } = require('../env')
 
 function getAbsoluteRequire (mod) {
   return require
@@ -24,7 +24,7 @@ const resolve = {
     'react-dom/server': getAbsoluteRequire('react-dom/server'),
     'react-router-dom': getAbsoluteRequire('react-router-dom'),
     'styled-components': getAbsoluteRequire('styled-components'),
-    '@robbtraister/fusion-components': getAbsoluteRequire('../src/fusion/components'),
+    '@robbtraister/fusion-components': path.resolve(__dirname, '../src/fusion/components'),
     '~': bundleRoot
   },
   extensions: [

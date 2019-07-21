@@ -10,26 +10,27 @@ const getTags = require('./tags')
 
 const unpack = require('../../utils/unpack')
 
-const {
-  defaultOutpuType,
-  distRoot
-} = require('../../../env')
+const { defaultOutpuType, distRoot } = require('../../../env')
 
 function render (context = {}) {
   const { outputType } = context
-  const OutputType = unpack(require(path.join(distRoot, 'components', 'output-types', outputType || defaultOutpuType)))
+  const OutputType = unpack(
+    require(path.join(
+      distRoot,
+      'components',
+      'output-types',
+      outputType || defaultOutpuType
+    ))
+  )
 
   const sheet = new ServerStyleSheet()
   try {
     const html = ReactDOM.renderToStaticMarkup(
       sheet.collectStyles(
-        React.createElement(
-          OutputType,
-          {
-            ...getTags(context),
-            context
-          }
-        )
+        React.createElement(OutputType, {
+          ...getTags(context),
+          context
+        })
       )
     )
 

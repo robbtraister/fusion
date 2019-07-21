@@ -23,8 +23,12 @@ function distRouter (options) {
       next(err)
     }
   })
-  distRouter.get('*', (req, res, next) => { res.sendStatus(404) })
-  distRouter.use((req, res, next) => { res.sendStatus(405) })
+  distRouter.get('*', (req, res, next) => {
+    res.sendStatus(404)
+  })
+  distRouter.use((req, res, next) => {
+    res.sendStatus(405)
+  })
 
   return distRouter
 }

@@ -7,9 +7,7 @@ const React = require('react')
 
 const App = require('../../components/app')
 
-const {
-  distRoot
-} = require('../../../../env')
+const { distRoot } = require('../../../../env')
 
 const components = require(path.join(distRoot, 'components', 'combinations'))
 
@@ -28,13 +26,10 @@ module.exports = context => {
       {
         id: props.id || 'fusion-app'
       },
-      React.createElement(
-        App,
-        {
-          ...context,
-          getComponent
-        }
-      )
+      React.createElement(App, {
+        ...context,
+        getComponent
+      })
     )
 
   AppWrapper.propTypes = {

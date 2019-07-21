@@ -38,11 +38,12 @@ module.exports = (root, name = 'template') => {
             test: /[\\/]bundle[\\/]components[\\/]/,
             enforce: true,
             name (mod) {
-              const match = /[\\/]bundle[\\/]components[\\/]([^\\/.]+)[\\/]([^\\/.]+)([\\/]([^\\/.]+))?/.exec(mod.resource || mod.context)
+              const match = /[\\/]bundle[\\/]components[\\/]([^\\/.]+)[\\/]([^\\/.]+)([\\/]([^\\/.]+))?/.exec(
+                mod.resource || mod.context
+              )
               const collection = match[1]
-              const type = (collection === 'features')
-                ? `${match[2]}${match[3]}`
-                : match[2]
+              const type =
+                collection === 'features' ? `${match[2]}${match[3]}` : match[2]
               return `components/${collection}/${type}`
             }
           }

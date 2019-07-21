@@ -2,6 +2,6 @@
 
 const { isProd } = require('../env')
 
-const mode = (isProd) ? 'production' : 'development'
+const mode = isProd ? 'production' : 'development'
 
 module.exports = mode

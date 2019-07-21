@@ -156,10 +156,7 @@ class Compiler {
         path.join(distRoot, `templates/${this.name}.css.json`),
         JSON.stringify({ styleHash })
       ),
-      writeFile(
-        path.join(distRoot, `styles/${styleHash}.css`),
-        template.css
-      )
+      writeFile(path.join(distRoot, `styles/${styleHash}.css`), template.css)
     ])
 
     return template
@@ -184,15 +181,9 @@ ${unpack}
 window.Fusion = window.Fusion || {}
 Fusion.components = Fusion.components || {}
 ${imports}
-
-Fusion.layout = ${JSON.stringify(
-  this.renderables && this.renderables[0] && this.renderables[0].collection === 'layouts'
-    ? this.renderables[0].type
-    : undefined
-)}
 Fusion.outputType = ${JSON.stringify(this.outputType)}
-Fusion.template = ${JSON.stringify(this.template)}
-Fusion.tree = ${JSON.stringify(this.tree)}
+Fusion.trees = Fusion.trees || {}
+Fusion.trees[${JSON.stringify(this.template)}] = ${JSON.stringify(this.tree)}
 `
 
     await mkdir(await this.rootDir)

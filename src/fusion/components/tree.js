@@ -53,17 +53,15 @@ const Tree = props => {
 
     const componentProps = Component === React.Fragment ? { key } : props
 
-    return (
+    return React.createElement(
+      ComponentContext.Provider,
+      providerProps,
       React.createElement(
-        ComponentContext.Provider,
-        providerProps,
-        React.createElement(
-          Component,
-          componentProps,
-          children instanceof Object
-            ? [].concat(children).map(createElement)
-            : children
-        )
+        Component,
+        componentProps,
+        children instanceof Object
+          ? [].concat(children).map(createElement)
+          : children
       )
     )
   }

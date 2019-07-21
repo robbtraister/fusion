@@ -42,9 +42,14 @@ class App extends React.Component {
       ...appContext
     } = this.props
 
+    const renderables = getDescendants({ children: tree })
     const value = {
       ...appContext,
-      renderables: getDescendants({ children: tree }),
+      layout:
+        renderables && renderables[0] && renderables[0].collection === 'layouts'
+          ? renderables[0].type
+          : undefined,
+      renderables,
       tree
     }
 
@@ -61,10 +66,7 @@ class App extends React.Component {
       React.createElement(
         this.RouterComponent,
         this.routerProps,
-        children || React.createElement(
-          Tree,
-          treeProps
-        )
+        children || React.createElement(Tree, treeProps)
       )
     )
   }
@@ -120,4 +122,4 @@ App.propTypes = ClientApp.propTypes = ServerApp.propTypes = {
   tree: PropTypes.oneOfType([PropTypes.array, PropTypes.object])
 }
 
-module.exports = (isClient ? ClientApp : ServerApp)
+module.exports = isClient ? ClientApp : ServerApp

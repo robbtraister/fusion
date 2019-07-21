@@ -3,13 +3,12 @@
 const React = require('react')
 
 module.exports = context => props => {
-  const __html =
-    'window.Fusion=window.Fusion||{};'
+  const __html = `document.addEventListener('DOMContentLoaded',function(){Fusion&&Fusion.render&&Fusion.render(${JSON.stringify(
+    { ...context, tree: undefined }
+  )})});`
 
-  return React.createElement(
-    'script',
-    {
-      dangerouslySetInnerHTML: { __html }
-    }
-  )
+  return React.createElement('script', {
+    // defer: true,
+    dangerouslySetInnerHTML: { __html }
+  })
 }

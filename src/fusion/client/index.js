@@ -17,6 +17,7 @@ window.ReactRouterDOM = ReactRouterDOM
 window.FusionComponents = FusionComponents
 
 const Fusion = (window.Fusion = window.Fusion || {})
+Fusion.trees = Fusion.trees || {}
 
 function getComponent ({ collection, type }) {
   try {
@@ -26,20 +27,18 @@ function getComponent ({ collection, type }) {
   }
 }
 
-function render () {
-  const targetElement = document.getElementById('fusion-app')
+function render (context = {}, id = 'fusion-app') {
+  const targetElement = document.getElementById(id)
   if (targetElement) {
     const serverHTML = targetElement.innerHTML
     try {
-      console.log(Fusion)
-      ReactDOM[Fusion.method || 'render'](
-        React.createElement(
-          App,
-          {
-            getComponent,
-            tree: Fusion.tree
-          }
-        ),
+      ReactDOM[context.method || 'render'](
+        React.createElement(App, {
+          ...context,
+          outputType: context.outputType || Fusion.outputType,
+          tree: context.tree || Fusion.trees[context.template],
+          getComponent
+        }),
         targetElement
       )
     } catch (_) {
@@ -48,6 +47,7 @@ function render () {
   }
 }
 
-window.addEventListener('DOMContentLoaded', render)
+// window.addEventListener('DOMContentLoaded', () => render({ tree: Fusion.tree }))
+Fusion.render = render
 
 export default render

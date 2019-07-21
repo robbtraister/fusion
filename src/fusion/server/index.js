@@ -2,6 +2,7 @@
 
 const path = require('path')
 
+const glob = require('glob')
 const React = require('react')
 const ReactDOM = require('react-dom/server')
 const { ServerStyleSheet } = require('styled-components')
@@ -10,19 +11,23 @@ const getTags = require('./tags')
 
 const unpack = require('../../utils/unpack')
 
-const { defaultOutpuType, distRoot } = require('../../../env')
+const { defaultOutputType, distRoot } = require('../../../env')
 
-function render (context = {}) {
-  const { outputType } = context
-  const OutputType = unpack(
-    require(path.join(
-      distRoot,
-      'components',
-      'output-types',
-      outputType || defaultOutpuType
-    ))
-  )
+const outputTypes = {}
+glob.sync(path.join(distRoot, 'components', 'output-types', '*.js'))
+  .forEach((filePath) => {
+    const outputType = path.parse(filePath).name
+    const OutputType = unpack(require(filePath))
+    outputTypes[outputType] = OutputType
+    if (OutputType && OutputType.transforms) {
+      Object.keys(OutputType.transforms)
+        .forEach((transform) => {
+          outputTypes[transform] = OutputType
+        })
+    }
+  })
 
+async function render ({ OutputType, context = {} }) {
   const sheet = new ServerStyleSheet()
   try {
     const html = ReactDOM.renderToStaticMarkup(
@@ -49,4 +54,14 @@ function render (context = {}) {
   }
 }
 
-module.exports = render
+module.exports = async (context) => {
+  const { outputType } = context
+  const OutputType = outputTypes[outputType] || defaultOutputType
+  const transform = OutputType.transforms && OutputType.transforms[outputType]
+
+  const html = await render({ context, OutputType })
+
+  return (transform)
+    ? transform(html, context)
+    : html
+}

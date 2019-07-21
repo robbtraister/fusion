@@ -2,19 +2,19 @@
 
 const path = require('path')
 
-const getTree = require('./tree')
 const compile = require('../compile')
 
-const { defaultOutputType, distRoot } = require('../../../env')
+const { bundleRoot, defaultOutputType, distRoot } = require('../../../env')
+
+const resolveUri = require(path.join(bundleRoot, 'resolve'))
 
 const getTemplateStyleHash = ({ outputType, template }) =>
   require(path.join(distRoot, 'templates', template, `${outputType}.css`))
     .styleHash
 
-async function resolve (uri) {
-  const outputType = defaultOutputType
-  const template = 'abc'
-  const tree = await getTree(template)
+async function resolve (uri, query = {}) {
+  const { template, tree } = resolveUri(uri)
+  const outputType = query.outputType || defaultOutputType
 
   let styleHash = null
   try {

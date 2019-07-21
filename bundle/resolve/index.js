@@ -6,10 +6,24 @@ const patterns = [
     template: 'sports'
   },
   {
+    pattern: /^\/?body\/?$/,
+    template: 'body'
+  },
+  {
+    pattern: /^\/?header\/?$/,
+    template: 'header'
+  },
+  {
     pattern: /.*/,
     template: 'abc'
   }
 ]
+
+function getTree (template) {
+  try {
+    return require(`./trees/${template}`)
+  } catch (_) {}
+}
 
 function resolve (uri) {
   let match
@@ -21,10 +35,7 @@ function resolve (uri) {
   })
 
   if (match) {
-    let tree
-    try {
-      tree = require(`./trees/${template}`)
-    } catch (_) {}
+    const tree = getTree(template)
 
     return {
       template,
@@ -34,3 +45,5 @@ function resolve (uri) {
 }
 
 module.exports = resolve
+module.exports.getTree = getTree
+module.exports.resolve = resolve

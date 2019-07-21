@@ -5,9 +5,10 @@ const path = require('path')
 const express = require('express')
 
 const compile = require('../compile')
-const getTree = require('../resolve/tree')
 
 const { bundleRoot, distRoot } = require('../../../env')
+
+const { getTree } = require(path.join(bundleRoot, 'resolve'))
 
 function distRouter (options) {
   const distRouter = express.Router()

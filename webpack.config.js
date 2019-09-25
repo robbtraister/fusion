@@ -19,6 +19,7 @@ const manifest = require('./src/manifest')()
 require('./src/manifest/generate')(manifest)
 const { components } = manifest
 
+const EnginePlugin = require('./webpack/plugins/engine-plugin')
 const OnBuildPlugin = require('./webpack/plugins/on-build-plugin')
 
 function collectionEntries (collectionName) {
@@ -221,7 +222,6 @@ module.exports = [
     },
     output: {
       filename: '[name].js',
-      chunkFilename: '[name].js',
       libraryTarget: 'commonjs2',
       path: distRoot
     },
@@ -229,7 +229,8 @@ module.exports = [
       new MiniCssExtractPlugin({
         filename: '[name].css',
         chunkFilename: '[name].css'
-      })
+      }),
+      new EnginePlugin()
     ],
     target: 'node'
   }

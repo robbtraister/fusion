@@ -12,7 +12,7 @@ const failHandler = isProd
 
 function logHandler (err, req, res, next) {
   console.error(err)
-  next()
+  next(err)
 }
 
 module.exports = options => [logHandler, failHandler]
